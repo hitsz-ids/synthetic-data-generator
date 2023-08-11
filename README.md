@@ -79,14 +79,20 @@ Synthetic Data Generator（SDG）是一个专注于结构化表格数据快速�
 
 ## 快速开始
 
+### 从Pypi安装
+
+```bash
+pip isntall sdgx
+```
+
 ### 单表数据快速合成示例
 
 ```python
 # 导入相关模块
-from utils.io.csv_utils import *
-from models.single_table.ctgan import GeneratorCTGAN
-from transform.transformer import DataTransformerCTGAN
-from transform.sampler import DataSamplerCTGAN
+from sdgx.utils.io.csv_utils import *
+from sdgx.models.single_table.ctgan import GeneratorCTGAN
+from sdgx.transform.transformer import DataTransformerCTGAN
+from sdgx.transform.sampler import DataSamplerCTGAN
 
 # 读取数据
 demo_data, discrete_cols  = get_demo_single_table()
@@ -95,7 +101,7 @@ demo_data, discrete_cols  = get_demo_single_table()
 真实数据示例如下：
 
 ```
-       age  workclass  fnlwgt  ... hours-per-week  native-country  label
+       age  workclass  fnlwgt  ... hours-per-week  native-country  class
 0       27    Private  177119  ...             44   United-States  <=50K
 1       27    Private  216481  ...             40   United-States  <=50K
 2       25    Private  256263  ...             40   United-States  <=50K
@@ -127,7 +133,7 @@ sampled_data = model.generate(1000)
 合成数据如下：
 
 ```
-   age         workclass  fnlwgt  ... hours-per-week  native-country  label
+   age         workclass  fnlwgt  ... hours-per-week  native-country  class
 0   33           Private  276389  ...             41   United-States   >50K
 1   33  Self-emp-not-inc  296948  ...             54   United-States  <=50K
 2   67       Without-pay  266913  ...             51        Columbia  <=50K
