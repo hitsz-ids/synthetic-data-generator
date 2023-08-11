@@ -1,24 +1,24 @@
 ---
 sidebar_position: 1
 ---
-
 # 快速入门
-
 
 ## 单表数据快速合成示例
 
 ```python
 # 导入相关模块
-from sdg.tabular.synthesizers import CTGAN
-from sdg.tabular.data import get_single_table
+from sdgx.tabular.synthesizers import CTGAN
+from sdgx.tabular.data import get_single_table
 import pandas as pd
 
 # 读取数据
 data = get_single_table()
 ```
+
 真实数据如下：
+
 ```
-       age  workclass  fnlwgt  ... hours-per-week  native-country  label
+       age  workclass  fnlwgt  ... hours-per-week  native-country  class
 0       27    Private  177119  ...             44   United-States  <=50K
 1       27    Private  216481  ...             40   United-States  <=50K
 2       25    Private  256263  ...             40   United-States  <=50K
@@ -34,6 +34,7 @@ data = get_single_table()
 [32561 rows x 15 columns]
 
 ```
+
 ```python
 #定义模型
 model = CTGAN()
@@ -46,8 +47,9 @@ sampled = model.generate(num_rows=10)
 ```
 
 合成数据如下：
+
 ```
-   age         workclass  fnlwgt  ... hours-per-week  native-country  label
+   age         workclass  fnlwgt  ... hours-per-week  native-country  class
 0   33           Private  276389  ...             41   United-States   >50K
 1   33  Self-emp-not-inc  296948  ...             54   United-States  <=50K
 2   67       Without-pay  266913  ...             51        Columbia  <=50K
@@ -60,18 +62,18 @@ sampled = model.generate(num_rows=10)
 9   28         State-gov  837932  ...             99   United-States  <=50K
 ```
 
-
 ## 多表数据快速合成示例
 
 ```python
 # 导入相关模块
-from sdg.tabular.synthesizers import CWAMT
-from sdg.tabular.data import get_multi_table
+from sdgx.tabular.synthesizers import CWAMT
+from sdgx.tabular.data import get_multi_table
 import pandas as pd
 
 # 读取数据
 data = get_multi_table()
 ```
+
 真实数据如下：
 
 ```
@@ -114,7 +116,9 @@ model.fit(data)
 # 生成合成数据
 sampled = model.generate(num_rows=10)
 ```
+
 合成数据如下：
+
 ```
 {'table1': {'table_name': 'train', 'table_value':     Store  DayOfWeek        Date  ...  Promo  StateHoliday  SchoolHoliday
 0    3          2  2013-01-01  ...      0             a              1
@@ -152,7 +156,6 @@ sampled = model.generate(num_rows=10)
 
 [10 rows x 10 columns]}}
 ```
-
 
 ## API
 
