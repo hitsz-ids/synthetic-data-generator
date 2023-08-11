@@ -1,9 +1,8 @@
-
-import logging
 import contextlib
-import torch 
-import numpy as np 
+import logging
 
+import numpy as np
+import torch
 
 
 # 添加增加的日志log
@@ -12,13 +11,16 @@ def get_log_file_handler(log_path):
     # https://docs.python.org/3/library/logging.handlers.html#timedrotatingfilehandler
     # 查路径请参考：
     # fileshandle.baseFilename
-    fileshandler = logging.handlers.TimedRotatingFileHandler(log_path, when='W6', interval=5, backupCount=15, encoding = 'utf-8')
+    fileshandler = logging.handlers.TimedRotatingFileHandler(
+        log_path, when="W6", interval=5, backupCount=15, encoding="utf-8"
+    )
     fileshandler.suffix = "%Y%m%d_%H%M%S.log"
     fileshandler.setLevel(logging.DEBUG)
-    fmt_str = '%(asctime)s %(levelname)s %(filename)s[%(lineno)d] %(message)s'
+    fmt_str = "%(asctime)s %(levelname)s %(filename)s[%(lineno)d] %(message)s"
     formatter = logging.Formatter(fmt_str)
     fileshandler.setFormatter(formatter)
     return fileshandler
+
 
 # 引入自 ctgan
 # 未来会根据业务需求优化修改

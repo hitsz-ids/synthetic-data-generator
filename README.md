@@ -1,24 +1,17 @@
 # 组件简介
+
 高质高效的单表和多表数据合成组件。
 
 ## 简介
 
 Synthetic Data Generator（SDG）是一个专注于结构化表格数据快速生成合成数据的组件。它支持先进的CTGAN、TVAE、CTAB-GAN、OCTGAN、CorTGAN等10种模型，并跟踪业界最新工作，将新发表的优质算法/模型纳入支持清单。SDG不仅支持单表和多表数据的快速生成，还从生产环境的角度出发，提供多元化的部署和多机多卡训练等特性，帮助组织和企业用户快速生成高质量的合成数据，以支持各种应用场景和需求。
 
-
-| 重要链接                                                     |                                                              |
-| ------------------------------------------------------------ | ------------------------------------------------------------ |
-| :book:  [文档](https://sgd.github.io/)               | 项目API文档                                                  |
-| :octocat:  [项目仓库](https://github.com/hitsz-ids/synthetic-data-generator)  | 项目Github仓库                                               |
-| :scroll: [License](https://github.com/hitsz-ids/synthetic-data-generator/blob/main/LICENSE) | Apache-2.0 license                                           |
-| 举个例子 🌰 | 在[AI靶场](https://datai.pcl.ac.cn/)上运行SDG示例（TBD） |
-
-[文档]: https://sgd.github.io/
-[项目仓库]: https://github.com/hitsz-ids/synthetic-data-generator
-[License]: https://github.com/hitsz-ids/synthetic-data-generator/blob/main/LICENSE
-[AI靶场]: https://datai.pcl.ac.cn/
-
-
+| 重要链接                                                                                                                                                                                                   |                                                       |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| 📖  [文档](https://sgd.github.io/)                                                                                                                                                                            | 项目API文档                                           |
+| :octocat:  [项目仓库](https://github.com/hitsz-ids/synthetic-data-generator) | 项目Github仓库                                        |
+| 📜 [License](https://github.com/hitsz-ids/synthetic-data-generator/blob/main/LICENSE)                                                                                                                         | Apache-2.0 license                                    |
+| 举个例子 🌰                                                                                                                                                                                                | 在[AI靶场](https://datai.pcl.ac.cn/)上运行SDG示例（TBD） |
 
 ## 目录
 
@@ -32,8 +25,6 @@ Synthetic Data Generator（SDG）是一个专注于结构化表格数据快速�
 - [如何贡献](#如何贡献)
 - [许可证](#许可证)
 
-
-
 ## 主要特性
 
 + 支持SOTA工作并进行性能优化
@@ -46,33 +37,32 @@ Synthetic Data Generator（SDG）是一个专注于结构化表格数据快速�
   + 提供中文敏感数据自动识别能力，包括姓名、身份证号、人名等17种常见敏感字段；
   + 实现对敏感字段的匿名化，保证合成数据的安全性。
 
-
 ## 算法列表
 
 ### 表1：单表合成算法效果对比(F1-score)
 
-| 模型                   |       Adult(二分类数据集)(%)       |     Satellite(多分类数据集)(%)     |
-|:----------------:|:----------------------------:|:----------------------------:|
-| 原始数据集 |             69.5             |            89.23             |
-| CTGAN                |            60.38             |            69.43             |
-| TVAE                 |            59.52             |            83.58             |
-| table-GAN            |            63.29             |            79.15             |
-| CTAB-GAN             |            58.59             |            79.24             |
-| OCT-GAN              |            55.18             |            80.98             |
-| CorTGAN              | **67.13** | **84.27** |
-
+|    模型    | Adult(二分类数据集)(%) | Satellite(多分类数据集)(%) |
+| :--------: | :--------------------: | :------------------------: |
+| 原始数据集 |          69.5          |           89.23           |
+|   CTGAN   |         60.38         |           69.43           |
+|    TVAE    |         59.52         |           83.58           |
+| table-GAN |         63.29         |           79.15           |
+|  CTAB-GAN  |         58.59         |           79.24           |
+|  OCT-GAN  |         55.18         |           80.98           |
+|  CorTGAN  |    **67.13**    |      **84.27**      |
 
 ### 表2：多表合成算法效果对比
 
-| 模型     | Rossmann(回归数据集)(rmspe)        | Telstra(分类数据集)(mlogloss) | 
-|:----------:|:----------------------:|:---------------------:|
-| 原始数据集 | 0.2217                                        | 0.5381              | 
-| SDV      | 0.6897                                    | 1.1719              |
-| CWAMT    | **0.4348**                                     | **0.818**               | 
+|    模型    | Rossmann(回归数据集)(rmspe) | Telstra(分类数据集)(mlogloss) |
+| :--------: | :-------------------------: | :---------------------------: |
+| 原始数据集 |           0.2217           |            0.5381            |
+|    SDV    |           0.6897           |            1.1719            |
+|   CWAMT   |      **0.4348**      |        **0.818**        |
 
 ### 相关论文和数据集链接
 
 #### 论文
+
 - CTGAN：[Modeling Tabular Data using Conditional GAN](https://proceedings.neurips.cc/paper/2019/hash/254ed7d2de3b23ab10936522dd547b78-Abstract.html)
 - TVAE：[Modeling Tabular Data using Conditional GAN](https://proceedings.neurips.cc/paper/2019/hash/254ed7d2de3b23ab10936522dd547b78-Abstract.html)
 - table-GAN：[Data Synthesis based on Generative Adversarial Networks](https://arxiv.org/pdf/1806.03384.pdf)
@@ -81,11 +71,11 @@ Synthetic Data Generator（SDG）是一个专注于结构化表格数据快速�
 - SDV：[The Synthetic data vault](https://sci-hub.se/10.1109/DSAA.2016.49 "多表合成")
 
 #### 数据集
+
 - [Adult数据集](http://archive.ics.uci.edu/ml/datasets/adult)
 - [Satellite数据集](http://archive.ics.uci.edu/dataset/146/statlog+landsat+satellite)
 - [Rossmann数据集](https://www.kaggle.com/competitions/rossmann-store-sales/data)
 - [Telstra数据集](https://www.kaggle.com/competitions/telstra-recruiting-network/data)
-
 
 ## 快速开始
 
@@ -101,7 +91,9 @@ from transform.sampler import DataSamplerCTGAN
 # 读取数据
 demo_data, discrete_cols  = get_demo_single_table()
 ```
+
 真实数据示例如下：
+
 ```
        age  workclass  fnlwgt  ... hours-per-week  native-country  label
 0       27    Private  177119  ...             44   United-States  <=50K
@@ -119,6 +111,7 @@ demo_data, discrete_cols  = get_demo_single_table()
 [32561 rows x 15 columns]
 
 ```
+
 ```python
 #定义模型
 model = GeneratorCTGAN(epochs=10,\
@@ -132,6 +125,7 @@ sampled_data = model.generate(1000)
 ```
 
 合成数据如下：
+
 ```
    age         workclass  fnlwgt  ... hours-per-week  native-country  label
 0   33           Private  276389  ...             41   United-States   >50K
@@ -146,11 +140,9 @@ sampled_data = model.generate(1000)
 9   28         State-gov  837932  ...             99   United-States  <=50K
 ```
 
-
 ## API
 
 具体接口参数请参考 [API文档](https://SDG.readthedocs.io/en/latest/api/index.html) 【TBD】。
-
 
 ## 维护者
 
@@ -160,8 +152,13 @@ SDG开源项目由**哈尔滨工业大学（深圳）数据安全研究院**发�
 
 非常欢迎你的加入！[提一个 Issue](https://github.com/hitsz-ids/synthetic-data-generator/issues/new) 或者提交一个 Pull Request。
 
+开发环境配置请参考[开发者文档](./DEVELOP.md)
 
 ## 许可证
 
 SDG开源项目使用 Apache-2.0 license，有关协议请参考[LICENSE](https://github.com/hitsz-ids/synthetic-data-generator/blob/main/LICENSE)。
 
+[文档]: https://sgd.github.io/
+[项目仓库]: https://github.com/hitsz-ids/synthetic-data-generator
+[License]: https://github.com/hitsz-ids/synthetic-data-generator/blob/main/LICENSE
+[AI靶场]: https://datai.pcl.ac.cn/
