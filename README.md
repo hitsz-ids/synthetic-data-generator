@@ -82,7 +82,7 @@ Synthetic Data Generator（SDG）是一个专注于结构化表格数据快速�
 ### 从Pypi安装
 
 ```bash
-pip isntall sdgx
+pip install sdgx
 ```
 
 ### 单表数据快速合成示例
