@@ -19,7 +19,6 @@ class mysql_db_connector:
         database_name,
         database_type="mysql",
     ) -> None:
-
         # 配置log路径
         if not os.path.exists(sdg_log_dir):
             os.makedirs(sdg_log_dir)
