@@ -32,12 +32,10 @@ def get_demo_single_table():
 
 # 获取csv形式的单表数据
 def get_single_table(input_path):
-
     pass
 
 
 # 自动检测函数，用于检测 discrete_cols
 # 不一定最准确，但可以一定程度上方便使用
 def auto_select_discrete_cols(pd_obj):
-
     pass

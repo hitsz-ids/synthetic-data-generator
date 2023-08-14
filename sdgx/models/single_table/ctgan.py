@@ -301,7 +301,6 @@ class CTGAN(BaseSynthesizer):
         transformer=None,
         sampler=None,
     ):
-
         assert batch_size % 2 == 0
 
         self._embedding_dim = embedding_dim
@@ -506,7 +505,6 @@ class CTGAN(BaseSynthesizer):
         steps_per_epoch = max(len(train_data) // self._batch_size, 1)
         for i in range(epochs):
             for id_ in range(steps_per_epoch):
-
                 for n in range(self._discriminator_steps):
                     fakez = torch.normal(mean=mean, std=std)
 

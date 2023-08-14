@@ -4,7 +4,6 @@ import torch
 
 class BaseGeneratorModel:
     def __init__(self, transformer=None, sampler=None) -> None:
-
         # 以下几个变量都需要在初始化 model 时进行更改
         self.model = None  # 存放模型
         self.status = "UNFINED"
@@ -32,7 +31,6 @@ class BaseGeneratorModel:
         raise NotImplementedError
 
     def dump_to_disk(self, output_path=""):
-
         raise NotImplementedError
 
     pass
