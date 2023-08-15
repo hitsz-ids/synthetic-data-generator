@@ -11,7 +11,7 @@ packages. Before generating a package, we first need to install `build`.
 pip install build twine hatch
 ```
 
-Bump the version using `hatch`. 
+Bump the version using `hatch`.
 
 ```bash
 hatch version <new-version>
