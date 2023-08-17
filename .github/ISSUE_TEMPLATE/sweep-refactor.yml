@@ -1,4 +1,4 @@
-name: Refactor
+name: Sweep Refactor
 title: 'Sweep: '
 description: Write something like "Modify the ... api endpoint to use ... version and ... framework"
 labels: sweep
