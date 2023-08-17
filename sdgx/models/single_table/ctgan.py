@@ -137,8 +137,7 @@ class Generator(Module):
         data = self.seq(input_)
         return data
 
-
-# 从 ctgan中引入，后续根据时
+    # 从 ctgan中引入，后续根据时
 
     """Base class for all default synthesizers of ``CTGAN``."""
 
