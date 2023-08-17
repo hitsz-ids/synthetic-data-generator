@@ -25,7 +25,7 @@ def get_demo_single_table():
         "race",
         "sex",
         "native-country",
-        "class",
+        "income",
     ]
     return pd_obj, discrete_cols
 
