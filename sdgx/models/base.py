@@ -31,7 +31,7 @@ class BaseSynthesizerModel:
         raise NotImplementedError
 
     random_states = None
-    
+
     def __getstate__(self):
         device_backup = self._device
         self.set_device(torch.device("cpu"))
@@ -46,7 +46,7 @@ class BaseSynthesizerModel:
             state["_torch_random_state"] = self.random_states[1].get_state()
             state.pop("random_states")
         return state
-    
+
     def __setstate__(self, state):
         if "_numpy_random_state" in state and "_torch_random_state" in state:
             np_state = state.pop("_numpy_random_state")
@@ -59,20 +59,20 @@ class BaseSynthesizerModel:
         self.__dict__ = state
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.set_device(device)
-    
+
     def save(self, path):
         device_backup = self._device
         self.set_device(torch.device("cpu"))
         torch.save(self, path)
         self.set_device(device_backup)
-    
+
     @classmethod
     def load(cls, path):
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         model = torch.load(path)
         model.set_device(device)
         return model
-    
+
     def set_random_state(self, random_state):
         if random_state is None:
             self.random_states = random_state
