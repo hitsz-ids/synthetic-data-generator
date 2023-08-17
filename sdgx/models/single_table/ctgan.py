@@ -16,7 +16,7 @@ from torch.nn import (
 )
 
 # base 类
-from sdgx.models.base import BaseGeneratorModel
+from sdgx.models.base import BaseSynthesizerModel
 
 # transformer 以及 sampler 已经拆分，单独挪到了 transform/ 目录中
 from sdgx.transform.sampler import DataSamplerCTGAN
@@ -139,7 +139,7 @@ class Generator(Module):
 
 
 # 从 ctgan中引入，后续根据时
-class BaseSynthesizer:
+
     """Base class for all default synthesizers of ``CTGAN``."""
 
     random_states = None
@@ -235,7 +235,7 @@ class BaseSynthesizer:
 
 
 # CTGAN model
-class CTGAN(BaseSynthesizer):
+class CTGAN(BaseSynthesizerModel):
     """Conditional Table GAN Synthesizer.
 
     This is the core class of the CTGAN project, where the different components
