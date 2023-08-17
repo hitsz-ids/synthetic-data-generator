@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+
 class BaseMetric(ABC):
     def __init__(self, real_data, synthetic_data):
         self.real_data = real_data
