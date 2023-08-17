@@ -16,7 +16,7 @@ from torch.nn import (
 )
 
 # base 类
-from sdgx.models.base import BaseGeneratorModel
+from sdgx.models.base import BaseSynthesizerModel
 
 # transformer 以及 sampler 已经拆分，单独挪到了 transform/ 目录中
 from sdgx.transform.sampler import DataSamplerCTGAN
@@ -26,7 +26,7 @@ from sdgx.transform.transformer import DataTransformerCTGAN
 from sdgx.utils.utils import random_state
 
 
-class GeneratorCTGAN(BaseGeneratorModel):
+class GeneratorCTGAN(BaseSynthesizerModel):
     def __init__(self, epochs, transformer=None, sampler=None) -> None:
         # super().__init__()
 
@@ -235,7 +235,7 @@ class BaseSynthesizer:
 
 
 # CTGAN model
-class CTGAN(BaseSynthesizer):
+class CTGAN(BaseSynthesizerModel):
     """Conditional Table GAN Synthesizer.
 
     This is the core class of the CTGAN project, where the different components
@@ -639,13 +639,4 @@ class CTGAN(BaseSynthesizer):
             fakeact = self._apply_activate(fake)
             data.append(fakeact.detach().cpu().numpy())
 
-        data = np.concatenate(data, axis=0)
-        data = data[:n]
-
-        return self._transformer.inverse_transform(data)
-
-    def set_device(self, device):
-        """Set the `device` to be used ('GPU' or 'CPU)."""
-        self._device = device
-        if self._generator is not None:
-            self._generator.to(self._device)
+        # BaseSynthesizer class removed
