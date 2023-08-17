@@ -3,7 +3,6 @@ import torch
 
 
 class BaseSynthesizerModel:
-
     random_states = None
 
     def __init__(self, transformer=None, sampler=None) -> None:
@@ -13,7 +12,7 @@ class BaseSynthesizerModel:
         self.model_type = "MODEL_TYPE_UNDEFINED"
         # self.epochs = epochs
         self._device = "CPU"
-    
+
     def set_device(self, device):
         """Set the `device` to be used ('GPU' or 'CPU')."""
         self._device = device

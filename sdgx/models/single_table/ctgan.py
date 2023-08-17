@@ -15,13 +15,16 @@ from torch.nn import (
     functional,
 )
 
-# base 类已拆分，挪到 base.py 
+# base 类已拆分，挪到 base.py
 from sdgx.models.base import BaseSynthesizerModel
+
 # transformer 以及 sampler 已经拆分，挪到 transform/ 目录中
 from sdgx.transform.sampler import DataSamplerCTGAN
 from sdgx.transform.transformer import DataTransformerCTGAN
+
 # 其他函数
 from sdgx.utils.utils import random_state
+
 
 class Discriminator(Module):
     """Discriminator for the CTGAN."""
@@ -103,6 +106,7 @@ class Generator(Module):
         """Apply the Generator to the `input_`."""
         data = self.seq(input_)
         return data
+
 
 # 后续需要根据实际情况做性能优化
 class CTGAN(BaseSynthesizerModel):
