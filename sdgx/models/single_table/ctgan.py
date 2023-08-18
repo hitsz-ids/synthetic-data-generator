@@ -43,7 +43,9 @@ class GeneratorCTGAN(BaseGeneratorModel):
         self.model_type = "CTGAN"
         self.status = "ready"
 
-    def fit(self, input_df, discrete_cols=[]):
+    def fit(self, input_df, discrete_cols=None):
+        if not discrete_cols:
+            discrete_cols = []
         # 模型训练
         self.model.fit(input_df, discrete_cols)
         return
