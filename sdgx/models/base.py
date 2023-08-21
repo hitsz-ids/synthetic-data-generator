@@ -12,7 +12,7 @@ class BaseSynthesizerModel:
         self.model_type = "MODEL_TYPE_UNDEFINED"
         # self.epochs = epochs
         self._device = "CPU"
-    
+
     def fit(self, input_df, discrete_cols=None):
         raise NotImplementedError
 
