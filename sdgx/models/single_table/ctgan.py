@@ -317,7 +317,8 @@ class CTGAN(BaseSynthesizerModel):
                 contain the integer indices of the columns. Otherwise, if it is
                 a ``pandas.DataFrame``, this list should contain the column names.
         """
-
+        if not discrete_cols:
+            discrete_cols = []
         # 离散列检查
         self._validate_discrete_columns(train_data, discrete_columns)
 
