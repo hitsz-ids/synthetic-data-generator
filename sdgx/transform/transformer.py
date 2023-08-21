@@ -7,6 +7,7 @@
 """
 
 from collections import namedtuple
+from typing import List, Optional
 
 import numpy as np
 import pandas as pd
@@ -101,7 +102,7 @@ class DataTransformerCTGAN(object):
             output_dimensions=num_categories,
         )
 
-    def fit(self, raw_data, discrete_columns=()):
+    def fit(self, raw_data, discrete_columns: Optional[List] = None):
         """Fit the ``DataTransformer``.
 
         Fits a ``ClusterBasedNormalizer`` for continuous columns and a
@@ -112,6 +113,8 @@ class DataTransformerCTGAN(object):
         self.output_info_list = []
         self.output_dimensions = 0
         self.dataframe = True
+        if not discrete_columns:
+            discrete_columns = []
 
         if not isinstance(raw_data, pd.DataFrame):
             self.dataframe = False
