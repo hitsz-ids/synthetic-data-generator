@@ -1,7 +1,8 @@
----
-sidebar_position: 1
----
 # 快速入门
+
+## 快速安装
+
+`pip install sdgx`
 
 ## 单表数据快速合成示例
 

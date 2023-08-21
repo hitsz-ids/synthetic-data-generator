@@ -15,67 +15,15 @@ Synthetic Data Generator（SDG）是一个专注于结构化表格数据快速�
 
 ## 目录
 
+
+- [快速开始](#快速开始)
 - [主要特性](#主要特性)
 - [算法列表](#算法列表)
 - [相关论文和数据集链接](#相关论文和数据集链接)
-- [安装](#安装)
-- [快速开始](#快速开始)
 - [API](#API)
 - [维护者](#维护者)
 - [如何贡献](#如何贡献)
 - [许可证](#许可证)
-
-## 主要特性
-
-+ 支持SOTA工作并进行性能优化
-  + 已支持单表和多表数据合成的10种先进算法，SDG会持续跟踪学术界和工业界的最新进展，及时引入支持优秀算法和模型；
-  + 针对实际生产需求进行优化，提升模型性能，降低内存开销，支持单机多卡、多机多卡等实用特性。
-+ 支持生产环境高效使用
-  + 提供自动化部署、容器化技术、自动化监控和报警等生产环境所需技术；
-  + 针对负载均衡和容错性进行专门优化，提升组件可用性。
-+ 支持中文敏感数据自动检测与匿名化
-  + 提供中文敏感数据自动识别能力，包括姓名、身份证号、人名等17种常见敏感字段；
-  + 实现对敏感字段的匿名化，保证合成数据的安全性。
-
-## 算法列表
-
-### 表1：单表合成算法效果对比(F1-score)
-
-|    模型    | Adult(二分类数据集)(%) | Satellite(多分类数据集)(%) |
-| :--------: | :--------------------: | :------------------------: |
-| 原始数据集 |          69.5          |           89.23           |
-|   CTGAN   |         60.38         |           69.43           |
-|    TVAE    |         59.52         |           83.58           |
-| table-GAN |         63.29         |           79.15           |
-|  CTAB-GAN  |         58.59         |           79.24           |
-|  OCT-GAN  |         55.18         |           80.98           |
-|  CorTGAN  |    **67.13**    |      **84.27**      |
-
-### 表2：多表合成算法效果对比
-
-|    模型    | Rossmann(回归数据集)(rmspe) | Telstra(分类数据集)(mlogloss) |
-| :--------: | :-------------------------: | :---------------------------: |
-| 原始数据集 |           0.2217           |            0.5381            |
-|    SDV    |           0.6897           |            1.1719            |
-|   CWAMT   |      **0.4348**      |        **0.818**        |
-
-### 相关论文和数据集链接
-
-#### 论文
-
-- CTGAN：[Modeling Tabular Data using Conditional GAN](https://proceedings.neurips.cc/paper/2019/hash/254ed7d2de3b23ab10936522dd547b78-Abstract.html)
-- TVAE：[Modeling Tabular Data using Conditional GAN](https://proceedings.neurips.cc/paper/2019/hash/254ed7d2de3b23ab10936522dd547b78-Abstract.html)
-- table-GAN：[Data Synthesis based on Generative Adversarial Networks](https://arxiv.org/pdf/1806.03384.pdf)
-- CTAB-GAN:[CTAB-GAN: Effective Table Data Synthesizing](https://proceedings.mlr.press/v157/zhao21a/zhao21a.pdf)
-- OCT-GAN: [OCT-GAN: Neural ODE-based Conditional Tabular GANs](https://arxiv.org/pdf/2105.14969.pdf)
-- SDV：[The Synthetic data vault](https://sci-hub.se/10.1109/DSAA.2016.49 "多表合成")
-
-#### 数据集
-
-- [Adult数据集](http://archive.ics.uci.edu/ml/datasets/adult)
-- [Satellite数据集](http://archive.ics.uci.edu/dataset/146/statlog+landsat+satellite)
-- [Rossmann数据集](https://www.kaggle.com/competitions/rossmann-store-sales/data)
-- [Telstra数据集](https://www.kaggle.com/competitions/telstra-recruiting-network/data)
 
 ## 快速开始
 
@@ -145,6 +93,59 @@ sampled_data = model.generate(1000)
 8   79           Private  332237  ...             41   United-States   >50K
 9   28         State-gov  837932  ...             99   United-States  <=50K
 ```
+
+## 主要特性
+
++ 支持SOTA工作并进行性能优化
+  + 已支持单表和多表数据合成的10种先进算法，SDG会持续跟踪学术界和工业界的最新进展，及时引入支持优秀算法和模型；
+  + 针对实际生产需求进行优化，提升模型性能，降低内存开销，支持单机多卡、多机多卡等实用特性。
++ 支持生产环境高效使用
+  + 提供自动化部署、容器化技术、自动化监控和报警等生产环境所需技术；
+  + 针对负载均衡和容错性进行专门优化，提升组件可用性。
++ 支持中文敏感数据自动检测与匿名化
+  + 提供中文敏感数据自动识别能力，包括姓名、身份证号、人名等17种常见敏感字段；
+  + 实现对敏感字段的匿名化，保证合成数据的安全性。
+
+## 算法列表
+
+### 表1：单表合成算法效果对比(F1-score)
+
+|    模型    | Adult(二分类数据集)(%) | Satellite(多分类数据集)(%) |
+| :--------: | :--------------------: | :------------------------: |
+| 原始数据集 |          69.5          |           89.23           |
+|   CTGAN   |         60.38         |           69.43           |
+|    TVAE    |         59.52         |           83.58           |
+| table-GAN |         63.29         |           79.15           |
+|  CTAB-GAN  |         58.59         |           79.24           |
+|  OCT-GAN  |         55.18         |           80.98           |
+|  CorTGAN  |    **67.13**    |      **84.27**      |
+
+### 表2：多表合成算法效果对比
+
+|    模型    | Rossmann(回归数据集)(rmspe) | Telstra(分类数据集)(mlogloss) |
+| :--------: | :-------------------------: | :---------------------------: |
+| 原始数据集 |           0.2217           |            0.5381            |
+|    SDV    |           0.6897           |            1.1719            |
+|   CWAMT   |      **0.4348**      |        **0.818**        |
+
+### 相关论文和数据集链接
+
+#### 论文
+
+- CTGAN：[Modeling Tabular Data using Conditional GAN](https://proceedings.neurips.cc/paper/2019/hash/254ed7d2de3b23ab10936522dd547b78-Abstract.html)
+- TVAE：[Modeling Tabular Data using Conditional GAN](https://proceedings.neurips.cc/paper/2019/hash/254ed7d2de3b23ab10936522dd547b78-Abstract.html)
+- table-GAN：[Data Synthesis based on Generative Adversarial Networks](https://arxiv.org/pdf/1806.03384.pdf)
+- CTAB-GAN:[CTAB-GAN: Effective Table Data Synthesizing](https://proceedings.mlr.press/v157/zhao21a/zhao21a.pdf)
+- OCT-GAN: [OCT-GAN: Neural ODE-based Conditional Tabular GANs](https://arxiv.org/pdf/2105.14969.pdf)
+- SDV：[The Synthetic data vault](https://sci-hub.se/10.1109/DSAA.2016.49 "多表合成")
+
+#### 数据集
+
+- [Adult数据集](http://archive.ics.uci.edu/ml/datasets/adult)
+- [Satellite数据集](http://archive.ics.uci.edu/dataset/146/statlog+landsat+satellite)
+- [Rossmann数据集](https://www.kaggle.com/competitions/rossmann-store-sales/data)
+- [Telstra数据集](https://www.kaggle.com/competitions/telstra-recruiting-network/data)
+
 
 ## API
 
