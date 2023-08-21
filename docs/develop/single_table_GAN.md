@@ -36,9 +36,9 @@
 其具体步骤如下：
 
 1.  在 [single_tablem目录](../../sdgx/models/single_table/) 中创建名为 xxx.py 的 Python 脚本文件，其中 xxx 是您打算开发的模块。
-    
+
 2.  继承 `BaseSynthesizerModel`基类 。
-      
+
       - 首先从 `sdgx/models/base.py` 中导入基类，并且导入其他必要的 Python 包，例如：
         ```python
             import warnings
@@ -59,10 +59,10 @@
             from sdgx.models.base import BaseSynthesizerModel
             from sdgx.transform.sampler import DataSamplerCTGAN
             from sdgx.transform.transformer import DataTransformerCTGAN
-        ``` 
-      
+        ```
+
       - 完成您的模块中的 `__init__` 函数，并定义相应的类变量，以CTGAN为例：
-   
+
           ```python
             class CTGAN(BaseSynthesizerModel):
                 def __init__(
@@ -72,7 +72,7 @@
                     discriminator_dim=(256, 256),
                     generator_lr=2e-4,
                     generator_decay=1e-6
-                    # ... 
+                    # ...
                     # 本文档仅为示意，篇幅原因，更多参数已省略
                 ):
                     assert batch_size % 2 == 0
@@ -86,12 +86,12 @@
                     self._discriminator_lr = discriminator_lr
                     self._discriminator_decay = discriminator_decay
 
-                    # ... 
+                    # ...
                     # 本文档仅为示意，篇幅原因，更多参数已省略
-          ``` 
-        
-      - 为了顺利使用sdg，您必须完成 `fit` 与 `sample` 这两个方法，它们有关仿真数据模型训练与数据的生成。    
-        
+          ```
+
+      - 为了顺利使用sdg，您必须完成 `fit` 与 `sample` 这两个方法，它们有关仿真数据模型训练与数据的生成。
+
 
 ## 第三步：定义模型所需的`Discriminator`类（可选）
 
