@@ -1,3 +1,5 @@
+from typing import List, Optional
+
 import numpy as np
 import torch
 
@@ -12,6 +14,9 @@ class BaseSynthesizerModel:
         self.model_type = "MODEL_TYPE_UNDEFINED"
         # self.epochs = epochs
         self._device = "CPU"
+
+    def fit(self, input_df, discrete_cols: Optional[List] = None):
+        raise NotImplementedError
 
     def set_device(self, device):
         """Set the `device` to be used ('GPU' or 'CPU')."""

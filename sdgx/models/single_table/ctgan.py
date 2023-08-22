@@ -1,4 +1,5 @@
 import warnings
+from typing import List, Optional
 
 import numpy as np
 import pandas as pd
@@ -269,7 +270,9 @@ class CTGAN(BaseSynthesizerModel):
                     ed = st + span_info.dim
                     ed_c = st_c + span_info.dim
                     tmp = functional.cross_entropy(
-                        data[:, st:ed], torch.argmax(c[:, st_c:ed_c], dim=1), reduction="none"
+                        data[:, st:ed],
+                        torch.argmax(c[:, st_c:ed_c], dim=1),
+                        reduction="none",
                     )
                     loss.append(tmp)
                     st = ed
@@ -305,7 +308,7 @@ class CTGAN(BaseSynthesizerModel):
             raise ValueError(f"Invalid columns found: {invalid_columns}")
 
     @random_state
-    def fit(self, train_data, discrete_columns=(), epochs=None):
+    def fit(self, train_data, discrete_columns: Optional[List] = None, epochs=None):
         """Fit the CTGAN Synthesizer models to the training data.
 
         Args:
@@ -317,7 +320,8 @@ class CTGAN(BaseSynthesizerModel):
                 contain the integer indices of the columns. Otherwise, if it is
                 a ``pandas.DataFrame``, this list should contain the column names.
         """
-
+        if not discrete_cols:
+            discrete_cols = []
         # 离散列检查
         self._validate_discrete_columns(train_data, discrete_columns)
 
@@ -350,11 +354,15 @@ class CTGAN(BaseSynthesizerModel):
 
         # sampler 作为参数给到 Generator 以及 Discriminator
         self._generator = Generator(
-            self._embedding_dim + self._data_sampler.dim_cond_vec(), self._generator_dim, data_dim
+            self._embedding_dim + self._data_sampler.dim_cond_vec(),
+            self._generator_dim,
+            data_dim,
         ).to(self._device)
 
         discriminator = Discriminator(
-            data_dim + self._data_sampler.dim_cond_vec(), self._discriminator_dim, pac=self.pac
+            data_dim + self._data_sampler.dim_cond_vec(),
+            self._discriminator_dim,
+            pac=self.pac,
         ).to(self._device)
 
         # 初始化 optimizer G 以及 D
