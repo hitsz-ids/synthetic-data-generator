@@ -1,4 +1,5 @@
 import warnings
+from typing import List, Optional
 
 import numpy as np
 import pandas as pd
@@ -15,45 +16,15 @@ from torch.nn import (
     functional,
 )
 
-# base 类
-from sdgx.models.base import BaseGeneratorModel
+# base 类已拆分，挪到 base.py
+from sdgx.models.base import BaseSynthesizerModel
 
-# transformer 以及 sampler 已经拆分，单独挪到了 transform/ 目录中
+# transformer 以及 sampler 已经拆分，挪到 transform/ 目录中
 from sdgx.transform.sampler import DataSamplerCTGAN
 from sdgx.transform.transformer import DataTransformerCTGAN
 
-# 一些辅助的函数
+# 其他函数
 from sdgx.utils.utils import random_state
-
-
-class GeneratorCTGAN(BaseGeneratorModel):
-    def __init__(self, epochs, transformer=None, sampler=None) -> None:
-        # super().__init__()
-
-        # ctgan 参数，需要预先定义
-        self.epochs = epochs
-
-        # 模型相关的其他参数
-        self.model = CTGAN(
-            epochs=self.epochs,  # 以下为拆分的 transformer 与 sampler
-            # 本组件可以自定义这两个内容
-            transformer=transformer,
-            sampler=sampler,
-        )
-        self.model_type = "CTGAN"
-        self.status = "ready"
-
-    def fit(self, input_df, discrete_cols=[]):
-        # 模型训练
-        self.model.fit(input_df, discrete_cols)
-        return
-
-    def generate(self, n_rows=100):
-        # 使用模型 generate 数据
-        generated_data = self.model.sample(n_rows)
-        return generated_data
-
-    pass
 
 
 class Discriminator(Module):
@@ -138,104 +109,8 @@ class Generator(Module):
         return data
 
 
-# 从 ctgan中引入，后续根据时
-class BaseSynthesizer:
-    """Base class for all default synthesizers of ``CTGAN``."""
-
-    random_states = None
-
-    def __getstate__(self):
-        """Improve pickling state for ``BaseSynthesizer``.
-
-        Convert to ``cpu`` device before starting the pickling process in order to be able to
-        load the model even when used from an external tool such as ``SDV``. Also, if
-        ``random_states`` are set, store their states as dictionaries rather than generators.
-
-        Returns:
-            dict:
-                Python dict representing the object.
-        """
-        device_backup = self._device
-        self.set_device(torch.device("cpu"))
-        state = self.__dict__.copy()
-        self.set_device(device_backup)
-        if (
-            isinstance(self.random_states, tuple)
-            and isinstance(self.random_states[0], np.random.RandomState)
-            and isinstance(self.random_states[1], torch.Generator)
-        ):
-            state["_numpy_random_state"] = self.random_states[0].get_state()
-            state["_torch_random_state"] = self.random_states[1].get_state()
-            state.pop("random_states")
-
-        return state
-
-    def __setstate__(self, state):
-        """Restore the state of a ``BaseSynthesizer``.
-
-        Restore the ``random_states`` from the state dict if those are present and then
-        set the device according to the current hardware.
-        """
-        if "_numpy_random_state" in state and "_torch_random_state" in state:
-            np_state = state.pop("_numpy_random_state")
-            torch_state = state.pop("_torch_random_state")
-
-            current_torch_state = torch.Generator()
-            current_torch_state.set_state(torch_state)
-
-            current_numpy_state = np.random.RandomState()
-            current_numpy_state.set_state(np_state)
-            state["random_states"] = (current_numpy_state, current_torch_state)
-
-        self.__dict__ = state
-        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        self.set_device(device)
-
-    def save(self, path):
-        """Save the model in the passed `path`."""
-        device_backup = self._device
-        self.set_device(torch.device("cpu"))
-        torch.save(self, path)
-        self.set_device(device_backup)
-
-    @classmethod
-    def load(cls, path):
-        """Load the model stored in the passed `path`."""
-        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        model = torch.load(path)
-        model.set_device(device)
-        return model
-
-    def set_random_state(self, random_state):
-        """Set the random state.
-
-        Args:
-            random_state (int, tuple, or None):
-                Either a tuple containing the (numpy.random.RandomState, torch.Generator)
-                or an int representing the random seed to use for both random states.
-        """
-        if random_state is None:
-            self.random_states = random_state
-        elif isinstance(random_state, int):
-            self.random_states = (
-                np.random.RandomState(seed=random_state),
-                torch.Generator().manual_seed(random_state),
-            )
-        elif (
-            isinstance(random_state, tuple)
-            and isinstance(random_state[0], np.random.RandomState)
-            and isinstance(random_state[1], torch.Generator)
-        ):
-            self.random_states = random_state
-        else:
-            raise TypeError(
-                f"`random_state` {random_state} expected to be an int or a tuple of "
-                "(`np.random.RandomState`, `torch.Generator`)"
-            )
-
-
-# CTGAN model
-class CTGAN(BaseSynthesizer):
+# 后续需要根据实际情况做性能优化
+class CTGAN(BaseSynthesizerModel):
     """Conditional Table GAN Synthesizer.
 
     This is the core class of the CTGAN project, where the different components
@@ -395,7 +270,9 @@ class CTGAN(BaseSynthesizer):
                     ed = st + span_info.dim
                     ed_c = st_c + span_info.dim
                     tmp = functional.cross_entropy(
-                        data[:, st:ed], torch.argmax(c[:, st_c:ed_c], dim=1), reduction="none"
+                        data[:, st:ed],
+                        torch.argmax(c[:, st_c:ed_c], dim=1),
+                        reduction="none",
                     )
                     loss.append(tmp)
                     st = ed
@@ -431,7 +308,7 @@ class CTGAN(BaseSynthesizer):
             raise ValueError(f"Invalid columns found: {invalid_columns}")
 
     @random_state
-    def fit(self, train_data, discrete_columns=(), epochs=None):
+    def fit(self, train_data, discrete_columns: Optional[List] = None, epochs=None):
         """Fit the CTGAN Synthesizer models to the training data.
 
         Args:
@@ -443,7 +320,8 @@ class CTGAN(BaseSynthesizer):
                 contain the integer indices of the columns. Otherwise, if it is
                 a ``pandas.DataFrame``, this list should contain the column names.
         """
-
+        if not discrete_columns:
+            discrete_columns = []
         # 离散列检查
         self._validate_discrete_columns(train_data, discrete_columns)
 
@@ -476,11 +354,15 @@ class CTGAN(BaseSynthesizer):
 
         # sampler 作为参数给到 Generator 以及 Discriminator
         self._generator = Generator(
-            self._embedding_dim + self._data_sampler.dim_cond_vec(), self._generator_dim, data_dim
+            self._embedding_dim + self._data_sampler.dim_cond_vec(),
+            self._generator_dim,
+            data_dim,
         ).to(self._device)
 
         discriminator = Discriminator(
-            data_dim + self._data_sampler.dim_cond_vec(), self._discriminator_dim, pac=self.pac
+            data_dim + self._data_sampler.dim_cond_vec(),
+            self._discriminator_dim,
+            pac=self.pac,
         ).to(self._device)
 
         # 初始化 optimizer G 以及 D
@@ -643,9 +525,3 @@ class CTGAN(BaseSynthesizer):
         data = data[:n]
 
         return self._transformer.inverse_transform(data)
-
-    def set_device(self, device):
-        """Set the `device` to be used ('GPU' or 'CPU)."""
-        self._device = device
-        if self._generator is not None:
-            self._generator.to(self._device)

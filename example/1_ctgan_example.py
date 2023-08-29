@@ -2,7 +2,7 @@
 # ipython -i  example/1_ctgan_example.py
 # 并查看 sampled_data 变量
 
-from sdgx.models.single_table.ctgan import GeneratorCTGAN
+from sdgx.models.single_table.ctgan import CTGAN
 from sdgx.transform.sampler import DataSamplerCTGAN
 from sdgx.transform.transformer import DataTransformerCTGAN
 from sdgx.utils.io.csv_utils import *
@@ -12,8 +12,8 @@ from sdgx.utils.io.csv_utils import *
 demo_data, discrete_cols = get_demo_single_table()
 
 
-model = GeneratorCTGAN(epochs=10, transformer=DataTransformerCTGAN, sampler=DataSamplerCTGAN)
+model = CTGAN(epochs=10, transformer=DataTransformerCTGAN, sampler=DataSamplerCTGAN)
 model.fit(demo_data, discrete_cols)
 
 # sampled
-sampled_data = model.generate(1000)
+sampled_data = model.sample(1000)
