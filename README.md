@@ -35,10 +35,10 @@ pip install sdgx
 
 ```python
 # 导入相关模块
-from sdgx.utils.io.csv_utils import *
-from sdgx.models.single_table.ctgan import GeneratorCTGAN
-from sdgx.transform.transformer import DataTransformerCTGAN
+from sdgx.models.single_table.ctgan import CTGAN
 from sdgx.transform.sampler import DataSamplerCTGAN
+from sdgx.transform.transformer import DataTransformerCTGAN
+from sdgx.utils.io.csv_utils import *
 
 # 读取数据
 demo_data, discrete_cols  = get_demo_single_table()
