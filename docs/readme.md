@@ -8,12 +8,14 @@
 
 ```python
 # 导入相关模块
-from sdgx.tabular.synthesizers import CTGAN
-from sdgx.tabular.data import get_single_table
-import pandas as pd
+from sdgx.models.single_table.ctgan import CTGAN
+from sdgx.transform.sampler import DataSamplerCTGAN
+from sdgx.transform.transformer import DataTransformerCTGAN
+from sdgx.utils.io.csv_utils import *
 
 # 读取数据
-data = get_single_table()
+demo_data, discrete_cols = get_demo_single_table()
+
 ```
 
 真实数据如下：
@@ -38,13 +40,15 @@ data = get_single_table()
 
 ```python
 #定义模型
-model = CTGAN()
+model = GeneratorCTGAN(epochs=10,\
+                       transformer= DataTransformerCTGAN,\
+                       sampler=DataSamplerCTGAN)
 
 #训练模型
-model.fit(data)
+model.fit(demo_data, discrete_cols)
 
 # 生成合成数据
-sampled = model.generate(num_rows=10)
+sampled_data = model.sample(1000)
 ```
 
 合成数据如下：
@@ -67,9 +71,8 @@ sampled = model.generate(num_rows=10)
 
 ```python
 # 导入相关模块
-from sdgx.tabular.synthesizers import CWAMT
-from sdgx.tabular.data import get_multi_table
-import pandas as pd
+from sdgx.models.single_table.cwamt import CWAMT
+from sdgx.utils.io.csv_utils import *
 
 # 读取数据
 data = get_multi_table()
