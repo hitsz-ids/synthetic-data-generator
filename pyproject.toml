@@ -23,6 +23,7 @@ dependencies = [
     "dython",
     "seaborn",
     "table-evaluator",
+    "copulas",
 ]
 dynamic = ["version"]
 classifiers = [
