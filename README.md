@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="docs/sdg_logo.png" width="300" >
+  <img src="docs/sdg_logo.png" width="400" >
 </div>
 
 # 🚀 Introduction
