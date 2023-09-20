@@ -2,7 +2,7 @@
   <img src="docs/sdg_logo.png" width="300" >
 </div>
 
-# 合成数据生成器 -- 快速生成高质量合成数据！
+# 🚀 Introduction
 
 [![License](https://img.shields.io/badge/License-Apache%202-2162A3.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)  [![CN doc](https://img.shields.io/badge/文档-中文版-2162A3.svg)](README_zh_CN.md)
 
@@ -13,11 +13,8 @@ There is no correspondence between synthetic data and real data, and it is not s
 In practical applications, there is no need to worry about the risk of privacy leakage. 
 High-quality synthetic data can also be used in various fields such as data opening, model training and debugging, system development and testing, etc.
 
-## 💻 Architecture Overview
 
-
-
-## Main features
+## 🎉 Features
 
 + high performance
    + SDG supports a variety of statistical methods, achieving up to 120 times faster execution speed, and reduces dependence on GPU devices;
@@ -31,7 +28,7 @@ High-quality synthetic data can also be used in various fields such as data open
    + SDG supports differential privacy, anonymization and other methods to enhance the security of synthetic data.
 
 
-## Quick Start
+## 🔛 Quick Start
 
 ### Install from PyPi
 
@@ -101,14 +98,14 @@ Synthetic data are as follows：
 ```
 
 
-## Join Community
+## 🤝 Join Community
 
 The SDG project was initiated by **Institute of Data Security, Harbin Institute of Technology**. If you are interested in out project, welcome to join our community. We welcome organizations, teams, and individuals who share our commitment to data protection and security through open source:
 
 - Submit an issue by viewing [View First Good Issue](https://github.com/hitsz-ids/synthetic-data-generator/issues/new) or submit a Pull Request。
 - For developer documentation, please see  [Develop documents].(./docs/develop/readme.md)
 
-## Related Work
+## 👩‍🎓 Related Work
 
 ### Research Paper
 
@@ -126,7 +123,7 @@ The SDG project was initiated by **Institute of Data Security, Harbin Institute 
 - [Telstra](https://www.kaggle.com/competitions/telstra-recruiting-network/data)
 
 
-## License
+## 💻 License
 
 The SDG open source project uses Apache-2.0 license, please refer to the [LICENSE].(https://github.com/hitsz-ids/synthetic-data-generator/blob/main/LICENSE)。
 
