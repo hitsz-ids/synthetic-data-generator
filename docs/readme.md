@@ -161,6 +161,3 @@ sampled = model.generate(num_rows=10)
 [10 rows x 10 columns]}}
 ```
 
-## API
-
-除python组件之外，SDG还支持以Restful接口形式调用，具体接口参数请参考 [API文档](https://SDG.readthedocs.io/en/latest/api/index.html)。
