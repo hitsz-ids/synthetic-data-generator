@@ -4,7 +4,7 @@
 
 # 🚀 Introduction
 
-[![License](https://img.shields.io/badge/License-Apache%202-2162A3.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)  [![CN doc](https://img.shields.io/badge/文档-中文版-2162A3.svg)](README_zh_CN.md)
+[![License](https://img.shields.io/badge/License-Apache%202-2162A3.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)  [![CN doc](https://img.shields.io/badge/文档-中文版-2162A3.svg)](README_ZH_CN.md)
 
 Synthetic Data Generator (SDG) is a framework focused on quickly generating high-quality structured tabular data. It supports more than 10 single-table and multi-table data synthesis algorithms, achieving up to 120 times performance improvement, and supports differential privacy and other methods to enhance the security of synthesized data.
 
@@ -123,7 +123,7 @@ The SDG project was initiated by **Institute of Data Security, Harbin Institute 
 - [Telstra](https://www.kaggle.com/competitions/telstra-recruiting-network/data)
 
 
-## 💻 License
+## 📄 License
 
 The SDG open source project uses Apache-2.0 license, please refer to the [LICENSE].(https://github.com/hitsz-ids/synthetic-data-generator/blob/main/LICENSE)。
 
