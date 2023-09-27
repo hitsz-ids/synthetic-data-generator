@@ -2,13 +2,15 @@
   <img src="docs/sdg_logo.png" width="400" >
 </div>
 
-<center>
+<div align="center">
+<p align="center">
+
+[![License](https://img.shields.io/badge/License-Apache%202-2162A3.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)  [![CN doc](https://img.shields.io/badge/Doc-English-2162A3.svg)](README.md)  [![slack](https://img.shields.io/badge/Slack-Join%20Chat-ff69b4.svg?style=flat-square)](https://join.slack.com/t/hitsz-ids/shared_invite/zt-2395mt6x2-dwf0j_423QkAgGvlNA5E1g)
 
 # 🚀 合成数据生成器 -- 快速生成高质量合成数据！
 
-[![License](https://img.shields.io/badge/License-Apache%202-2162A3.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)  [![CN doc](https://img.shields.io/badge/Doc-English-2162A3.svg)](README.md)  [![slack](https://img.shields.io/badge/Slack-join%20chat-ff69b4.svg?style=flat-square)](https://join.slack.com/t/hitsz-ids/shared_invite/zt-2395mt6x2-dwf0j_423QkAgGvlNA5E1g)
-
-</center>
+</p>
+</div>
 
 合成数据生成器（Synthetic Data Generator，SDG）是一个专注于快速生成高质量结构化表格数据的组件。支持10余种单表、多表数据合成算法，实现最高120倍性能提升，支持差分隐私等方法，加强合成数据安全性。
 

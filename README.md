@@ -2,13 +2,15 @@
   <img src="docs/sdg_logo.png" width="400" >
 </div>
 
-<center>
+<div align="center">
+<p align="center">
 
-[![License](https://img.shields.io/badge/License-Apache%202-2162A3.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)  [![CN doc](https://img.shields.io/badge/Doc-English-2162A3.svg)](README.md)  [![slack](https://img.shields.io/badge/Slack-join%20chat-ff69b4.svg?style=flat-square)](https://join.slack.com/t/hitsz-ids/shared_invite/zt-2395mt6x2-dwf0j_423QkAgGvlNA5E1g)
+[![License](https://img.shields.io/badge/License-Apache%202-2162A3.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)  [![CN doc](https://img.shields.io/badge/Doc-Simplified_Chinese-2162A3.svg)](README_ZH_CN.md)  [![slack](https://img.shields.io/badge/Slack-Join%20Chat-ff69b4.svg?style=flat-square)](https://join.slack.com/t/hitsz-ids/shared_invite/zt-2395mt6x2-dwf0j_423QkAgGvlNA5E1g)
 
-</center>
+# 🚀 Synthetic Data Generator
 
-# 🚀 Introduction
+</p>
+</div>
 
 Synthetic Data Generator (SDG) is a framework focused on quickly generating high-quality structured tabular data. It supports more than 10 single-table and multi-table data synthesis algorithms, achieving up to 120 times performance improvement, and supports differential privacy and other methods to enhance the security of synthesized data.
 
