@@ -5,7 +5,7 @@
 <div align="center">
 <p align="center">
 
-[![License](https://img.shields.io/badge/License-Apache%202-2162A3.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)  [![CN doc](https://img.shields.io/badge/Doc-English-2162A3.svg)](README.md)  [![slack](https://img.shields.io/badge/Slack-join%20chat-ff69b4.svg?style=flat-square)](https://join.slack.com/t/hitsz-ids/shared_invite/zt-2395mt6x2-dwf0j_423QkAgGvlNA5E1g)
+[![License](https://img.shields.io/badge/License-Apache%202-2162A3.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)  [![CN doc](https://img.shields.io/badge/Doc-Simplified_Chinese-2162A3.svg)](README.md)  [![slack](https://img.shields.io/badge/Slack-Join%20Chat-ff69b4.svg?style=flat-square)](https://join.slack.com/t/hitsz-ids/shared_invite/zt-2395mt6x2-dwf0j_423QkAgGvlNA5E1g)
 
 # 🚀 Synthetic Data Generator
 
