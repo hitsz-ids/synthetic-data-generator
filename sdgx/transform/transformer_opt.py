@@ -1,18 +1,13 @@
-"""
-    DataTransformer 模块：
-
-    目前使用了CTGAN开源项目中的代码
-    后续还会根据实际业务需求进一步进行改写
-    以及进行一些性能优化
-"""
-
 from collections import namedtuple
 from typing import List, Optional
 
 import numpy as np
+import os 
+from io import StringIO
 import pandas as pd
 from joblib import Parallel, delayed
 from rdt.transformers import ClusterBasedNormalizer, OneHotEncoder
+from sdgx.utils.io.csv_utils import get_csv_column
 
 SpanInfo = namedtuple("SpanInfo", ["dim", "activation_fn"])
 ColumnTransformInfo = namedtuple(
@@ -20,18 +15,22 @@ ColumnTransformInfo = namedtuple(
     ["column_name", "column_type", "transform", "output_info", "output_dimensions"],
 )
 
+# OPTIMIZE SDG 重写的 Data Transformer
+class DataTransformer(object):
+    """ OPTIMIZE SDG 重写的 Data Transformer
 
-class DataTransformerCTGAN(object):
-    """Data Transformer.
-
-    Model continuous columns with a BayesianGMM and normalized to a scalar [0, 1] and a vector.
-    Discrete columns are encoded using a scikit-learn OneHotEncoder.
+    应对大数据（数据 > 内存）情况下的 Transformer 解决方案
+        - 对于连续列：使用 BayesianGMM 对连续列建模并标准化为标量 [0, 1] 和向量。
+        - 对于离散列：使用 scikit-learn OneHotEncoder 进行编码。
+    
+    本例的实现主要是为了支持大数据情况，并支持将 transform 的数据结果 以及 transformer
+    所需的各类元数据 dump 到硬盘中，以实现较少的内存消耗。
     """
 
     def __init__(self, max_clusters=10, weight_threshold=0.005):
         """Create a data transformer.
 
-        Args:
+        输入参数:
             max_clusters (int):
                 Maximum number of Gaussian distributions in Bayesian GMM.
             weight_threshold (float):
@@ -40,60 +39,58 @@ class DataTransformerCTGAN(object):
         self._max_clusters = max_clusters
         self._weight_threshold = weight_threshold
 
-    def _fit_continuous(self, data):
-        """Train Bayesian GMM for continuous columns.
+    def _fit_continuous(self, column_name):
+        """ 针对连续特征，训练一个贝叶斯 GMM， 用于 transform。
+            该方法暂时不需要做进一步修改
 
-        Args:
+        输入参数:
             data (pd.DataFrame):
-                A dataframe containing a column.
+                一个 pd.DataFrame 对象，但是只含有单列数据
 
-        Returns:
-            namedtuple:
-                A ``ColumnTransformInfo`` object.
+        返回对象说明:
+            namedtuple对象:
+                返回单个 ``ColumnTransformInfo`` 对象
         """
-        column_name = data.columns[0]
+        data = get_csv_column(self.raw_data_path, column_name)
 
-        # 这里进行了修改，用于防止未来的兼容性问题，同时避免出现以下警告
-        # ======================================================
-        # FutureWarning: Future versions of RDT
-        # will not support the 'model_missing_values' parameter.
-        # Please switch to using the 'missing_value_generation'
-        # parameter to select your strategy.
-        # ======================================================
+        # column_name = data.columns[0]
 
-        # 修改前
-        # gm = ClusterBasedNormalizer(model_missing_values=True, max_clusters=min(len(data), 10))
-        # 修改后
         gm = ClusterBasedNormalizer(
             missing_value_generation="from_column", max_clusters=min(len(data), 10)
         )
         gm.fit(data, column_name)
         num_components = sum(gm.valid_component_indicator)
 
+        # 使用 transform 对象存储单个列的 transformer 
         return ColumnTransformInfo(
             column_name=column_name,
             column_type="continuous",
-            transform=gm,
+            transform=gm, 
             output_info=[SpanInfo(1, "tanh"), SpanInfo(num_components, "softmax")],
             output_dimensions=1 + num_components,
         )
 
-    def _fit_discrete(self, data):
-        """Fit one hot encoder for discrete column.
+    def _fit_discrete(self, column_name):
+        """ 针对离散特征：使用一个 one hot encoder 进行编码.
+            该方法暂时不需要做进一步修改
 
-        Args:
+        输入参数:
             data (pd.DataFrame):
-                A dataframe containing a column.
+                一个 pd.DataFrame 对象，但是只含有单列数据
+            column_name (str)：
+                需要进行 fit 操作的列名
 
-        Returns:
-            namedtuple:
-                A ``ColumnTransformInfo`` object.
+        返回对象说明:
+            namedtuple对象:
+                返回单个 ``ColumnTransformInfo`` 对象
         """
-        column_name = data.columns[0]
+        data = get_csv_column(self.raw_data_path, column_name)
+        # column_name = data.columns[0]
         ohe = OneHotEncoder()
         ohe.fit(data, column_name)
         num_categories = len(ohe.dummies)
 
+        # 使用 transform 对象存储单个列的 transformer 
         return ColumnTransformInfo(
             column_name=column_name,
             column_type="discrete",
@@ -102,34 +99,76 @@ class DataTransformerCTGAN(object):
             output_dimensions=num_categories,
         )
 
-    def fit(self, raw_data, discrete_columns: Optional[List] = None):
-        """Fit the ``DataTransformer``.
+    # `fit` 是 transform 的入口方法
+    def fit(self, raw_data_path , discrete_columns: Optional[List] = None, csv_cache_N = 1000):
+        """ 进行 DataTransformer 的 Fit 操作
 
-        Fits a ``ClusterBasedNormalizer`` for continuous columns and a
-        ``OneHotEncoder`` for discrete columns.
+        针对连续变量，使用 ``ClusterBasedNormalizer`` 进行 transform；
+        对于离散变量，使用 ``OneHotEncoder``  进行 transform。
 
-        This step also counts the #columns in matrix data and span information.
+        此步骤还对矩阵数据和跨度信息中的#columns 进行计数操作。        
+        输入参数:
+            raw_data_path (str):
+                目前仅接受 csv 文件作为输入。
+            discrete_columns (list): 
+                离散列名称，需要与 csv 文件的列名对应名，
+                默认该参数为 [] 。
+            csv_cache_N (int): 
+                为了减少内存，使用缓存 csv 的行数。
         """
+        # raw data 需要从 path 中获取
+        raw_data = None 
+        self.raw_data_path = raw_data_path
         self.output_info_list = []
         self.output_dimensions = 0
-        self.dataframe = True
+        self.csv_cache_N = csv_cache_N
+        # self.dataframe = True
+        self.dataframe = False
         if not discrete_columns:
             discrete_columns = []
 
-        if not isinstance(raw_data, pd.DataFrame):
-            self.dataframe = False
-            # work around for RDT issue #328 Fitting with numerical column names fails
-            discrete_columns = [str(column) for column in discrete_columns]
-            column_names = [str(num) for num in range(raw_data.shape[1])]
-            raw_data = pd.DataFrame(raw_data, columns=column_names)
+        # 对 data frame 的检测，如果不是 data frame ，还是转换为了 dataframe 进行操作
+        # 但是经过搜索 此处仅对 后续一个逻辑又变化，所以我们直接把 self.dataframe 设置为 False 
+        # 在未来处理的时候，单独载入 data frame 
+        # if not isinstance(raw_data, pd.DataFrame):
+        #     self.dataframe = False
+        #     # work around for RDT issue #328 Fitting with numerical column names fails
+        #     discrete_columns = [str(column) for column in discrete_columns]
+        #     column_names = [str(num) for num in range(raw_data.shape[1])]
+        #     raw_data = pd.DataFrame(raw_data, columns=column_names)
+        
+        # 对 discrete_columns 的处理还是保留了下来
+        discrete_columns = [str(column) for column in discrete_columns]
+        # column_names = [str(num) for num in range(raw_data.shape[1])]
 
-        self._column_raw_dtypes = raw_data.infer_objects().dtypes
+        # 对 raw_data_path 增加检查
+        #   - 是否存在，使用 os.path.exists 判断
+        #   - 是否是 csv ，目前仅做名称上的检查
+        if not os.path.exists(raw_data_path):
+            raise FileNotFoundError("Input csv NOT Found.")
+        if not "csv" in raw_data_path:
+            raise ValueError("Input Data is NOT CSV.")
+
+        # raw data columns 在原有的实现方法中使用了 raw_data.columns
+        # 这么做的问题就在于 df 直接载入了所有数据
+        # 为了减少内存消耗，我们通过读取 csv 的前 x 行，并借助原有代码完成相应功能的计算
+        cache_csv_str = ""
+        with open(raw_data_path, "r") as f:
+            for _ in range(self.csv_cache_N+1):
+                cache_csv_str += f.readline()
+        # 从 str 创建 data frame 
+        cache_io = StringIO(cache_csv_str)
+        raw_data_cache = pd.read_csv(cache_io)
+
+        self._column_raw_dtypes = raw_data_cache.infer_objects().dtypes
         self._column_transform_info_list = []
-        for column_name in raw_data.columns:
+
+
+        for column_name in raw_data_cache.columns:
             if column_name in discrete_columns:
-                column_transform_info = self._fit_discrete(raw_data[[column_name]])
+                column_transform_info = self._fit_discrete(column_name)
             else:
-                column_transform_info = self._fit_continuous(raw_data[[column_name]])
+                column_transform_info = self._fit_continuous(column_name)
 
             self.output_info_list.append(column_transform_info.output_info)
             self.output_dimensions += column_transform_info.output_dimensions
@@ -190,8 +229,11 @@ class DataTransformerCTGAN(object):
 
         return Parallel(n_jobs=-1)(processes)
 
-    def transform(self, raw_data):
+    def transform(self, input_data_path, output_data_path):
         """Take raw data and output a matrix data."""
+        # 从 disk 中读取
+        raw_data = None
+        
         if not isinstance(raw_data, pd.DataFrame):
             column_names = [str(num) for num in range(raw_data.shape[1])]
             raw_data = pd.DataFrame(raw_data, columns=column_names)
@@ -282,5 +324,3 @@ class DataTransformerCTGAN(object):
             "column_id": column_id,
             "value_id": np.argmax(one_hot),
         }
-
-

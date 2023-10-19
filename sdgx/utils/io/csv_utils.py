@@ -35,7 +35,18 @@ def get_single_table(input_path):
     pass
 
 
-# 自动检测函数，用于检测 discrete_cols
-# 不一定最准确，但可以一定程度上方便使用
-def auto_select_discrete_cols(pd_obj):
-    pass
+def get_csv_column(input_path, column_name):
+    '''按 column 形式读取 csv，返回 pd.DataFrame 的单列数据
+
+    输入参数:
+        input_path (str):
+            作为输入的 csv 路径
+        column_name (str)：
+            需要提取的 csv 列名
+
+    返回对象说明:
+        namedtuple对象 (pd.DataFrame):
+            返回单个 ``pd.DataFrame`` 对象
+    '''
+    df_col = pd.read_csv(input_path, usecols=[column_name])
+    return df_col
