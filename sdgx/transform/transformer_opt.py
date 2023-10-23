@@ -7,7 +7,7 @@ from io import StringIO
 import pandas as pd
 from joblib import Parallel, delayed
 from rdt.transformers import ClusterBasedNormalizer, OneHotEncoder
-from sdgx.utils.io.csv_utils import get_csv_column
+from sdgx.utils.io.csv_utils import get_csv_column, get_csv_column_count
 
 SpanInfo = namedtuple("SpanInfo", ["dim", "activation_fn"])
 ColumnTransformInfo = namedtuple(
@@ -81,7 +81,7 @@ class DataTransformer(object):
                 需要进行 fit 操作的列名
 
         返回对象说明:
-            namedtuple对象:
+            namedtuple 对象:
                 返回单个 ``ColumnTransformInfo`` 对象
         """
         data = get_csv_column(self.raw_data_path, column_name)
@@ -107,6 +107,7 @@ class DataTransformer(object):
         对于离散变量，使用 ``OneHotEncoder``  进行 transform。
 
         此步骤还对矩阵数据和跨度信息中的#columns 进行计数操作。        
+        
         输入参数:
             raw_data_path (str):
                 目前仅接受 csv 文件作为输入。
@@ -117,7 +118,7 @@ class DataTransformer(object):
                 为了减少内存，使用缓存 csv 的行数。
         """
         # raw data 需要从 path 中获取
-        raw_data = None 
+        # raw_data = None 
         self.raw_data_path = raw_data_path
         self.output_info_list = []
         self.output_dimensions = 0
@@ -139,7 +140,7 @@ class DataTransformer(object):
         
         # 对 discrete_columns 的处理还是保留了下来
         discrete_columns = [str(column) for column in discrete_columns]
-        # column_names = [str(num) for num in range(raw_data.shape[1])]
+        
 
         # 对 raw_data_path 增加检查
         #   - 是否存在，使用 os.path.exists 判断
@@ -159,6 +160,9 @@ class DataTransformer(object):
         # 从 str 创建 data frame 
         cache_io = StringIO(cache_csv_str)
         raw_data_cache = pd.read_csv(cache_io)
+        
+        # get columns 
+        self.column_names = [str(num) for num in range(raw_data_cache.shape[1])]
 
         self._column_raw_dtypes = raw_data_cache.infer_objects().dtypes
         self._column_transform_info_list = []
@@ -195,21 +199,51 @@ class DataTransformer(object):
         ohe = column_transform_info.transform
         return ohe.transform(data).to_numpy()
 
-    def _synchronous_transform(self, raw_data, column_transform_info_list):
-        """Take a Pandas DataFrame and transform columns synchronous.
+    def _synchronous_transform(self, input_data_path, column_transform_info_list, output_path):
+        """Take a csv path, and transform columns synchronous.
 
-        Outputs a list with Numpy arrays.
+        Outputs a list with Numpy arrays to disk.
         """
-        column_data_list = []
-        for column_transform_info in column_transform_info_list:
-            column_name = column_transform_info.column_name
-            data = raw_data[[column_name]]
-            if column_transform_info.column_type == "continuous":
-                column_data_list.append(self._transform_continuous(column_transform_info, data))
-            else:
-                column_data_list.append(self._transform_discrete(column_transform_info, data))
+        
+        loop = True
+        has_write_header = True
+        # use iterator = True 
+        reader =  pd.read_csv(input_data_path, iterator=True, chunksize= 1000000)
+        while loop:
+            column_data_list = []
+            # get raw data 
+            raw_data = None
+            try:
+                raw_data = reader.get_chunk()
+            except StopIteration: 
+                loop = False
 
-        return column_data_list
+            # break if loop is iteration is end 
+            if not loop:
+                break
+            
+            # write csv header to file 
+            if has_write_header:
+                f = open(output_path, "w")
+                f.write(",".join(raw_data.columns.to_list()) + '\n')
+                f.close()
+                has_write_header = False
+
+            # transform data here
+            for column_transform_info in column_transform_info_list:
+                column_name = column_transform_info.column_name
+                # 获取列数据
+                data = raw_data[[column_name]]
+                if column_transform_info.column_type == "continuous":
+                    column_data_list.append(self._transform_continuous(column_transform_info, data))
+                else:
+                    column_data_list.append(self._transform_discrete(column_transform_info, data))
+            
+            # 追加写到 output path 吧
+            df_chunk = np.concatenate(column_data_list, axis=1).astype(float)
+            df_chunk.to_csv(output_path, mode = "a", header = False)
+        # end while
+        # return column_data_list
 
     def _parallel_transform(self, raw_data, column_transform_info_list):
         """Take a Pandas DataFrame and transform columns in parallel.
@@ -229,23 +263,39 @@ class DataTransformer(object):
 
         return Parallel(n_jobs=-1)(processes)
 
+    # TODO function to finish
     def transform(self, input_data_path, output_data_path):
         """Take raw data and output a matrix data."""
         # 从 disk 中读取
         raw_data = None
         
-        if not isinstance(raw_data, pd.DataFrame):
-            column_names = [str(num) for num in range(raw_data.shape[1])]
-            raw_data = pd.DataFrame(raw_data, columns=column_names)
-
+        #  check the parameter `input_data_path`
+        if not os.path.exists(input_data_path):
+            raise FileNotFoundError("Input csv NOT Found.")
+        if not "csv" in input_data_path:
+            raise ValueError("Input Data is NOT CSV.")
+        # check the parameter `output data path`
+        if not os.path.exists(output_data_path):
+            raise FileNotFoundError("Input csv NOT Found.")
+        if not "csv" in output_data_path:
+            raise ValueError("Input Data is NOT CSV.")
+        
+        # get the csv shape column count
+        # import func from utils 
+        column_cnt = get_csv_column_count(input_data_path)
+        
         # Only use parallelization with larger data sizes.
         # Otherwise, the transformation will be slower.
-        if raw_data.shape[0] < 500:
+        if column_cnt < 500:
+            # column_data_list = self._synchronous_transform(
             column_data_list = self._synchronous_transform(
-                raw_data, self._column_transform_info_list
+                input_data_path,
+                self._column_transform_info_list
             )
         else:
-            column_data_list = self._parallel_transform(raw_data, self._column_transform_info_list)
+            column_data_list = self._parallel_transform(
+                input_data_path,
+                self._column_transform_info_list)
 
         return np.concatenate(column_data_list, axis=1).astype(float)
 
