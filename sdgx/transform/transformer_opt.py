@@ -123,16 +123,15 @@ class DataTransformer(object):
         self.output_info_list = []
         self.output_dimensions = 0
         self.csv_cache_N = csv_cache_N
-        # self.dataframe = True
-        self.dataframe = False
+        # self.dataframe = False
         if not discrete_columns:
             discrete_columns = []
 
         # 对 data frame 的检测，如果不是 data frame ，还是转换为了 dataframe 进行操作
-        # 但是经过搜索 此处仅对 后续一个逻辑又变化，所以我们直接把 self.dataframe 设置为 False 
+        # 但是经过搜索 此处仅对 后续一个逻辑又变化，所以我们直接把 self. dataframe 设置为 False 
         # 在未来处理的时候，单独载入 data frame 
         # if not isinstance(raw_data, pd.DataFrame):
-        #     self.dataframe = False
+        #     self. dataframe = False
         #     # work around for RDT issue #328 Fitting with numerical column names fails
         #     discrete_columns = [str(column) for column in discrete_columns]
         #     column_names = [str(num) for num in range(raw_data.shape[1])]
@@ -206,7 +205,7 @@ class DataTransformer(object):
         """
         
         loop = True
-        has_write_header = True
+        # has_write_header = True
         # use iterator = True 
         reader =  pd.read_csv(input_data_path, iterator=True, chunksize= 1000000)
         while loop:
@@ -222,12 +221,14 @@ class DataTransformer(object):
             if not loop:
                 break
             
+            '''
             # write csv header to file 
             if has_write_header:
                 f = open(output_path, "w")
                 f.write(",".join(raw_data.columns.to_list()) + '\n')
                 f.close()
                 has_write_header = False
+            '''
 
             # transform data here
             for column_transform_info in column_transform_info_list:
@@ -240,8 +241,11 @@ class DataTransformer(object):
                     column_data_list.append(self._transform_discrete(column_transform_info, data))
             
             # 追加写到 output path 吧
-            df_chunk = np.concatenate(column_data_list, axis=1).astype(float)
-            df_chunk.to_csv(output_path, mode = "a", header = False)
+            chunk_array = np.concatenate(column_data_list, axis=1).astype(float)
+            # file object 
+            f = open(output_path , 'a')
+            np.savetxt(f, chunk_array, fmt="%g", delimiter= ',')
+            f.close()
         # end while
         # return column_data_list
 
@@ -274,9 +278,8 @@ class DataTransformer(object):
             raise FileNotFoundError("Input csv NOT Found.")
         if not "csv" in input_data_path:
             raise ValueError("Input Data is NOT CSV.")
+        
         # check the parameter `output data path`
-        if not os.path.exists(output_data_path):
-            raise FileNotFoundError("Input csv NOT Found.")
         if not "csv" in output_data_path:
             raise ValueError("Input Data is NOT CSV.")
         
@@ -286,18 +289,20 @@ class DataTransformer(object):
         
         # Only use parallelization with larger data sizes.
         # Otherwise, the transformation will be slower.
-        if column_cnt < 500:
-            # column_data_list = self._synchronous_transform(
-            column_data_list = self._synchronous_transform(
+        # if column_cnt < 500:
+        # column_data_list = self._synchronous_transform(
+        self._synchronous_transform(
                 input_data_path,
-                self._column_transform_info_list
+                self._column_transform_info_list,
+                output_data_path
             )
-        else:
-            column_data_list = self._parallel_transform(
-                input_data_path,
-                self._column_transform_info_list)
+        # else:
+        #     column_data_list = self._parallel_transform(
+        #         input_data_path,
+        #         self._column_transform_info_list)
 
-        return np.concatenate(column_data_list, axis=1).astype(float)
+        # return np.concatenate(column_data_list, axis=1).astype(float)
+        return output_data_path
 
     def _inverse_transform_continuous(self, column_transform_info, column_data, sigmas, st):
         gm = column_transform_info.transform
@@ -314,7 +319,7 @@ class DataTransformer(object):
         data = pd.DataFrame(column_data, columns=list(ohe.get_output_sdtypes()))
         return ohe.reverse_transform(data)[column_transform_info.column_name]
 
-    def inverse_transform(self, data, sigmas=None):
+    def inverse_transform(self, data, sigmas=None, output_path = None, write_header = True):
         """Take matrix data and output raw data.
 
         Output uses the same type as input to the transform function.
@@ -343,9 +348,20 @@ class DataTransformer(object):
         recovered_data = pd.DataFrame(recovered_data, columns=column_names).astype(
             self._column_raw_dtypes
         )
-        if not self.dataframe:
-            recovered_data = recovered_data.to_numpy()
 
+        # input is csv, self.dataframe will always be true
+        # if not self.dataframe:
+        #     recovered_data = recovered_data.to_numpy()
+        if output_path is not None:
+            f = open(output_path, 'w')
+            # write csv header to file 
+            if write_header:
+                # f = open(output_path, "w")
+                # recovered_data's type is pd.DataFrame
+                f.write(",".join(recovered_data.columns.to_list()) + '\n')
+            f.close()
+            recovered_data.to_csv(output_path, index=False)
+            
         return recovered_data
 
     def convert_column_name_value_to_id(self, column_name, value):

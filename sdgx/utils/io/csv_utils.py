@@ -8,7 +8,7 @@ def get_demo_single_table():
     """
     
     """
-    demo_data_path = Path("dataset/adult.csv")
+    demo_data_path = Path("./dataset/adult.csv")
     if not demo_data_path.exists():
         # Download from datahub
         demo_data_path.parent.mkdir(parents=True, exist_ok=True)
