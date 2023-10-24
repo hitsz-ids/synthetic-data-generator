@@ -1,6 +1,6 @@
 """
     Wrappers around copulas models.
-    需要修改：fit接口以适应性能优化措施
+    需要修改: fit接口以适应性能优化措施
 """
 import logging
 import warnings
@@ -14,16 +14,19 @@ import scipy
 from copulas import multivariate
 from rdt.transformers import OneHotEncoder
 
-from sdv.errors import NonParametricError
-from sdv.single_table.base import BaseSingleTableSynthesizer
-from sdv.single_table.utils import (
+# transformer 以及 sampler 已经拆分，挪到 transform/ 目录中
+# from sdgx.transform.sampler import DataSamplerCTGAN
+from sdgx.transform.transformer import DataTransformerCTGAN
+from sdgx.errors import NonParametricError
+from sdgx.statistics.base import BaseSynthesizerModel
+from sdgx.utils.utils import (
     flatten_dict, log_numerical_distributions_error, unflatten_dict,
     validate_numerical_distributions)
 
 LOGGER = logging.getLogger(__name__)
 
 
-class GaussianCopulaSynthesizer(BaseSingleTableSynthesizer):
+class GaussianCopulaSynthesizer(BaseSynthesizerModel):
     """Model wrapping ``copulas.multivariate.GaussianMultivariate`` copula.
 
     Args:
@@ -66,7 +69,7 @@ class GaussianCopulaSynthesizer(BaseSingleTableSynthesizer):
 
     # 这里代表的是几种可选的分布，这里通常使用 beta
     # 其他分布的内容我们可以以后再了解。
-    # 这个应该是属于 类变量的 
+    # 这个应该是属于 类变量的
     _DISTRIBUTIONS = {
         'norm': copulas.univariate.GaussianUnivariate,
         'beta': copulas.univariate.BetaUnivariate,
@@ -102,16 +105,17 @@ class GaussianCopulaSynthesizer(BaseSingleTableSynthesizer):
     # 初始化方法，参数的类型需要仔细分析一下
     def __init__(self, metadata, enforce_min_max_values=True, enforce_rounding=True, locales=None,
                  numerical_distributions=None, default_distribution=None):
-        super().__init__(
-            metadata, # fit 数据集的元数据
-            enforce_min_max_values=enforce_min_max_values, # 限制最大最小value，一般都是true
-            enforce_rounding=enforce_rounding, # 保持相同的小数点位数， 一般都是true
-            locales=locales, # 和语言设置有关，这个暂时不太清楚
-        )
-        # 验证分布？ 
-        # 这个时候还没有输入数据的，只有 metadata 
+
+        self.metadata = metadata,  # fit 数据集的元数据
+        self.enforce_min_max_values = enforce_min_max_values,  # 限制最大最小value，一般都是true
+        self.enforce_rounding = enforce_rounding,  # 保持相同的小数点位数， 一般都是true
+        self.locales = locales,  # 和语言设置有关，这个暂时不太清楚
+
+        # 验证分布？
+        # 这个时候还没有输入数据的，只有 metadata
         # 应该是通过 metadata 来验证分布的
-        validate_numerical_distributions(numerical_distributions, self.metadata.columns)
+        validate_numerical_distributions(
+            numerical_distributions, self.metadata)
         # 这里的意思是，如果没有指定分布，那么就使用 beta 分布
         # 下面分别是两个参数，重新赋值
         self.numerical_distributions = numerical_distributions or {}
@@ -119,7 +123,8 @@ class GaussianCopulaSynthesizer(BaseSingleTableSynthesizer):
 
         # 以下几行代码是使用 class method 把字符串类型的分布
         # 转化为 copulas.univariate 的分布实例
-        self._default_distribution = self.get_distribution_class(self.default_distribution)
+        self._default_distribution = self.get_distribution_class(
+            self.default_distribution)
         self._numerical_distributions = {
             field: self.get_distribution_class(distribution)
             for field, distribution in self.numerical_distributions.items()
@@ -134,13 +139,15 @@ class GaussianCopulaSynthesizer(BaseSingleTableSynthesizer):
     # 初步的性能优化方案可以是：
     # 1. 增加增量学习机制，防止内存消耗过多
     # 2. 增加
-    def _fit(self, processed_data):
-        """Fit the model to the table.
+    def fit(self, processed_data):
 
-        Args:
-            processed_data (pandas.DataFrame):
-                Data to be learned.
-        """
+        # 载入 transformer
+        self._transformer = DataTransformerCTGAN()
+        self._transformer.fit(processed_data, self.metadata[0])
+
+        # 使用 transformer 处理数据
+        processed_data = pd.DataFrame(self._transformer.transform(processed_data))
+
         # 这个应该是打 log ，不影响实际训练
         log_numerical_distributions_error(
             self.numerical_distributions, processed_data.columns, LOGGER)
@@ -186,7 +193,8 @@ class GaussianCopulaSynthesizer(BaseSingleTableSynthesizer):
                 )
     # 生成数据函数，这里其实直接调用的 model 的方法
     # 没有其他了
-    def _sample(self, num_rows, conditions=None):
+
+    def sample(self, num_rows, conditions=None):
         """Sample the indicated number of rows from the model.
 
         Args:
@@ -201,7 +209,7 @@ class GaussianCopulaSynthesizer(BaseSingleTableSynthesizer):
             pandas.DataFrame:
                 Sampled data.
         """
-        return self._model.sample(num_rows, conditions=conditions)
+        return self._transformer.inverse_transform(self._model.sample(num_rows, conditions=conditions).to_numpy())
 
     def _get_valid_columns_from_metadata(self, columns):
         valid_columns = []
@@ -236,7 +244,8 @@ class GaussianCopulaSynthesizer(BaseSingleTableSynthesizer):
         valid_columns = self._get_valid_columns_from_metadata(columns)
         for column, learned_params in zip(columns, univariates):
             if column in valid_columns:
-                distribution = self.numerical_distributions.get(column, self.default_distribution)
+                distribution = self.numerical_distributions.get(
+                    column, self.default_distribution)
                 learned_params.pop('type')
                 learned_distributions[column] = {
                     'distribution': distribution,
@@ -265,7 +274,8 @@ class GaussianCopulaSynthesizer(BaseSingleTableSynthesizer):
                 univariate = univariate._instance
 
             if univariate.PARAMETRIC == copulas.univariate.ParametricType.NON_PARAMETRIC:
-                raise NonParametricError('This GaussianCopula uses non parametric distributions')
+                raise NonParametricError(
+                    'This GaussianCopula uses non parametric distributions')
 
         params = self._model.to_dict()
 
@@ -274,7 +284,8 @@ class GaussianCopulaSynthesizer(BaseSingleTableSynthesizer):
             correlation.append(row[:index + 1])
 
         params['correlation'] = correlation
-        params['univariates'] = dict(zip(params.pop('columns'), params['univariates']))
+        params['univariates'] = dict(
+            zip(params.pop('columns'), params['univariates']))
         params['num_rows'] = self._num_rows
 
         return flatten_dict(params)
@@ -378,7 +389,8 @@ class GaussianCopulaSynthesizer(BaseSingleTableSynthesizer):
         for column, univariate in model_parameters['univariates'].items():
             columns.append(column)
             univariate['type'] = self.get_distribution_class(
-                self._numerical_distributions.get(column, self.default_distribution)
+                self._numerical_distributions.get(
+                    column, self.default_distribution)
             )
             if 'scale' in univariate:
                 univariate['scale'] = max(0, univariate['scale'])
@@ -390,7 +402,8 @@ class GaussianCopulaSynthesizer(BaseSingleTableSynthesizer):
 
         correlation = model_parameters.get('correlation')
         if correlation:
-            model_parameters['correlation'] = self._rebuild_correlation_matrix(correlation)
+            model_parameters['correlation'] = self._rebuild_correlation_matrix(
+                correlation)
         else:
             model_parameters['correlation'] = [[1.0]]
 
@@ -409,8 +422,10 @@ class GaussianCopulaSynthesizer(BaseSingleTableSynthesizer):
         parameters = unflatten_dict(parameters)
         if 'num_rows' in parameters:
             num_rows = parameters.pop('num_rows')
-            self._num_rows = 0 if pd.isna(num_rows) else max(0, int(round(num_rows)))
+            self._num_rows = 0 if pd.isna(
+                num_rows) else max(0, int(round(num_rows)))
 
         if parameters:
             parameters = self._rebuild_gaussian_copula(parameters)
-            self._model = multivariate.GaussianMultivariate.from_dict(parameters)
+            self._model = multivariate.GaussianMultivariate.from_dict(
+                parameters)

@@ -4,3 +4,6 @@
 class SdgxError(Exception):
     """Base class for exceptions in this module."""
     pass    
+
+class NonParametricError(Exception):
+    """Exception to indicate that a model is not parametric."""
