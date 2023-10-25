@@ -3,6 +3,7 @@ import logging
 
 import numpy as np
 import torch
+from torch.nn import functional
 
 
 # 添加增加的日志log
@@ -42,6 +43,10 @@ def random_state(function):
 
     return wrapper
 
+def random_choice_prob_index(a, axis=1):
+    r = np.expand_dims(np.random.rand(a.shape[1 - axis]), axis=axis)
+    return (a.cumsum(axis=axis) > r).argmax(axis=axis)
+
 
 @contextlib.contextmanager
 def set_random_states(random_state, set_model_random_state):
@@ -72,3 +77,5 @@ def set_random_states(random_state, set_model_random_state):
 
         np.random.set_state(original_np_state)
         torch.set_rng_state(original_torch_state)
+
+

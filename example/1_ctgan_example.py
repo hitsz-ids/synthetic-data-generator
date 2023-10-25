@@ -3,6 +3,7 @@
 # 并查看 sampled_data 变量
 
 from sdgx.models.single_table.ctgan import CTGAN
+from sdgx.models.single_table.oct_gan import OCTGAN
 from sdgx.transform.sampler import DataSamplerCTGAN
 from sdgx.transform.transformer import DataTransformerCTGAN
 from sdgx.utils.io.csv_utils import *
@@ -12,8 +13,11 @@ from sdgx.utils.io.csv_utils import *
 demo_data, discrete_cols = get_demo_single_table()
 
 
-model = CTGAN(epochs=10, transformer=DataTransformerCTGAN, sampler=DataSamplerCTGAN)
+# model = CTGAN(epochs=10, transformer=DataTransformerCTGAN, sampler=DataSamplerCTGAN)
+model = OCTGAN(epochs=10, transformer=DataTransformerCTGAN, sampler=DataSamplerCTGAN)
 model.fit(demo_data, discrete_cols)
 
 # sampled
 sampled_data = model.sample(1000)
+
+print(sampled_data)
