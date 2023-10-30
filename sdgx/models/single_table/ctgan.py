@@ -109,7 +109,8 @@ class Generator(Module):
         return data
 
 
-# 后续需要根据实际情况做性能优化
+# 目前针对了较大的数据进行内存占用上的优化
+# 总体思路是采用分批 load 进内存的方法，优化其占用空间的大小
 class CTGAN(BaseSynthesizerModel):
     """Conditional Table GAN Synthesizer.
 
@@ -155,6 +156,12 @@ class CTGAN(BaseSynthesizerModel):
             Whether to attempt to use cuda for GPU computation.
             If this is False or CUDA is not available, CPU will be used.
             Defaults to ``True``.
+        memory_optimize(bool):
+            设计上这个参数需要是 str 类型或者 bool 类型 可以是如下数值：
+                - True：根据实际情况进行自动化内存优化，保证在能跑完的情况下，尽量多地利用内存，同时不报错
+                - False：不采用任何内存优化策略
+                - None：同 False 
+            该参数默认设为 False 
     """
 
     def __init__(
@@ -173,8 +180,7 @@ class CTGAN(BaseSynthesizerModel):
         epochs=300,
         pac=10,
         cuda=True,
-        transformer=None,
-        sampler=None,
+        memory_optimize = False
     ):
         assert batch_size % 2 == 0
 
@@ -202,11 +208,14 @@ class CTGAN(BaseSynthesizerModel):
             device = "cuda"
         self._device = torch.device(device)
 
-        # self._transformer = None
-        # self._data_sampler = None
-        self._transformer = transformer
-        self._data_sampler = sampler
         self._generator = None
+
+        # 是否启用内存优化，这里初步打算采用内存限制进行
+        # 设计上这个参数需要是 str 类型或者 bool 类型 可以是如下数值：
+        #   - True：根据实际情况进行自动化内存优化，保证在能跑完的情况下，尽量多地利用内存，同时不报错
+        #   - False：不采用任何内存优化策略
+        self.memory_optimize = memory_optimize
+
 
     @staticmethod
     def _gumbel_softmax(logits, tau=1, hard=False, eps=1e-10, dim=-1):
@@ -306,23 +315,68 @@ class CTGAN(BaseSynthesizerModel):
 
         if invalid_columns:
             raise ValueError(f"Invalid columns found: {invalid_columns}")
+    
+    
+    # OPTIMIZE 新增方法，完成在内存受限情况下的 CTGAN 训练
+    @random_state 
+    def fit_optimze(self, train_data_iterator,\
+                    discrete_columns: Optional[List] = [],\
+                    epoches = 10):
+        ''' OPTIMIZE 新增方法，在内存受限情况下完成 CTGAN 训练
+
+        参数列表：
+            train_data_iterator (iterator)：
+                train_data_iterator 是 带有训练数据的迭代器，
+                需要根据 csv 文件，迭代返回训练数据，
+                属于必填参数。
+            discrete_columns (list-like)：
+                描述离散特征的一个 python 列表。
+                如果 训练数据的迭代器 中不含有列名，则返回列的编号，
+                否则 ，返回列的名称（可以乱序），
+                属于选填参数，默认为 python 空列表。
+            epoches(int-like)：
+                CTGAN 模型的迭代次数，
+                选填参数，默认为10，但严肃应用中应必须填写。
+        '''
+        if epochs is None:
+            epochs = self._epochs
+        
+
+        pass
 
     @random_state
-    def fit(self, train_data, discrete_columns: Optional[List] = None, epochs=None):
+    def fit(self, train_data,
+            discrete_columns: Optional[List] = None,\
+            train_data_iterator = None,
+            epochs=None):
         """Fit the CTGAN Synthesizer models to the training data.
 
         Args:
             train_data (numpy.ndarray or pandas.DataFrame):
                 Training Data. It must be a 2-dimensional numpy array or a pandas.DataFrame.
+            train_data_iterator (iterator)：
+                train_data_iterator 是 带有训练数据的迭代器
+                需要根据 csv 文件，迭代返回训练数据
             discrete_columns (list-like):
                 List of discrete columns to be used to generate the Conditional
                 Vector. If ``train_data`` is a Numpy array, this list should
                 contain the integer indices of the columns. Otherwise, if it is
                 a ``pandas.DataFrame``, this list should contain the column names.
         """
+        # set discrete_columns
         if not discrete_columns:
             discrete_columns = []
-        # 离散列检查
+
+        # OPTIMIZE 检查 optimize 以及 train_data_iterator 
+        if self.memory_optimize and train_data_iterator is None:
+            raise ValueError("train_data_iterator should not be None.")
+        # 如果符合 optimize 的需求，则转到新实现的 optimize 方法，这样也不干扰老方法的顺利执行
+        if self.memory_optimize and train_data_iterator is not None:
+            self.fit_optimze(train_data_iterator, discrete_columns, epochs)
+            return 
+        # OPTIMIZE 改动结束
+
+        # 以下为原始的 fit 方法
         self._validate_discrete_columns(train_data, discrete_columns)
 
         # 参数检查
