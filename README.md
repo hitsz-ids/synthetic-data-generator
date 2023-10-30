@@ -36,6 +36,16 @@ High-quality synthetic data can also be used in various fields such as data open
 
 ## 🔛 Quick Start
 
+### Local Install (Recommended)
+
+At present, the code of this project is updated very quickly. We recommend that you use SDG by installing it through the source code.
+
+```bash
+git clone git@github.com:hitsz-ids/synthetic-data-generator.git
+pip install -r requirement.txt
+python setup.py install
+```
+
 ### Install from PyPi
 
 ```bash
@@ -47,8 +57,6 @@ pip install sdgx
 ```python
 # Import modules
 from sdgx.models.single_table.ctgan import CTGAN
-from sdgx.transform.sampler import DataSamplerCTGAN
-from sdgx.transform.transformer import DataTransformerCTGAN
 from sdgx.utils.io.csv_utils import *
 
 # Read data from demo
@@ -77,9 +85,7 @@ Real data are as follows：
 
 ```python
 # Define model
-model = CTGAN(epochs=10,\
-                       transformer= DataTransformerCTGAN,\
-                       sampler=DataSamplerCTGAN)
+model = CTGAN(epochs=10)
 # Model training
 model.fit(demo_data, discrete_cols)
 
