@@ -33,6 +33,16 @@
 
 ## 🔛 快速开始
 
+### 从本地安装（目前推荐）
+
+目前本项目的代码更新速度快，我们推荐您通过源码进行安装的方式使用SDG。
+
+```bash
+git clone git@github.com:hitsz-ids/synthetic-data-generator.git
+pip install -r requirement.txt
+python setup.py install
+```
+
 ### 从Pypi安装
 
 ```bash
@@ -44,8 +54,6 @@ pip install sdgx
 ```python
 # 导入相关模块
 from sdgx.models.single_table.ctgan import CTGAN
-from sdgx.transform.sampler import DataSamplerCTGAN
-from sdgx.transform.transformer import DataTransformerCTGAN
 from sdgx.utils.io.csv_utils import *
 
 # 读取数据
@@ -74,9 +82,7 @@ demo_data, discrete_cols  = get_demo_single_table()
 
 ```python
 #定义模型
-model = CTGAN(epochs=10,\
-                       transformer= DataTransformerCTGAN,\
-                       sampler=DataSamplerCTGAN)
+model = CTGAN(epochs=10)
 # 训练模型
 model.fit(demo_data, discrete_cols)
 
