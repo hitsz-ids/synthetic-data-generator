@@ -1,4 +1,4 @@
-"""Top-level package for duetector."""
+"""Top-level package for SDG."""
 
 __author__ = "hitsz-ids"
-__version__ = "0.0.0a0"
+__version__ = "0.0.1a0"
