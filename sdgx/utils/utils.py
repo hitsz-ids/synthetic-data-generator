@@ -74,7 +74,7 @@ def set_random_states(random_state, set_model_random_state):
         torch.set_rng_state(original_torch_state)
 
 
-def flatten_array(nested, prefix=''):
+def flatten_array(nested, prefix=""):
     """Flatten an array as a dict.
 
     Args:
@@ -89,7 +89,7 @@ def flatten_array(nested, prefix=''):
     """
     result = {}
     for index in range(len(nested)):
-        prefix_key = '__'.join([prefix, str(index)]) if len(prefix) else str(index)
+        prefix_key = "__".join([prefix, str(index)]) if len(prefix) else str(index)
 
         value = nested[index]
         if isinstance(value, (list, np.ndarray)):
@@ -104,10 +104,10 @@ def flatten_array(nested, prefix=''):
     return result
 
 
-IGNORED_DICT_KEYS = ['fitted', 'distribution', 'type']
+IGNORED_DICT_KEYS = ["fitted", "distribution", "type"]
 
 
-def flatten_dict(nested, prefix=''):
+def flatten_dict(nested, prefix=""):
     """Flatten a dictionary.
 
     This method returns a flatten version of a dictionary, concatenating key names with
@@ -126,7 +126,7 @@ def flatten_dict(nested, prefix=''):
     result = {}
 
     for key, value in nested.items():
-        prefix_key = '__'.join([prefix, str(key)]) if len(prefix) else key
+        prefix_key = "__".join([prefix, str(key)]) if len(prefix) else key
 
         if key in IGNORED_DICT_KEYS and not isinstance(value, (dict, list)):
             continue
@@ -150,13 +150,13 @@ def log_numerical_distributions_error(numerical_distributions, processed_data_co
         logger.info(
             f"Requested distribution '{numerical_distributions[column]}' "
             f"cannot be applied to column '{column}' because it no longer "
-            'exists after preprocessing.'
+            "exists after preprocessing."
         )
 
 
 def _key_order(key_value):
     parts = []
-    for part in key_value[0].split('__'):
+    for part in key_value[0].split("__"):
         if part.isdigit():
             part = int(part)
 
@@ -179,9 +179,9 @@ def unflatten_dict(flat):
     unflattened = {}
 
     for key, value in sorted(flat.items(), key=_key_order):
-        if '__' in key:
-            key, subkey = key.split('__', 1)
-            subkey, name = subkey.rsplit('__', 1)
+        if "__" in key:
+            key, subkey = key.split("__", 1)
+            subkey, name = subkey.rsplit("__", 1)
 
             if name.isdigit():
                 column_index = int(name)
@@ -196,13 +196,13 @@ def unflatten_dict(flat):
                     row = array[row_index]
                 else:
                     # This should never happen
-                    raise ValueError('There was an error unflattening the extension.')
+                    raise ValueError("There was an error unflattening the extension.")
 
                 if len(row) == column_index:
                     row.append(value)
                 else:
                     # This should never happen
-                    raise ValueError('There was an error unflattening the extension.')
+                    raise ValueError("There was an error unflattening the extension.")
 
             else:
                 subdict = unflattened.setdefault(key, {})
@@ -232,7 +232,7 @@ def validate_numerical_distributions(numerical_distributions, metadata_columns):
     """
     if numerical_distributions:
         if not isinstance(numerical_distributions, dict):
-            raise TypeError('numerical_distributions can only be None or a dict instance.')
+            raise TypeError("numerical_distributions can only be None or a dict instance.")
 
         invalid_columns = numerical_distributions.keys() - set(metadata_columns)
         # if invalid_columns:

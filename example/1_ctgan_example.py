@@ -3,6 +3,7 @@
 # 并查看 sampled_data 变量
 
 from sdgx.models.single_table.ctgan import CTGAN
+
 # from sdgx.transform.sampler import DataSamplerCTGAN
 # from sdgx.transform.transformer import DataTransformerCTGAN
 from sdgx.utils.io.csv_utils import *
