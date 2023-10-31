@@ -160,4 +160,3 @@ sampled = model.generate(num_rows=10)
 
 [10 rows x 10 columns]}}
 ```
-

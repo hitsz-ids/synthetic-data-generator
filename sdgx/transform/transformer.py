@@ -282,5 +282,3 @@ class DataTransformerCTGAN(object):
             "column_id": column_id,
             "value_id": np.argmax(one_hot),
         }
-
-

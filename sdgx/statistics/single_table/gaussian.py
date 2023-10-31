@@ -1,6 +1,6 @@
 """
-    GaussianMultivariate module. 
-    需要对 copulas 的代码进行修改 + 性能优化    
+    GaussianMultivariate module.
+    需要对 copulas 的代码进行修改 + 性能优化
 """
 
 import logging
@@ -9,16 +9,22 @@ import warnings
 
 import numpy as np
 import pandas as pd
-from scipy import stats
-
 from copulas import (
-    EPSILON, check_valid_values, get_instance, get_qualified_name, random_state, store_args,
-    validate_random_state)
+    EPSILON,
+    check_valid_values,
+    get_instance,
+    get_qualified_name,
+    random_state,
+    store_args,
+    validate_random_state,
+)
 from copulas.multivariate.base import Multivariate
 from copulas.univariate import GaussianUnivariate, Univariate
+from scipy import stats
 
 LOGGER = logging.getLogger(__name__)
 DEFAULT_DISTRIBUTION = Univariate
+
 
 class GaussianMultivariate(Multivariate):
     """Class for a multivariate distribution that uses the Gaussian copula.
@@ -42,13 +48,13 @@ class GaussianMultivariate(Multivariate):
     def __repr__(self):
         """Produce printable representation of the object."""
         if self.distribution == DEFAULT_DISTRIBUTION:
-            distribution = ''
+            distribution = ""
         elif isinstance(self.distribution, type):
             distribution = f'distribution="{self.distribution.__name__}"'
         else:
             distribution = f'distribution="{self.distribution}"'
 
-        return f'GaussianMultivariate({distribution})'
+        return f"GaussianMultivariate({distribution})"
 
     def _transform_to_normal(self, X):
         if isinstance(X, pd.Series):
@@ -95,7 +101,7 @@ class GaussianMultivariate(Multivariate):
             X (pandas.DataFrame):
                 Values of the random variables.
         """
-        LOGGER.info('Fitting %s', self)
+        LOGGER.info("Fitting %s", self)
 
         if not isinstance(X, pd.DataFrame):
             X = pd.DataFrame(X)
@@ -108,15 +114,15 @@ class GaussianMultivariate(Multivariate):
             else:
                 distribution = self.distribution
 
-            LOGGER.debug('Fitting column %s to %s', column_name, distribution)
+            LOGGER.debug("Fitting column %s to %s", column_name, distribution)
 
             univariate = get_instance(distribution)
             try:
                 univariate.fit(column)
             except BaseException:
                 warning_message = (
-                    f'Unable to fit to a {distribution} distribution for column {column_name}. '
-                    'Using a Gaussian distribution instead.'
+                    f"Unable to fit to a {distribution} distribution for column {column_name}. "
+                    "Using a Gaussian distribution instead."
                 )
                 warnings.warn(warning_message)
                 univariate = GaussianUnivariate()
@@ -128,11 +134,11 @@ class GaussianMultivariate(Multivariate):
         self.columns = columns
         self.univariates = univariates
 
-        LOGGER.debug('Computing correlation')
+        LOGGER.debug("Computing correlation")
         self.correlation = self._get_correlation(X)
         self.fitted = True
 
-        LOGGER.debug('GaussianMultivariate fitted successfully')
+        LOGGER.debug("GaussianMultivariate fitted successfully")
 
     def probability_density(self, X):
         """Compute the probability density for each point in X.
@@ -281,24 +287,23 @@ class GaussianMultivariate(Multivariate):
         univariates = [univariate.to_dict() for univariate in self.univariates]
 
         return {
-            'correlation': self.correlation.to_numpy().tolist(),
-            'univariates': univariates,
-            'columns': self.columns,
-            'type': get_qualified_name(self),
+            "correlation": self.correlation.to_numpy().tolist(),
+            "univariates": univariates,
+            "columns": self.columns,
+            "type": get_qualified_name(self),
         }
 
     @classmethod
     def from_dict(cls, copula_dict):
-
         instance = cls()
         instance.univariates = []
-        columns = copula_dict['columns']
+        columns = copula_dict["columns"]
         instance.columns = columns
 
-        for parameters in copula_dict['univariates']:
+        for parameters in copula_dict["univariates"]:
             instance.univariates.append(Univariate.from_dict(parameters))
 
-        correlation = copula_dict['correlation']
+        correlation = copula_dict["correlation"]
         instance.correlation = pd.DataFrame(correlation, index=columns, columns=columns)
         instance.fitted = True
 

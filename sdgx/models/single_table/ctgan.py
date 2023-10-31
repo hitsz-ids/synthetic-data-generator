@@ -160,8 +160,8 @@ class CTGAN(BaseSynthesizerModel):
             设计上这个参数需要是 str 类型或者 bool 类型 可以是如下数值：
                 - True：根据实际情况进行自动化内存优化，保证在能跑完的情况下，尽量多地利用内存，同时不报错
                 - False：不采用任何内存优化策略
-                - None：同 False 
-            该参数默认设为 False 
+                - None：同 False
+            该参数默认设为 False
     """
 
     def __init__(
@@ -180,7 +180,7 @@ class CTGAN(BaseSynthesizerModel):
         epochs=300,
         pac=10,
         cuda=True,
-        memory_optimize = False
+        memory_optimize=False,
     ):
         assert batch_size % 2 == 0
 
@@ -215,7 +215,6 @@ class CTGAN(BaseSynthesizerModel):
         #   - True：根据实际情况进行自动化内存优化，保证在能跑完的情况下，尽量多地利用内存，同时不报错
         #   - False：不采用任何内存优化策略
         self.memory_optimize = memory_optimize
-
 
     @staticmethod
     def _gumbel_softmax(logits, tau=1, hard=False, eps=1e-10, dim=-1):
@@ -315,14 +314,11 @@ class CTGAN(BaseSynthesizerModel):
 
         if invalid_columns:
             raise ValueError(f"Invalid columns found: {invalid_columns}")
-    
-    
+
     # OPTIMIZE 新增方法，完成在内存受限情况下的 CTGAN 训练
-    @random_state 
-    def fit_optimze(self, train_data_iterator,\
-                    discrete_columns: Optional[List] = [],\
-                    epoches = 10):
-        ''' OPTIMIZE 新增方法，在内存受限情况下完成 CTGAN 训练
+    @random_state
+    def fit_optimze(self, train_data_iterator, discrete_columns: Optional[List] = [], epoches=10):
+        """OPTIMIZE 新增方法，在内存受限情况下完成 CTGAN 训练
 
         参数列表：
             train_data_iterator (iterator)：
@@ -337,18 +333,20 @@ class CTGAN(BaseSynthesizerModel):
             epoches(int-like)：
                 CTGAN 模型的迭代次数，
                 选填参数，默认为10，但严肃应用中应必须填写。
-        '''
+        """
         if epochs is None:
             epochs = self._epochs
-        
 
         pass
 
     @random_state
-    def fit(self, train_data,
-            discrete_columns: Optional[List] = None,\
-            train_data_iterator = None,
-            epochs=None):
+    def fit(
+        self,
+        train_data,
+        discrete_columns: Optional[List] = None,
+        train_data_iterator=None,
+        epochs=None,
+    ):
         """Fit the CTGAN Synthesizer models to the training data.
 
         Args:
@@ -367,13 +365,13 @@ class CTGAN(BaseSynthesizerModel):
         if not discrete_columns:
             discrete_columns = []
 
-        # OPTIMIZE 检查 optimize 以及 train_data_iterator 
+        # OPTIMIZE 检查 optimize 以及 train_data_iterator
         if self.memory_optimize and train_data_iterator is None:
             raise ValueError("train_data_iterator should not be None.")
         # 如果符合 optimize 的需求，则转到新实现的 optimize 方法，这样也不干扰老方法的顺利执行
         if self.memory_optimize and train_data_iterator is not None:
             self.fit_optimze(train_data_iterator, discrete_columns, epochs)
-            return 
+            return
         # OPTIMIZE 改动结束
 
         # 以下为原始的 fit 方法

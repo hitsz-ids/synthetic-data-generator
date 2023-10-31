@@ -1,15 +1,15 @@
+copulas==0.9.1
+dython==0.5.1
+joblib>=1.2.0
+numpy>=1.21.5
+pandas>=1.2.4
+PyMySQL>=1.0.2
+pytest>=7.4.3
+rdt==1.6.0
+scikit-learn==1.2.2
+seaborn==0.11.1
 # using python 3.8 3.9, 3.10
 setproctitle>=1.2.3
-PyMySQL>=1.0.2
-pandas>=1.2.4
-numpy>=1.21.5
-scikit-learn==1.2.2
+table-evaluator>=1.4.2
 torch>=2.1.0
 torchvision
-rdt==1.6.0
-joblib>=1.2.0
-dython==0.5.1
-seaborn==0.11.1
-table-evaluator>=1.4.2
-copulas==0.9.1
-pytest>=7.4.3
