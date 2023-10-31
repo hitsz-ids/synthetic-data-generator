@@ -43,7 +43,7 @@ At present, the code of this project is updated very quickly. We recommend that 
 ```bash
 git clone git@github.com:hitsz-ids/synthetic-data-generator.git
 pip install -r requirement.txt
-python setup.py install
+pip install .
 ```
 
 ### Install from PyPi

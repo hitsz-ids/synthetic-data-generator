@@ -40,7 +40,7 @@
 ```bash
 git clone git@github.com:hitsz-ids/synthetic-data-generator.git
 pip install -r requirement.txt
-python setup.py install
+pip install .
 ```
 
 ### 从Pypi安装
