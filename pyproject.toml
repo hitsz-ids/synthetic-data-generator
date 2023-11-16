@@ -33,7 +33,7 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-test = ["pytest"]
+test = ["pytest", "pytest-cov"]
 docs = ["Sphinx<=7.2.4", "sphinx-rtd-theme", "sphinx-click", "autodoc_pydantic"]
 
 
