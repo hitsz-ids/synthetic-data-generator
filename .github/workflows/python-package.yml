@@ -27,4 +27,9 @@ jobs:
         python -m pip install -e .[test]
     - name: Test with pytest
       run: |
-        pytest -vv
+        pytest -vv --cov=sdgx
+    - name: Install dependencies for building
+      run: |
+        pip install build twine hatch
+    - name: Test building
+      run: python -m build
