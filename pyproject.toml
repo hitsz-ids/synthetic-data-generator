@@ -22,6 +22,7 @@ dependencies = [
     "seaborn",
     "table-evaluator",
     "copulas",
+    "click",
 ]
 dynamic = ["version"]
 classifiers = [
@@ -36,6 +37,8 @@ classifiers = [
 test = ["pytest"]
 docs = ["Sphinx<=7.2.4", "sphinx-rtd-theme", "sphinx-click", "autodoc_pydantic"]
 
+[project.scripts]
+sdgx = "sdgx.cli.main:cli"
 
 [[project.authors]]
 name = "hitsz-ids"
