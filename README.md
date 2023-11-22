@@ -145,4 +145,4 @@ The SDG project was initiated by **Institute of Data Security, Harbin Institute 
 
 ## 📄 License
 
-The SDG open source project uses Apache-2.0 license, please refer to the [LICENSE].(https://github.com/hitsz-ids/synthetic-data-generator/blob/main/LICENSE)。
+The SDG open source project uses Apache-2.0 license, please refer to the [LICENSE](https://github.com/hitsz-ids/synthetic-data-generator/blob/main/LICENSE).
