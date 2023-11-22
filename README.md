@@ -36,6 +36,14 @@ High-quality synthetic data can also be used in various fields such as data open
 
 ## 🔛 Quick Start
 
+### Pre-build image
+
+You can use pre-built images to quickly experience the latest features.
+
+```bash
+docker pull idsteam/sdgx:latest
+```
+
 ### Local Install (Recommended)
 
 At present, the code of this project is updated very quickly. We recommend that you use SDG by installing it through the source code.
