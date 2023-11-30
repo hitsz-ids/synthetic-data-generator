@@ -4,8 +4,8 @@
 
 from sdgx.models.single_table.ctgan import CTGAN
 
-# from sdgx.transform.sampler import DataSamplerCTGAN
-# from sdgx.transform.transformer import DataTransformerCTGAN
+# from sdgx.data_process.sampling.sampler import DataSamplerCTGAN
+# from sdgx.data_process.transform.transform import DataTransformer
 from sdgx.utils.io.csv_utils import *
 
 # 针对 csv 格式的小规模数据
