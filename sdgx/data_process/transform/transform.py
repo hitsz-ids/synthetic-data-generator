@@ -1,9 +1,6 @@
 """
-    DataTransformer 模块：
-
-    目前使用了CTGAN开源项目中的代码
-    后续还会根据实际业务需求进一步进行改写
-    以及进行一些性能优化
+    DataTransform 模块：
+        将把该模块列入 Data Process 中
 """
 
 from collections import namedtuple
@@ -20,8 +17,7 @@ ColumnTransformInfo = namedtuple(
     ["column_name", "column_type", "transform", "output_info", "output_dimensions"],
 )
 
-
-class DataTransformerCTGAN(object):
+class DataTransformer(object):
     """Data Transformer.
 
     Model continuous columns with a BayesianGMM and normalized to a scalar [0, 1] and a vector.
