@@ -2,32 +2,29 @@ name: Testing docker image build
 
 on:
   pull_request:
-    branches: [ "master", "main" ]
+    branches: ["master", "main"]
 
 jobs:
   deploy:
     strategy:
-        fail-fast: true
+      fail-fast: true
 
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    # Build docker images
-    -
-      name: Set up QEMU
-      uses: docker/setup-qemu-action@v2
-    -
-      name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
-    -
-      name: Build image
-      id: docker_build_test
-      uses: docker/build-push-action@v4
-      with:
-        context: .
-        platforms: linux/amd64,linux/arm64/v8
-        file: ./docker/Dockerfile
-        push: false
-        tags: build
+      # Build docker images
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Build image
+        id: docker_build_test
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64/v8
+          file: ./docker/Dockerfile
+          push: false
+          tags: build

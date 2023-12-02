@@ -19,20 +19,18 @@ There is no correspondence between synthetic data and real data, and it is not s
 In practical applications, there is no need to worry about the risk of privacy leakage.
 High-quality synthetic data can also be used in various fields such as data opening, model training and debugging, system development and testing, etc.
 
-
 ## 🎉 Features
 
-+ high performance
-   + SDG supports a variety of statistical methods, achieving up to 120 times faster execution speed, and reduces dependence on GPU devices;
-   + SDG is optimized for large dataset, consumes less memory than other frameworks or GAN-based algorithms;
-   + SDG will continue to track the latest progress in academia and industry, and introduce and support excellent algorithms and models in a timely manner.
-+ Rapid deployment in production environment
-   + Optimize for actual production needs, improve model performance, reduce memory overhead, and support practical features such as single machine multiple cards, multiple machines multiple cards;
-   + Provide technologies required for production environments such as automated deployment, containerization, automated monitoring and alarming, and support rapid one-key deployment;
-   + Specially optimized for load balancing and fault tolerance to improve high availability.
-+ Privacy enhancements:
-   + SDG supports differential privacy, anonymization and other methods to enhance the security of synthetic data.
-
+- high performance
+  - SDG supports a variety of statistical methods, achieving up to 120 times faster execution speed, and reduces dependence on GPU devices;
+  - SDG is optimized for large dataset, consumes less memory than other frameworks or GAN-based algorithms;
+  - SDG will continue to track the latest progress in academia and industry, and introduce and support excellent algorithms and models in a timely manner.
+- Rapid deployment in production environment
+  - Optimize for actual production needs, improve model performance, reduce memory overhead, and support practical features such as single machine multiple cards, multiple machines multiple cards;
+  - Provide technologies required for production environments such as automated deployment, containerization, automated monitoring and alarming, and support rapid one-key deployment;
+  - Specially optimized for load balancing and fault tolerance to improve high availability.
+- Privacy enhancements:
+  - SDG supports differential privacy, anonymization and other methods to enhance the security of synthetic data.
 
 ## 🔛 Quick Start
 
@@ -117,13 +115,12 @@ Synthetic data are as follows：
 9   28         State-gov  837932  ...             99   United-States  <=50K
 ```
 
-
 ## 🤝 Join Community
 
 The SDG project was initiated by **Institute of Data Security, Harbin Institute of Technology**. If you are interested in out project, welcome to join our community. We welcome organizations, teams, and individuals who share our commitment to data protection and security through open source:
 
 - Submit an issue by viewing [View First Good Issue](https://github.com/hitsz-ids/synthetic-data-generator/issues/new) or submit a Pull Request。
-- For developer documentation, please see  [Develop documents].(./docs/develop/readme.md)
+- For developer documentation, please see  \[Develop documents\].(./docs/develop/readme.md)
 
 ## 👩‍🎓 Related Work
 
@@ -142,7 +139,6 @@ The SDG project was initiated by **Institute of Data Security, Harbin Institute 
 - [Rossmann](https://www.kaggle.com/competitions/rossmann-store-sales/data)
 - [Telstra](https://www.kaggle.com/competitions/telstra-recruiting-network/data)
 
-
 ## 📄 License
 
-The SDG open source project uses Apache-2.0 license, please refer to the [LICENSE].(https://github.com/hitsz-ids/synthetic-data-generator/blob/main/LICENSE)。
+The SDG open source project uses Apache-2.0 license, please refer to the \[LICENSE\].(https://github.com/hitsz-ids/synthetic-data-generator/blob/main/LICENSE)。
