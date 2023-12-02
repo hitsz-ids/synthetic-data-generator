@@ -72,3 +72,7 @@ class ModelManager(metaclass=Singleton):
             return self.registed_model[model_name](**kwargs)
         except Exception as e:
             raise ModelInitializationError(e)
+
+    @staticmethod
+    def load(model_path) -> BaseSynthesizerModel:
+        return BaseSynthesizerModel.load(model_path)
