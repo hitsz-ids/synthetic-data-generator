@@ -1,5 +1,6 @@
 import contextlib
 import logging
+import threading
 
 import numpy as np
 import torch
@@ -241,3 +242,15 @@ def validate_numerical_distributions(numerical_distributions, metadata_columns):
         #         f'{invalid_columns}. The column names you provide must be present '
         #         'in the metadata.'
         #     )
+
+
+class Singleton(type):
+    _instances = {}
+    _lock = threading.Lock()
+
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            with cls._lock:
+                if cls not in cls._instances:
+                    cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]

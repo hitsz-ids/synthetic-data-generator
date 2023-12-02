@@ -10,3 +10,15 @@ class SdgxError(Exception):
 
 class NonParametricError(Exception):
     """Exception to indicate that a model is not parametric."""
+
+
+class ModelNotFoundError(SdgxError):
+    pass
+
+
+class ModelRegisterError(SdgxError):
+    pass
+
+
+class ModelInitializationError(SdgxError):
+    pass

@@ -1,8 +1,11 @@
 import click
 
+from sdgx.models.manager import ModelManager
+
 
 @click.command()
 def fit():
+    print(ModelManager().registed_model)
     print("sdgx fit")
 
 

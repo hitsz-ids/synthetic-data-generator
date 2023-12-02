@@ -23,6 +23,8 @@ dependencies = [
     "table-evaluator",
     "copulas",
     "click",
+    "pluggy",
+    "loguru",
 ]
 dynamic = ["version"]
 classifiers = [
