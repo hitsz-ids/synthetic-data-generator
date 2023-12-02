@@ -14,6 +14,8 @@ def register(manager):
     """
     For more information about this function, please check the ``ModelManager``
 
+    We provided an example package for you in {project_root}/example/extension/dummymodel.
+
     Example:
     .. code-block:: python
 
@@ -25,4 +27,14 @@ def register(manager):
         @hookimpl
         def register(manager):
             manager.register("DummyModel", MyOwnModel)
+
+
+    Config ``project.entry-points`` so that we can find it
+
+    .. code-block:: toml
+    [project.entry-points."sdgx.model"]
+    < whatever-name > = "<package>.<path>.<to>.<model-file>"
+
+
+    You can verify it by `sdgx list-models`.
     """

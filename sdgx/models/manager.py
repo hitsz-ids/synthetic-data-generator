@@ -61,6 +61,7 @@ class ModelManager(metaclass=Singleton):
 
     def register(self, model_name, model_cls: type[BaseSynthesizerModel]):
         model_name = self._normalize_name(model_name)
+        logger.info(f"Register for new model: {model_name}")
         self._registed_model[model_name] = model_cls
 
     def init_model(self, model_name, **kwargs: dict[str, Any]) -> BaseSynthesizerModel:

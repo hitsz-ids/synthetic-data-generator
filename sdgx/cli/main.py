@@ -5,7 +5,6 @@ from sdgx.models.manager import ModelManager
 
 @click.command()
 def fit():
-    print(ModelManager().registed_model)
     print("sdgx fit")
 
 
@@ -15,8 +14,9 @@ def sample():
 
 
 @click.command()
-def fit_and_sample():
-    print("sdgx fit and sample")
+def list_models():
+    for model_name, model_cls in ModelManager().registed_model.items():
+        print(f"{model_name} is registed as class: {model_cls}.")
 
 
 @click.group()
@@ -26,4 +26,4 @@ def cli():
 
 cli.add_command(fit)
 cli.add_command(sample)
-cli.add_command(fit_and_sample)
+cli.add_command(list_models)
