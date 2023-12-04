@@ -119,8 +119,8 @@ Synthetic data are as follows：
 
 The SDG project was initiated by **Institute of Data Security, Harbin Institute of Technology**. If you are interested in out project, welcome to join our community. We welcome organizations, teams, and individuals who share our commitment to data protection and security through open source:
 
-- Submit an issue by viewing [View First Good Issue](https://github.com/hitsz-ids/synthetic-data-generator/issues/new) or submit a Pull Request。
-- For developer documentation, please see  \[Develop documents\].(./docs/develop/readme.md)
+- Submit an issue by viewing [View First Good Issue](https://github.com/hitsz-ids/synthetic-data-generator/issues/new) or submit a Pull Request.
+- For developer documentation, please see [Develop documents](./docs/develop/readme.md).
 
 ## 👩‍🎓 Related Work
 
