@@ -1,0 +1,17 @@
+# Build with hatch, you can use any build tool you like.
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "sdgx-dummymodel"
+
+dependencies = ["sdgx"]
+dynamic = ["version"]
+
+# This is the entry point for the ModelManager to find the model.
+[project.entry-points."sdgx.model"]
+dummymodel = "dummymodel.model"
+
+[tool.hatch.version]
+path = "dummymodel/__init__.py"
