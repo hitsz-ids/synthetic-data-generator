@@ -38,27 +38,28 @@
 
 1. 继承 `BaseSynthesizerModel`基类 。
 
-      - 首先从 `sdgx/models/base.py` 中导入基类，并且导入其他必要的 Python 包，例如：
-        ```python
-            import warnings
-            import numpy as np
-            import pandas as pd
-            import torch
-            from torch import optim
-            from torch.nn import (
-                BatchNorm1d,
-                Dropout,
-                LeakyReLU,
-                Linear,
-                Module,
-                ReLU,
-                Sequential,
-                functional,
-            )
-            from sdgx.models.base import BaseSynthesizerModel
-            from sdgx.data_process.sampling.sampler import DataSamplerCTGAN
-            from sdgx.data_process.transform.transform import DataTransformer
-        ```
+   - 首先从 `sdgx/models/base.py` 中导入基类，并且导入其他必要的 Python 包，例如：
+
+     ```python
+         import warnings
+         import numpy as np
+         import pandas as pd
+         import torch
+         from torch import optim
+         from torch.nn import (
+             BatchNorm1d,
+             Dropout,
+             LeakyReLU,
+             Linear,
+             Module,
+             ReLU,
+             Sequential,
+             functional,
+         )
+         from sdgx.models.base import BaseSynthesizerModel
+         from sdgx.data_process.sampling.sampler import DataSamplerCTGAN
+         from sdgx.data_process.transform.transform import DataTransformer
+     ```
 
    - 完成您的模块中的 `__init__` 函数，并定义相应的类变量，以CTGAN为例：
 

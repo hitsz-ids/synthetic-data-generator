@@ -16,13 +16,13 @@ from torch.nn import (
     functional,
 )
 
-# base 类已拆分，挪到 base.py
-from sdgx.models.base import BaseSynthesizerModel
-from sdgx.models.extension import hookimpl
-
 # transformer 以及 sampler 已经拆分，挪到 transform/ 目录中
 from sdgx.data_process.sampling.sampler import DataSamplerCTGAN
 from sdgx.data_process.transform.transform import DataTransformer
+
+# base 类已拆分，挪到 base.py
+from sdgx.models.base import BaseSynthesizerModel
+from sdgx.models.extension import hookimpl
 
 # 其他函数
 from sdgx.utils.utils import random_state

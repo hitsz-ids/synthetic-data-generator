@@ -14,12 +14,11 @@ import scipy
 from copulas import multivariate
 from rdt.transformers import OneHotEncoder
 
-from sdgx.errors import NonParametricError
-from sdgx.statistics.base import BaseSynthesizerModel
-
 # transformer 以及 sampler 已经拆分，挪到 transform/ 目录中
 # from sdgx.data_process.sampling.sampler import DataSamplerCTGAN
 from sdgx.data_process.transform.transform import DataTransformer
+from sdgx.errors import NonParametricError
+from sdgx.statistics.base import BaseSynthesizerModel
 from sdgx.utils.utils import (
     flatten_dict,
     log_numerical_distributions_error,

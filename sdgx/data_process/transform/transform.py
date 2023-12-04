@@ -17,6 +17,7 @@ ColumnTransformInfo = namedtuple(
     ["column_name", "column_type", "transform", "output_info", "output_dimensions"],
 )
 
+
 class DataTransformer(object):
     """Data Transformer.
 
