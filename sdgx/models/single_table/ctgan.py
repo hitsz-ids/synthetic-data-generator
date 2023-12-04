@@ -1,5 +1,5 @@
 import warnings
-from typing import List, Optional
+from typing import Any, List, Optional
 
 import numpy as np
 import pandas as pd
@@ -18,6 +18,7 @@ from torch.nn import (
 
 # base 类已拆分，挪到 base.py
 from sdgx.models.base import BaseSynthesizerModel
+from sdgx.models.extension import hookimpl
 
 # transformer 以及 sampler 已经拆分，挪到 transform/ 目录中
 from sdgx.transform.sampler import DataSamplerCTGAN
@@ -577,3 +578,8 @@ class CTGAN(BaseSynthesizerModel):
         data = data[:n]
 
         return self._transformer.inverse_transform(data)
+
+
+@hookimpl
+def register(manager):
+    manager.register("CTGAN", CTGAN)
