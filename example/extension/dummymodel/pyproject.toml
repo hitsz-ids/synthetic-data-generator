@@ -9,7 +9,7 @@ name = "sdgx-dummymodel"
 dependencies = ["sdgx"]
 dynamic = ["version"]
 
-# This is the entry point for the FilterManager to find the Filter.
+# This is the entry point for the ModelManager to find the model.
 [project.entry-points."sdgx.model"]
 dummymodel = "dummymodel.model"
 
