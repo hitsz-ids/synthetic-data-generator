@@ -1,3 +1,8 @@
+# Refer CTGAN Version 0.6.0: https://github.com/sdv-dev/CTGAN@a40570e321cb46d798a823f350e1010a0270d804
+# Which is Lincensed by MIT License
+
+import os
+from copy import deepcopy
 from typing import List, Optional
 
 import numpy as np
@@ -39,18 +44,39 @@ class BaseSynthesizerModel:
             state.pop("random_states")
         return state
 
+    def __getstate__(self):
+        device_backup = self._device
+        self.set_device(torch.device("cpu"))
+        state = deepcopy(self.__dict__)
+        self.set_device(device_backup)
+
+        random_states = self.random_states
+        if (
+            isinstance(random_states, tuple)
+            and isinstance(random_states[0], np.random.RandomState)
+            and isinstance(random_states[1], torch.Generator)
+        ):
+            state["_numpy_random_state"] = random_states[0].get_state()
+            state["_torch_random_state"] = random_states[1].get_state()
+            del state["random_states"]
+
+        return state
+
     def __setstate__(self, state):
-        if "_numpy_random_state" in state and "_torch_random_state" in state:
-            np_state = state.pop("_numpy_random_state")
-            torch_state = state.pop("_torch_random_state")
+        np_state = state.pop("_numpy_random_state", None)
+        torch_state = state.pop("_torch_random_state", None)
+        if np_state is not None and torch_state is not None:
             current_torch_state = torch.Generator()
             current_torch_state.set_state(torch_state)
             current_numpy_state = np.random.RandomState()
             current_numpy_state.set_state(np_state)
             state["random_states"] = (current_numpy_state, current_torch_state)
         self.__dict__ = state
-        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        self.set_device(device)
+        # FIXME: Extrace it into a config file
+        if not os.getenv("SDG_FORCE_LOAD_CPU"):
+            # Prefer cuda if not specified
+            device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+            self.set_device(device)
 
     def save(self, path):
         device_backup = self._device

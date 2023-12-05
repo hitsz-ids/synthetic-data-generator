@@ -181,15 +181,12 @@ class DataTransformer(object):
         column_name = data.columns[0]
         flattened_column = data[column_name].to_numpy().flatten()
         data = data.assign(**{column_name: flattened_column})
-        gm = column_transform_info.transform
-        transformed = gm.transform(data)
+        transformed_data = column_transform_info.transform.transform(data)
 
-        #  Converts the transformed data to the appropriate output format.
-        #  The first column (ending in '.normalized') stays the same,
-        #  but the lable encoded column (ending in '.component') is one hot encoded.
-        output = np.zeros((len(transformed), column_transform_info.output_dimensions))
-        output[:, 0] = transformed[f"{column_name}.normalized"].to_numpy()
-        index = transformed[f"{column_name}.component"].to_numpy().astype(int)
+        output_dimensions = column_transform_info.output_dimensions
+        output = np.zeros((len(transformed_data), output_dimensions))
+        output[:, 0] = transformed_data[f"{column_name}.normalized"].to_numpy()
+        index = transformed_data[f"{column_name}.component"].to_numpy().astype(int)
         output[np.arange(index.size), index + 1] = 1.0
 
         return output

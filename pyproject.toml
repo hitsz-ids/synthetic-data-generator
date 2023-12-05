@@ -14,7 +14,7 @@ dependencies = [
     "pandas",
     "numpy",
     "scikit-learn",
-    "torch",
+    "torch>=2",
     "torchvision",
     "rdt",
     "joblib",
