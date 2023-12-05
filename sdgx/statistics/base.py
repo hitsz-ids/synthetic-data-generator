@@ -47,7 +47,7 @@ class BaseSynthesizerModel:
     def __getstate__(self):
         device_backup = self._device
         self.set_device(torch.device("cpu"))
-        state = deepcopy(self.__dict__)
+        state = self.__dict__.copy()
         self.set_device(device_backup)
 
         random_states = self.random_states
