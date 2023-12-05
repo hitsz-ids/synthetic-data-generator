@@ -10,6 +10,7 @@ _HERE = os.path.dirname(__file__)
 sys.path.append(os.getcwd())
 
 from sdgx.data_process.transform.transform import DataTransformer
+
 # from sdgx.data_process.transform.transformer_opt import DataTransformer
 from sdgx.utils.io.csv_utils import *
 
@@ -20,7 +21,8 @@ def test_transformer_original():
     ctgan_transformer.fit(demo_data, discrete_cols)
     transformed_data = ctgan_transformer.transform(demo_data)
 
-'''
+
+"""
 def test_transformer_opt():
     # 测试经过内存优化之后的 transformer
     demo_data_path = "./dataset/adult.csv"
@@ -40,7 +42,7 @@ def test_transformer_opt():
     shutil.os.remove("inverse_tmp.csv")
     shutil.os.remove("output_tmp.csv")
     pass
-'''
+"""
 
 
 if __name__ == "__main__":
