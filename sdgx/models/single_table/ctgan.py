@@ -16,13 +16,13 @@ from torch.nn import (
     functional,
 )
 
+# transformer 以及 sampler 已经拆分，挪到 transform/ 目录中
+from sdgx.data_process.sampling.sampler import DataSamplerCTGAN
+from sdgx.data_process.transform.transform import DataTransformer
+
 # base 类已拆分，挪到 base.py
 from sdgx.models.base import BaseSynthesizerModel
 from sdgx.models.extension import hookimpl
-
-# transformer 以及 sampler 已经拆分，挪到 transform/ 目录中
-from sdgx.transform.sampler import DataSamplerCTGAN
-from sdgx.transform.transformer import DataTransformerCTGAN
 
 # 其他函数
 from sdgx.utils.utils import random_state
@@ -391,7 +391,7 @@ class CTGAN(BaseSynthesizerModel):
             )
 
         # 载入 transformer
-        self._transformer = DataTransformerCTGAN()
+        self._transformer = DataTransformer()
         self._transformer.fit(train_data, discrete_columns)
 
         # 使用 transformer 处理数据
