@@ -14,12 +14,11 @@ import scipy
 from copulas import multivariate
 from rdt.transformers import OneHotEncoder
 
+# transformer 以及 sampler 已经拆分，挪到 transform/ 目录中
+# from sdgx.data_process.sampling.sampler import DataSamplerCTGAN
+from sdgx.data_process.transform.transform import DataTransformer
 from sdgx.errors import NonParametricError
 from sdgx.statistics.base import BaseSynthesizerModel
-
-# transformer 以及 sampler 已经拆分，挪到 transform/ 目录中
-# from sdgx.transform.sampler import DataSamplerCTGAN
-from sdgx.transform.transformer import DataTransformerCTGAN
 from sdgx.utils.utils import (
     flatten_dict,
     log_numerical_distributions_error,
@@ -149,7 +148,7 @@ class GaussianCopulaSynthesizer(BaseSynthesizerModel):
     # 2. 增加
     def fit(self, processed_data):
         # 载入 transformer
-        self._transformer = DataTransformerCTGAN()
+        self._transformer = DataTransformer()
         self._transformer.fit(processed_data, self.metadata[0])
 
         # 使用 transformer 处理数据

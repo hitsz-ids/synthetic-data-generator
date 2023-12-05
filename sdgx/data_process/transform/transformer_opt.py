@@ -21,7 +21,7 @@ ColumnTransformInfo = namedtuple(
 class DataTransformer(object):
     """OPTIMIZE SDG 重写的 Data Transformer
 
-    应对大数据（数据 > 内存）情况下的 Transformer 解决方案
+    应对大数据（数据 > 内存）情况下的 Transformer 解决方案（试行）
         - 对于连续列：使用 BayesianGMM 对连续列建模并标准化为标量 [0, 1] 和向量。
         - 对于离散列：使用 scikit-learn OneHotEncoder 进行编码。
 
