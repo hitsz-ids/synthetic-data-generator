@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.abspath(".."))
 
 # -- Project information -----------------------------------------------------
 
-project = "Synthetic Data Generator"
+project = "synthetic-data-generator"
 copyright = "2023, hitsz-ids"
 author = "hitsz-ids"
 
