@@ -42,6 +42,8 @@ High-quality synthetic data can also be used in various fields such as data open
 - Privacy enhancements:
   - SDG supports differential privacy, anonymization and other methods to enhance the security of synthetic data.
 
+Read [the latest API docs](https://synthetic-data-generator.readthedocs.io/en/latest/) for more details.
+
 ## 🔛 Quick Start
 
 ### Pre-build image
