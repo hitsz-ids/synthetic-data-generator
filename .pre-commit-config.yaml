@@ -38,6 +38,7 @@ repos:
     rev: "v4.0.0-alpha.3"
     hooks:
       - id: prettier
+        entry: env PRETTIER_LEGACY_CLI=1 prettier
         types_or: [yaml, html, json]
 
   - repo: https://github.com/pre-commit/pygrep-hooks
