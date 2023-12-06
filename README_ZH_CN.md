@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="docs/sdg_logo.png" width="400" >
+  <img src="assets/sdg_logo.png" width="400" >
 </div>
 
 <div align="center">
@@ -46,8 +46,9 @@ docker pull idsteam/sdgx:latest
 
 ```bash
 git clone git@github.com:hitsz-ids/synthetic-data-generator.git
-pip install -r requirement.txt
 pip install .
+# 或者直接从git安装
+pip install git+https://github.com/hitsz-ids/synthetic-data-generator.git
 ```
 
 ### 从Pypi安装
@@ -118,7 +119,21 @@ sampled_data = model.generate(1000)
 SDG开源项目由**哈尔滨工业大学（深圳）数据安全研究院**发起，若您对SDG项目感兴趣并愿意一起完善它，欢迎加入我们的开源社区：
 
 - 非常欢迎你的加入！[提一个 Issue](https://github.com/hitsz-ids/synthetic-data-generator/issues/new) 或者提交一个 Pull Request。
-- 开发环境配置请参考[开发者文档](./DEVELOP.md)
+- 开发环境配置请参考[开发者文档](./CONTRIBUTING.md)
+
+### Contributors
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+
+<!-- prettier-ignore-start -->
+
+<!-- markdownlint-disable -->
+
+<!-- markdownlint-restore -->
+
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
 
 ## 👩‍🎓 相关工作
 
