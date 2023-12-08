@@ -59,7 +59,7 @@ To address these challenges, we intend to design a new system that is efficient,
 and capable of simulating databases at the scale of tens of millions.
 This new system will be designed with a flexible architecture
 that can easily incorporate additional algorithms and support different types of data.
-Furthermore, it will be licensed under the `Apache 2.0 license <https://www.apache.org/licenses/LICENSE-2.0>`_,
+Furthermore, it will be licensed under the `Apache 2.0 license <https://github.com/hitsz-ids/synthetic-data-generator/blob/main/LICENSE>`_,
 which allows for greater freedom in terms of modifications and derivative works.
 
 By developing this new system, we aim to advance the research and development of synthetic data,
