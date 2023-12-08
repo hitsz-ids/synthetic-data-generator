@@ -17,7 +17,7 @@ Pre-commit will automatically format the code before each commit, It can also be
 pre-commit run --all-files
 ```
 
-Comment style is [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings).
+Comment style follows [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings).
 
 ## Install Locally with Test Dependencies
 

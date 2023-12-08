@@ -6,6 +6,6 @@
 set -e
 docker run --rm \
 -it \
--p 8080:80 \
+-p 8910:80 \
 -v $(pwd)/../docs/build/html:/usr/share/nginx/html:ro \
 nginx
