@@ -68,4 +68,4 @@ local http server to view the docs
 
    cd ./dev-tools && ./start-docs-host.sh
 
-Access ``http://localhost:8080`` for docs.
+Access ``http://localhost:8910`` for docs.
