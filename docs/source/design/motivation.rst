@@ -1,8 +1,8 @@
 Our motivation of this project
 ========================================
 
-What for?
-----------------
+Synthetic data? what for?
+---------------------------------------
 
 Generally, we want to generate synthetic data for various reasons [#1]_ [#2]_ [#3]_ [#4]_:
 
@@ -88,4 +88,4 @@ Follow our project on `GitHub <https://github.com/hitsz-ids/synthetic-data-gener
 
 Help us improve our project on `GitHub Issues <https://github.com/hitsz-ids/synthetic-data-generator/issues>`_.
 
-Getting started on contributing: :ref:`developer_guides`.
+Start contributing: :ref:`developer_guides`.
