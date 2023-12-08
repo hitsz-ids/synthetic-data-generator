@@ -1,6 +1,9 @@
 Our motivation of this project
 ========================================
 
+What for?
+----------------
+
 Generally, we want to generate synthetic data for various reasons [#1]_ [#2]_ [#3]_ [#4]_:
 
 - **Data Privacy**: Synthetic data can be generated without using sensitive customer data such as
@@ -21,6 +24,10 @@ Generally, we want to generate synthetic data for various reasons [#1]_ [#2]_ [#
 .. [#2] https://indiaai.gov.in/article/synthetic-data-description-benefits-and-implementation
 .. [#3] https://www.klippa.com/en/blog/information/what-is-synthetic-data/
 .. [#4] https://www.ibm.com/topics/synthetic-data
+
+
+SDV: SOTA, but not perfact
+---------------------------------------------------------
 
 In this case, we found `SDV <https://github.com/sdv-dev/SDV>`_,
 a Python library designed to be your one-stop shop for creating tabular synthetic data.
