@@ -26,7 +26,7 @@ Generally, we want to generate synthetic data for various reasons [#1]_ [#2]_ [#
 .. [#4] https://www.ibm.com/topics/synthetic-data
 
 
-SDV: SOTA, but not perfact
+SDV: SOTA, and not perfact
 ---------------------------------------------------------
 
 In this case, we found `SDV <https://github.com/sdv-dev/SDV>`_,
