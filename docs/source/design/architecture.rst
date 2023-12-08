@@ -3,7 +3,7 @@ Architecture
 
 .. NOTE::
 
-    For our motivation, please refer to :ref:`motivation`
+    For our motivation, please refer to :ref:`Our motivation <Our motivation of this project>`
 
 
 Overview

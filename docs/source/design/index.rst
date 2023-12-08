@@ -7,4 +7,4 @@ Design of Synthetic Data Generator
     :maxdepth: 2
 
     Architecture <architecture>
-    Motivation <motivation>
+    Our motivation of this project <motivation>

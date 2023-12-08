@@ -1,5 +1,5 @@
-Motivation
-====================
+Our motivation of this project
+========================================
 
 Generally, we want to generate synthetic data for various reasons [#1]_ [#2]_ [#3]_ [#4]_:
 
