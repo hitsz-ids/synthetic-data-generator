@@ -4,7 +4,7 @@ Our motivation of this project
 Synthetic data? what for?
 ---------------------------------------
 
-Generally, we want to generate synthetic data for various reasons [#1]_ [#2]_ [#3]_ [#4]_:
+Generally, we want to generate synthetic data for various reasons: [#1]_ [#2]_ [#3]_ [#4]_
 
 - **Data Privacy**: Synthetic data can be generated without using sensitive customer data such as
   Personally Identifiable Information (PII) or Personal Health Information (PHI).
