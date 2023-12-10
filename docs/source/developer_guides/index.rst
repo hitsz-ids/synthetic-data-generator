@@ -10,3 +10,4 @@ Before you start, maybe you are interested in :ref:`architecture` and :ref:`Our 
 
     Extented Synthetic Data Generator <extension>
     Contributing to our project directly <contributing>
+    Data Models Specification <data_models>

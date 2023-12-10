@@ -30,15 +30,58 @@ Overview
 .. image:: /_static/architecture.png
     :align: center
 
+The SDG project was designed to be easily extensible in order to allow for
+leveraging the strengths of the community for project development. We call it **the SDG Ecosystem**.
+
+In **the SDG Ecosystem**, the SDG's main focus will be on the development of the ``SDG Library``,
+``Plugin System`` and ``Synthesizer``.
+It's encouraged to develop the ``Data Connector`` and ``Evaluator`` according to your needs.
+We'll provide some of the native support, as well as some plugin projects maintained by hitsz-ids.
 
 
 Key components
 -------------------------------------
 
+- **Data Connector**: Used to connect to different data sources.
+  Because data varies from organisation to organisation and mission to mission,
+  users may need to develop their own Data Connector to suit their needs.
+- **DataLoader**: DataLoader enables data to be loaded into memory in batches.
+  To avoid network overhead from repeated reads,
+  the DataLoader **SHOULD** support some caching policies.
+- **Data Processor**: Data Processor will be used for pre-processing and post-processing of data.
+
+  - ``Inspector``: Used to extract metadata such as patterns, types, etc. from raw data.
+  - ``Transformer``: Used to modify data to comply with requirements, such as masking sensitive information or discarding non-compliant data.
+  - ``Formatter``: Used to format non-compliant data into compliant data, such as datetime to timestamp.
+  - ``Sampler``: Used to sample data. For sparse or huge datasets, it is a more efficient way.
+    Simple sampling may lead to loss of some information, which **MAY** need to do more processing to ensure uniformity,
+    *e.g. sparse category should not be missing after sampling.*
+- **Model**: Models used to generate synthetic data.
+
+  - A model needs to support incremental training as much as possible.
+    DataLoader will be the entry point for its input,
+    and Model can decide whether to get all the data at once according to its own implementation.
+  - The Model is stateful and it **SHOULD** record the previous output. To avoids outputting duplicate information.
+  - Model **SHOULD** support save/load from/to disk.
+- **Plugin System**: Used to support plugin project for SDG.
+  We will use `Pluggy <https://github.com/pytest-dev/pluggy>`_ to implement a zero-invasive plug-in system for SDG,
+  users can call the plug-in through the **CLI** or directly use the ``Manager``.
+- **Synthesizer**: All logic will be tied together by ``Synthesizer``.
+
 
 Data Model
 -------------------------------------
 
+- **Metadata**: Each field of the form data, its type, and its restrictions.
+  Data Processor and Model can use it to understand the raw data
+  and its constraints to get more realistic fitted data.
+- **ProcessedData**: The raw data will be processed to remove those that do not meet the requirements
+  and the format of the data will be converted to a common format
+  on which any model can be developed based on this format assumption.
+
+.. NOTE::
+
+    For developers, please refer to :ref:`Developer guides for data models <Data Models Specification>`
 
 Interaction
 -------------------------------------
