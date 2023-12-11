@@ -53,6 +53,7 @@ Key components
   - ``Inspector``: Used to extract metadata such as patterns, types, etc. from raw data.
   - ``Transformer``: Used to modify data to comply with requirements, such as masking sensitive information or discarding non-compliant data.
   - ``Formatter``: Used to format non-compliant data into compliant data, such as datetime to timestamp.
+    The **same** Formatter **SHOULD** be used for training and sampling.
   - ``Sampler``: Used to sample data. For sparse or huge datasets, it is a more efficient way.
     Simple sampling may lead to loss of some information, which **MAY** need to do more processing to ensure uniformity,
     *e.g. sparse category should not be missing after sampling.*
