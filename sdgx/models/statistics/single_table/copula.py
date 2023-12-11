@@ -17,7 +17,7 @@ from rdt.transformers import OneHotEncoder
 # transformer 以及 sampler 已经拆分，挪到 transform/ 目录中
 # from sdgx.data_process.sampling.sampler import DataSamplerCTGAN
 from sdgx.data_processors.transformers.transform import DataTransformer
-from sdgx.errors import NonParametricError
+from sdgx.exceptions import NonParametricError
 from sdgx.statistics.base import BaseSynthesizerModel
 from sdgx.utils.utils import (
     flatten_dict,

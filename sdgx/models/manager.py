@@ -8,7 +8,11 @@ from typing import Any
 import pluggy
 
 from sdgx import models
-from sdgx.errors import ModelInitializationError, ModelNotFoundError, ModelRegisterError
+from sdgx.exceptions import (
+    ModelInitializationError,
+    ModelNotFoundError,
+    ModelRegisterError,
+)
 from sdgx.log import logger
 from sdgx.models import extension
 from sdgx.models.base import BaseSynthesizerModel
