@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-class columnMetric(object):
+class ColumnMetric(object):
     upper_bound = None
     lower_bound = None
     metric_name = "Accuracy"

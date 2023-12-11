@@ -1,4 +1,4 @@
-class singleTableMetric:
+class SingleTableMetric:
     upper_bound = None
     lower_bound = None
     metric_name = None
@@ -15,7 +15,7 @@ class singleTableMetric:
         raise NotImplementedError()
 
     # not a class method
-    def calculate(real_data, synthetic_data):
+    def calculate(self, real_data, synthetic_data):
         raise NotImplementedError()
 
     @classmethod
