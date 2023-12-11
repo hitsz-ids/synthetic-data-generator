@@ -1,15 +1,14 @@
 """
-    DataSampler 模块：
-
-    目前使用了CTGAN开源项目中的代码
-    后续还会根据实际业务需求进一步进行改写
-    以及进行一些性能优化
+# Refer CTGAN Version 0.6.0: https://github.com/sdv-dev/CTGAN@a40570e321cb46d798a823f350e1010a0270d804
+# Which is Lincensed by MIT License
 """
 
 import numpy as np
 
+from sdgx.data_processors.samplers.base import Sampler
 
-class DataSamplerCTGAN(object):
+
+class DataSamplerCTGAN(Sampler):
     """DataSampler samples the conditional vector and corresponding data for CTGAN."""
 
     def __init__(self, data, output_info, log_frequency):

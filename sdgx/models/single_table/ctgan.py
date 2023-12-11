@@ -20,8 +20,8 @@ from torch.nn import (
 )
 
 # transformer 以及 sampler 已经拆分，挪到 transform/ 目录中
-from sdgx.data_process.sampling.sampler import DataSamplerCTGAN
-from sdgx.data_process.transform.transform import DataTransformer
+from sdgx.data_processors.samplers.ctgan_sampler import DataSamplerCTGAN
+from sdgx.data_processors.transformers.transform import DataTransformer
 
 # base 类已拆分，挪到 base.py
 from sdgx.models.base import BaseSynthesizerModel

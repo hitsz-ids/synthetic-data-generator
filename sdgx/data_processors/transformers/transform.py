@@ -11,6 +11,8 @@ import pandas as pd
 from joblib import Parallel, delayed
 from rdt.transformers import ClusterBasedNormalizer, OneHotEncoder
 
+from sdgx.data_processors.transformers.base import Transformer
+
 SpanInfo = namedtuple("SpanInfo", ["dim", "activation_fn"])
 ColumnTransformInfo = namedtuple(
     "ColumnTransformInfo",
@@ -18,7 +20,7 @@ ColumnTransformInfo = namedtuple(
 )
 
 
-class DataTransformer(object):
+class DataTransformer(Transformer):
     """Data Transformer.
 
     Model continuous columns with a BayesianGMM and normalized to a scalar [0, 1] and a vector.

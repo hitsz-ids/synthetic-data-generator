@@ -58,7 +58,7 @@
          )
          from sdgx.models.base import BaseSynthesizerModel
          from sdgx.data_process.sampling.sampler import DataSamplerCTGAN
-         from sdgx.data_process.transform.transform import DataTransformer
+         from sdgx.data_processors.transformers.transform import DataTransformer
      ```
 
    - 完成您的模块中的 `__init__` 函数，并定义相应的类变量，以CTGAN为例：

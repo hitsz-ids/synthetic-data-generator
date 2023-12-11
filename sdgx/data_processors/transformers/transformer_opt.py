@@ -8,6 +8,7 @@ import pandas as pd
 from joblib import Parallel, delayed
 from rdt.transformers import ClusterBasedNormalizer, OneHotEncoder
 
+from sdgx.data_processors.transformers.base import Transformer
 from sdgx.utils.io.csv_utils import get_csv_column, get_csv_column_count
 
 SpanInfo = namedtuple("SpanInfo", ["dim", "activation_fn"])
@@ -18,7 +19,7 @@ ColumnTransformInfo = namedtuple(
 
 
 # OPTIMIZE SDG 重写的 Data Transformer
-class DataTransformer(object):
+class DataTransformer(Transformer):
     """OPTIMIZE SDG 重写的 Data Transformer
 
     应对大数据（数据 > 内存）情况下的 Transformer 解决方案（试行）
