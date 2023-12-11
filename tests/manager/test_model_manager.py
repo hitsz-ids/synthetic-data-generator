@@ -15,7 +15,7 @@ def manager():
     ],
 )
 def test_manager(supported_model, manager: ModelManager):
-    assert supported_model in manager.registed_models
+    assert manager._normalize_name(supported_model) in manager.registed_models
     manager.init_model(supported_model, epochs=1)
 
 

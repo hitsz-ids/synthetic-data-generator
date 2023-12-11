@@ -13,7 +13,7 @@ def manager():
     [],
 )
 def test_manager(supported_data_connector, manager: DataConnectorManager):
-    assert supported_data_connector in manager.registed_data_connectors
+    assert manager._normalize_name(supported_data_connector) in manager.registed_data_connectors
     manager.init_data_connector(supported_data_connector)
 
 

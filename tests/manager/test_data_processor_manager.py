@@ -13,7 +13,7 @@ def manager():
     [],
 )
 def test_manager(supported_data_processor, manager: DataProcessorManager):
-    assert supported_data_processor in manager.registed_data_processors
+    assert manager._normalize_name(supported_data_processor) in manager.registed_data_processors
     manager.init_data_processor(supported_data_processor)
 
 

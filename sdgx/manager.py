@@ -37,7 +37,7 @@ class Manager(metaclass=Singleton):
 
     @property
     def registed_cls(self):
-        # Lazy load when query registed_models
+        # Lazy load when access
         if self._registed_cls:
             return self._registed_cls
         for f in self.pm.hook.register(manager=self):
@@ -73,14 +73,12 @@ class Manager(metaclass=Singleton):
 
     def init(self, cls_name, **kwargs: dict[str, Any]):
         cls_name = self._normalize_name(cls_name)
-        if not cls_name in self.registed_models:
+        if not cls_name in self.registed_cls:
             raise NotFoundError
         try:
             instance = self.registed_cls[cls_name](**kwargs)
             if not isinstance(instance, self.register_type):
-                raise InitializationError(
-                    f"{cls_name} is not a subclass of {self.registed_models}."
-                )
+                raise InitializationError(f"{cls_name} is not a subclass of {self.register_type}.")
             return instance
         except Exception as e:
             raise InitializationError(e)
