@@ -7,7 +7,7 @@
 要开发模块，需要执行以下 5 个步骤：
 
 1. 明确需要开发的模块类型；
-1. 算法模块需要继承`BaseSynthesizerModel`类，并完成几个指定的函数；
+1. 算法模块需要继承`SynthesizerModel`类，并完成几个指定的函数；
 1. 定义模型所需的`Discriminator`类（可选）；
 1. 定义模型所需的`Generator`类（可选）；
 1. 本地安装以及测试您的模型。
@@ -30,13 +30,13 @@
 
 ## 第二步：定义您的模型类
 
-大体上讲，定义一个算法模块需要继承`BaseSynthesizerModel`基类，并完成几个指定的函数，即可成为您自己实现的模型模块。
+大体上讲，定义一个算法模块需要继承`SynthesizerModel`基类，并完成几个指定的函数，即可成为您自己实现的模型模块。
 
 其具体步骤如下：
 
 1. 在 [single_tablem目录](../../sdgx/models/single_table/) 中创建名为 xxx.py 的 Python 脚本文件，其中 xxx 是您打算开发的模块。
 
-1. 继承 `BaseSynthesizerModel`基类 。
+1. 继承 `SynthesizerModel`基类 。
 
    - 首先从 `sdgx/models/base.py` 中导入基类，并且导入其他必要的 Python 包，例如：
 
@@ -56,15 +56,15 @@
              Sequential,
              functional,
          )
-         from sdgx.models.base import BaseSynthesizerModel
+         from sdgx.models.base import SynthesizerModel
          from sdgx.data_process.sampling.sampler import DataSamplerCTGAN
-         from sdgx.data_process.transform.transform import DataTransformer
+         from sdgx.data_processors.transformers.transform import DataTransformer
      ```
 
    - 完成您的模块中的 `__init__` 函数，并定义相应的类变量，以CTGAN为例：
 
      ```python
-       class CTGAN(BaseSynthesizerModel):
+       class CTGAN(SynthesizerModel):
            def __init__(
                self,
                embedding_dim=128,

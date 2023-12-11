@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "sdgx"
 description = "synthetic-data-generator"
-keywords = ["sdg", "hitsz-ids"]
+keywords = ["synthetic data", "hitsz-ids"]
 requires-python = ">=3.8"
 
 dependencies = [

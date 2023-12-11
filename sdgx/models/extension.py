@@ -12,14 +12,14 @@ hookspec = pluggy.HookspecMarker(project_name)
 @hookspec
 def register(manager):
     """
-    For more information about this function, please check the ``ModelManager``
+    For more information about this function, please check the :ref:`Manager`
 
     We provided an example package for you in {project_root}/example/extension/dummymodel.
 
     Example:
     .. code-block:: python
 
-        class MyOwnModel(BaseSynthesizerModel):
+        class MyOwnModel(SynthesizerModel):
             ...
 
         from sdgx.models.extension import hookimpl

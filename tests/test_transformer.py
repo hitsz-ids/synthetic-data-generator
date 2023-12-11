@@ -9,7 +9,7 @@ import pytest
 _HERE = os.path.dirname(__file__)
 sys.path.append(os.getcwd())
 
-from sdgx.data_process.transform.transform import DataTransformer
+from sdgx.data_processors.transformers.transform import DataTransformer
 
 # from sdgx.data_process.transform.transformer_opt import DataTransformer
 from sdgx.utils.io.csv_utils import *
