@@ -1,4 +1,7 @@
-class Generator:
+from sdgx.data_processors.base import DataProcessor
+
+
+class Generator(DataProcessor):
     """
     Base class for generators.
 

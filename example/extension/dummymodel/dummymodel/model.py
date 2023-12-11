@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from sdgx.models.base import BaseSynthesizerModel
+from sdgx.models.base import SynthesizerModel
 
 
-class MyOwnModel(BaseSynthesizerModel):
+class MyOwnModel(SynthesizerModel):
     ...
 
 

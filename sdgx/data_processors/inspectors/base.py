@@ -1,4 +1,7 @@
-class Inspector:
+from sdgx.data_processors.base import DataProcessor
+
+
+class Inspector(DataProcessor):
     """
     Base Inspector class
 

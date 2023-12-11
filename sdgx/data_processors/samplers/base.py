@@ -1,4 +1,7 @@
-class Sampler:
+from sdgx.data_processors.base import DataProcessor
+
+
+class Sampler(DataProcessor):
     """
     Base class for samplers.
 

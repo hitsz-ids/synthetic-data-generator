@@ -10,19 +10,25 @@ class NonParametricError(Exception):
     """
 
 
-class ModelNotFoundError(SdgxError):
+class ManagerError(SdgxError):
+    """
+    Exception to indicate that exception when using manager.
+    """
+
+
+class NotFoundError(ManagerError):
     """
     Exception to indicate that a model is not found.
     """
 
 
-class ModelRegisterError(SdgxError):
+class RegisterError(ManagerError):
     """
-    Exception to indicate that exception when registering model.
+    Exception to indicate that exception when registering.
     """
 
 
-class ModelInitializationError(SdgxError):
+class InitializationError(ManagerError):
     """
     Exception to indicate that exception when initializing model.
     """

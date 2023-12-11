@@ -4,14 +4,14 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "sdgx-dummymodel"
+name = "sdgx-dummymdataprocessor"
 
 dependencies = ["sdgx"]
 dynamic = ["version"]
 
 # This is the entry point for the Manager to find the extension.
-[project.entry-points."sdgx.model"]
-dummymodel = "dummymodel.model"
+[project.entry-points."sdgx.data_processor"]
+dummydataprocessor = "dummydataprocessor.model"
 
 [tool.hatch.version]
-path = "dummymodel/__init__.py"
+path = "dummydataprocessor/__init__.py"

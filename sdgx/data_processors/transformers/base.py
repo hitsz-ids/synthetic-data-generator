@@ -1,4 +1,7 @@
-class Transformer:
+from sdgx.data_processors.base import DataProcessor
+
+
+class Transformer(DataProcessor):
     """
     Base class for transformers.
 

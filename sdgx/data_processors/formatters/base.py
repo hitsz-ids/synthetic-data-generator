@@ -1,20 +1,7 @@
-"""
-# Formatter: column format conversion tool, the basic description is as follows:
-# - For different types of columns, implement the ability to parse, for example: DataTime into timestamp form;
-# - for different types of columns, to provide format conversion capabilities
-# - Input and output are [column] data.
-
-The difference with Transformer:
-# - When a single column is used as input, use formatter for formatting issues.
-# - When a whole table is used as input, use data transformer.
-# - Usually, in Data Transformer implementations, different formatters are called for different columns.
-# - Provide extract method
-#extract
-
-"""
+from sdgx.data_processors.base import DataProcessor
 
 
-class Formatter:
+class Formatter(DataProcessor):
     """
     Base class for formatters.
 

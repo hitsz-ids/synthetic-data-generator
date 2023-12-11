@@ -83,7 +83,7 @@ def sample(
 
 @click.command()
 def list_models():
-    for model_name, model_cls in ModelManager().registed_model.items():
+    for model_name, model_cls in ModelManager().registed_models.items():
         print(f"{model_name} is registed as class: {model_cls}.")
 
 

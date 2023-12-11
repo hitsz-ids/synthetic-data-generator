@@ -18,7 +18,7 @@ from rdt.transformers import OneHotEncoder
 # from sdgx.data_process.sampling.sampler import DataSamplerCTGAN
 from sdgx.data_processors.transformers.transform import DataTransformer
 from sdgx.exceptions import NonParametricError
-from sdgx.statistics.base import BaseSynthesizerModel
+from sdgx.statistics.base import SynthesizerModel
 from sdgx.utils.utils import (
     flatten_dict,
     log_numerical_distributions_error,
@@ -29,7 +29,7 @@ from sdgx.utils.utils import (
 LOGGER = logging.getLogger(__name__)
 
 
-class GaussianCopulaSynthesizer(BaseSynthesizerModel):
+class GaussianCopulaSynthesizer(SynthesizerModel):
     """Model wrapping ``copulas.multivariate.GaussianMultivariate`` copula.
 
     Args:
