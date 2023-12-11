@@ -1,24 +1,28 @@
-# TBD
-# 主要用于存放 sdg 中特有的的报错信息
-
-
 class SdgxError(Exception):
-    """Base class for exceptions in this module."""
-
-    pass
+    """
+    Base class for exceptions in this module.
+    """
 
 
 class NonParametricError(Exception):
-    """Exception to indicate that a model is not parametric."""
+    """
+    Exception to indicate that a model is not parametric.
+    """
 
 
 class ModelNotFoundError(SdgxError):
-    pass
+    """
+    Exception to indicate that a model is not found.
+    """
 
 
 class ModelRegisterError(SdgxError):
-    pass
+    """
+    Exception to indicate that exception when registering model.
+    """
 
 
 class ModelInitializationError(SdgxError):
-    pass
+    """
+    Exception to indicate that exception when initializing model.
+    """
