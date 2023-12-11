@@ -4,7 +4,7 @@ class columnMetric(object):
 
     upper_bound = None
     lower_bound = None
-    metric_name = None
+    metric_name = 'Accuracy'
 
     def __init__(self) -> None:
         

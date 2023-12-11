@@ -6,18 +6,18 @@ class multiTableMetric():
     metadata = None
     table_list = []
 
-    def __init__(self, metadata) -> None:
+    def __init__(self, metadata: dict) -> None:
         self.metadata = metadata
         pass
     
     @classmethod
     def check_input(real_data, synthetic_data):
-        # should be dict，其中有表
+        # real_data or synthetic_data should be dict，其中有表
 
         pass
 
-    @classmethod
-    def calculate(real_data, synthetic_data):
+    # not a class method
+    def calculate(self, real_data, synthetic_data):
 
         raise NotImplementedError()
 

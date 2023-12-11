@@ -15,7 +15,7 @@ class singleTableMetric():
 
         raise NotImplementedError()
 
-    @classmethod
+    # not a class method 
     def calculate(real_data, synthetic_data):
 
         raise NotImplementedError()
