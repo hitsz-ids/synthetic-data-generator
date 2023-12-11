@@ -3,7 +3,7 @@ Architecture
 
 .. NOTE::
 
-    For our motivation, please refer to :ref:`Our motivation <Our motivation of this project>`
+    For our motivation, please refer to :ref:`Our motivation <Our motivation of this project>`.
 
 Principles and Goals
 -------------------------------------
@@ -82,7 +82,7 @@ Data Model
 
 .. NOTE::
 
-    For developers, please refer to :ref:`Developer guides for data models <Data Models Specification>`
+    For developers, please refer to :ref:`Developer guides for data models <Data Models Specification>`.
 
 Interaction
 -------------------------------------
