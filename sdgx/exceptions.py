@@ -32,3 +32,15 @@ class InitializationError(ManagerError):
     """
     Exception to indicate that exception when initializing model.
     """
+
+
+class ManagerLoadModelError(ManagerError):
+    """
+    Exception to indicate that exception when loading model for :ref:`ModelManager`.
+    """
+
+
+class SynthesizerInitError(ManagerError):
+    """
+    Exception to indicate that exception when synthesizing model.
+    """

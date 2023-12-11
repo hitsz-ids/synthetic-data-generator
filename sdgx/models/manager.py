@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 from sdgx import models
+from sdgx.exceptions import ManagerLoadModelError
 from sdgx.manager import Manager
 from sdgx.models import extension
 from sdgx.models.base import SynthesizerModel
@@ -17,7 +18,7 @@ class ModelManager(Manager):
     @property
     def registed_models(self):
         """
-        Proxy to registed_cls
+        redirect to registed_cls
         """
 
         return self.registed_cls
@@ -28,11 +29,14 @@ class ModelManager(Manager):
 
     def init_model(self, model_name, **kwargs: dict[str, Any]) -> SynthesizerModel:
         """
-        Proxy to init
+        redirect to init
         """
 
         return self.init(model_name, **kwargs)
 
     @staticmethod
     def load(model_path) -> SynthesizerModel:
-        return SynthesizerModel.load(model_path)
+        try:
+            return SynthesizerModel.load(model_path)
+        except Exception as e:
+            raise ManagerLoadModelError(e)
