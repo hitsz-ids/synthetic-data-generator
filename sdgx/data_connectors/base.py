@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from contextlib import contextmanager
 from typing import Generator
 
 import pandas as pd
@@ -13,10 +12,10 @@ class DataConnector:
     def _columns(self) -> list[str]:
         raise NotImplementedError
 
-    def generator(self, offset=0, chunksize=0) -> Generator[pd.DataFrame, None, None]:
+    def iter(self, offset=0, chunksize=0) -> Generator[pd.DataFrame, None, None]:
         raise NotImplementedError
 
-    def read(self, offset=0, limit=0) -> pd.DataFrame:
+    def read(self, offset=0, limit=None) -> pd.DataFrame:
         return self._read(offset, limit)
 
     def columns(self) -> list[str]:

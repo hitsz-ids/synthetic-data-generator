@@ -44,3 +44,9 @@ class SynthesizerInitError(ManagerError):
     """
     Exception to indicate that exception when synthesizing model.
     """
+
+
+class CacheError(SdgxError):
+    """
+    Exception to indicate that exception when using cache.
+    """

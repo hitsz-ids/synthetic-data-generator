@@ -35,8 +35,8 @@ def test_keys(csv_connector: CsvConnector):
     assert len(keys) == 4
 
 
-def test_generator(csv_connector):
-    for df in csv_connector.generator(chunksize=1):
+def test_generator(csv_connector: CsvConnector):
+    for df in csv_connector.iter(chunksize=1):
         assert len(df) == 1
 
 

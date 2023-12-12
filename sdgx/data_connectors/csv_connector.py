@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from contextlib import contextmanager
 from typing import Generator
 
 import pandas as pd
@@ -23,9 +22,7 @@ class CsvConnector(DataConnector):
         self.header = header
         self.read_csv_kwargs = read_csv_kwargs
 
-    def _read(self, offset=0, limit=0) -> pd.DataFrame:
-        if limit == 0:
-            limit = None
+    def _read(self, offset=0, limit=None) -> pd.DataFrame:
         return pd.read_csv(
             self.path,
             sep=self.sep,
@@ -44,7 +41,7 @@ class CsvConnector(DataConnector):
         ).columns.tolist()
         return d
 
-    def generator(self, offset=0, chunksize=1000) -> Generator[pd.DataFrame, None, None]:
+    def iter(self, offset=0, chunksize=1000) -> Generator[pd.DataFrame, None, None]:
         for d in pd.read_csv(
             self.path,
             sep=self.sep,
