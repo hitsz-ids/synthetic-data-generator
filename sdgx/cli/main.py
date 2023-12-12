@@ -4,6 +4,8 @@ from pathlib import Path
 import click
 import pandas
 
+from sdgx.data_connectors.manager import DataConnectorManager
+from sdgx.data_processors.manager import DataProcessorManager
 from sdgx.models.manager import ModelManager
 
 
@@ -87,6 +89,24 @@ def list_models():
         print(f"{model_name} is registed as class: {model_cls}.")
 
 
+@click.command()
+def list_data_connectors():
+    for (
+        model_name,
+        model_cls,
+    ) in DataConnectorManager().registed_data_connectors.items():
+        print(f"{model_name} is registed as class: {model_cls}.")
+
+
+@click.command()
+def list_data_processors():
+    for (
+        model_name,
+        model_cls,
+    ) in DataProcessorManager().registed_data_processors.items():
+        print(f"{model_name} is registed as class: {model_cls}.")
+
+
 @click.group()
 def cli():
     pass
@@ -95,3 +115,9 @@ def cli():
 cli.add_command(fit)
 cli.add_command(sample)
 cli.add_command(list_models)
+cli.add_command(list_data_connectors)
+cli.add_command(list_data_processors)
+
+
+if __name__ == "__main__":
+    cli()
