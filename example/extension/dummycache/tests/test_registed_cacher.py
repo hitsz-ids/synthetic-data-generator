@@ -8,9 +8,9 @@ def manager():
     yield CacherManager()
 
 
-def test_registed_data_connector(manager: CacherManager):
+def test_registed_cacher(manager: CacherManager):
     assert manager._normalize_name("DummyCache") in manager.registed_cachers
-    manager.init_data_connector("DummyCache")
+    manager.init_cacher("DummyCache")
 
 
 if __name__ == "__main__":
