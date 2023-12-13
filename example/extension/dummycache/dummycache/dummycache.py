@@ -12,4 +12,4 @@ from sdgx.cachers.extension import hookimpl
 
 @hookimpl
 def register(manager):
-    manager.register("DummyDataCacher", MyOwnCache)
+    manager.register("DummyCache", MyOwnCache)
