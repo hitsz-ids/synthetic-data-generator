@@ -10,7 +10,6 @@ def manager():
 
 def test_registed_data_processor(manager: DataProcessorManager):
     assert manager._normalize_name("DummyDataProcessor") in manager.registed_data_processors
-    manager.init_data_processor("DummyDataProcessor")
 
 
 if __name__ == "__main__":

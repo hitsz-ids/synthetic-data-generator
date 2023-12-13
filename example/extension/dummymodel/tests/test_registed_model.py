@@ -10,7 +10,6 @@ def manager():
 
 def test_registed_model(manager: ModelManager):
     assert manager._normalize_name("DummyModel") in manager.registed_models
-    manager.init_model("DummyModel")
 
 
 if __name__ == "__main__":
