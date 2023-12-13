@@ -53,7 +53,7 @@ class Synthesizer:
         elif isinstance(model, SynthesizerModel):
             self.model = model
         elif model_path:
-            model_path = Path(model_path).resolve()
+            model_path = Path(model_path).expanduser().resolve()
             self.model = ModelManager().load(model_path)
         else:
             raise SynthesizerInitError("model or model_path must be specified")

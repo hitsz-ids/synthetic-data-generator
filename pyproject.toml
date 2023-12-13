@@ -25,6 +25,7 @@ dependencies = [
     "click",
     "pluggy",
     "loguru",
+    "pyarrow",
 ]
 dynamic = ["version"]
 classifiers = [
