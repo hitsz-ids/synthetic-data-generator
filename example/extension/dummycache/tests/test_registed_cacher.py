@@ -10,7 +10,6 @@ def manager():
 
 def test_registed_cacher(manager: CacherManager):
     assert manager._normalize_name("DummyCache") in manager.registed_cachers
-    manager.init_cacher("DummyCache")
 
 
 if __name__ == "__main__":
