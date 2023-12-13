@@ -14,8 +14,8 @@ from sdgx.utils.utils import Singleton
 
 
 class Manager(metaclass=Singleton):
-    register_type = object
-    project_name = ""
+    register_type: type = object
+    project_name: str = ""
     hookspecs_model = None
 
     def __init__(self):

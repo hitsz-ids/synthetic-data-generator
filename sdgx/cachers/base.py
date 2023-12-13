@@ -9,6 +9,14 @@ from sdgx.data_connectors.base import DataConnector
 
 
 class Cacher:
+    """
+    Base class for cachers
+
+    Cacher is used to cache raw data and :ref:`ProcessedData` to prevent repeat read or process.
+
+    You can treat Cacher as a :ref:`DataConnector`
+    """
+
     def __init__(self, blocksize, *args, **kwargs) -> None:
         self.blocksize = blocksize
 

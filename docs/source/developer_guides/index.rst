@@ -8,6 +8,6 @@ Before you start, maybe you are interested in :ref:`architecture` and :ref:`Our 
 .. toctree::
     :maxdepth: 2
 
-    Extented Synthetic Data Generator <extension>
+    Extented Synthetic Data Generator <extension/index>
     Contributing to our project directly <contributing>
     Data Models Specification <data_models>

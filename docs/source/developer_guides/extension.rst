@@ -1,2 +1,0 @@
-Extented Synthetic Data Generator
-=====================================
