@@ -9,7 +9,10 @@ from sdgx.data_connectors.base import DataConnector
 
 class DataLoader:
     """
-    Wrapper of :ref:`DataConnector`
+    Combine :ref:`Cacher` and :ref:`DataConnector` to load data in an efficient way.
+
+    Default Cacher is :ref:`DiskCache`.
+
     """
 
     def __init__(

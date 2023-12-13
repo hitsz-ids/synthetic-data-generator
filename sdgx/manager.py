@@ -14,9 +14,33 @@ from sdgx.utils.utils import Singleton
 
 
 class Manager(metaclass=Singleton):
+    """
+    Base class for all manager.
+
+    Manager is a singleton class for preventing multiple initialization.
+
+    Define following attributes in subclass:
+        * register_type: Base class for registered class
+        * project_name: Name of entry-point for extensio
+        * hookspecs_model: Hook specification model(where @hookspec is defined)
+
+    For available managers, please refer to :ref:`Plugin-supported modules`
+
+    """
+
     register_type: type = object
+    """
+    Base class for registered class
+    """
     project_name: str = ""
+    """
+    Name of entry-point for extension
+    """
+
     hookspecs_model = None
+    """
+    Hook specification model(where @hookspec is defined)
+    """
 
     def __init__(self):
         self.pm = pluggy.PluginManager(self.project_name)
@@ -36,8 +60,12 @@ class Manager(metaclass=Singleton):
         return
 
     @property
-    def registed_cls(self):
-        # Lazy load when access
+    def registed_cls(self) -> dict[str, type]:
+        """
+        Access all registed class.
+
+        Lazy load, only load once.
+        """
         if self._registed_cls:
             return self._registed_cls
         for f in self.pm.hook.register(manager=self):
@@ -49,6 +77,9 @@ class Manager(metaclass=Singleton):
         return self._registed_cls
 
     def _load_dir(self, module):
+        """
+        Import all python files in a submodule.
+        """
         modules = glob.glob(join(dirname(module.__file__), "*.py"))
         sub_packages = (
             basename(f)[:-3] for f in modules if isfile(f) and not f.endswith("__init__.py")
@@ -61,6 +92,10 @@ class Manager(metaclass=Singleton):
         return name.strip().lower()
 
     def register(self, cls_name, cls: type):
+        """
+        Register a new model, if the model is already registed, skip it.
+        """
+
         cls_name = self._normalize_name(cls_name)
         logger.info(f"Register for new model: {cls_name}")
         if cls in self._registed_cls.values():
@@ -72,6 +107,13 @@ class Manager(metaclass=Singleton):
         self._registed_cls[cls_name] = cls
 
     def init(self, cls_name, **kwargs: dict[str, Any]):
+        """
+        Init a new subclass of self.register_type.
+
+        Raises:
+            NotFoundError: if cls_name is not registered
+            InitializationError: if failed to initialize
+        """
         cls_name = self._normalize_name(cls_name)
         if not cls_name in self.registed_cls:
             raise NotFoundError

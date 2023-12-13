@@ -5,6 +5,8 @@ Cacher
    :members:
    :undoc-members:
    :inherited-members:
+   :show-inheritance:
+   :private-members:
 
 
 
@@ -15,3 +17,5 @@ NoCache
    :members:
    :undoc-members:
    :inherited-members:
+   :show-inheritance:
+   :private-members:

@@ -9,6 +9,18 @@ The entry-point name of this extension.
 Should be used in ``pyproject.toml`` as ``[project.entry-points."{project_name}"]``
 """
 hookimpl = pluggy.HookimplMarker(project_name)
+"""
+Hookimpl marker for this extension, extension module should use this marker
+
+Example:
+
+    .. code-block:: python
+
+        @hookimpl
+        def register(manager):
+            ...
+"""
+
 hookspec = pluggy.HookspecMarker(project_name)
 
 

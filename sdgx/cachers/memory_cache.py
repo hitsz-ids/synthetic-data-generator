@@ -12,6 +12,16 @@ from sdgx.log import logger
 
 
 class MemoryCache(Cacher):
+    """
+    Cacher that cache data in memory
+
+    Only useful for testing and small dataset for performance.
+
+    Args:
+        blocksize (int): The blocksize of the cache.
+
+    """
+
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.cache = {}

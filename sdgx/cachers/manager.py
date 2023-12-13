@@ -16,10 +16,20 @@ class CacherManager(Manager):
 
     @property
     def registed_cachers(self):
+        """
+        redirect to registed_cls
+        """
         return self.registed_cls
 
     def load_all_local_model(self):
+        """
+        Load all local model. Currently only ``sdgx.cachers``.
+        """
+
         self._load_dir(cachers)
 
     def init_cacher(self, cacher_name, **kwargs: dict[str, Any]) -> Cacher:
+        """
+        redirect to init
+        """
         return self.init(cacher_name, **kwargs)
