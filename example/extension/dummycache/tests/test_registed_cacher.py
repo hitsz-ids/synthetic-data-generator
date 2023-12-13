@@ -9,7 +9,7 @@ def manager():
 
 
 def test_registed_data_connector(manager: CacherManager):
-    assert manager._normalize_name("DummyCache") in manager.registed_data_connectors
+    assert manager._normalize_name("DummyCache") in manager.registed_cachers
     manager.init_data_connector("DummyCache")
 
 
