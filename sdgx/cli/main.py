@@ -4,6 +4,7 @@ from pathlib import Path
 import click
 import pandas
 
+from sdgx.cachers.manager import CacherManager
 from sdgx.data_connectors.manager import DataConnectorManager
 from sdgx.data_processors.manager import DataProcessorManager
 from sdgx.models.manager import ModelManager
@@ -107,6 +108,12 @@ def list_data_processors():
         print(f"{model_name} is registed as class: {model_cls}.")
 
 
+@click.command()
+def list_cachers():
+    for model_name, model_cls in CacherManager().registed_cachers.items():
+        print(f"{model_name} is registed as class: {model_cls}.")
+
+
 @click.group()
 def cli():
     pass
@@ -117,6 +124,7 @@ cli.add_command(sample)
 cli.add_command(list_models)
 cli.add_command(list_data_connectors)
 cli.add_command(list_data_processors)
+cli.add_command(list_cachers)
 
 
 if __name__ == "__main__":

@@ -15,11 +15,11 @@ class CacherManager(Manager):
     hookspecs_model = extension
 
     @property
-    def registed_cacher(self):
+    def registed_cachers(self):
         return self.registed_cls
 
     def load_all_local_model(self):
         self._load_dir(cachers)
 
-    def init_cacher(self, processor_name, **kwargs: dict[str, Any]) -> Cacher:
-        return self.init(processor_name, **kwargs)
+    def init_cacher(self, cacher_name, **kwargs: dict[str, Any]) -> Cacher:
+        return self.init(cacher_name, **kwargs)

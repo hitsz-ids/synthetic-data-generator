@@ -17,7 +17,7 @@ class DataLoader:
         data_connector: DataConnector,
         chunksize: int = 1000,
         cacher: Cacher | None = None,
-        cache_mode: str = "MemoryCache",
+        cache_mode: str = "DiskCache",
         cacher_kwargs: None | dict[str, Any] = None,
     ) -> None:
         self.data_connector = data_connector
@@ -25,9 +25,12 @@ class DataLoader:
         self.cache_manager = CacherManager()
 
         cacher_kwargs.setdefault("blocksize", self.chunksize)
+        cacher_kwargs.setdefault("identity", self.data_connector.identity)
         if not cacher:
             self.cacher = self.cache_manager.init_cacher(cache_mode, **cacher_kwargs)
         self.cacher = cacher
+
+        self.cacher.clear_invalid_cache()
 
     def iter(self) -> Generator[pd.DataFrame, None, None]:
         for d in self.cacher.iter(self.chunksize, self.data_connector):

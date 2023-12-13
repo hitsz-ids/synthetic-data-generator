@@ -13,7 +13,7 @@ def manager():
     ["NoCache", "MemoryCache", "DiskCache"],
 )
 def test_manager(supported_data_connector, manager: CacherManager):
-    assert manager._normalize_name(supported_data_connector) in manager.registed_cacher
+    assert manager._normalize_name(supported_data_connector) in manager.registed_cachers
 
 
 if __name__ == "__main__":

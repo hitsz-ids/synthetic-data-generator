@@ -19,6 +19,9 @@ class MemoryCache(Cacher):
     def is_cached(self, offset: int) -> bool:
         return offset in self.cache
 
+    def clear_invalid_cache(self):
+        self.cache.clear()
+
     def _refresh(self, offset: int, data: pd.DataFrame) -> None:
         if len(data) < self.blocksize:
             self.cache[offset] = data

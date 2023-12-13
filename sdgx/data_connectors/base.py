@@ -6,6 +6,11 @@ import pandas as pd
 
 
 class DataConnector:
+    identity = None
+    """
+    Identity for data source, e.g. table name, file path
+    """
+
     def _read(self, offset=0, limit=0) -> pd.DataFrame:
         raise NotImplementedError
 

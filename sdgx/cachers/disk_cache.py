@@ -11,10 +11,24 @@ from sdgx.log import logger
 
 
 class DiskCache(Cacher):
-    def __init__(self, cache_dir: str | Path = Path("/tmp/sdgx/"), *args, **kwargs) -> None:
+    def __init__(
+        self,
+        cache_dir: str | Path | None = None,
+        identity: str | None = None,
+        *args,
+        **kwargs,
+    ) -> None:
         super().__init__(*args, **kwargs)
-        self.cache_dir = Path(cache_dir).expanduser().resolve()
+        if not cache_dir:
+            cache_dir = Path.cwd() / ".sdgx_cache"
+            if identity:
+                cache_dir = cache_dir / identity
+        self.cache_dir = Path(cache_dir)
         self.cache_dir.mkdir(parents=True, exist_ok=True)
+
+    def clear_invalid_cache(self):
+        for f in self.cache_dir.glob("*.parquet"):
+            f.unlink()
 
     def _get_cache_filename(self, offset: int) -> Path:
         return self.cache_dir / f"{offset}.parquet"

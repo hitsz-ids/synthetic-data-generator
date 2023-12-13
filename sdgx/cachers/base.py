@@ -21,6 +21,9 @@ class Cacher:
     def load_all(self, data_connector: DataConnector) -> pd.DataFrame:
         raise NotImplementedError
 
+    def clear_invalid_cache(self):
+        return
+
     def iter(
         self, chunksize: int, data_connector: DataConnector
     ) -> Generator[pd.DataFrame, None, None]:

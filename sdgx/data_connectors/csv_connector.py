@@ -8,7 +8,9 @@ from sdgx.data_connectors.base import DataConnector
 
 
 class CsvConnector(DataConnector):
-    """ """
+    @property
+    def identity(self):
+        return self.path
 
     def __init__(
         self,

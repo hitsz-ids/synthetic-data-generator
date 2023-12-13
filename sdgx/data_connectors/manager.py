@@ -21,5 +21,5 @@ class DataConnectorManager(Manager):
     def load_all_local_model(self):
         self._load_dir(data_connectors)
 
-    def init_data_connector(self, processor_name, **kwargs: dict[str, Any]) -> DataConnector:
-        return self.init(processor_name, **kwargs)
+    def init_data_connector(self, connector_name, **kwargs: dict[str, Any]) -> DataConnector:
+        return self.init(connector_name, **kwargs)
