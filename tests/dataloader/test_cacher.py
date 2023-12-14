@@ -94,6 +94,7 @@ def test_cacher(cacher_cls, cache_dir, blocksize, chunksize, data_connector):
         data_connector.reset()
         cacher.load(0, chunksize, data_connector)
         assert not data_connector.is_readed
+    assert not cacher.load_all(data_connector).empty
 
 
 if __name__ == "__main__":
