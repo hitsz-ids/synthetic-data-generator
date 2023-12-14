@@ -1,6 +1,6 @@
-import os
-from typing import Any, Callable, Generator
-from uuid import uuid4
+from __future__ import annotations
+
+from typing import Callable, Generator
 
 import pandas as pd
 
