@@ -11,8 +11,14 @@ class DataLoader:
     """
     Combine :ref:`Cacher` and :ref:`DataConnector` to load data in an efficient way.
 
-    Default Cacher is :ref:`DiskCache`.
+    Default Cacher is :ref:`DiskCache`. Use ``cacher`` or ``cache_mode`` to specify a :ref:`Cacher`.
 
+    Args:
+        data_connector (:ref:`DataConnector`): The data connector
+        chunksize (int, optional): The chunksize of the cacher. Defaults to 1000.
+        cacher (:ref:`Cacher`, optional): The cacher. Defaults to None.
+        cache_mode (str, optional): The cache mode(name). Defaults to "DiskCache".
+        cacher_kwargs (dict, optional): The kwargs for cacher. Defaults to None
     """
 
     def __init__(
@@ -36,14 +42,29 @@ class DataLoader:
         self.cacher.clear_invalid_cache()
 
     def iter(self) -> Generator[pd.DataFrame, None, None]:
+        """
+        Load data from cache in chunk.
+        """
         for d in self.cacher.iter(self.chunksize, self.data_connector):
             yield d
 
     def keys(self) -> list:
+        """
+        Same as ``columns``
+        """
         return self.data_connector.keys()
 
     def columns(self) -> list:
+        """
+        Peak columns.
+
+        Returns:
+            list: name of columns
+        """
         return self.data_connector.columns()
 
     def load_all(self) -> pd.DataFrame:
+        """
+        Load all data from cache.
+        """
         return self.cacher.load_all(self.data_connector)
