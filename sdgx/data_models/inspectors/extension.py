@@ -53,7 +53,4 @@ def register(manager):
 
         [project.entry-points."sdgx.metadata.inspector"]
         {whatever-name} = "{package}.{path}.{to}.{file-with-hookimpl-function}"
-
-
-    You can verify it by `sdgx list-data-processors`.
     """
