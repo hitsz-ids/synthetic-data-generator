@@ -6,6 +6,7 @@ import pandas as pd
 from pydantic import BaseModel
 
 from sdgx.data_loader import DataLoader
+from sdgx.data_models.inspectors.inspect_meta import InspectMeta
 from sdgx.data_models.inspectors.manager import InspectorManager
 
 
@@ -23,7 +24,7 @@ class Relationship:
 class Metadata(BaseModel):
     # fields: List[str]
 
-    def update(self, metadata: Metadata):
+    def update(self, inspect_meta: InspectMeta):
         return self
 
     @classmethod

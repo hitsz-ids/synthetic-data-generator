@@ -1,6 +1,6 @@
 import pandas as pd
 
-from sdgx.data_models.metadata import Metadata
+from sdgx.data_models.inspectors.inspect_meta import InspectMeta
 
 
 class Inspector:
@@ -21,5 +21,5 @@ class Inspector:
         """
         return
 
-    def inspect(self) -> Metadata:
+    def inspect(self) -> InspectMeta:
         """Inspect raw data and generate metadata."""
