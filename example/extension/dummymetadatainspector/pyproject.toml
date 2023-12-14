@@ -23,5 +23,5 @@ ignore = [".*"]
 [tool.hatch.version]
 path = "dummymetadatainspector/__init__.py"
 
-[project.entry-points."sdgx.cacher"]
+[project.entry-points."sdgx.metadata.inspector"]
 dummymetadatainspector = "dummymetadatainspector.inspector"
