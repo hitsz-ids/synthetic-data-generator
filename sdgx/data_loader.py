@@ -24,7 +24,7 @@ class DataLoader:
     def __init__(
         self,
         data_connector: DataConnector,
-        chunksize: int = 1000,
+        chunksize: int = 10000,
         cacher: Cacher | None = None,
         cache_mode: str = "DiskCache",
         cacher_kwargs: None | dict[str, Any] = None,
