@@ -6,6 +6,7 @@ from typing import Any, Generator
 import pandas as pd
 
 from sdgx.data_connectors.base import DataConnector
+from sdgx.data_connectors.generator_connector import GeneratorConnector
 from sdgx.data_connectors.manager import DataConnectorManager
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.metadata import Metadata
@@ -23,26 +24,34 @@ class Synthesizer:
 
     def __init__(
         self,
-        data_connector: str | DataConnector,
-        data_processors: list[str | DataProcessor],
         model: str | SynthesizerModel,
         model_path: None | str | Path = None,
-        metadata: Metadata | None = None,
+        metadata: None | Metadata = None,
         metadata_path: None | str | Path = None,
+        data_connector: None | str | DataConnector = None,
         data_connectors_kwargs: None | dict[str, Any] = None,
-        data_loaders_kwargs: None | dict[str, Any] = None,
+        raw_data_loaders_kwargs: None | dict[str, Any] = None,
+        processored_data_loaders_kwargs: None | dict[str, Any] = None,
+        data_processors: None | list[str | DataProcessor] = None,
         data_processors_kwargs: None | dict[str, dict[str, Any]] = None,
         model_kwargs: None | dict[str, Any] = None,
     ):
+        # Init data connectors
         if isinstance(data_connector, str):
             data_connector = DataConnectorManager().init_data_connector(
                 data_connector, **(data_connectors_kwargs or {})
             )
-        self.dataloader = DataLoader(
-            data_connector,
-            **(data_loaders_kwargs or {}),
-        )
+        if data_connector:
+            self.dataloader = DataLoader(
+                data_connector,
+                **(raw_data_loaders_kwargs or {}),
+            )
+        else:
+            self.dataloader = None
 
+        # Init data processors
+        if not data_processors:
+            data_processors = []
         self.data_processors = [
             d
             if isinstance(d, DataProcessor)
@@ -54,6 +63,7 @@ class Synthesizer:
                 "metadata and metadata_path cannot be specified at the same time"
             )
 
+        # Load metadata
         if metadata:
             self.metadata = metadata
         elif metadata_path:
@@ -61,9 +71,9 @@ class Synthesizer:
         else:
             self.metadata = None
 
+        # Init model
         if model and model_path:
             raise SynthesizerInitError("model and model_path cannot be specified at the same time")
-
         if isinstance(model, str):
             self.model = ModelManager().init_model(model, **(model_kwargs or {}))
         elif isinstance(model, SynthesizerModel):
@@ -73,6 +83,9 @@ class Synthesizer:
             self.model = ModelManager().load(model_path)
         else:
             raise SynthesizerInitError("model or model_path must be specified")
+
+        # Other arguments
+        self.processored_data_loaders_kwargs = processored_data_loaders_kwargs or {}
 
     def save(self):
         """
@@ -92,10 +105,19 @@ class Synthesizer:
         for d in self.data_processors:
             d.fit(metadata)
 
-        for chunk in self.dataloader:
-            for d in self.data_processors:
-                chunk = d.convert(chunk)
-            self.model.fit(metadata, chunk)
+        def chunk_generator() -> Generator[pd.DataFrame, None, None]:
+            for chunk in self.dataloader.iter():
+                for d in self.data_processors:
+                    yield d.convert(chunk)
+
+        processed_dataloader = DataLoader(
+            GeneratorConnector(chunk_generator),
+            **self.processored_data_loaders_kwargs,
+        )
+        try:
+            self.model.fit(metadata, processed_dataloader)
+        finally:
+            processed_dataloader.finalize(clear_cache=True)
 
     def sample(
         self,

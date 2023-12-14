@@ -9,6 +9,7 @@ Built-in DataConnector
 
     DataConnector <base>
     CsvConnector <csv_connector>
+    GeneratorConnector <generator_connector>
 
 Custom DataConnector Relevant
 -----------------------------

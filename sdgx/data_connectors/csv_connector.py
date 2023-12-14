@@ -72,7 +72,7 @@ class CsvConnector(DataConnector):
         ).columns.tolist()
         return d
 
-    def iter(self, offset=0, chunksize=1000) -> Generator[pd.DataFrame, None, None]:
+    def _iter(self, offset=0, chunksize=1000) -> Generator[pd.DataFrame, None, None]:
         if chunksize is None:
             yield self._read(offset=offset)
             return

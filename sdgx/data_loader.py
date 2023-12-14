@@ -70,3 +70,11 @@ class DataLoader:
         Load all data from cache.
         """
         return self.cacher.load_all(self.data_connector)
+
+    def finalize(self, clear_cache=False) -> None:
+        """
+        Finalize the dataloader.
+        """
+        self.data_connector.finalize()
+        if clear_cache:
+            self.cacher.clear_cache()
