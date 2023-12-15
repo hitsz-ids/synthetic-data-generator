@@ -11,7 +11,7 @@ class columnMetric(object):
         pass
     
     @classmethod
-    def check_input(real_data, synthetic_data):
+    def check_input(cls, real_data, synthetic_data):
         # Input parameter must not contain None value
         if real_data is None or synthetic_data is None:
            raise TypeError("Input contains None.") 
@@ -39,7 +39,7 @@ class columnMetric(object):
             return None, None
 
     @classmethod
-    def calculate(real_data, synthetic_data):
+    def calculate(cls, real_data, synthetic_data):
         # This method should first check the input
         # such as: 
         real_data, synthetic_data = columnMetric.check_input(real_data, synthetic_data)
@@ -47,7 +47,7 @@ class columnMetric(object):
         raise NotImplementedError()
 
     @classmethod
-    def check_output(raw_metric_value):
+    def check_output(cls, raw_metric_value):
 
         raise NotImplementedError()
 
