@@ -7,9 +7,13 @@ from sdgx.data_process.transform.transform import DataTransformer
 
 
 class jsd(columnMetric):
-    lower_bound = 0
-    upper_bound = 1
-    metric_name = 'jensen_shannon_divergence'
+
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.lower_bound = 0
+        self.upper_bound = 1
+        self.metric_name = 'jensen_shannon_divergence'
 
     @classmethod
     def calculate(cls, real_data, synthetic_data, discrete, cols):
@@ -50,7 +54,8 @@ class jsd(columnMetric):
 
     @classmethod
     def check_output(cls, raw_metric_value):
-        if raw_metric_value < cls.lower_bound or raw_metric_value > cls.upper_bound:
+        instance = cls()
+        if raw_metric_value < instance.lower_bound or raw_metric_value > instance.upper_bound:
             raise ValueError
         pass
 
