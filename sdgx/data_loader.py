@@ -19,7 +19,7 @@ class DataLoader:
         data_connector (:ref:`DataConnector`): The data connector
         chunksize (int, optional): The chunksize of the cacher. Defaults to 1000.
         cacher (:ref:`Cacher`, optional): The cacher. Defaults to None.
-        cache_mode (str, optional): The cache mode(name). Defaults to "DiskCache".
+        cache_mode (str, optional): The cache mode(cachers' name). Defaults to "DiskCache", more info in :ref:`DiskCache`.
         cacher_kwargs (dict, optional): The kwargs for cacher. Defaults to None
     """
 
