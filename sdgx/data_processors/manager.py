@@ -21,7 +21,6 @@ class DataProcessorManager(Manager):
     def load_all_local_model(self):
         self._load_dir(data_processors.formatters)
         self._load_dir(data_processors.generators)
-        self._load_dir(data_processors.inspectors)
         self._load_dir(data_processors.samplers)
         self._load_dir(data_processors.transformers)
 

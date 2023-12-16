@@ -1,1 +1,1 @@
-from . import formatters, generators, inspectors, samplers, transformers
+from . import formatters, generators, samplers, transformers

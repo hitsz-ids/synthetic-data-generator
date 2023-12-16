@@ -1,0 +1,27 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "dummymetadatainspector"
+dependencies = ["sdgx"]
+dynamic = ["version"]
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
+]
+[project.optional-dependencies]
+test = ["pytest"]
+
+[tool.check-manifest]
+ignore = [".*"]
+
+[tool.hatch.version]
+path = "dummymetadatainspector/__init__.py"
+
+[project.entry-points."sdgx.metadata.inspector"]
+dummymetadatainspector = "dummymetadatainspector.inspector"

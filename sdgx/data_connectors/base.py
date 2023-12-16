@@ -52,7 +52,7 @@ class DataConnector:
         Returns:
             Generator[pd.DataFrame, None, None]: Generator/Iterator for readed dataframe
         """
-        raise NotImplementedError
+        return self._iter(offset, chunksize)
 
     def read(self, offset=0, limit=None) -> pd.DataFrame:
         """
@@ -82,3 +82,9 @@ class DataConnector:
         Same as ``columns``.
         """
         return self.columns()
+
+    def finalize(self):
+        """
+        Finalize the data connector.
+        """
+        pass

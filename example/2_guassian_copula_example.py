@@ -2,7 +2,7 @@
 # ipython -i  example/2_guassian_copula_example.py
 # 并查看 sampled_data 变量
 
-from sdgx.statistics.single_table.copula import GaussianCopulaSynthesizer
+from sdgx.models.statistics.single_table.copula import GaussianCopulaSynthesizer
 from sdgx.utils.io.csv_utils import *
 
 # 针对 csv 格式的小规模数据

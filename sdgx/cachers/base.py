@@ -40,6 +40,12 @@ class Cacher:
 
         raise NotImplementedError
 
+    def clear_cache(self):
+        """
+        Clear all cache
+        """
+        return
+
     def clear_invalid_cache(self):
         """
         Clear invalid cache.

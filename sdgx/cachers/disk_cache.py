@@ -42,12 +42,20 @@ class DiskCache(Cacher):
         self.cache_dir = Path(cache_dir)
         self.cache_dir.mkdir(parents=True, exist_ok=True)
 
-    def clear_invalid_cache(self):
+    def clear_cache(self):
         """
         Clear all cache in cache_dir.
         """
         for f in self.cache_dir.glob("*.parquet"):
             f.unlink()
+
+    def clear_invalid_cache(self):
+        """
+        Clear all cache in cache_dir.
+
+        TODO: Improve cache invalidation
+        """
+        return self.clear_cache()
 
     def _get_cache_filename(self, offset: int) -> Path:
         """

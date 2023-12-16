@@ -2,10 +2,9 @@ from __future__ import annotations
 
 from typing import Any
 
-from sdgx import models
 from sdgx.exceptions import ManagerLoadModelError
 from sdgx.manager import Manager
-from sdgx.models import extension
+from sdgx.models import extension, ml, statistics
 from sdgx.models.base import SynthesizerModel
 from sdgx.models.extension import project_name as PROJECT_NAME
 
@@ -24,8 +23,10 @@ class ModelManager(Manager):
         return self.registed_cls
 
     def load_all_local_model(self):
-        self._load_dir(models.single_table)
-        self._load_dir(models.multi_tables)
+        self._load_dir(ml.single_table)
+        self._load_dir(ml.multi_tables)
+        self._load_dir(statistics.single_table)
+        self._load_dir(statistics.multi_tables)
 
     def init_model(self, model_name, **kwargs: dict[str, Any]) -> SynthesizerModel:
         """

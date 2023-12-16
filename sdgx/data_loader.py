@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Any, Generator
 
 import pandas as pd
@@ -24,7 +26,7 @@ class DataLoader:
     def __init__(
         self,
         data_connector: DataConnector,
-        chunksize: int = 1000,
+        chunksize: int = 10000,
         cacher: Cacher | None = None,
         cache_mode: str = "DiskCache",
         cacher_kwargs: None | dict[str, Any] = None,
@@ -33,11 +35,11 @@ class DataLoader:
         self.chunksize = chunksize
         self.cache_manager = CacherManager()
 
+        if not cacher_kwargs:
+            cacher_kwargs = {}
         cacher_kwargs.setdefault("blocksize", self.chunksize)
         cacher_kwargs.setdefault("identity", self.data_connector.identity)
-        if not cacher:
-            self.cacher = self.cache_manager.init_cacher(cache_mode, **cacher_kwargs)
-        self.cacher = cacher
+        self.cacher = cacher or self.cache_manager.init_cacher(cache_mode, **cacher_kwargs)
 
         self.cacher.clear_invalid_cache()
 
@@ -68,3 +70,11 @@ class DataLoader:
         Load all data from cache.
         """
         return self.cacher.load_all(self.data_connector)
+
+    def finalize(self, clear_cache=False) -> None:
+        """
+        Finalize the dataloader.
+        """
+        self.data_connector.finalize()
+        if clear_cache:
+            self.cacher.clear_cache()
