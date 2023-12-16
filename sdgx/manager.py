@@ -97,7 +97,7 @@ class Manager(metaclass=Singleton):
         """
 
         cls_name = self._normalize_name(cls_name)
-        logger.info(f"Register for new model: {cls_name}")
+        logger.debug(f"Register for new model: {cls_name}")
         if cls in self._registed_cls.values():
             logger.error(f"SKIP: {cls_name} is already registed")
             return

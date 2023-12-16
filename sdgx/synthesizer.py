@@ -13,6 +13,7 @@ from sdgx.data_models.metadata import Metadata
 from sdgx.data_processors.base import DataProcessor
 from sdgx.data_processors.manager import DataProcessorManager
 from sdgx.exceptions import SynthesizerInitError
+from sdgx.log import logger
 from sdgx.models.base import SynthesizerModel
 from sdgx.models.manager import ModelManager
 
@@ -47,6 +48,7 @@ class Synthesizer:
                 **(raw_data_loaders_kwargs or {}),
             )
         else:
+            logger.warning("No data_connector provided, will not support `fit`")
             self.dataloader = None
 
         # Init data processors
@@ -87,7 +89,7 @@ class Synthesizer:
         # Other arguments
         self.processored_data_loaders_kwargs = processored_data_loaders_kwargs or {}
 
-    def save(self):
+    def save(self) -> Path:
         """
         TODO: Dump metadata and model to file
         """
@@ -107,7 +109,13 @@ class Synthesizer:
         metadata_include_inspectors: None | list[str] = None,
         metadata_exclude_inspectors: None | list[str] = None,
         inspector_init_kwargs: None | dict[str, Any] = None,
+        model_fit_kwargs: None | dict[str, Any] = None,
     ):
+        if not self.dataloader:
+            raise SynthesizerInitError(
+                "Cannot fit without dataloader, check `data_connector` parameter when initializing Synthesizer"
+            )
+
         metadata = (
             metadata
             or self.metadata
@@ -132,7 +140,7 @@ class Synthesizer:
             **self.processored_data_loaders_kwargs,
         )
         try:
-            self.model.fit(metadata, processed_dataloader)
+            self.model.fit(metadata, processed_dataloader, **(model_fit_kwargs or {}))
         finally:
             processed_dataloader.finalize(clear_cache=True)
 
@@ -141,28 +149,30 @@ class Synthesizer:
         count: int,
         chunksize: None | int = None,
         metadata: None | Metadata = None,
-        **kwargs,
+        model_fit_kwargs: None | dict[str, Any] = None,
     ) -> pd.DataFrame | Generator[pd.DataFrame, None, None]:
         metadata = metadata or self.metadata
         if metadata:
             for d in self.data_processors:
                 d.fit(metadata)
+        if not model_fit_kwargs:
+            model_fit_kwargs = {}
 
         if chunksize is None:
-            sample_data = self.model.sample(count, **kwargs)
+            sample_data = self.model.sample(count, **model_fit_kwargs)
             for d in self.data_processors:
                 sample_data = d.reverse_convert(sample_data)
             return sample_data
 
         sample_times = count // chunksize
         for _ in range(sample_times):
-            sample_data = self.model.sample(chunksize, **kwargs)
+            sample_data = self.model.sample(chunksize, **model_fit_kwargs)
             for d in self.data_processors:
                 sample_data = d.reverse_convert(sample_data)
             yield sample_data
 
         if count % chunksize > 0:
-            sample_data = self.model.sample(count % chunksize, **kwargs)
+            sample_data = self.model.sample(count % chunksize, **model_fit_kwargs)
             for d in self.data_processors:
                 sample_data = d.reverse_convert(sample_data)
             yield sample_data
