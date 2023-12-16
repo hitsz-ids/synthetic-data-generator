@@ -100,8 +100,25 @@ class Synthesizer:
         Loaded Synthesizer only support sample
         """
 
-    def fit(self):
-        metadata = self.metadata or Metadata.from_dataloader(self.dataloader)
+    def fit(
+        self,
+        metadata: None | Metadata = None,
+        inspector_max_chunk: int = 10,
+        metadata_include_inspectors: None | list[str] = None,
+        metadata_exclude_inspectors: None | list[str] = None,
+        inspector_init_kwargs: None | dict[str, Any] = None,
+    ):
+        metadata = (
+            metadata
+            or self.metadata
+            or Metadata.from_dataloader(
+                self.dataloader,
+                max_chunk=inspector_max_chunk,
+                include_inspectors=metadata_include_inspectors,
+                exclude_inspectors=metadata_exclude_inspectors,
+                inspector_init_kwargs=inspector_init_kwargs,
+            )
+        )
         for d in self.data_processors:
             d.fit(metadata)
 

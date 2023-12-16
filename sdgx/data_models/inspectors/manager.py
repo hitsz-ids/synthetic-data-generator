@@ -22,4 +22,18 @@ class InspectorManager(Manager):
         self._load_dir(inspectors)
 
     def init_all_inspectors(self, **kwargs: Any) -> list[Inspector]:
-        return [self.init(inspector_name, **kwargs) for inspector_name in self.registed_inspectors]
+        return [
+            self.init(inspector_name, **kwargs)
+            for inspector_name in self.registed_inspectors.keys()
+        ]
+
+    def init_inspcetors(
+        self,
+        includes: list[str] | None = None,
+        excludes: list[str] | None = None,
+        **kwargs: Any,
+    ) -> list[Inspector]:
+        includes = includes or self.registed_inspectors.keys()
+        if excludes:
+            includes = list(set(includes) - set(excludes))
+        return [self.init(inspector_name, **kwargs) for inspector_name in includes]

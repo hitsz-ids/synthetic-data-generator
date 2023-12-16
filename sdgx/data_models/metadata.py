@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from enum import Enum
+from typing import Any
 
 import pandas as pd
 from pydantic import BaseModel
@@ -28,8 +29,17 @@ class Metadata(BaseModel):
         return self
 
     @classmethod
-    def from_dataloader(cls, dataloader: DataLoader, max_chunk: int = 10) -> "Metadata":
-        inspectors = InspectorManager().init_all_inspectors()
+    def from_dataloader(
+        cls,
+        dataloader: DataLoader,
+        max_chunk: int = 10,
+        include_inspectors: list[str] | None = None,
+        exclude_inspectors: list[str] | None = None,
+        inspector_init_kwargs: dict[str, Any] | None = None,
+    ) -> "Metadata":
+        inspectors = InspectorManager().init_inspcetors(
+            include_inspectors, exclude_inspectors, **(inspector_init_kwargs or {})
+        )
         for i, chunk in enumerate(dataloader.iter()):
             for inspector in inspectors:
                 inspector.fit(chunk)
@@ -43,8 +53,16 @@ class Metadata(BaseModel):
         return metadata
 
     @classmethod
-    def from_dataframe(cls, df: pd.DataFrame) -> "Metadata":
-        inspectors = InspectorManager().init_all_inspectors()
+    def from_dataframe(
+        cls,
+        df: pd.DataFrame,
+        include_inspectors: list[str] | None = None,
+        exclude_inspectors: list[str] | None = None,
+        inspector_init_kwargs: dict[str, Any] | None = None,
+    ) -> "Metadata":
+        inspectors = InspectorManager().init_inspcetors(
+            include_inspectors, exclude_inspectors, **(inspector_init_kwargs or {})
+        )
         for inspector in inspectors:
             inspector.fit(df)
 
