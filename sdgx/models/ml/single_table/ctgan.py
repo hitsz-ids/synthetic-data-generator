@@ -19,16 +19,11 @@ from torch.nn import (
     functional,
 )
 
-# transformer 以及 sampler 已经拆分，挪到 transform/ 目录中
-from sdgx.data_processors.samplers.ctgan_sampler import DataSamplerCTGAN
-from sdgx.data_processors.transformers.transform import DataTransformer
-
-# base 类已拆分，挪到 base.py
 from sdgx.models.base import SynthesizerModel
+from sdgx.models.components.sample import DataSamplerCTGAN
+from sdgx.models.components.transform import DataTransformer
+from sdgx.models.components.utils import random_state
 from sdgx.models.extension import hookimpl
-
-# 其他函数
-from sdgx.utils.utils import random_state
 
 
 class Discriminator(Module):

@@ -9,13 +9,52 @@ from joblib import Parallel, delayed
 from rdt.transformers import ClusterBasedNormalizer, OneHotEncoder
 
 from sdgx.data_processors.transformers.base import Transformer
-from sdgx.utils.io.csv_utils import get_csv_column, get_csv_column_count
 
 SpanInfo = namedtuple("SpanInfo", ["dim", "activation_fn"])
 ColumnTransformInfo = namedtuple(
     "ColumnTransformInfo",
     ["column_name", "column_type", "transform", "output_info", "output_dimensions"],
 )
+
+
+def get_csv_column(input_path, column_name):
+    """按 column 形式读取 csv，返回 pd.DataFrame 的单列数据
+
+    输入参数:
+        input_path (str):
+            作为输入的 csv 路径
+        column_name (str)：
+            需要提取的 csv 列名
+
+    返回对象说明:
+        namedtuple对象 (pd.DataFrame):
+            返回单个 ``pd.DataFrame`` 对象
+    """
+    df_col = pd.read_csv(input_path, usecols=[column_name])
+    return df_col
+
+
+def get_csv_column_count(input_path, id_col=False):
+    """get the column number from csv, the input is the path
+
+    Args:
+        input_path (str):
+            the path of csv file
+        id_col (bool):
+            whether csv file contains id column,
+            if true, the count of column will minus by 1
+
+    Returns:
+        cnt (int):
+            the count of column in csv
+    """
+    first_line = None
+    with open(input_path) as f:
+        first_line = f.readline()
+    cnt = len(first_line.split(","))
+    if id_col:
+        cnt = cnt - 1
+    return cnt
 
 
 # OPTIMIZE SDG 重写的 Data Transformer

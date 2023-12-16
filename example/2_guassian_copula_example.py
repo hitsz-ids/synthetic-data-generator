@@ -3,7 +3,7 @@
 # 并查看 sampled_data 变量
 
 from sdgx.models.statistics.single_table.copula import GaussianCopulaSynthesizer
-from sdgx.utils.io.csv_utils import *
+from sdgx.utils import *
 
 # 针对 csv 格式的小规模数据
 # 目前我们以 df 作为输入的数据的格式
