@@ -1,4 +1,4 @@
-DataLoader
+Data Loader
 ============================
 
 .. automodule:: sdgx.data_loader

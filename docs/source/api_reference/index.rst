@@ -7,7 +7,7 @@ API Reference
     :maxdepth: 2
 
     Synthesizer <synthesizer>
-    DataLoader <data_loader>
+    Data Loader <data_loader>
     Cacher for DataLoader <cachers/index>
     Data Connector <data_connectors/index>
     Manager <manager>
