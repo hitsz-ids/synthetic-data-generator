@@ -9,7 +9,9 @@ import warnings
 
 import numpy as np
 import pandas as pd
-from copulas import (
+from scipy import stats
+
+from sdgx.models.components.sdv_copulas import (
     EPSILON,
     check_valid_values,
     get_instance,
@@ -18,9 +20,8 @@ from copulas import (
     store_args,
     validate_random_state,
 )
-from copulas.multivariate.base import Multivariate
-from copulas.univariate import GaussianUnivariate, Univariate
-from scipy import stats
+from sdgx.models.components.sdv_copulas.multivariate.base import Multivariate
+from sdgx.models.components.sdv_copulas.univariate import GaussianUnivariate, Univariate
 
 LOGGER = logging.getLogger(__name__)
 DEFAULT_DISTRIBUTION = Univariate

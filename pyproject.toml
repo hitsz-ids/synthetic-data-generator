@@ -9,24 +9,21 @@ keywords = ["synthetic data", "hitsz-ids"]
 requires-python = ">=3.8"
 
 dependencies = [
-    "setproctitle",
-    "PyMySQL",
     "pandas",
     "numpy",
-    "scikit-learn",
+    "scipy",
+    "pyyaml",
+    'scikit-learn>=0.24,<2',
+    'Faker>=10',
+    "matplotlib",
     "torch>=2",
     "torchvision",
-    "rdt",
-    "joblib",
-    "dython",
-    "seaborn",
     "table-evaluator",
-    "copulas",
     "click",
     "pluggy",
     "loguru",
     "pyarrow",
-    "pydantic>=2"
+    "pydantic>=2",
 ]
 dynamic = ["version"]
 classifiers = [

@@ -1,6 +1,8 @@
-import pandas as pd
+from __future__ import annotations
 
-from sdgx.data_models.inspectors.inspect_meta import InspectMeta
+from typing import Any
+
+import pandas as pd
 
 
 class Inspector:
@@ -8,10 +10,13 @@ class Inspector:
     Base Inspector class
 
     Inspector is used to inspect data and generate metadata automatically.
+
+    Parameters:
+        ready (bool): Ready to inspect, maybe all fields are fitted, or indicate if there is more data, inspector will be more precise.
     """
 
-    ready: bool
-    """Ready to inspect, maybe all fields are fitted."""
+    def __init__(self, *args, **kwargs):
+        self.ready: bool = False
 
     def fit(self, raw_data: pd.DataFrame):
         """Fit the inspector.
@@ -21,5 +26,5 @@ class Inspector:
         """
         return
 
-    def inspect(self) -> InspectMeta:
+    def inspect(self) -> dict[str, Any]:
         """Inspect raw data and generate metadata."""

@@ -35,15 +35,17 @@ def generator_data() -> pd.DataFrame:
 
 
 class MockDataConnector(GeneratorConnector):
-    def __init__(self):
-        super().__init__(generator_data)
+    def __init__(self, *args, **kwargs):
+        super().__init__(generator_data, *args, **kwargs)
 
 
 @pytest.fixture
-def synthesizer():
+def synthesizer(cacher_kwargs):
     yield Synthesizer(
         MockModel(),
         data_connector=MockDataConnector(),
+        raw_data_loaders_kwargs={"cacher_kwargs": cacher_kwargs},
+        processored_data_loaders_kwargs={"cacher_kwargs": cacher_kwargs},
     )
 
 

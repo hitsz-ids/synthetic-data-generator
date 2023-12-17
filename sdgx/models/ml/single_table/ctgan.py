@@ -19,16 +19,12 @@ from torch.nn import (
     functional,
 )
 
-# transformer 以及 sampler 已经拆分，挪到 transform/ 目录中
-from sdgx.data_processors.samplers.ctgan_sampler import DataSamplerCTGAN
-from sdgx.data_processors.transformers.transform import DataTransformer
-
-# base 类已拆分，挪到 base.py
 from sdgx.models.base import SynthesizerModel
+from sdgx.models.components.sample import DataSamplerCTGAN
+from sdgx.models.components.transform import DataTransformer
+from sdgx.models.components.utils import random_state
 from sdgx.models.extension import hookimpl
-
-# 其他函数
-from sdgx.utils.utils import random_state
+from sdgx.models.ml.single_table.base import TorchSynthesizerModel
 
 
 class Discriminator(Module):
@@ -115,7 +111,7 @@ class Generator(Module):
 
 # 目前针对了较大的数据进行内存占用上的优化
 # 总体思路是采用分批 load 进内存的方法，优化其占用空间的大小
-class CTGAN(SynthesizerModel):
+class CTGAN(TorchSynthesizerModel):
     """Conditional Table GAN Synthesizer.
 
     This is the core class of the CTGAN project, where the different components
