@@ -4,10 +4,10 @@ import pandas as pd
 from scipy.stats import entropy, gaussian_kde
 
 from sdgx.data_process.transform.transform import DataTransformer
-from sdgx.metrics.column.base import columnMetric
+from sdgx.metrics.column.base import ColumnMetric
 
 
-class jsd(columnMetric):
+class jsd(ColumnMetric):
     def __init__(self) -> None:
         super().__init__()
         self.lower_bound = 0
