@@ -1,4 +1,4 @@
-.. _api_reference/data-connector-extension:
+.. _api_reference/data-connectors-extension:
 
 Extension hookspec
 ============================

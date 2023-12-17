@@ -23,7 +23,8 @@ View latest extension example on `GitHub <https://github.com/hitsz-ids/synthetic
 Plugin-supported modules
 ------------------------
 
-- :ref:`Cacher for DataLoader <api_reference/cacher-extension>`
-- :ref:`Data Connector <_api_reference/data-connector-extension>`
-- :ref:`Data Processor <_api_reference/data-processor-extension>`
-- :ref:`Model <_api_reference/model-extension>`
+- :ref:`Cacher for DataLoader <api_reference/cachers-extension>`
+- :ref:`Data Connector <api_reference/data-connectors-extension>`
+- :ref:`Data Processor <api_reference/data-processors-extension>`
+- :ref:`Inspector for Metadata <api_reference/data-models-inspectors-extension>`
+- :ref:`Model <api_reference/models-extension>`

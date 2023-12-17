@@ -1,9 +1,9 @@
-.. _api_reference/cachers-extension:
+.. _api_reference/data-processors-extension:
 
 Extension hookspec
 ============================
 
-.. automodule:: sdgx.cachers.extension
+.. automodule:: sdgx.data_processors.extension
    :members:
    :undoc-members:
    :inherited-members:
