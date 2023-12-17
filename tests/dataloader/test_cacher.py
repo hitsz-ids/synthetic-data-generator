@@ -65,13 +65,6 @@ def data_connector(csv_file):
     )
 
 
-@pytest.fixture
-def cache_dir():
-    p = Path("/tmp/sdgx-unit-test/")
-    yield p
-    shutil.rmtree(p, ignore_errors=True)
-
-
 @pytest.mark.parametrize(
     "cacher_cls",
     [
@@ -82,8 +75,8 @@ def cache_dir():
 )
 @pytest.mark.parametrize("blocksize", [1])
 @pytest.mark.parametrize("chunksize", [1])
-def test_cacher(cacher_cls, cache_dir, blocksize, chunksize, data_connector):
-    cacher: Cacher = cacher_cls(blocksize=blocksize, cache_dir=cache_dir)
+def test_cacher(cacher_cls, cacher_kwargs, blocksize, chunksize, data_connector):
+    cacher: Cacher = cacher_cls(blocksize=blocksize, **cacher_kwargs)
     for d in cacher.iter(chunksize, data_connector):
         assert len(d) == chunksize
     if isinstance(cacher, NoCache):

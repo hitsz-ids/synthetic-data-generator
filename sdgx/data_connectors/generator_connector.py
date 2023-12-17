@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import os
+from functools import cached_property
 from typing import Callable, Generator
 
 import pandas as pd
@@ -21,9 +23,9 @@ class GeneratorConnector(DataConnector):
         This connector is not been registered by default. So only be used with the library way.
     """
 
-    @property
+    @cached_property
     def identity(self) -> str:
-        return f"{id(self.generator_caller)}"
+        return f"generator-{os.getpid()}-{id(self.generator_caller)}"
 
     def __init__(
         self,

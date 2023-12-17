@@ -1,31 +1,49 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Any
+from typing import Any, List
 
 import pandas as pd
 from pydantic import BaseModel
 
 from sdgx.data_loader import DataLoader
-from sdgx.data_models.inspectors.inspect_meta import InspectMeta
 from sdgx.data_models.inspectors.manager import InspectorManager
+from sdgx.exceptions import MetadataInitError
+from sdgx.utils import cache
+
+# TODO: Design metadata for relationships...
+# class DType(Enum):
+#     datetime = "datetime"
+#     timestamp = "timestamp"
+#     numeric = "numeric"
+#     category = "category"
 
 
-class DType(Enum):
-    datetime = "datetime"
-    timestamp = "timestamp"
-    numeric = "numeric"
-    category = "category"
-
-
-class Relationship:
-    pass
+# class Relationship:
+#     pass
 
 
 class Metadata(BaseModel):
-    # fields: List[str]
+    discrete_columns: List[str] = []
+    _extend: dict[str, Any] = {}
 
-    def update(self, inspect_meta: InspectMeta):
+    @cache
+    def get(self, key: str):
+        return getattr(self, key, getattr(self._extend, key, None))
+
+    def set(self, key: str, value: Any):
+        if key == "_extend":
+            raise MetadataInitError("Cannot set _extend directly")
+
+        if key in self.model_fields:
+            setattr(self, key, value)
+        else:
+            self._extend[key] = value
+
+    def update(self, attributes: dict[str, Any]):
+        for k, v in attributes.items():
+            self.set(k, v)
+
         return self
 
     @classmethod
@@ -68,7 +86,6 @@ class Metadata(BaseModel):
 
         metadata = Metadata()
         for inspector in inspectors:
-            if inspector.ready:
-                metadata.update(inspector.inspect())
+            metadata.update(inspector.inspect())
 
         return metadata

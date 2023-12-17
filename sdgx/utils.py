@@ -6,8 +6,15 @@ import pandas as pd
 
 from sdgx.log import logger
 
+try:
+    from functools import cache
+except ImportError:
+    from functools import lru_cache as cache
 
-def get_demo_single_table(data_dir="./dataset"):
+__all__ = ["download_demo_data", "get_demo_single_table", "cache", "Singleton"]
+
+
+def download_demo_data(data_dir: str | Path = "./dataset") -> Path:
     data_dir = Path(data_dir).expanduser().resolve()
     demo_data_path = data_dir / "adult.csv"
     if not demo_data_path.exists():
@@ -18,6 +25,11 @@ def get_demo_single_table(data_dir="./dataset"):
         url = "https://datahub.io/machine-learning/adult/r/adult.csv"
         urllib.request.urlretrieve(url, demo_data_path)
 
+    return demo_data_path
+
+
+def get_demo_single_table(data_dir: str | Path = "./dataset"):
+    demo_data_path = download_demo_data(data_dir)
     pd_obj = pd.read_csv(demo_data_path)
     discrete_cols = [
         "workclass",

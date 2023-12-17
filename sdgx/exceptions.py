@@ -50,3 +50,9 @@ class CacheError(SdgxError):
     """
     Exception to indicate that exception when using cache.
     """
+
+
+class MetadataInitError(SdgxError):
+    """
+    Exception to indicate that exception when initializing metadata.
+    """

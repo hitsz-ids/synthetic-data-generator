@@ -38,7 +38,7 @@ class CsvConnector(DataConnector):
         Identity of the data source is the sha256 of the file
         """
         with open(self.path, "rb") as f:
-            return hashlib.sha256(f.read()).hexdigest()
+            return f"csvfile-{hashlib.sha256(f.read()).hexdigest()}"
 
     def __init__(
         self,

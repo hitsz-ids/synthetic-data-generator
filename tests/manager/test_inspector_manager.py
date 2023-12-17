@@ -10,7 +10,9 @@ def manager():
 
 @pytest.mark.parametrize(
     "supported_inspector",
-    [],
+    [
+        "DiscreteInspector",
+    ],
 )
 def test_manager(supported_inspector, manager: InspectorManager):
     assert manager._normalize_name(supported_inspector) in manager.registed_inspectors
