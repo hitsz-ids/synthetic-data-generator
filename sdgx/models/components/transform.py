@@ -50,21 +50,7 @@ class DataTransformer:
                 A ``ColumnTransformInfo`` object.
         """
         column_name = data.columns[0]
-
-        # 这里进行了修改，用于防止未来的兼容性问题，同时避免出现以下警告
-        # ======================================================
-        # FutureWarning: Future versions of RDT
-        # will not support the 'model_missing_values' parameter.
-        # Please switch to using the 'missing_value_generation'
-        # parameter to select your strategy.
-        # ======================================================
-
-        # 修改前
-        # gm = ClusterBasedNormalizer(model_missing_values=True, max_clusters=min(len(data), 10))
-        # 修改后
-        gm = ClusterBasedNormalizer(
-            missing_value_generation="from_column", max_clusters=min(len(data), 10)
-        )
+        gm = ClusterBasedNormalizer(model_missing_values=True, max_clusters=min(len(data), 10))
         gm.fit(data, column_name)
         num_components = sum(gm.valid_component_indicator)
 
