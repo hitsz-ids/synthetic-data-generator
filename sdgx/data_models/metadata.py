@@ -28,8 +28,8 @@ class Metadata(BaseModel):
     _extend: Dict[str, Any] = {}
 
     @cache
-    def get(self, key: str):
-        return getattr(self, key, getattr(self._extend, key, None))
+    def get(self, key: str, default=None) -> Any:
+        return getattr(self, key, getattr(self._extend, key, default))
 
     def set(self, key: str, value: Any):
         if key == "_extend":
