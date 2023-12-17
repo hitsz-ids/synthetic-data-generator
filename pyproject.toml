@@ -36,7 +36,7 @@ classifiers = [
 
 [project.optional-dependencies]
 test = ["pytest", "pytest-cov"]
-docs = ["Sphinx<=7.2.6", "sphinx-rtd-theme", "sphinx-click", "autodoc_pydantic"]
+docs = ["Sphinx", "sphinx-rtd-theme", "sphinx-click", "autodoc_pydantic>=2"]
 
 [project.scripts]
 sdgx = "sdgx.cli.main:cli"

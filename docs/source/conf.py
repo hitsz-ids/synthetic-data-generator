@@ -69,3 +69,5 @@ html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
 
 todo_include_todos = True
+
+html_logo = "_static/sdg_logo.png"

@@ -12,7 +12,7 @@ class Cacher:
     """
     Base class for cachers
 
-    Cacher is used to cache raw data and :ref:`ProcessedData` to prevent repeat read or process.
+    Cacher is used to cache raw data and processed data to prevent repeat read or process.
 
     You can treat Cacher as a warrper of :ref:`DataConnector`
     """

@@ -1,9 +1,9 @@
-.. _api_reference/cachers-extension:
+.. _api_reference/models-extension:
 
 Extension hookspec
 ============================
 
-.. automodule:: sdgx.cachers.extension
+.. automodule:: sdgx.models.extension
    :members:
    :undoc-members:
    :inherited-members:
