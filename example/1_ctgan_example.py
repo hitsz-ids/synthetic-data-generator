@@ -22,7 +22,7 @@ sampled_data = model.sample(1000)
 
 # selected_columns = ["education-num", "fnlwgt"]
 # isDiscrete = False
-selected_columns = ['workclass']
+selected_columns = ["workclass"]
 isDiscrete = True
 metrics = JSD.calculate(demo_data, sampled_data, isDiscrete, selected_columns)
 print(metrics)
