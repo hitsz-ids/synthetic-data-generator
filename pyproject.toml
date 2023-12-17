@@ -9,24 +9,21 @@ keywords = ["synthetic data", "hitsz-ids"]
 requires-python = ">=3.8"
 
 dependencies = [
-    "setproctitle",
-    "PyMySQL",
     "pandas",
     "numpy",
-    "scikit-learn",
     "torch>=2",
     "torchvision",
-    "rdt",
-    "joblib",
-    "dython",
-    "seaborn",
+    # sdv-dev changes their license, here we use MIT licensed version
+    "rdt<1.3.0",
+    "ctgan<0.7.0",
+    "copulas<0.8.0",
+    # sdv-dev ends
     "table-evaluator",
-    "copulas",
     "click",
     "pluggy",
     "loguru",
     "pyarrow",
-    "pydantic>=2"
+    "pydantic>=2",
 ]
 dynamic = ["version"]
 classifiers = [
