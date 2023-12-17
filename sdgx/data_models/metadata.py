@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Any, List
+from typing import Any, Dict, List
 
 import pandas as pd
 from pydantic import BaseModel
@@ -25,7 +25,7 @@ from sdgx.utils import cache
 
 class Metadata(BaseModel):
     discrete_columns: List[str] = []
-    _extend: dict[str, Any] = {}
+    _extend: Dict[str, Any] = {}
 
     @cache
     def get(self, key: str):
