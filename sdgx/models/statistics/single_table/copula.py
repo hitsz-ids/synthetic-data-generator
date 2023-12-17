@@ -6,15 +6,14 @@ import logging
 import warnings
 from copy import deepcopy
 
-import copulas
-import copulas.univariate
 import numpy as np
 import pandas as pd
 import scipy
-from copulas import multivariate
-from rdt.transformers import OneHotEncoder
 
+import sdgx.models.components.sdv_copulas as copulas
 from sdgx.exceptions import NonParametricError
+from sdgx.models.components.sdv_copulas import multivariate
+from sdgx.models.components.sdv_rdt.transformers import OneHotEncoder
 
 # transformer 以及 sampler 已经拆分，挪到 transform/ 目录中
 # from sdgx.data_process.sampling.sampler import DataSamplerCTGAN

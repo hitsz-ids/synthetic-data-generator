@@ -6,9 +6,10 @@ from typing import List, Optional
 import numpy as np
 import pandas as pd
 from joblib import Parallel, delayed
-from rdt.transformers import ClusterBasedNormalizer, OneHotEncoder
 
 from sdgx.data_processors.transformers.base import Transformer
+
+from .sdv_rdt.transformers import ClusterBasedNormalizer, OneHotEncoder
 
 SpanInfo = namedtuple("SpanInfo", ["dim", "activation_fn"])
 ColumnTransformInfo = namedtuple(

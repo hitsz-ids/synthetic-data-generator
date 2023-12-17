@@ -1,12 +1,11 @@
-# Refer CTGAN Version 0.6.0: https://github.com/sdv-dev/CTGAN@a40570e321cb46d798a823f350e1010a0270d804
-# Which is Lincensed by MIT License
+"""CTGAN module."""
 
 import warnings
-from typing import Any, List, Optional
 
 import numpy as np
 import pandas as pd
 import torch
+from packaging import version
 from torch import optim
 from torch.nn import (
     BatchNorm1d,
@@ -19,12 +18,12 @@ from torch.nn import (
     functional,
 )
 
-from sdgx.models.base import SynthesizerModel
-from sdgx.models.components.sample import DataSamplerCTGAN
-from sdgx.models.components.transform import DataTransformer
-from sdgx.models.components.utils import random_state
-from sdgx.models.extension import hookimpl
-from sdgx.models.ml.single_table.base import TorchSynthesizerModel
+from sdgx.models.components.sdv_ctgan.data_sampler import DataSampler
+from sdgx.models.components.sdv_ctgan.data_transformer import DataTransformer
+from sdgx.models.components.sdv_ctgan.synthesizers.base import (
+    BaseSynthesizer,
+    random_state,
+)
 
 
 class Discriminator(Module):
@@ -109,9 +108,7 @@ class Generator(Module):
         return data
 
 
-# 目前针对了较大的数据进行内存占用上的优化
-# 总体思路是采用分批 load 进内存的方法，优化其占用空间的大小
-class CTGAN(TorchSynthesizerModel):
+class CTGAN(BaseSynthesizer):
     """Conditional Table GAN Synthesizer.
 
     This is the core class of the CTGAN project, where the different components
@@ -156,12 +153,6 @@ class CTGAN(TorchSynthesizerModel):
             Whether to attempt to use cuda for GPU computation.
             If this is False or CUDA is not available, CPU will be used.
             Defaults to ``True``.
-        memory_optimize(bool):
-            设计上这个参数需要是 str 类型或者 bool 类型 可以是如下数值：
-                - True：根据实际情况进行自动化内存优化，保证在能跑完的情况下，尽量多地利用内存，同时不报错
-                - False：不采用任何内存优化策略
-                - None：同 False
-            该参数默认设为 False
     """
 
     def __init__(
@@ -180,7 +171,6 @@ class CTGAN(TorchSynthesizerModel):
         epochs=300,
         pac=10,
         cuda=True,
-        memory_optimize=False,
     ):
         assert batch_size % 2 == 0
 
@@ -206,21 +196,43 @@ class CTGAN(TorchSynthesizerModel):
             device = cuda
         else:
             device = "cuda"
+
         self._device = torch.device(device)
 
+        self._transformer = None
+        self._data_sampler = None
         self._generator = None
-
-        # 是否启用内存优化，这里初步打算采用内存限制进行
-        # 设计上这个参数需要是 str 类型或者 bool 类型 可以是如下数值：
-        #   - True：根据实际情况进行自动化内存优化，保证在能跑完的情况下，尽量多地利用内存，同时不报错
-        #   - False：不采用任何内存优化策略
-        self.memory_optimize = memory_optimize
 
     @staticmethod
     def _gumbel_softmax(logits, tau=1, hard=False, eps=1e-10, dim=-1):
+        """Deals with the instability of the gumbel_softmax for older versions of torch.
+
+        For more details about the issue:
+        https://drive.google.com/file/d/1AA5wPfZ1kquaRtVruCd6BiYZGcDeNxyP/view?usp=sharing
+
+        Args:
+            logits […, num_features]:
+                Unnormalized log probabilities
+            tau:
+                Non-negative scalar temperature
+            hard (bool):
+                If True, the returned samples will be discretized as one-hot vectors,
+                but will be differentiated as if it is the soft sample in autograd
+            dim (int):
+                A dimension along which softmax will be computed. Default: -1.
+
+        Returns:
+            Sampled tensor of same shape as logits from the Gumbel-Softmax distribution.
         """
-        For compatibility, gumbelsoftmax is stable now: https://github.com/pytorch/pytorch/issues/41663
-        """
+        if version.parse(torch.__version__) < version.parse("1.2.0"):
+            for i in range(10):
+                transformed = functional.gumbel_softmax(
+                    logits, tau=tau, hard=hard, eps=eps, dim=dim
+                )
+                if not torch.isnan(transformed).any():
+                    return transformed
+            raise ValueError("gumbel_softmax returning NaN.")
+
         return functional.gumbel_softmax(logits, tau=tau, hard=hard, eps=eps, dim=dim)
 
     def _apply_activate(self, data):
@@ -257,9 +269,7 @@ class CTGAN(TorchSynthesizerModel):
                     ed = st + span_info.dim
                     ed_c = st_c + span_info.dim
                     tmp = functional.cross_entropy(
-                        data[:, st:ed],
-                        torch.argmax(c[:, st_c:ed_c], dim=1),
-                        reduction="none",
+                        data[:, st:ed], torch.argmax(c[:, st_c:ed_c], dim=1), reduction="none"
                     )
                     loss.append(tmp)
                     st = ed
@@ -294,69 +304,21 @@ class CTGAN(TorchSynthesizerModel):
         if invalid_columns:
             raise ValueError(f"Invalid columns found: {invalid_columns}")
 
-    # OPTIMIZE 新增方法，完成在内存受限情况下的 CTGAN 训练
     @random_state
-    def fit_optimze(self, train_data_iterator, discrete_columns: Optional[List] = [], epoches=10):
-        """OPTIMIZE 新增方法，在内存受限情况下完成 CTGAN 训练
-
-        参数列表：
-            train_data_iterator (iterator)：
-                train_data_iterator 是 带有训练数据的迭代器，
-                需要根据 csv 文件，迭代返回训练数据，
-                属于必填参数。
-            discrete_columns (list-like)：
-                描述离散特征的一个 python 列表。
-                如果 训练数据的迭代器 中不含有列名，则返回列的编号，
-                否则 ，返回列的名称（可以乱序），
-                属于选填参数，默认为 python 空列表。
-            epoches(int-like)：
-                CTGAN 模型的迭代次数，
-                选填参数，默认为10，但严肃应用中应必须填写。
-        """
-        if epochs is None:
-            epochs = self._epochs
-
-        pass
-
-    @random_state
-    def fit(
-        self,
-        train_data,
-        discrete_columns: Optional[List] = None,
-        train_data_iterator=None,
-        epochs=None,
-    ):
+    def fit(self, train_data, discrete_columns=(), epochs=None):
         """Fit the CTGAN Synthesizer models to the training data.
 
         Args:
             train_data (numpy.ndarray or pandas.DataFrame):
                 Training Data. It must be a 2-dimensional numpy array or a pandas.DataFrame.
-            train_data_iterator (iterator)：
-                train_data_iterator 是 带有训练数据的迭代器
-                需要根据 csv 文件，迭代返回训练数据
             discrete_columns (list-like):
                 List of discrete columns to be used to generate the Conditional
                 Vector. If ``train_data`` is a Numpy array, this list should
                 contain the integer indices of the columns. Otherwise, if it is
                 a ``pandas.DataFrame``, this list should contain the column names.
         """
-        # set discrete_columns
-        if not discrete_columns:
-            discrete_columns = []
-
-        # OPTIMIZE 检查 optimize 以及 train_data_iterator
-        if self.memory_optimize and train_data_iterator is None:
-            raise ValueError("train_data_iterator should not be None.")
-        # 如果符合 optimize 的需求，则转到新实现的 optimize 方法，这样也不干扰老方法的顺利执行
-        if self.memory_optimize and train_data_iterator is not None:
-            self.fit_optimze(train_data_iterator, discrete_columns, epochs)
-            return
-        # OPTIMIZE 改动结束
-
-        # 以下为原始的 fit 方法
         self._validate_discrete_columns(train_data, discrete_columns)
 
-        # 参数检查
         if epochs is None:
             epochs = self._epochs
         else:
@@ -368,35 +330,25 @@ class CTGAN(TorchSynthesizerModel):
                 DeprecationWarning,
             )
 
-        # 载入 transformer
         self._transformer = DataTransformer()
         self._transformer.fit(train_data, discrete_columns)
 
-        # 使用 transformer 处理数据
         train_data = self._transformer.transform(train_data)
 
-        # 载入 sampler
-        self._data_sampler = DataSamplerCTGAN(
+        self._data_sampler = DataSampler(
             train_data, self._transformer.output_info_list, self._log_frequency
         )
 
-        # data dim 从 transformer 中取得
         data_dim = self._transformer.output_dimensions
 
-        # sampler 作为参数给到 Generator 以及 Discriminator
         self._generator = Generator(
-            self._embedding_dim + self._data_sampler.dim_cond_vec(),
-            self._generator_dim,
-            data_dim,
+            self._embedding_dim + self._data_sampler.dim_cond_vec(), self._generator_dim, data_dim
         ).to(self._device)
 
         discriminator = Discriminator(
-            data_dim + self._data_sampler.dim_cond_vec(),
-            self._discriminator_dim,
-            pac=self.pac,
+            data_dim + self._data_sampler.dim_cond_vec(), self._discriminator_dim, pac=self.pac
         ).to(self._device)
 
-        # 初始化 optimizer G 以及 D
         optimizerG = optim.Adam(
             self._generator.parameters(),
             lr=self._generator_lr,
@@ -414,7 +366,6 @@ class CTGAN(TorchSynthesizerModel):
         mean = torch.zeros(self._batch_size, self._embedding_dim, device=self._device)
         std = mean + 1
 
-        # 开始执行 fit  流程，直到结束
         steps_per_epoch = max(len(train_data) // self._batch_size, 1)
         for i in range(epochs):
             for id_ in range(steps_per_epoch):
@@ -458,7 +409,7 @@ class CTGAN(TorchSynthesizerModel):
                     )
                     loss_d = -(torch.mean(y_real) - torch.mean(y_fake))
 
-                    optimizerD.zero_grad(set_to_none=False)
+                    optimizerD.zero_grad()
                     pen.backward(retain_graph=True)
                     loss_d.backward()
                     optimizerD.step()
@@ -489,7 +440,7 @@ class CTGAN(TorchSynthesizerModel):
 
                 loss_g = -torch.mean(y_fake) + cross_entropy
 
-                optimizerG.zero_grad(set_to_none=False)
+                optimizerG.zero_grad()
                 loss_g.backward()
                 optimizerG.step()
 
@@ -557,7 +508,8 @@ class CTGAN(TorchSynthesizerModel):
 
         return self._transformer.inverse_transform(data)
 
-
-@hookimpl
-def register(manager):
-    manager.register("CTGAN", CTGAN)
+    def set_device(self, device):
+        """Set the `device` to be used ('GPU' or 'CPU)."""
+        self._device = device
+        if self._generator is not None:
+            self._generator.to(self._device)

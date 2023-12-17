@@ -1,16 +1,15 @@
-"""
-    DataTransform 模块：
-        将把该模块列入 Data Process 中
-"""
+"""DataTransformer module."""
 
 from collections import namedtuple
-from typing import List, Optional
 
 import numpy as np
 import pandas as pd
 from joblib import Parallel, delayed
 
-from .sdv_rdt.transformers import ClusterBasedNormalizer, OneHotEncoder
+from sdgx.models.components.sdv_rdt.transformers import (
+    ClusterBasedNormalizer,
+    OneHotEncoder,
+)
 
 SpanInfo = namedtuple("SpanInfo", ["dim", "activation_fn"])
 ColumnTransformInfo = namedtuple(
@@ -19,7 +18,7 @@ ColumnTransformInfo = namedtuple(
 )
 
 
-class DataTransformer:
+class DataTransformer(object):
     """Data Transformer.
 
     Model continuous columns with a BayesianGMM and normalized to a scalar [0, 1] and a vector.
@@ -86,7 +85,7 @@ class DataTransformer:
             output_dimensions=num_categories,
         )
 
-    def fit(self, raw_data, discrete_columns: Optional[List] = None):
+    def fit(self, raw_data, discrete_columns=()):
         """Fit the ``DataTransformer``.
 
         Fits a ``ClusterBasedNormalizer`` for continuous columns and a
@@ -97,8 +96,6 @@ class DataTransformer:
         self.output_info_list = []
         self.output_dimensions = 0
         self.dataframe = True
-        if not discrete_columns:
-            discrete_columns = []
 
         if not isinstance(raw_data, pd.DataFrame):
             self.dataframe = False
@@ -121,8 +118,7 @@ class DataTransformer:
 
     def _transform_continuous(self, column_transform_info, data):
         column_name = data.columns[0]
-        flattened_column = data[column_name].to_numpy().flatten()
-        data = data.assign(**{column_name: flattened_column})
+        data[column_name] = data[column_name].to_numpy().flatten()
         gm = column_transform_info.transform
         transformed = gm.transform(data)
 
@@ -194,7 +190,7 @@ class DataTransformer:
     def _inverse_transform_continuous(self, column_transform_info, column_data, sigmas, st):
         gm = column_transform_info.transform
         data = pd.DataFrame(column_data[:, :2], columns=list(gm.get_output_sdtypes()))
-        data[data.columns[1]] = np.argmax(column_data[:, 1:], axis=1)
+        data.iloc[:, 1] = np.argmax(column_data[:, 1:], axis=1)
         if sigmas is not None:
             selected_normalized_value = np.random.normal(data.iloc[:, 0], sigmas[st])
             data.iloc[:, 0] = selected_normalized_value
