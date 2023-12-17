@@ -18,7 +18,7 @@ def metadata(dataloader):
 
 
 def test_metadata(metadata: Metadata):
-    assert metadata.discrete_columns
+    assert metadata.discrete_columns == metadata.get("discrete_columns")
     assert metadata.model_dump_json()
 
 

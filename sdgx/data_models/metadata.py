@@ -27,7 +27,6 @@ class Metadata(BaseModel):
     discrete_columns: List[str] = []
     _extend: Dict[str, Any] = {}
 
-    @cache
     def get(self, key: str, default=None) -> Any:
         return getattr(self, key, getattr(self._extend, key, default))
 
