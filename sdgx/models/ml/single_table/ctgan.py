@@ -199,33 +199,23 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
         device = device
         self._device = torch.device(device)
 
+        # Following components are initialized in `_pre_fit`
         self._transformer = None
         self._data_sampler = None
         self._generator = None
 
     def fit(self, metadata: Metadata, dataloader: DataLoader, *args, **kwargs):
         discrete_columns = metadata.get("discrete_columns", [])
-        return self._fit(dataloader.load_all(), discrete_columns)
+        self._pre_fit(dataloader, discrete_columns)
+        self._fit(dataloader, discrete_columns)
 
-    @random_state
-    def _fit(self, train_data, discrete_columns=None):
-        """Fit the CTGAN Synthesizer models to the training data.
-
-        Args:
-            train_data (numpy.ndarray or pandas.DataFrame):
-                Training Data. It must be a 2-dimensional numpy array or a pandas.DataFrame.
-            discrete_columns (list-like):
-                List of discrete columns to be used to generate the Conditional
-                Vector. If ``train_data`` is a Numpy array, this list should
-                contain the integer indices of the columns. Otherwise, if it is
-                a ``pandas.DataFrame``, this list should contain the column names.
-        """
+    def _pre_fit(self, dataloader: DataLoader, discrete_columns: list[str] = None):
         if not discrete_columns:
             discrete_columns = []
 
-        self._validate_discrete_columns(train_data, discrete_columns)
-
-        epochs = self._epochs
+        self._validate_discrete_columns(dataloader.columns(), discrete_columns)
+        # Fit Transformer and DataSampler
+        train_data = dataloader[:]
         self._transformer = DataTransformer()
         self._transformer.fit(train_data, discrete_columns)
 
@@ -235,12 +225,22 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
             train_data, self._transformer.output_info_list, self._log_frequency
         )
 
+        # Initialize Generator
         data_dim = self._transformer.output_dimensions
-
         self._generator = Generator(
             self._embedding_dim + self._data_sampler.dim_cond_vec(), self._generator_dim, data_dim
         ).to(self._device)
 
+    @random_state
+    def _fit(self, dataloader: DataLoader, discrete_columns=None):
+        """Fit the CTGAN Synthesizer models to the training data.
+
+        Args:
+            dataloader: :ref:`DataLoader` for the training data processed by :ref:`DataProcessor`.
+
+        """
+        epochs = self._epochs
+        data_dim = self._transformer.output_dimensions
         discriminator = Discriminator(
             data_dim + self._data_sampler.dim_cond_vec(), self._discriminator_dim, pac=self.pac
         ).to(self._device)
@@ -262,7 +262,7 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
         mean = torch.zeros(self._batch_size, self._embedding_dim, device=self._device)
         std = mean + 1
 
-        steps_per_epoch = max(len(train_data) // self._batch_size, 1)
+        steps_per_epoch = max(len(dataloader) // self._batch_size, 1)
         for i in range(epochs):
             for id_ in range(steps_per_epoch):
                 for n in range(self._discriminator_steps):
@@ -495,7 +495,7 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
         """Check whether ``discrete_columns`` exists in ``train_data``.
 
         Args:
-            train_data (numpy.ndarray or pandas.DataFrame):
+            train_data (numpy.ndarray or pandas.DataFrame or list):
                 Training Data. It must be a 2-dimensional numpy array or a pandas.DataFrame.
             discrete_columns (list-like):
                 List of discrete columns to be used to generate the Conditional
@@ -510,6 +510,8 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
             for column in discrete_columns:
                 if column < 0 or column >= train_data.shape[1]:
                     invalid_columns.append(column)
+        elif isinstance(train_data, list):
+            invalid_columns = set(discrete_columns) - set(train_data)
         else:
             raise TypeError("``train_data`` should be either pd.DataFrame or np.array.")
 
