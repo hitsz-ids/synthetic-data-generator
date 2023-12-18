@@ -23,9 +23,12 @@ class Synthesizer:
     Synthesizer takes all logic of preprocessing data, fit model and sample
     """
 
+    METADATA_SAVE_NAME = "metadata.json"
+    MODEL_SAVE_NAME = "model.pkl"
+
     def __init__(
         self,
-        model: str | SynthesizerModel,
+        model: str | SynthesizerModel | type[SynthesizerModel],
         model_path: None | str | Path = None,
         metadata: None | Metadata = None,
         metadata_path: None | str | Path = None,
@@ -54,10 +57,13 @@ class Synthesizer:
         # Init data processors
         if not data_processors:
             data_processors = []
+        self.data_processors_manager = DataProcessorManager()
         self.data_processors = [
             d
             if isinstance(d, DataProcessor)
-            else DataProcessorManager().init_data_processor(d, **(data_processors_kwargs or {}))
+            else self.data_processors_manager.init_data_processor(
+                d, **(data_processors_kwargs or {})
+            )
             for d in data_processors
         ]
         if metadata and metadata_path:
@@ -69,38 +75,82 @@ class Synthesizer:
         if metadata:
             self.metadata = metadata
         elif metadata_path:
-            self.metadata.load(metadata_path)
+            self.metadata = Metadata.load(metadata_path)
         else:
             self.metadata = None
 
         # Init model
-        if model and model_path:
-            raise SynthesizerInitError("model and model_path cannot be specified at the same time")
+        self.model_manager = ModelManager()
+        if isinstance(model, SynthesizerModel) and model_path:
+            raise SynthesizerInitError(
+                "model as instance and model_path cannot be specified at the same time"
+            )
         if isinstance(model, str):
-            self.model = ModelManager().init_model(model, **(model_kwargs or {}))
+            self.model = self.model_manager.init_model(model, **(model_kwargs or {}))
         elif isinstance(model, SynthesizerModel):
             self.model = model
         elif model_path:
-            model_path = Path(model_path).expanduser().resolve()
-            self.model = ModelManager().load(model_path)
+            self.model_manager.load(model, model_path)
         else:
             raise SynthesizerInitError("model or model_path must be specified")
 
         # Other arguments
         self.processored_data_loaders_kwargs = processored_data_loaders_kwargs or {}
 
-    def save(self) -> Path:
+    def save(self, save_dir: str | Path) -> Path:
         """
-        TODO: Dump metadata and model to file
+        Dump metadata and model to file
         """
+        save_dir = Path(save_dir).expanduser().resolve()
+        save_dir.mkdir(parents=True, exist_ok=True)
+        if self.metadata:
+            self.metadata.save(save_dir / self.METADATA_SAVE_NAME)
+        self.model.save(save_dir / self.MODEL_SAVE_NAME)
+        return save_dir
 
     @classmethod
-    def load(cls) -> Synthesizer:
+    def load(
+        cls,
+        load_dir: str | Path,
+        model: str | type[SynthesizerModel],
+        metadata: None | Metadata = None,
+        data_connector: None | str | DataConnector = None,
+        data_connectors_kwargs: None | dict[str, Any] = None,
+        raw_data_loaders_kwargs: None | dict[str, Any] = None,
+        processored_data_loaders_kwargs: None | dict[str, Any] = None,
+        data_processors: None | list[str | DataProcessor] = None,
+        data_processors_kwargs: None | dict[str, dict[str, Any]] = None,
+    ) -> "Synthesizer":
         """
-        TODO: Load metadata and model from file
+        Load metadata and model from file
+        """
 
-        Loaded Synthesizer only support sample
-        """
+        load_dir = Path(load_dir).expanduser().resolve()
+
+        if not load_dir.exists():
+            raise SynthesizerInitError(f"{load_dir.as_posix()} does not exist")
+        model_path = load_dir / cls.MODEL_SAVE_NAME
+        if not model_path.exists():
+            raise SynthesizerInitError(
+                f"{model_path.as_posix()} does not exist, cannot load model."
+            )
+
+        metadata_path = load_dir / cls.METADATA_SAVE_NAME
+        if not metadata_path.exists():
+            metadata_path = None
+
+        return Synthesizer(
+            model=model,
+            model_path=load_dir / cls.MODEL_SAVE_NAME,
+            metadata=metadata,
+            metadata_path=metadata_path,
+            data_connector=data_connector,
+            data_connectors_kwargs=data_connectors_kwargs,
+            raw_data_loaders_kwargs=raw_data_loaders_kwargs,
+            processored_data_loaders_kwargs=processored_data_loaders_kwargs,
+            data_processors=data_processors,
+            data_processors_kwargs=data_processors_kwargs,
+        )
 
     def fit(
         self,

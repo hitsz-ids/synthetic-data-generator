@@ -37,8 +37,10 @@ class Cacher:
         """
         Load all data from data_connector or cache
         """
-
-        raise NotImplementedError
+        return pd.concat(
+            self.iter(chunksize=self.blocksize, data_connector=data_connector),
+            ignore_index=True,
+        )
 
     def clear_cache(self):
         """

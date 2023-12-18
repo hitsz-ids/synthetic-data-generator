@@ -17,7 +17,7 @@ class DataConnector:
     Identity of data source, e.g. table name, hash of content
     """
 
-    def _read(self, offset=0, limit=None) -> pd.DataFrame:
+    def _read(self, offset: int = 0, limit: int | None = None) -> pd.DataFrame:
         """
         Subclass must implement this for reading data.
 
@@ -33,7 +33,7 @@ class DataConnector:
         """
         raise NotImplementedError
 
-    def _iter(self, offset=0, chunksize=0) -> Generator[pd.DataFrame, None, None]:
+    def _iter(self, offset: int = 0, chunksize: int = 0) -> Generator[pd.DataFrame, None, None]:
         """
         Subclass should implement this for reading data in chunk.
 
@@ -41,7 +41,7 @@ class DataConnector:
         """
         raise NotImplementedError
 
-    def iter(self, offset=0, chunksize=0) -> Generator[pd.DataFrame, None, None]:
+    def iter(self, offset: int = 0, chunksize: int = 0) -> Generator[pd.DataFrame, None, None]:
         """
         Interface for reading data in chunk.
 
@@ -54,7 +54,7 @@ class DataConnector:
         """
         return self._iter(offset, chunksize)
 
-    def read(self, offset=0, limit=None) -> pd.DataFrame:
+    def read(self, offset: int = 0, limit: int | None = None) -> pd.DataFrame:
         """
         Interface for reading data.
 

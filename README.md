@@ -38,7 +38,7 @@ High-quality synthetic data can also be used in various fields such as data open
   - Provide distributed training support for deep learning models with frameworks such as torch.
 - Privacy enhancements:
   - SDG supports differential privacy, anonymization and other methods to enhance the security of synthetic data.
-- Easy to Extend
+- Easy to extend
   - Supports expansion of models, data processing, data connectors, etc. in the form of plug-in packages
 
 Read [the latest API docs](https://synthetic-data-generator.readthedocs.io/en/latest/) for more details.

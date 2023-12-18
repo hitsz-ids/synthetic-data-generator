@@ -1,12 +1,11 @@
-# Refer CTGAN Version 0.6.0: https://github.com/sdv-dev/CTGAN@a40570e321cb46d798a823f350e1010a0270d804
-# Which is Lincensed by MIT License
+from __future__ import annotations
 
-import warnings
-from typing import Any, List, Optional
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import torch
+from packaging import version
 from torch import optim
 from torch.nn import (
     BatchNorm1d,
@@ -19,12 +18,17 @@ from torch.nn import (
     functional,
 )
 
-from sdgx.models.base import SynthesizerModel
-from sdgx.models.components.sample import DataSamplerCTGAN
-from sdgx.models.components.transform import DataTransformer
-from sdgx.models.components.utils import random_state
+from sdgx.data_loader import DataLoader
+from sdgx.data_models.metadata import Metadata
+from sdgx.log import logger
+from sdgx.models.components.sdv_ctgan.data_sampler import DataSampler
+from sdgx.models.components.sdv_ctgan.data_transformer import DataTransformer
+from sdgx.models.components.sdv_ctgan.synthesizers.base import (
+    BaseSynthesizer as SDVBaseSynthesizer,
+)
+from sdgx.models.components.sdv_ctgan.synthesizers.base import random_state
 from sdgx.models.extension import hookimpl
-from sdgx.models.ml.single_table.base import TorchSynthesizerModel
+from sdgx.models.ml.single_table.base import MLSynthesizerModel
 
 
 class Discriminator(Module):
@@ -109,15 +113,16 @@ class Generator(Module):
         return data
 
 
-# 目前针对了较大的数据进行内存占用上的优化
-# 总体思路是采用分批 load 进内存的方法，优化其占用空间的大小
-class CTGAN(TorchSynthesizerModel):
-    """Conditional Table GAN Synthesizer.
+class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
+    """
+    Modified from ``sdgx.models.components.sdv_ctgan.synthesizers.ctgan.CTGANSynthesizer``.
+    A CTGANSynthesizer but provided :ref:`SynthesizerModel` interface with chunked fit.
 
     This is the core class of the CTGAN project, where the different components
     are orchestrated together.
     For more details about the process, please check the [Modeling Tabular data using
     Conditional GAN](https://arxiv.org/abs/1907.00503) paper.
+
 
     Args:
         embedding_dim (int):
@@ -152,16 +157,8 @@ class CTGAN(TorchSynthesizerModel):
         pac (int):
             Number of samples to group together when applying the discriminator.
             Defaults to 10.
-        cuda (bool):
-            Whether to attempt to use cuda for GPU computation.
-            If this is False or CUDA is not available, CPU will be used.
-            Defaults to ``True``.
-        memory_optimize(bool):
-            设计上这个参数需要是 str 类型或者 bool 类型 可以是如下数值：
-                - True：根据实际情况进行自动化内存优化，保证在能跑完的情况下，尽量多地利用内存，同时不报错
-                - False：不采用任何内存优化策略
-                - None：同 False
-            该参数默认设为 False
+        device (str):
+            Device to run the training on. Preferred to be 'cuda' for GPU if available.
     """
 
     def __init__(
@@ -179,8 +176,7 @@ class CTGAN(TorchSynthesizerModel):
         verbose=False,
         epochs=300,
         pac=10,
-        cuda=True,
-        memory_optimize=False,
+        device="cuda" if torch.cuda.is_available() else "cpu",
     ):
         assert batch_size % 2 == 0
 
@@ -200,27 +196,253 @@ class CTGAN(TorchSynthesizerModel):
         self._epochs = epochs
         self.pac = pac
 
-        if not cuda or not torch.cuda.is_available():
-            device = "cpu"
-        elif isinstance(cuda, str):
-            device = cuda
-        else:
-            device = "cuda"
+        device = device
         self._device = torch.device(device)
 
+        self._transformer = None
+        self._data_sampler = None
         self._generator = None
 
-        # 是否启用内存优化，这里初步打算采用内存限制进行
-        # 设计上这个参数需要是 str 类型或者 bool 类型 可以是如下数值：
-        #   - True：根据实际情况进行自动化内存优化，保证在能跑完的情况下，尽量多地利用内存，同时不报错
-        #   - False：不采用任何内存优化策略
-        self.memory_optimize = memory_optimize
+    def fit(self, metadata: Metadata, dataloader: DataLoader, *args, **kwargs):
+        discrete_columns = metadata.get("discrete_columns", [])
+        return self._fit(dataloader.load_all(), discrete_columns)
+
+    @random_state
+    def _fit(self, train_data, discrete_columns=None):
+        """Fit the CTGAN Synthesizer models to the training data.
+
+        Args:
+            train_data (numpy.ndarray or pandas.DataFrame):
+                Training Data. It must be a 2-dimensional numpy array or a pandas.DataFrame.
+            discrete_columns (list-like):
+                List of discrete columns to be used to generate the Conditional
+                Vector. If ``train_data`` is a Numpy array, this list should
+                contain the integer indices of the columns. Otherwise, if it is
+                a ``pandas.DataFrame``, this list should contain the column names.
+        """
+        if not discrete_columns:
+            discrete_columns = []
+
+        self._validate_discrete_columns(train_data, discrete_columns)
+
+        epochs = self._epochs
+        self._transformer = DataTransformer()
+        self._transformer.fit(train_data, discrete_columns)
+
+        train_data = self._transformer.transform(train_data)
+
+        self._data_sampler = DataSampler(
+            train_data, self._transformer.output_info_list, self._log_frequency
+        )
+
+        data_dim = self._transformer.output_dimensions
+
+        self._generator = Generator(
+            self._embedding_dim + self._data_sampler.dim_cond_vec(), self._generator_dim, data_dim
+        ).to(self._device)
+
+        discriminator = Discriminator(
+            data_dim + self._data_sampler.dim_cond_vec(), self._discriminator_dim, pac=self.pac
+        ).to(self._device)
+
+        optimizerG = optim.Adam(
+            self._generator.parameters(),
+            lr=self._generator_lr,
+            betas=(0.5, 0.9),
+            weight_decay=self._generator_decay,
+        )
+
+        optimizerD = optim.Adam(
+            discriminator.parameters(),
+            lr=self._discriminator_lr,
+            betas=(0.5, 0.9),
+            weight_decay=self._discriminator_decay,
+        )
+
+        mean = torch.zeros(self._batch_size, self._embedding_dim, device=self._device)
+        std = mean + 1
+
+        steps_per_epoch = max(len(train_data) // self._batch_size, 1)
+        for i in range(epochs):
+            for id_ in range(steps_per_epoch):
+                for n in range(self._discriminator_steps):
+                    fakez = torch.normal(mean=mean, std=std)
+
+                    condvec = self._data_sampler.sample_condvec(self._batch_size)
+                    if condvec is None:
+                        c1, m1, col, opt = None, None, None, None
+                        real = self._data_sampler.sample_data(self._batch_size, col, opt)
+                    else:
+                        c1, m1, col, opt = condvec
+                        c1 = torch.from_numpy(c1).to(self._device)
+                        m1 = torch.from_numpy(m1).to(self._device)
+                        fakez = torch.cat([fakez, c1], dim=1)
+
+                        perm = np.arange(self._batch_size)
+                        np.random.shuffle(perm)
+                        real = self._data_sampler.sample_data(
+                            self._batch_size, col[perm], opt[perm]
+                        )
+                        c2 = c1[perm]
+
+                    fake = self._generator(fakez)
+                    fakeact = self._apply_activate(fake)
+
+                    real = torch.from_numpy(real.astype("float32")).to(self._device)
+
+                    if c1 is not None:
+                        fake_cat = torch.cat([fakeact, c1], dim=1)
+                        real_cat = torch.cat([real, c2], dim=1)
+                    else:
+                        real_cat = real
+                        fake_cat = fakeact
+
+                    y_fake = discriminator(fake_cat)
+                    y_real = discriminator(real_cat)
+
+                    pen = discriminator.calc_gradient_penalty(
+                        real_cat, fake_cat, self._device, self.pac
+                    )
+                    loss_d = -(torch.mean(y_real) - torch.mean(y_fake))
+
+                    optimizerD.zero_grad()
+                    pen.backward(retain_graph=True)
+                    loss_d.backward()
+                    optimizerD.step()
+
+                fakez = torch.normal(mean=mean, std=std)
+                condvec = self._data_sampler.sample_condvec(self._batch_size)
+
+                if condvec is None:
+                    c1, m1, col, opt = None, None, None, None
+                else:
+                    c1, m1, col, opt = condvec
+                    c1 = torch.from_numpy(c1).to(self._device)
+                    m1 = torch.from_numpy(m1).to(self._device)
+                    fakez = torch.cat([fakez, c1], dim=1)
+
+                fake = self._generator(fakez)
+                fakeact = self._apply_activate(fake)
+
+                if c1 is not None:
+                    y_fake = discriminator(torch.cat([fakeact, c1], dim=1))
+                else:
+                    y_fake = discriminator(fakeact)
+
+                if condvec is None:
+                    cross_entropy = 0
+                else:
+                    cross_entropy = self._cond_loss(fake, c1, m1)
+
+                loss_g = -torch.mean(y_fake) + cross_entropy
+
+                optimizerG.zero_grad()
+                loss_g.backward()
+                optimizerG.step()
+
+            if self._verbose:
+                logger.info(
+                    f"Epoch {i+1}, Loss G: {loss_g.detach().cpu(): .4f},"  # noqa: T001
+                    f"Loss D: {loss_d.detach().cpu(): .4f}",
+                )
+
+    def sample(self, count: int, *args, **kwargs) -> pd.DataFrame:
+        return self._sample(count, *args, **kwargs)
+
+    @random_state
+    def _sample(self, n, condition_column=None, condition_value=None):
+        """Sample data similar to the training data.
+
+        Choosing a condition_column and condition_value will increase the probability of the
+        discrete condition_value happening in the condition_column.
+
+        Args:
+            n (int):
+                Number of rows to sample.
+            condition_column (string):
+                Name of a discrete column.
+            condition_value (string):
+                Name of the category in the condition_column which we wish to increase the
+                probability of happening.
+
+        Returns:
+            numpy.ndarray or pandas.DataFrame
+        """
+        if condition_column is not None and condition_value is not None:
+            condition_info = self._transformer.convert_column_name_value_to_id(
+                condition_column, condition_value
+            )
+            global_condition_vec = self._data_sampler.generate_cond_from_condition_column_info(
+                condition_info, self._batch_size
+            )
+        else:
+            global_condition_vec = None
+
+        steps = n // self._batch_size + 1
+        data = []
+        for i in range(steps):
+            mean = torch.zeros(self._batch_size, self._embedding_dim)
+            std = mean + 1
+            fakez = torch.normal(mean=mean, std=std).to(self._device)
+
+            if global_condition_vec is not None:
+                condvec = global_condition_vec.copy()
+            else:
+                condvec = self._data_sampler.sample_original_condvec(self._batch_size)
+
+            if condvec is None:
+                pass
+            else:
+                c1 = condvec
+                c1 = torch.from_numpy(c1).to(self._device)
+                fakez = torch.cat([fakez, c1], dim=1)
+
+            fake = self._generator(fakez)
+            fakeact = self._apply_activate(fake)
+            data.append(fakeact.detach().cpu().numpy())
+
+        data = np.concatenate(data, axis=0)
+        data = data[:n]
+
+        return self._transformer.inverse_transform(data)
+
+    def save(self, path: str | Path):
+        return SDVBaseSynthesizer.save(self, path)
+
+    @classmethod
+    def load(cls, path: str | Path) -> "CTGANSynthesizerModel":
+        return SDVBaseSynthesizer.load(path)
 
     @staticmethod
     def _gumbel_softmax(logits, tau=1, hard=False, eps=1e-10, dim=-1):
+        """Deals with the instability of the gumbel_softmax for older versions of torch.
+
+        For more details about the issue:
+        https://drive.google.com/file/d/1AA5wPfZ1kquaRtVruCd6BiYZGcDeNxyP/view?usp=sharing
+
+        Args:
+            logits […, num_features]:
+                Unnormalized log probabilities
+            tau:
+                Non-negative scalar temperature
+            hard (bool):
+                If True, the returned samples will be discretized as one-hot vectors,
+                but will be differentiated as if it is the soft sample in autograd
+            dim (int):
+                A dimension along which softmax will be computed. Default: -1.
+
+        Returns:
+            Sampled tensor of same shape as logits from the Gumbel-Softmax distribution.
         """
-        For compatibility, gumbelsoftmax is stable now: https://github.com/pytorch/pytorch/issues/41663
-        """
+        if version.parse(torch.__version__) < version.parse("1.2.0"):
+            for i in range(10):
+                transformed = functional.gumbel_softmax(
+                    logits, tau=tau, hard=hard, eps=eps, dim=dim
+                )
+                if not torch.isnan(transformed).any():
+                    return transformed
+            raise ValueError("gumbel_softmax returning NaN.")
+
         return functional.gumbel_softmax(logits, tau=tau, hard=hard, eps=eps, dim=dim)
 
     def _apply_activate(self, data):
@@ -294,270 +516,13 @@ class CTGAN(TorchSynthesizerModel):
         if invalid_columns:
             raise ValueError(f"Invalid columns found: {invalid_columns}")
 
-    # OPTIMIZE 新增方法，完成在内存受限情况下的 CTGAN 训练
-    @random_state
-    def fit_optimze(self, train_data_iterator, discrete_columns: Optional[List] = [], epoches=10):
-        """OPTIMIZE 新增方法，在内存受限情况下完成 CTGAN 训练
-
-        参数列表：
-            train_data_iterator (iterator)：
-                train_data_iterator 是 带有训练数据的迭代器，
-                需要根据 csv 文件，迭代返回训练数据，
-                属于必填参数。
-            discrete_columns (list-like)：
-                描述离散特征的一个 python 列表。
-                如果 训练数据的迭代器 中不含有列名，则返回列的编号，
-                否则 ，返回列的名称（可以乱序），
-                属于选填参数，默认为 python 空列表。
-            epoches(int-like)：
-                CTGAN 模型的迭代次数，
-                选填参数，默认为10，但严肃应用中应必须填写。
-        """
-        if epochs is None:
-            epochs = self._epochs
-
-        pass
-
-    @random_state
-    def fit(
-        self,
-        train_data,
-        discrete_columns: Optional[List] = None,
-        train_data_iterator=None,
-        epochs=None,
-    ):
-        """Fit the CTGAN Synthesizer models to the training data.
-
-        Args:
-            train_data (numpy.ndarray or pandas.DataFrame):
-                Training Data. It must be a 2-dimensional numpy array or a pandas.DataFrame.
-            train_data_iterator (iterator)：
-                train_data_iterator 是 带有训练数据的迭代器
-                需要根据 csv 文件，迭代返回训练数据
-            discrete_columns (list-like):
-                List of discrete columns to be used to generate the Conditional
-                Vector. If ``train_data`` is a Numpy array, this list should
-                contain the integer indices of the columns. Otherwise, if it is
-                a ``pandas.DataFrame``, this list should contain the column names.
-        """
-        # set discrete_columns
-        if not discrete_columns:
-            discrete_columns = []
-
-        # OPTIMIZE 检查 optimize 以及 train_data_iterator
-        if self.memory_optimize and train_data_iterator is None:
-            raise ValueError("train_data_iterator should not be None.")
-        # 如果符合 optimize 的需求，则转到新实现的 optimize 方法，这样也不干扰老方法的顺利执行
-        if self.memory_optimize and train_data_iterator is not None:
-            self.fit_optimze(train_data_iterator, discrete_columns, epochs)
-            return
-        # OPTIMIZE 改动结束
-
-        # 以下为原始的 fit 方法
-        self._validate_discrete_columns(train_data, discrete_columns)
-
-        # 参数检查
-        if epochs is None:
-            epochs = self._epochs
-        else:
-            warnings.warn(
-                (
-                    "`epochs` argument in `fit` method has been deprecated and will be removed "
-                    "in a future version. Please pass `epochs` to the constructor instead"
-                ),
-                DeprecationWarning,
-            )
-
-        # 载入 transformer
-        self._transformer = DataTransformer()
-        self._transformer.fit(train_data, discrete_columns)
-
-        # 使用 transformer 处理数据
-        train_data = self._transformer.transform(train_data)
-
-        # 载入 sampler
-        self._data_sampler = DataSamplerCTGAN(
-            train_data, self._transformer.output_info_list, self._log_frequency
-        )
-
-        # data dim 从 transformer 中取得
-        data_dim = self._transformer.output_dimensions
-
-        # sampler 作为参数给到 Generator 以及 Discriminator
-        self._generator = Generator(
-            self._embedding_dim + self._data_sampler.dim_cond_vec(),
-            self._generator_dim,
-            data_dim,
-        ).to(self._device)
-
-        discriminator = Discriminator(
-            data_dim + self._data_sampler.dim_cond_vec(),
-            self._discriminator_dim,
-            pac=self.pac,
-        ).to(self._device)
-
-        # 初始化 optimizer G 以及 D
-        optimizerG = optim.Adam(
-            self._generator.parameters(),
-            lr=self._generator_lr,
-            betas=(0.5, 0.9),
-            weight_decay=self._generator_decay,
-        )
-
-        optimizerD = optim.Adam(
-            discriminator.parameters(),
-            lr=self._discriminator_lr,
-            betas=(0.5, 0.9),
-            weight_decay=self._discriminator_decay,
-        )
-
-        mean = torch.zeros(self._batch_size, self._embedding_dim, device=self._device)
-        std = mean + 1
-
-        # 开始执行 fit  流程，直到结束
-        steps_per_epoch = max(len(train_data) // self._batch_size, 1)
-        for i in range(epochs):
-            for id_ in range(steps_per_epoch):
-                for n in range(self._discriminator_steps):
-                    fakez = torch.normal(mean=mean, std=std)
-
-                    condvec = self._data_sampler.sample_condvec(self._batch_size)
-                    if condvec is None:
-                        c1, m1, col, opt = None, None, None, None
-                        real = self._data_sampler.sample_data(self._batch_size, col, opt)
-                    else:
-                        c1, m1, col, opt = condvec
-                        c1 = torch.from_numpy(c1).to(self._device)
-                        m1 = torch.from_numpy(m1).to(self._device)
-                        fakez = torch.cat([fakez, c1], dim=1)
-
-                        perm = np.arange(self._batch_size)
-                        np.random.shuffle(perm)
-                        real = self._data_sampler.sample_data(
-                            self._batch_size, col[perm], opt[perm]
-                        )
-                        c2 = c1[perm]
-
-                    fake = self._generator(fakez)
-                    fakeact = self._apply_activate(fake)
-
-                    real = torch.from_numpy(real.astype("float32")).to(self._device)
-
-                    if c1 is not None:
-                        fake_cat = torch.cat([fakeact, c1], dim=1)
-                        real_cat = torch.cat([real, c2], dim=1)
-                    else:
-                        real_cat = real
-                        fake_cat = fakeact
-
-                    y_fake = discriminator(fake_cat)
-                    y_real = discriminator(real_cat)
-
-                    pen = discriminator.calc_gradient_penalty(
-                        real_cat, fake_cat, self._device, self.pac
-                    )
-                    loss_d = -(torch.mean(y_real) - torch.mean(y_fake))
-
-                    optimizerD.zero_grad(set_to_none=False)
-                    pen.backward(retain_graph=True)
-                    loss_d.backward()
-                    optimizerD.step()
-
-                fakez = torch.normal(mean=mean, std=std)
-                condvec = self._data_sampler.sample_condvec(self._batch_size)
-
-                if condvec is None:
-                    c1, m1, col, opt = None, None, None, None
-                else:
-                    c1, m1, col, opt = condvec
-                    c1 = torch.from_numpy(c1).to(self._device)
-                    m1 = torch.from_numpy(m1).to(self._device)
-                    fakez = torch.cat([fakez, c1], dim=1)
-
-                fake = self._generator(fakez)
-                fakeact = self._apply_activate(fake)
-
-                if c1 is not None:
-                    y_fake = discriminator(torch.cat([fakeact, c1], dim=1))
-                else:
-                    y_fake = discriminator(fakeact)
-
-                if condvec is None:
-                    cross_entropy = 0
-                else:
-                    cross_entropy = self._cond_loss(fake, c1, m1)
-
-                loss_g = -torch.mean(y_fake) + cross_entropy
-
-                optimizerG.zero_grad(set_to_none=False)
-                loss_g.backward()
-                optimizerG.step()
-
-            if self._verbose:
-                print(
-                    f"Epoch {i+1}, Loss G: {loss_g.detach().cpu(): .4f},"  # noqa: T001
-                    f"Loss D: {loss_d.detach().cpu(): .4f}",
-                    flush=True,
-                )
-
-    @random_state
-    def sample(self, n, condition_column=None, condition_value=None):
-        """Sample data similar to the training data.
-
-        Choosing a condition_column and condition_value will increase the probability of the
-        discrete condition_value happening in the condition_column.
-
-        Args:
-            n (int):
-                Number of rows to sample.
-            condition_column (string):
-                Name of a discrete column.
-            condition_value (string):
-                Name of the category in the condition_column which we wish to increase the
-                probability of happening.
-
-        Returns:
-            numpy.ndarray or pandas.DataFrame
-        """
-        if condition_column is not None and condition_value is not None:
-            condition_info = self._transformer.convert_column_name_value_to_id(
-                condition_column, condition_value
-            )
-            global_condition_vec = self._data_sampler.generate_cond_from_condition_column_info(
-                condition_info, self._batch_size
-            )
-        else:
-            global_condition_vec = None
-
-        steps = n // self._batch_size + 1
-        data = []
-        for i in range(steps):
-            mean = torch.zeros(self._batch_size, self._embedding_dim)
-            std = mean + 1
-            fakez = torch.normal(mean=mean, std=std).to(self._device)
-
-            if global_condition_vec is not None:
-                condvec = global_condition_vec.copy()
-            else:
-                condvec = self._data_sampler.sample_original_condvec(self._batch_size)
-
-            if condvec is None:
-                pass
-            else:
-                c1 = condvec
-                c1 = torch.from_numpy(c1).to(self._device)
-                fakez = torch.cat([fakez, c1], dim=1)
-
-            fake = self._generator(fakez)
-            fakeact = self._apply_activate(fake)
-            data.append(fakeact.detach().cpu().numpy())
-
-        data = np.concatenate(data, axis=0)
-        data = data[:n]
-
-        return self._transformer.inverse_transform(data)
+    def set_device(self, device):
+        """Set the `device` to be used ('GPU' or 'CPU)."""
+        self._device = device
+        if self._generator is not None:
+            self._generator.to(self._device)
 
 
 @hookimpl
 def register(manager):
-    manager.register("CTGAN", CTGAN)
+    manager.register("CTGAN", CTGANSynthesizerModel)

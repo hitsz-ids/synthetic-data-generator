@@ -8,8 +8,10 @@ import pandas as pd
 from joblib import Parallel, delayed
 
 from sdgx.data_processors.transformers.base import Transformer
-
-from .sdv_rdt.transformers import ClusterBasedNormalizer, OneHotEncoder
+from sdgx.models.components.sdv_rdt.transformers import (
+    ClusterBasedNormalizer,
+    OneHotEncoder,
+)
 
 SpanInfo = namedtuple("SpanInfo", ["dim", "activation_fn"])
 ColumnTransformInfo = namedtuple(
