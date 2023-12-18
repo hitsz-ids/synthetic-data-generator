@@ -1,2 +1,4 @@
 [run]
-omit = sdgx/models/components/sdv_*
+omit =
+    */tests/*
+    */sdgx/models/components/sdv_*
