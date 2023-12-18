@@ -95,9 +95,7 @@ class DataLoader:
             and this may totally broken.
 
         """
-        if isinstance(key, tuple):
-            sli, rows = key
-        elif isinstance(key, list):
+        if isinstance(key, list):
             sli = None
             rows = key
         else:
@@ -105,7 +103,7 @@ class DataLoader:
             rows = None
 
         if not sli:
-            return self.load_all()[rows]
+            return pd.concat((d[rows] for d in self.iter()), ignore_index=True)
 
         start = sli.start or 0
         stop = sli.stop or len(self)
@@ -123,10 +121,7 @@ class DataLoader:
             for i in range(n_iter)
         )
 
-        if not rows:
-            return pd.concat(tables, ignore_index=True)[start - offset : stop - offset : step]
-        else:
-            return pd.concat(tables, ignore_index=True)[start - offset : stop - offset : step, rows]
+        return pd.concat(tables, ignore_index=True)[start - offset : stop - offset : step]
 
     @cache
     def __len__(self):

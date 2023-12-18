@@ -103,14 +103,6 @@ class DataTransformer(object):
 
         self._column_raw_dtypes = data_loader[: data_loader.chunksize].infer_objects().dtypes
         self._column_transform_info_list = []
-        # FIXME: Use data_lodaer.iter() for chunk reading
-        # for df in data_loader.iter:
-        #    for column_name in data_loader.columns():
-        #       if column_name in discrete_columns:
-        #           column_transform_info = self._fit_discrete(data_loader[[column_name]])
-        #       else:
-        #           column_transform_info = self._fit_continuous(data_loader[[column_name]])
-
         for column_name in data_loader.columns():
             if column_name in discrete_columns:
                 column_transform_info = self._fit_discrete(data_loader[[column_name]])
