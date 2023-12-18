@@ -40,7 +40,7 @@ coverage reports
 
 .. code:: bash
 
-   pytest -vv --cov=sdgx/ --cov-config=.coveragerc tests # Generate coverage reports
+   pytest -vv --cov-config=.coveragerc --cov=sdgx/ tests # Generate coverage reports
 
 Run unit-test before PR, **ensure that new features are covered by unit
 tests**
