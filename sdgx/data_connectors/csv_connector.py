@@ -69,6 +69,7 @@ class CsvConnector(DataConnector):
             sep=self.sep,
             header=self.header,
             nrows=0,
+            **self.read_csv_kwargs,
         ).columns.tolist()
         return d
 
