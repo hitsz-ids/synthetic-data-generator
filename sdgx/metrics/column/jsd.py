@@ -8,12 +8,13 @@ from sdgx.metrics.column.base import ColumnMetric
 
 
 class JSD(ColumnMetric):
-    '''JSD : Jensen Shannon Divergence
-    
+    """JSD : Jensen Shannon Divergence
+
     This class is used to calculate the Jensen Shannon divergence value betweenthe target columns of real data and synthetic data.
 
     Currently, we support discrete and continuous columns as inputs.
-    '''
+    """
+
     def __init__(self) -> None:
         super().__init__()
         self.lower_bound = 0
@@ -21,24 +22,25 @@ class JSD(ColumnMetric):
         self.metric_name = "jensen_shannon_divergence"
 
     @classmethod
-    def calculate(cls,\
-                  real_data: pd.DataFrame,\
-                  synthetic_data: pd.DataFrame,\
-                  cols: list[str] | None,\
-                  discrete: bool = True,\
-                  ) -> pd.DataFrame:
+    def calculate(
+        cls,
+        real_data: pd.DataFrame,
+        synthetic_data: pd.DataFrame,
+        cols: list[str] | None,
+        discrete: bool = True,
+    ) -> pd.DataFrame:
         """
         Calculate the JSD value between a real column and a synthetic column.
 
         Args:
             real_data (pd.DataFrame): The real data.
-            
+
             real_data (pd.DataFrame): The synthetic data.
 
             cols (list[str]): The target column to calculat JSD metric.
-            
+
             discrete (bool): Whether this column is a discrete column.
-        
+
         Returns:
             JSD_val (float): The meteic value.
         """
@@ -85,26 +87,24 @@ class JSD(ColumnMetric):
 
     @classmethod
     def check_output(cls, raw_metric_value: float):
-        ''' Check the output value.
-        
+        """Check the output value.
+
         Args:
             raw_metric_value (float):  the calculated raw value of the JSD metric.
-        '''
+        """
         instance = cls()
         if raw_metric_value < instance.lower_bound or raw_metric_value > instance.upper_bound:
             raise ValueError
 
     @classmethod
-    def jensen_shannon_divergence(cls,\
-                                  p: float,\
-                                  q: float):
-        '''Calculate the jensen_shannon_divergence of p and q.
-        
+    def jensen_shannon_divergence(cls, p: float, q: float):
+        """Calculate the jensen_shannon_divergence of p and q.
+
         Args:
             p (float): the input parameter p.
 
             q (float): the input parameter q.
-        '''
+        """
         # Calculate the average distribution of p and q
         m = 0.5 * (p + q)
 

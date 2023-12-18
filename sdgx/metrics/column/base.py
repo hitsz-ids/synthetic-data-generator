@@ -46,9 +46,7 @@ class ColumnMetric(object):
         raise NotImplementedError()
 
     @classmethod
-
     def check_output(cls, raw_metric_value):
-    
         raise NotImplementedError()
 
     pass

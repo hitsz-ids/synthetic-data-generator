@@ -23,4 +23,4 @@ selected_columns = ["workclass"]
 isDiscrete = True
 metrics = JSD.calculate(demo_data, sampled_data, selected_columns, isDiscrete)
 
-print("JSD metric of column %s: %g" %(selected_columns[0], metrics))
+print("JSD metric of column %s: %g" % (selected_columns[0], metrics))
