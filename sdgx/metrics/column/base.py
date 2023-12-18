@@ -24,7 +24,7 @@ class ColumnMetric(object):
             raise TypeError("real_data's type must not be None, int, float or str")
 
         # if type is pd.Series, return directly
-        if type(real_data) is pd.Series or type(real_data) is pd.DataFrame:
+        if isinstance(real_data, pd.Series ) or isinstance(real_data, pd.DataFrame):
             return real_data, synthetic_data
 
         # if type is not pd.Series or pd.DataFrame tranfer it to Series
