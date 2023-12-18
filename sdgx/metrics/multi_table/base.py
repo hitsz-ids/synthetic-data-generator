@@ -1,4 +1,4 @@
-class multiTableMetric:
+class MultiTableMetric:
     upper_bound = None
     lower_bound = None
     metric_name = None

@@ -10,7 +10,7 @@ class ColumnMetric(object):
         pass
 
     @classmethod
-    def check_input(real_data, synthetic_data):
+    def check_input(cls, real_data, synthetic_data):
         # Input parameter must not contain None value
         if real_data is None or synthetic_data is None:
             raise TypeError("Input contains None.")
@@ -24,10 +24,10 @@ class ColumnMetric(object):
             raise TypeError("real_data's type must not be None, int, float or str")
 
         # if type is pd.Series, return directly
-        if type(real_data) is pd.Series:
+        if isinstance(real_data, pd.Series) or isinstance(real_data, pd.DataFrame):
             return real_data, synthetic_data
 
-        # if type is not pd.Series, tranfer it to Series
+        # if type is not pd.Series or pd.DataFrame tranfer it to Series
         try:
             real_data = pd.Series(real_data)
             synthetic_data = pd.Series(synthetic_data)
@@ -38,7 +38,7 @@ class ColumnMetric(object):
             return None, None
 
     @classmethod
-    def calculate(real_data, synthetic_data):
+    def calculate(cls, real_data, synthetic_data):
         # This method should first check the input
         # such as:
         real_data, synthetic_data = columnMetric.check_input(real_data, synthetic_data)
@@ -46,7 +46,7 @@ class ColumnMetric(object):
         raise NotImplementedError()
 
     @classmethod
-    def check_output(raw_metric_value):
+    def check_output(cls, raw_metric_value):
         raise NotImplementedError()
 
     pass
