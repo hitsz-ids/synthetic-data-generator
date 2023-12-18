@@ -1,9 +1,7 @@
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from scipy.stats import entropy, gaussian_kde
 
-from sdgx.data_process.transform.transform import DataTransformer
 from sdgx.metrics.column.base import ColumnMetric
 
 
@@ -35,7 +33,7 @@ class JSD(ColumnMetric):
         Args:
             real_data (pd.DataFrame): The real data.
 
-            real_data (pd.DataFrame): The synthetic data.
+            synthetic_data (pd.DataFrame): The synthetic data.
 
             cols (list[str]): The target column to calculat JSD metric.
 
