@@ -1,8 +1,8 @@
 class MultiTableMetric:
-    '''MultiTableMetric 
-    
+    """MultiTableMetric
+
     Metrics used to evaluate the quality of synthetic multi-table data.
-    '''
+    """
 
     upper_bound = None
     lower_bound = None
@@ -11,39 +11,38 @@ class MultiTableMetric:
     table_list = []
 
     def __init__(self, metadata: dict) -> None:
-        ''' Initialization
+        """Initialization
 
         Args:
             metadata(dict): This parameter accepts a metadata description dict, which is used to describe the table relations and column description information for each table.
-        '''
+        """
         self.metadata = metadata
         pass
 
     @classmethod
     def check_input(real_data: dict, synthetic_data: dict):
-        '''Format check for single table input.
-        
+        """Format check for single table input.
+
         The `real_data` and `synthetic_data` should be dict, which contains tables (in pd.DataFrame).
-        
-        Args: 
+
+        Args:
 
             real_data(dict): the real (original) data table.
 
-            synthetic_data(dict): the synthetic (generated) data table.       
-        '''
-        
+            synthetic_data(dict): the synthetic (generated) data table.
+        """
 
         pass
 
     # not a class method
     def calculate(self, real_data: dict, synthetic_data: dict):
-        '''Calculate the metric value between real tables and synthetic tables.
-        
+        """Calculate the metric value between real tables and synthetic tables.
+
         Args:
             real_data(dict): the real (original) data table.
 
             synthetic_data(dict): the synthetic (generated) data table.
-        '''
+        """
         raise NotImplementedError()
 
     @classmethod

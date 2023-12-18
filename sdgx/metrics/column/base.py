@@ -2,10 +2,11 @@ import pandas as pd
 
 
 class ColumnMetric(object):
-    '''ColumnMetric 
-    
+    """ColumnMetric
+
     Metrics used to evaluate the quality of synthetic data columns.
-    '''
+    """
+
     upper_bound = None
     lower_bound = None
     metric_name = "Accuracy"
@@ -14,16 +15,16 @@ class ColumnMetric(object):
         pass
 
     @classmethod
-    def check_input(cls,
-                    real_data: pd.Series | pd.DataFrame,
-                    synthetic_data: pd.Series | pd.DataFrame):
-        '''Input check for column or table input.
-        
+    def check_input(
+        cls, real_data: pd.Series | pd.DataFrame, synthetic_data: pd.Series | pd.DataFrame
+    ):
+        """Input check for column or table input.
+
         Args:
             real_data(pd.DataFrame or pd.Series): the real (original) data table / column.
 
             synthetic_data(pd.DataFrame or pd.Series): the synthetic (generated) data table / column.
-        '''
+        """
 
         # Input parameter must not contain None value
         if real_data is None or synthetic_data is None:
@@ -52,16 +53,16 @@ class ColumnMetric(object):
             return None, None
 
     @classmethod
-    def calculate(cls,
-                  real_data: pd.Series | pd.DataFrame,
-                  synthetic_data: pd.Series | pd.DataFrame):
-        '''Calculate the metric value between columns between real table and synthetic table.
-        
+    def calculate(
+        cls, real_data: pd.Series | pd.DataFrame, synthetic_data: pd.Series | pd.DataFrame
+    ):
+        """Calculate the metric value between columns between real table and synthetic table.
+
         Args:
             real_data(pd.DataFrame or pd.Series): the real (original) data table / column.
 
             synthetic_data(pd.DataFrame or pd.Series): the synthetic (generated) data table / column.
-        '''
+        """
         # This method should first check the input
         # such as:
         real_data, synthetic_data = ColumnMetric.check_input(real_data, synthetic_data)
