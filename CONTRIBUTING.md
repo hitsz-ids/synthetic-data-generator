@@ -30,8 +30,7 @@ pip install -e .[test]
 We use pytest to write unit tests, and use pytest-cov to generate coverage reports
 
 ```bash
-pytest -v
-pytest --cov=sdgx # Generate coverage reports
+pytest -vv --cov-config=.coveragerc --cov=sdgx/ tests
 ```
 
 Run unit-test before PR, **ensure that new features are covered by unit tests**

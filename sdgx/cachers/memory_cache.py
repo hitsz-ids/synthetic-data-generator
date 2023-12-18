@@ -64,13 +64,6 @@ class MemoryCache(Cacher):
             return data
         return data[:chunksize]
 
-    def load_all(self, data_connector: DataConnector) -> pd.DataFrame:
-        # Concat all dataframe
-        return pd.concat(
-            self.iter(chunksize=self.blocksize, data_connector=data_connector),
-            ignore_index=True,
-        )
-
     def iter(
         self, chunksize: int, data_connector: DataConnector
     ) -> Generator[pd.DataFrame, None, None]:

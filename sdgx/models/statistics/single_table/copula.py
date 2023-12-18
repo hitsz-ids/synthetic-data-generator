@@ -13,11 +13,11 @@ import scipy
 import sdgx.models.components.sdv_copulas as copulas
 from sdgx.exceptions import NonParametricError
 from sdgx.models.components.sdv_copulas import multivariate
-from sdgx.models.components.sdv_rdt.transformers import OneHotEncoder
 
 # transformer 以及 sampler 已经拆分，挪到 transform/ 目录中
 # from sdgx.data_process.sampling.sampler import DataSamplerCTGAN
-from sdgx.models.components.transform import DataTransformer
+from sdgx.models.components.sdv_ctgan.data_transformer import DataTransformer
+from sdgx.models.components.sdv_rdt.transformers import OneHotEncoder
 from sdgx.models.components.utils import (
     flatten_dict,
     log_numerical_distributions_error,

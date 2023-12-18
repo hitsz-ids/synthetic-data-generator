@@ -1,16 +1,19 @@
-"""
-    DataTransform 模块：
-        将把该模块列入 Data Process 中
-"""
+"""DataTransformer module."""
+from __future__ import annotations
 
 from collections import namedtuple
-from typing import List, Optional
+from typing import Any, Generator
 
 import numpy as np
 import pandas as pd
 from joblib import Parallel, delayed
 
-from .sdv_rdt.transformers import ClusterBasedNormalizer, OneHotEncoder
+from sdgx.data_connectors.base import DataConnector
+from sdgx.data_loader import DataLoader
+from sdgx.models.components.sdv_rdt.transformers import (
+    ClusterBasedNormalizer,
+    OneHotEncoder,
+)
 
 SpanInfo = namedtuple("SpanInfo", ["dim", "activation_fn"])
 ColumnTransformInfo = namedtuple(
@@ -19,7 +22,7 @@ ColumnTransformInfo = namedtuple(
 )
 
 
-class DataTransformer:
+class DataTransformer(object):
     """Data Transformer.
 
     Model continuous columns with a BayesianGMM and normalized to a scalar [0, 1] and a vector.
@@ -86,7 +89,7 @@ class DataTransformer:
             output_dimensions=num_categories,
         )
 
-    def fit(self, raw_data, discrete_columns: Optional[List] = None):
+    def fit(self, data_loader: DataLoader, discrete_columns=()):
         """Fit the ``DataTransformer``.
 
         Fits a ``ClusterBasedNormalizer`` for continuous columns and a
@@ -97,23 +100,14 @@ class DataTransformer:
         self.output_info_list = []
         self.output_dimensions = 0
         self.dataframe = True
-        if not discrete_columns:
-            discrete_columns = []
 
-        if not isinstance(raw_data, pd.DataFrame):
-            self.dataframe = False
-            # work around for RDT issue #328 Fitting with numerical column names fails
-            discrete_columns = [str(column) for column in discrete_columns]
-            column_names = [str(num) for num in range(raw_data.shape[1])]
-            raw_data = pd.DataFrame(raw_data, columns=column_names)
-
-        self._column_raw_dtypes = raw_data.infer_objects().dtypes
+        self._column_raw_dtypes = data_loader[: data_loader.chunksize].infer_objects().dtypes
         self._column_transform_info_list = []
-        for column_name in raw_data.columns:
+        for column_name in data_loader.columns():
             if column_name in discrete_columns:
-                column_transform_info = self._fit_discrete(raw_data[[column_name]])
+                column_transform_info = self._fit_discrete(data_loader[[column_name]])
             else:
-                column_transform_info = self._fit_continuous(raw_data[[column_name]])
+                column_transform_info = self._fit_continuous(data_loader[[column_name]])
 
             self.output_info_list.append(column_transform_info.output_info)
             self.output_dimensions += column_transform_info.output_dimensions
@@ -121,8 +115,7 @@ class DataTransformer:
 
     def _transform_continuous(self, column_transform_info, data):
         column_name = data.columns[0]
-        flattened_column = data[column_name].to_numpy().flatten()
-        data = data.assign(**{column_name: flattened_column})
+        data[column_name] = data[column_name].to_numpy().flatten()
         gm = column_transform_info.transform
         transformed = gm.transform(data)
 
@@ -174,27 +167,27 @@ class DataTransformer:
 
         return Parallel(n_jobs=-1)(processes)
 
-    def transform(self, raw_data):
+    def transform(self, dataloader: DataLoader):
         """Take raw data and output a matrix data."""
-        if not isinstance(raw_data, pd.DataFrame):
-            column_names = [str(num) for num in range(raw_data.shape[1])]
-            raw_data = pd.DataFrame(raw_data, columns=column_names)
 
         # Only use parallelization with larger data sizes.
         # Otherwise, the transformation will be slower.
-        if raw_data.shape[0] < 500:
+        if dataloader.shape[0] < 500:
             column_data_list = self._synchronous_transform(
-                raw_data, self._column_transform_info_list
+                dataloader, self._column_transform_info_list
             )
         else:
-            column_data_list = self._parallel_transform(raw_data, self._column_transform_info_list)
+            column_data_list = self._parallel_transform(
+                dataloader, self._column_transform_info_list
+            )
 
+        # FIXME: Return a dataloader to support chunking
         return np.concatenate(column_data_list, axis=1).astype(float)
 
     def _inverse_transform_continuous(self, column_transform_info, column_data, sigmas, st):
         gm = column_transform_info.transform
         data = pd.DataFrame(column_data[:, :2], columns=list(gm.get_output_sdtypes()))
-        data[data.columns[1]] = np.argmax(column_data[:, 1:], axis=1)
+        data.iloc[:, 1] = np.argmax(column_data[:, 1:], axis=1)
         if sigmas is not None:
             selected_normalized_value = np.random.normal(data.iloc[:, 0], sigmas[st])
             data.iloc[:, 0] = selected_normalized_value

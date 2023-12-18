@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import json
 from enum import Enum
+from pathlib import Path
 from typing import Any, Dict, List
 
 import pandas as pd
@@ -88,3 +90,13 @@ class Metadata(BaseModel):
             metadata.update(inspector.inspect())
 
         return metadata
+
+    def save(self, path: str | Path):
+        with path.open("w") as f:
+            f.write(self.model_dump_json())
+
+    @classmethod
+    def load(cls, path: str | Path) -> "Metadata":
+        path = Path(path).expanduser().resolve()
+        attributes = json.load(path.open("r"))
+        return Metadata().update(attributes)

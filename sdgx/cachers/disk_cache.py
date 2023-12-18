@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from functools import lru_cache
 from pathlib import Path
 from typing import Generator
 
@@ -81,6 +82,7 @@ class DiskCache(Cacher):
         else:
             data.to_parquet(self._get_cache_filename(offset))
 
+    @lru_cache(maxsize=64)
     def load(self, offset: int, chunksize: int, data_connector: DataConnector) -> pd.DataFrame:
         """
         Load data from data_connector or cache
@@ -105,15 +107,6 @@ class DiskCache(Cacher):
         if len(data) < chunksize:
             return data
         return data[:chunksize]
-
-    def load_all(self, data_connector: DataConnector) -> pd.DataFrame:
-        """
-        Load all data from data_connector or cache
-        """
-        return pd.concat(
-            self.iter(chunksize=self.blocksize, data_connector=data_connector),
-            ignore_index=True,
-        )
 
     def iter(
         self, chunksize: int, data_connector: DataConnector

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from functools import cached_property
 from typing import Any, Generator
 
 import pandas as pd
@@ -7,6 +8,7 @@ import pandas as pd
 from sdgx.cachers.base import Cacher
 from sdgx.cachers.manager import CacherManager
 from sdgx.data_connectors.base import DataConnector
+from sdgx.utils import cache
 
 
 class DataLoader:
@@ -78,3 +80,53 @@ class DataLoader:
         self.data_connector.finalize()
         if clear_cache:
             self.cacher.clear_cache()
+
+    def __getitem__(self, key: list | slice | tuple) -> pd.DataFrame:
+        """
+        Support get data by index and slice
+
+        Warning:
+
+            This is very tricky when using :ref:`GeneratorConnector` with a :ref:`Cacher`.
+            When calling ``len``, will iterate and store all data in cache.
+            Then we can ``load`` the data from cache. This makes accessing data in correct index.
+
+            If using :ref:`GeneratorConnector` with :ref:`NoCache`, the index will be wrong
+            and this may totally broken.
+
+        """
+        if isinstance(key, list):
+            sli = None
+            rows = key
+        else:
+            sli = key
+            rows = None
+
+        if not sli:
+            return pd.concat((d[rows] for d in self.iter()), ignore_index=True)
+
+        start = sli.start or 0
+        stop = sli.stop or len(self)
+        step = sli.step or 1
+
+        offset = (start // self.chunksize) * self.chunksize
+        n_iter = ((stop - start) // self.chunksize) + 1
+
+        tables = (
+            self.cacher.load(
+                offset=offset + i * self.chunksize,
+                chunksize=self.chunksize,
+                data_connector=self.data_connector,
+            )
+            for i in range(n_iter)
+        )
+
+        return pd.concat(tables, ignore_index=True)[start - offset : stop - offset : step]
+
+    @cache
+    def __len__(self):
+        return sum(len(l) for l in self.iter())
+
+    @cached_property
+    def shape(self):
+        return (len(self), len(self.columns()))

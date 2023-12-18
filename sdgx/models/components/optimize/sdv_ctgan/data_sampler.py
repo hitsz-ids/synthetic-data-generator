@@ -1,16 +1,16 @@
-"""
-Refer CTGAN Version 0.6.0: https://github.com/sdv-dev/CTGAN@a40570e321cb46d798a823f350e1010a0270d804
-Which is Lincensed by MIT License
-"""
+"""DataSampler module."""
+from __future__ import annotations
 
 import numpy as np
 
+from sdgx.data_loader import DataLoader
 
-class DataSamplerCTGAN:
+
+class DataSampler(object):
     """DataSampler samples the conditional vector and corresponding data for CTGAN."""
 
-    def __init__(self, data, output_info, log_frequency):
-        self._data = data
+    def __init__(self, dataloader: DataLoader | np.ndarray, output_info, log_frequency):
+        self._data: DataLoader | np.ndarray = dataloader
 
         def is_discrete_column(column_info):
             return len(column_info) == 1 and column_info[0].activation_fn == "softmax"
@@ -35,12 +35,12 @@ class DataSamplerCTGAN:
 
                 rid_by_cat = []
                 for j in range(span_info.dim):
-                    rid_by_cat.append(np.nonzero(data[:, st + j])[0])
+                    rid_by_cat.append(np.nonzero(dataloader[:, st + j])[0])
                 self._rid_by_cat_cols.append(rid_by_cat)
                 st = ed
             else:
                 st += sum([span_info.dim for span_info in column_info])
-        assert st == data.shape[1]
+        assert st == dataloader.shape[1]
 
         # Prepare an interval matrix for efficiently sample conditional vector
         max_category = max(
@@ -63,7 +63,7 @@ class DataSamplerCTGAN:
             if is_discrete_column(column_info):
                 span_info = column_info[0]
                 ed = st + span_info.dim
-                category_freq = np.sum(data[:, st:ed], axis=0)
+                category_freq = np.sum(dataloader[:, st:ed], axis=0)
                 if log_frequency:
                     category_freq = np.log(category_freq + 1)
                 category_prob = category_freq / np.sum(category_freq)

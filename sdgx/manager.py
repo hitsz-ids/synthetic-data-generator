@@ -114,11 +114,16 @@ class Manager(metaclass=Singleton):
             NotFoundError: if cls_name is not registered
             InitializationError: if failed to initialize
         """
-        cls_name = self._normalize_name(cls_name)
-        if not cls_name in self.registed_cls:
-            raise NotFoundError
+        if isinstance(cls_name, type):
+            cls_type = cls_name
+        else:
+            cls_name = self._normalize_name(cls_name)
+
+            if not cls_name in self.registed_cls:
+                raise NotFoundError
+            cls_type = self.registed_cls[cls_name]
         try:
-            instance = self.registed_cls[cls_name](**kwargs)
+            instance = cls_type(**kwargs)
             if not isinstance(instance, self.register_type):
                 raise InitializationError(f"{cls_name} is not a subclass of {self.register_type}.")
             return instance

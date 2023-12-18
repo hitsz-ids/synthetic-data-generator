@@ -9,7 +9,7 @@ from sdgx.data_models.metadata import Metadata
 
 
 class SynthesizerModel:
-    def fit(metadata: Metadata, dataloader: DataLoader, *args, **kwargs):
+    def fit(self, metadata: Metadata, dataloader: DataLoader, *args, **kwargs):
         raise NotImplementedError
 
     def sample(self, count: int, *args, **kwargs) -> pd.DataFrame:
