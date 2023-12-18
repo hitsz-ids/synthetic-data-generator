@@ -10,7 +10,7 @@
 # 导入相关模块
 from sdgx.models.single_table.ctgan import CTGAN
 from sdgx.data_process.sampling.sampler import DataSamplerCTGAN
-from sdgx.data_process.transform.transform import DataTransformer
+from sdgx.data_processors.transformers.transform import DataTransformer
 from sdgx.utils.io.csv_utils import *
 
 # 读取数据

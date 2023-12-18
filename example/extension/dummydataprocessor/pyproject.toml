@@ -1,0 +1,28 @@
+# Build with hatch, you can use any build tool you like.
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "dummydataprocessor"
+
+dependencies = ["sdgx"]
+dynamic = ["version"]
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
+]
+
+[project.optional-dependencies]
+test = ["pytest"]
+
+# This is the entry point for the Manager to find the extension.
+[project.entry-points."sdgx.data_processor"]
+dummydataprocessor = "dummydataprocessor.dataprocessor"
+
+[tool.hatch.version]
+path = "dummydataprocessor/__init__.py"

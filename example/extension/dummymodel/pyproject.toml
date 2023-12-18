@@ -4,12 +4,23 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "sdgx-dummymodel"
+name = "dummymodel"
 
 dependencies = ["sdgx"]
 dynamic = ["version"]
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
+]
 
-# This is the entry point for the ModelManager to find the model.
+[project.optional-dependencies]
+test = ["pytest"]
+
+# This is the entry point for the Manager to find the extension.
 [project.entry-points."sdgx.model"]
 dummymodel = "dummymodel.model"
 

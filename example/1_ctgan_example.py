@@ -1,6 +1,7 @@
-# 运行该例子，可使用：
-# ipython -i  example/1_ctgan_example.py
-# 并查看 sampled_data 变量
+# To run this example, you can use:
+#   ipython - i example/1_ctgan_example.py
+# then view the sampled_data
+
 import numpy as np
 
 from sdgx.metrics.column.jsd import JSD
@@ -24,3 +25,4 @@ isDiscrete = True
 metrics = JSD.calculate(demo_data, sampled_data, selected_columns, isDiscrete)
 
 print("JSD metric of column %s: %g" % (selected_columns[0], metrics))
+

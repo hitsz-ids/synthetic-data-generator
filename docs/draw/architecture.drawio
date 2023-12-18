@@ -1,0 +1,154 @@
+<mxfile host="65bd71144e">
+    <diagram id="OQYcgy7KPISNNCz2AWvt" name="第 1 页">
+        <mxGraphModel dx="534" dy="579" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="284" value="" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+                    <mxGeometry x="140" y="255" width="800" height="605" as="geometry"/>
+                </mxCell>
+                <mxCell id="285" value="" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+                    <mxGeometry x="170" y="385" width="510" height="395" as="geometry"/>
+                </mxCell>
+                <mxCell id="286" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+                    <mxGeometry x="690" y="260" width="140" height="520" as="geometry"/>
+                </mxCell>
+                <mxCell id="287" value="Plugin System" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1" vertex="1" parent="1">
+                    <mxGeometry x="715" y="260" width="90" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="288" value="Connector Manager" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="700" y="290" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="289" value="raw data" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=-0.006;exitY=0.684;exitDx=0;exitDy=0;entryX=1;entryY=0;entryDx=0;entryDy=75;entryPerimeter=0;exitPerimeter=0;" edge="1" parent="1" source="290" target="298">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="290" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="1">
+                    <mxGeometry x="250" y="260" width="430" height="110" as="geometry"/>
+                </mxCell>
+                <mxCell id="291" value="Data Connector" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1" vertex="1" parent="1">
+                    <mxGeometry x="260" y="260" width="100" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="292" value="CLI" style="rounded=1;whiteSpace=wrap;html=1;fontStyle=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+                    <mxGeometry x="250" y="210" width="670" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="293" value="Filesystem Connector" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="275" y="290" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="294" value="DB Connector" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="410" y="290" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="295" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="360" y="450" width="310" height="110" as="geometry"/>
+                </mxCell>
+                <mxCell id="296" value="Data Processor" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1" vertex="1" parent="1">
+                    <mxGeometry x="360" y="450" width="110" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="297" value="raw data" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0;exitDx=0;exitDy=27.5;exitPerimeter=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" source="298" target="290">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="298" value="Storage" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" vertex="1" parent="1">
+                    <mxGeometry x="50" y="260" width="60" height="110" as="geometry"/>
+                </mxCell>
+                <mxCell id="299" value="HDFS Connector" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="545" y="290" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="300" value="DataLoader" style="rounded=1;whiteSpace=wrap;html=1;fontStyle=1" vertex="1" parent="1">
+                    <mxGeometry x="260" y="400" width="410" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="301" value="SDG Library" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontStyle=1" vertex="1" parent="1">
+                    <mxGeometry x="170" y="385" width="90" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="302" value="ProcessorManager" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="700" y="460" width="120" height="45" as="geometry"/>
+                </mxCell>
+                <mxCell id="303" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="260" y="640" width="410" height="130" as="geometry"/>
+                </mxCell>
+                <mxCell id="304" value="" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="1">
+                    <mxGeometry x="140" y="870" width="800" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="305" value="Infrastructure" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="170" y="895" width="90" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="306" value="Apache Arrow" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="270" y="880" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="307" value="PyTorch" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="410" y="880" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="308" value="Sklearn" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="545" y="880" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="309" value="Synthesizer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1" vertex="1" parent="1">
+                    <mxGeometry x="840" y="260" width="80" height="520" as="geometry"/>
+                </mxCell>
+                <mxCell id="310" value="Model" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1" vertex="1" parent="1">
+                    <mxGeometry x="270" y="640" width="40" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="311" value="Metadata" style="rounded=1;whiteSpace=wrap;html=1;fontStyle=1" vertex="1" parent="1">
+                    <mxGeometry x="260" y="570" width="90" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="312" value="Transformer" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="370" y="485" width="90" height="65" as="geometry"/>
+                </mxCell>
+                <mxCell id="313" value="Formatter" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="470" y="485" width="90" height="65" as="geometry"/>
+                </mxCell>
+                <mxCell id="314" value="ModelManager" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="700" y="655" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="315" value="Sampler" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="570" y="485" width="90" height="65" as="geometry"/>
+                </mxCell>
+                <mxCell id="316" value="Processed data" style="rounded=1;whiteSpace=wrap;html=1;fontStyle=1" vertex="1" parent="1">
+                    <mxGeometry x="360" y="570" width="310" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="317" value="CTGAN" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="270" y="670" width="100" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="318" value="Inspector" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="260" y="450" width="90" height="110" as="geometry"/>
+                </mxCell>
+                <mxCell id="319" value="InspectorManager" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="700" y="515" width="120" height="45" as="geometry"/>
+                </mxCell>
+                <mxCell id="320" value="GaussianCopula&lt;span style=&quot;&quot;&gt;&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="410" y="670" width="100" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="321" value="HMA&lt;span style=&quot;&quot;&gt;&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="553.5" y="670" width="100" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="322" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" vertex="1" parent="1">
+                    <mxGeometry x="170" y="790" width="510" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="323" value="Evaluator" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontStyle=0" vertex="1" parent="1">
+                    <mxGeometry x="180" y="805" width="70" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="324" value="JSD" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="270" y="800" width="120" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="325" value="ML Similarity" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="410" y="800" width="120" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="326" value="Query Error" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="545" y="800" width="120" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="327" value="SDG Ecosystem" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontStyle=1;fontSize=18;" vertex="1" parent="1">
+                    <mxGeometry x="755" y="805" width="160" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="328" value="Apache Spark" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="680" y="880" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="329" value="Faker" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="815" y="880" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="330" value="Architecture of SDG" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontStyle=2" vertex="1" parent="1">
+                    <mxGeometry x="488" y="970" width="130" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="331" value="DataLoader" style="rounded=1;whiteSpace=wrap;html=1;fontStyle=1" vertex="1" parent="1">
+                    <mxGeometry x="360" y="600" width="310" height="30" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

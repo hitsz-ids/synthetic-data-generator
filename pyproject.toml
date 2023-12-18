@@ -5,26 +5,25 @@ build-backend = "hatchling.build"
 [project]
 name = "sdgx"
 description = "synthetic-data-generator"
-keywords = ["sdg", "hitsz-ids"]
+keywords = ["synthetic data", "hitsz-ids"]
 requires-python = ">=3.8"
 
 dependencies = [
-    "setproctitle",
-    "PyMySQL",
     "pandas",
     "numpy",
-    "scikit-learn",
+    "scipy",
+    "pyyaml",
+    'scikit-learn>=0.24,<2',
+    'Faker>=10',
+    "matplotlib",
     "torch>=2",
     "torchvision",
-    "rdt",
-    "joblib",
-    "dython",
-    "seaborn",
     "table-evaluator",
-    "copulas",
     "click",
     "pluggy",
     "loguru",
+    "pyarrow",
+    "pydantic>=2",
 ]
 dynamic = ["version"]
 classifiers = [
@@ -37,7 +36,7 @@ classifiers = [
 
 [project.optional-dependencies]
 test = ["pytest", "pytest-cov"]
-docs = ["Sphinx<=7.2.4", "sphinx-rtd-theme", "sphinx-click", "autodoc_pydantic"]
+docs = ["Sphinx", "sphinx-rtd-theme", "sphinx-click", "autodoc_pydantic>=2"]
 
 [project.scripts]
 sdgx = "sdgx.cli.main:cli"

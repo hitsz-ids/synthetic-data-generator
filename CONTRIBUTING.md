@@ -17,7 +17,7 @@ Pre-commit will automatically format the code before each commit, It can also be
 pre-commit run --all-files
 ```
 
-Comment style is [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings).
+Comment style follows [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings).
 
 ## Install Locally with Test Dependencies
 
@@ -56,4 +56,4 @@ Use [start-docs-host.sh](dev-tools/start-docs-host.sh) to deploy a local http se
 cd ./dev-tools && ./start-docs-host.sh
 ```
 
-Access `http://localhost:8080` for docs.
+Access `http://localhost:8910` for docs.

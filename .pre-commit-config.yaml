@@ -21,7 +21,7 @@ repos:
         args: ["--line-length", "100"]
 
   - repo: https://github.com/PyCQA/isort
-    rev: 5.12.0
+    rev: 5.13.0
     hooks:
       - id: isort
         files: \.py$
@@ -35,7 +35,7 @@ repos:
           [mdformat-gfm, mdformat-frontmatter, mdformat-footnote]
 
   - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: "v4.0.0-alpha.3"
+    rev: "v4.0.0-alpha.4"
     hooks:
       - id: prettier
         entry: env PRETTIER_LEGACY_CLI=1 prettier
@@ -52,5 +52,5 @@ repos:
     rev: "v1.7.1"
     hooks:
       - id: mypy
-        files: duetector
+        files: sdgx
         stages: [manual]

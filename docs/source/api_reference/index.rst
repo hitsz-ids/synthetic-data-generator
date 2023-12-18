@@ -1,0 +1,17 @@
+.. _api_reference:
+
+API Reference
+===============
+
+.. toctree::
+    :maxdepth: 2
+
+    Synthesizer <synthesizer>
+    Data Connector <data_connectors/index>
+    Data Loader <data_loader>
+    Cacher for DataLoader <cachers/index>
+    Data Processor <data_processors/index>
+    Models <models/index>
+    Metadata and Inspectors <data_models/index>
+    Manager <manager>
+    Exceptions <exceptions>

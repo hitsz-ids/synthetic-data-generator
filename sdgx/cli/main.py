@@ -4,6 +4,9 @@ from pathlib import Path
 import click
 import pandas
 
+from sdgx.cachers.manager import CacherManager
+from sdgx.data_connectors.manager import DataConnectorManager
+from sdgx.data_processors.manager import DataProcessorManager
 from sdgx.models.manager import ModelManager
 
 
@@ -83,7 +86,31 @@ def sample(
 
 @click.command()
 def list_models():
-    for model_name, model_cls in ModelManager().registed_model.items():
+    for model_name, model_cls in ModelManager().registed_models.items():
+        print(f"{model_name} is registed as class: {model_cls}.")
+
+
+@click.command()
+def list_data_connectors():
+    for (
+        model_name,
+        model_cls,
+    ) in DataConnectorManager().registed_data_connectors.items():
+        print(f"{model_name} is registed as class: {model_cls}.")
+
+
+@click.command()
+def list_data_processors():
+    for (
+        model_name,
+        model_cls,
+    ) in DataProcessorManager().registed_data_processors.items():
+        print(f"{model_name} is registed as class: {model_cls}.")
+
+
+@click.command()
+def list_cachers():
+    for model_name, model_cls in CacherManager().registed_cachers.items():
         print(f"{model_name} is registed as class: {model_cls}.")
 
 
@@ -95,3 +122,10 @@ def cli():
 cli.add_command(fit)
 cli.add_command(sample)
 cli.add_command(list_models)
+cli.add_command(list_data_connectors)
+cli.add_command(list_data_processors)
+cli.add_command(list_cachers)
+
+
+if __name__ == "__main__":
+    cli()
