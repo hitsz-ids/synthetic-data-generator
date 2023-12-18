@@ -161,7 +161,7 @@ class Synthesizer:
         inspector_init_kwargs: None | dict[str, Any] = None,
         model_fit_kwargs: None | dict[str, Any] = None,
     ):
-        if not self.dataloader:
+        if self.dataloader is None:
             raise SynthesizerInitError(
                 "Cannot fit without dataloader, check `data_connector` parameter when initializing Synthesizer"
             )
