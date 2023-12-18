@@ -27,7 +27,7 @@ jobs:
           python -m pip install -e .[test]
       - name: Test with pytest
         run: |
-          pytest -vv --cov=sdgx tests
+          pytest -vv --cov=sdgx --cov-config=.coveragerc tests
       - name: Install dependencies for building
         run: |
           pip install build twine hatch
