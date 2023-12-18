@@ -21,8 +21,8 @@ from torch.nn import (
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.metadata import Metadata
 from sdgx.log import logger
-from sdgx.models.components.sdv_ctgan.data_sampler import DataSampler
-from sdgx.models.components.sdv_ctgan.data_transformer import DataTransformer
+from sdgx.models.components.optimize.sdv_ctgan.data_sampler import DataSampler
+from sdgx.models.components.optimize.sdv_ctgan.data_transformer import DataTransformer
 from sdgx.models.components.sdv_ctgan.synthesizers.base import (
     BaseSynthesizer as SDVBaseSynthesizer,
 )
@@ -206,7 +206,7 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
 
     def fit(self, metadata: Metadata, dataloader: DataLoader, *args, **kwargs):
         discrete_columns = metadata.get("discrete_columns", [])
-        self._pre_fit(dataloader, discrete_columns)
+        dataloader = self._pre_fit(dataloader, discrete_columns)
         self._fit(dataloader, discrete_columns)
 
     def _pre_fit(self, dataloader: DataLoader, discrete_columns: list[str] = None):
@@ -215,14 +215,13 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
 
         self._validate_discrete_columns(dataloader.columns(), discrete_columns)
         # Fit Transformer and DataSampler
-        train_data = dataloader[:]
         self._transformer = DataTransformer()
-        self._transformer.fit(train_data, discrete_columns)
+        self._transformer.fit(dataloader, discrete_columns)
 
-        train_data = self._transformer.transform(train_data)
+        dataloader = self._transformer.transform(dataloader)
 
         self._data_sampler = DataSampler(
-            train_data, self._transformer.output_info_list, self._log_frequency
+            dataloader, self._transformer.output_info_list, self._log_frequency
         )
 
         # Initialize Generator
@@ -230,6 +229,7 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
         self._generator = Generator(
             self._embedding_dim + self._data_sampler.dim_cond_vec(), self._generator_dim, data_dim
         ).to(self._device)
+        return dataloader
 
     @random_state
     def _fit(self, dataloader: DataLoader, discrete_columns=None):

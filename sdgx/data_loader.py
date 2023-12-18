@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from functools import cached_property
 from typing import Any, Generator
 
 import pandas as pd
@@ -80,7 +81,7 @@ class DataLoader:
         if clear_cache:
             self.cacher.clear_cache()
 
-    def __getitem__(self, key: slice) -> pd.DataFrame:
+    def __getitem__(self, key: list | slice | tuple) -> pd.DataFrame:
         """
         Support get data by index and slice
 
@@ -94,9 +95,21 @@ class DataLoader:
             and this may totally broken.
 
         """
-        start = key.start or 0
-        stop = key.stop or len(self)
-        step = key.step or 1
+        if isinstance(key, tuple):
+            sli, rows = key
+        elif isinstance(key, list):
+            sli = None
+            rows = key
+        else:
+            sli = key
+            rows = None
+
+        if not sli:
+            return self.load_all()[rows]
+
+        start = sli.start or 0
+        stop = sli.stop or len(self)
+        step = sli.step or 1
 
         offset = (start // self.chunksize) * self.chunksize
         n_iter = ((stop - start) // self.chunksize) + 1
@@ -109,8 +122,16 @@ class DataLoader:
             )
             for i in range(n_iter)
         )
-        return pd.concat(tables, ignore_index=True)[start - offset : stop - offset : step]
+
+        if not rows:
+            return pd.concat(tables, ignore_index=True)[start - offset : stop - offset : step]
+        else:
+            return pd.concat(tables, ignore_index=True)[start - offset : stop - offset : step, rows]
 
     @cache
     def __len__(self):
         return sum(len(l) for l in self.iter())
+
+    @cached_property
+    def shape(self):
+        return (len(self), len(self.columns()))
