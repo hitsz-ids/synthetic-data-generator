@@ -1,5 +1,6 @@
 from sdgx.log import logger
 
+
 class MultiTableMetric:
     """MultiTableMetric
 
@@ -36,11 +37,14 @@ class MultiTableMetric:
 
         # The data type should be same
         if type(real_data) is not type(synthetic_data):
-            raise TypeError(
-                "Data type of real_data and synthetic data should be the same.")
+            raise TypeError("Data type of real_data and synthetic data should be the same.")
 
         # if type is dict, return directly
-        if isinstance(real_data, dict) and len(real_data.keys()) > 0 and len(synthetic_data.keys()) > 0:
+        if (
+            isinstance(real_data, dict)
+            and len(real_data.keys()) > 0
+            and len(synthetic_data.keys()) > 0
+        ):
             return real_data, synthetic_data
 
         logger.error("An error occurred while checking the input.")

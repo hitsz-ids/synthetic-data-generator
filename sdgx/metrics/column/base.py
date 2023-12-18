@@ -1,4 +1,5 @@
 import pandas as pd
+
 from sdgx.log import logger
 
 
@@ -21,7 +22,7 @@ class ColumnMetric(object):
     ):
         """Input check for column or table input.
 
-        Args:        
+        Args:
             real_data(pd.DataFrame or pd.Series): the real (original) data table / column.
 
             synthetic_data(pd.DataFrame or pd.Series): the synthetic (generated) data table / column.
@@ -33,13 +34,11 @@ class ColumnMetric(object):
 
         # The data type should be same
         if type(real_data) is not type(synthetic_data):
-            raise TypeError(
-                "Data type of real_data and synthetic data should be the same.")
+            raise TypeError("Data type of real_data and synthetic data should be the same.")
 
         # Check some data-types that must not be allowed
         if type(real_data) in [int, float, str]:
-            raise TypeError(
-                "real_data's type must not be None, int, float or str")
+            raise TypeError("real_data's type must not be None, int, float or str")
 
         # if type is pd.Series, return directly
         if isinstance(real_data, pd.Series) or isinstance(real_data, pd.DataFrame):
@@ -51,8 +50,7 @@ class ColumnMetric(object):
             synthetic_data = pd.Series(synthetic_data)
             return real_data, synthetic_data
         except Exception as e:
-            logger.error(
-                f"An error occurred while converting to pd.Series: {e}")
+            logger.error(f"An error occurred while converting to pd.Series: {e}")
 
         return None, None
 
@@ -69,8 +67,7 @@ class ColumnMetric(object):
         """
         # This method should first check the input
         # such as:
-        real_data, synthetic_data = ColumnMetric.check_input(
-            real_data, synthetic_data)
+        real_data, synthetic_data = ColumnMetric.check_input(real_data, synthetic_data)
 
         raise NotImplementedError()
 

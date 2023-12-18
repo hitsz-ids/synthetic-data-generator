@@ -36,7 +36,7 @@ class SingleTableMetric:
         # Input parameter must not contain None value
         if real_data is None or synthetic_data is None:
             raise TypeError("Input contains None.")
-        
+
         # The data type should be same
         if type(real_data) is not type(synthetic_data):
             raise TypeError("Data type of real_data and synthetic data should be the same.")
@@ -44,7 +44,7 @@ class SingleTableMetric:
         # if type is pd.Series, return directly
         if isinstance(real_data, pd.DataFrame):
             return real_data, synthetic_data
-        
+
         # if type is not pd.Series or pd.DataFrame tranfer it to Series
         try:
             real_data = pd.DataFrame(real_data)
@@ -52,7 +52,7 @@ class SingleTableMetric:
             return real_data, synthetic_data
         except Exception as e:
             logger.error(f"An error occurred while converting to pd.DataFrame: {e}")
-        
+
         return None, None
 
     def calculate(self, real_data: pd.DataFrame, synthetic_data: pd.DataFrame):
