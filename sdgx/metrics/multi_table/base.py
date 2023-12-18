@@ -1,4 +1,9 @@
 class MultiTableMetric:
+    '''MultiTableMetric 
+    
+    Metrics used to evaluate the quality of synthetic multi-table data.
+    '''
+
     upper_bound = None
     lower_bound = None
     metric_name = None
@@ -6,21 +11,48 @@ class MultiTableMetric:
     table_list = []
 
     def __init__(self, metadata: dict) -> None:
+        ''' Initialization
+
+        Args:
+            metadata(dict): This parameter accepts a metadata description dict, which is used to describe the table relations and column description information for each table.
+        '''
         self.metadata = metadata
         pass
 
     @classmethod
-    def check_input(real_data, synthetic_data):
-        # real_data or synthetic_data should be dict，其中有表
+    def check_input(real_data: dict, synthetic_data: dict):
+        '''Format check for single table input.
+        
+        The `real_data` and `synthetic_data` should be dict, which contains tables (in pd.DataFrame).
+        
+        Args: 
+
+            real_data(dict): the real (original) data table.
+
+            synthetic_data(dict): the synthetic (generated) data table.       
+        '''
+        
 
         pass
 
     # not a class method
-    def calculate(self, real_data, synthetic_data):
+    def calculate(self, real_data: dict, synthetic_data: dict):
+        '''Calculate the metric value between real tables and synthetic tables.
+        
+        Args:
+            real_data(dict): the real (original) data table.
+
+            synthetic_data(dict): the synthetic (generated) data table.
+        '''
         raise NotImplementedError()
 
     @classmethod
-    def check_output(raw_metric_value):
+    def check_output(raw_metric_value: float):
+        """Check the output value.
+
+        Args:
+            raw_metric_value (float):  the calculated raw value of the JSD metric.
+        """
         raise NotImplementedError()
 
     pass
