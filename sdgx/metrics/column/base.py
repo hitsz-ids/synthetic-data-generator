@@ -24,10 +24,10 @@ class ColumnMetric(object):
             raise TypeError("real_data's type must not be None, int, float or str")
 
         # if type is pd.Series, return directly
-        if type(real_data) is pd.Series:
+        if type(real_data) is pd.Series or type(real_data) is pd.DataFrame:
             return real_data, synthetic_data
 
-        # if type is not pd.Series, tranfer it to Series
+        # if type is not pd.Series or pd.DataFrame tranfer it to Series
         try:
             real_data = pd.Series(real_data)
             synthetic_data = pd.Series(synthetic_data)
