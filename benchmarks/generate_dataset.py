@@ -35,11 +35,11 @@ def random_datetime():
     default=(_HERE / "dataset/benchmark.csv").as_posix(),
 )
 @click.option("--num_rows", default=1_000_000)
-@click.option("--int_cols", default=10)
-@click.option("--float_cols", default=10)
-@click.option("--string_cols", default=5)
+@click.option("--int_cols", default=15)
+@click.option("--float_cols", default=15)
+@click.option("--string_cols", default=10)
 @click.option("--string_discrete_nums", default=50)
-@click.option("--timestamp_cols", default=1)
+@click.option("--timestamp_cols", default=10)
 @click.option("--datetime_cols", default=0)
 @click.command()
 def generate_dateset(
