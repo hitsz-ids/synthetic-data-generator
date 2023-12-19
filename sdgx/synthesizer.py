@@ -215,7 +215,7 @@ class Synthesizer:
                 sample_data = d.reverse_convert(sample_data)
             return sample_data
 
-        def _():
+        def generator_sample_caller():
             sample_times = count // chunksize
             for _ in range(sample_times):
                 sample_data = self.model.sample(chunksize, **model_fit_kwargs)
@@ -229,7 +229,7 @@ class Synthesizer:
                     sample_data = d.reverse_convert(sample_data)
                 yield sample_data
 
-        return _()
+        return generator_sample_caller()
 
     def cleanup(self):
         if self.dataloader:
