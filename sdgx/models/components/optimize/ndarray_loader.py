@@ -1,12 +1,16 @@
 from __future__ import annotations
 
+import os
 import shutil
 from functools import cached_property
 from pathlib import Path
 from typing import Generator
+from uuid import uuid4
 
 import numpy as np
 from numpy import ndarray
+
+DEFAULT_CACHE_ROOT = os.getenv("SDG_NDARRAY_CACHE_ROOT", "./.ndarry_cache")
 
 
 class NDArrayLoader:
@@ -16,10 +20,23 @@ class NDArrayLoader:
     Support for storing two-dimensional data by columns.
     """
 
-    def __init__(self, cache_dir: str | Path = "./.ndarry_cache") -> None:
+    def __init__(self, cache_root: str | Path = DEFAULT_CACHE_ROOT) -> None:
         self.store_index = 0
-        self.cache_dir = Path(cache_dir).expanduser().resolve()
-        self.cache_dir.mkdir(exist_ok=True, parents=True)
+        self.cache_root = Path(cache_root).expanduser().resolve()
+        self.cache_root.mkdir(exist_ok=True, parents=True)
+
+    @cached_property
+    def subdir(self) -> str:
+        """
+        Prevent collision of cache files.
+        """
+        return uuid4().hex
+
+    @cached_property
+    def cache_dir(self) -> Path:
+        """Cache directory for storing ndarray."""
+
+        return self.cache_root / self.subdir
 
     def _get_cache_filename(self, index: int) -> Path:
         return self.cache_dir / f"{index}.npy"
