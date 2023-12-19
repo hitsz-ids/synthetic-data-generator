@@ -209,7 +209,7 @@ class Synthesizer:
         metadata: None | Metadata = None,
         model_fit_kwargs: None | dict[str, Any] = None,
     ) -> pd.DataFrame | Generator[pd.DataFrame, None, None]:
-        self.logger.info("Sampling...")
+        logger.info("Sampling...")
         metadata = metadata or self.metadata
         if metadata:
             for d in self.data_processors:
