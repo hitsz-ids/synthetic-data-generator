@@ -71,59 +71,78 @@ pip install sdgx
 
 ### 单表数据快速合成示例
 
-```python
-# 导入相关模块
-from sdgx.models.single_table.ctgan import CTGAN
-from sdgx.utils.io.csv_utils import *
-
-# 读取数据
-demo_data, discrete_cols  = get_demo_single_table()
-```
-
-真实数据示例如下：
-
-```
-       age  workclass  fnlwgt  ... hours-per-week  native-country  class
-0       27    Private  177119  ...             44   United-States  <=50K
-1       27    Private  216481  ...             40   United-States  <=50K
-2       25    Private  256263  ...             40   United-States  <=50K
-3       46    Private  147640  ...             40   United-States  <=50K
-4       45    Private  172822  ...             76   United-States   >50K
-...    ...        ...     ...  ...            ...             ...    ...
-32556   43  Local-gov   33331  ...             40   United-States   >50K
-32557   44    Private   98466  ...             35   United-States  <=50K
-32558   23    Private   45317  ...             40   United-States  <=50K
-32559   45  Local-gov  215862  ...             45   United-States   >50K
-32560   25    Private  186925  ...             48   United-States  <=50K
-
-[32561 rows x 15 columns]
-
-```
+#### 演示代码
 
 ```python
-#定义模型
-model = CTGAN(epochs=10)
-# 训练模型
-model.fit(demo_data, discrete_cols)
+from sdgx.data_connectors.csv_connector import CsvConnector
+from sdgx.models.ml.single_table.ctgan import CTGANSynthesizerModel
+from sdgx.synthesizer import Synthesizer
+from sdgx.utils import download_demo_data
 
-# 生成合成数据
-sampled_data = model.generate(1000)
+dataset_csv = download_demo_data()
+data_connector = CsvConnector(path=dataset_csv)
+synthesizer = Synthesizer(
+    model=CTGANSynthesizerModel(epochs=1),  # For quick demo
+    data_connector=data_connector,
+)
+
+synthesizer.fit()
+sampled_data = synthesizer.sample(1000)
+synthesizer.cleanup()  # Clean all cache
+
+# Optional, use JSD for mectics
+from sdgx.metrics.column.jsd import JSD
+
+JSD = JSD()
+
+selected_columns = ["workclass"]
+isDiscrete = True
+metrics = JSD.calculate(data_connector.read(), sampled_data, selected_columns, isDiscrete)
+
+print("JSD metric of column %s: %g" % (selected_columns[0], metrics))
 ```
 
-合成数据如下：
+#### 对比
+
+真实数据：
+
+```python
+>>> data_connector.read()
+       age         workclass  fnlwgt  education  ...  capitalloss hoursperweek native-country  class
+0        2         State-gov   77516  Bachelors  ...            0            2  United-States  <=50K
+1        3  Self-emp-not-inc   83311  Bachelors  ...            0            0  United-States  <=50K
+2        2           Private  215646    HS-grad  ...            0            2  United-States  <=50K
+3        3           Private  234721       11th  ...            0            2  United-States  <=50K
+4        1           Private  338409  Bachelors  ...            0            2           Cuba  <=50K
+...    ...               ...     ...        ...  ...          ...          ...            ...    ...
+48837    2           Private  215419  Bachelors  ...            0            2  United-States  <=50K
+48838    4               NaN  321403    HS-grad  ...            0            2  United-States  <=50K
+48839    2           Private  374983  Bachelors  ...            0            3  United-States  <=50K
+48840    2           Private   83891  Bachelors  ...            0            2  United-States  <=50K
+48841    1      Self-emp-inc  182148  Bachelors  ...            0            3  United-States   >50K
+
+[48842 rows x 15 columns]
 
 ```
-   age         workclass  fnlwgt  ... hours-per-week  native-country  class
-0   33           Private  276389  ...             41   United-States   >50K
-1   33  Self-emp-not-inc  296948  ...             54   United-States  <=50K
-2   67       Without-pay  266913  ...             51        Columbia  <=50K
-3   49           Private  423018  ...             41   United-States   >50K
-4   22           Private  295325  ...             39   United-States   >50K
-5   63           Private  234140  ...             65   United-States  <=50K
-6   42           Private  243623  ...             52   United-States  <=50K
-7   75           Private  247679  ...             41   United-States  <=50K
-8   79           Private  332237  ...             41   United-States   >50K
-9   28         State-gov  837932  ...             99   United-States  <=50K
+
+仿真数据：
+
+```python
+>>> sampled_data
+     age workclass  fnlwgt     education  ...  capitalloss hoursperweek native-country  class
+0      1       NaN   28219  Some-college  ...            0            2    Puerto-Rico  <=50K
+1      2   Private  250166       HS-grad  ...            0            2  United-States   >50K
+2      2   Private   50304       HS-grad  ...            0            2  United-States  <=50K
+3      4   Private   89318     Bachelors  ...            0            2    Puerto-Rico   >50K
+4      1   Private  172149     Bachelors  ...            0            3  United-States  <=50K
+..   ...       ...     ...           ...  ...          ...          ...            ...    ...
+995    2       NaN  208938     Bachelors  ...            0            1  United-States  <=50K
+996    2   Private  166416     Bachelors  ...            2            2  United-States  <=50K
+997    2       NaN  336022       HS-grad  ...            0            1  United-States  <=50K
+998    3   Private  198051       Masters  ...            0            2  United-States   >50K
+999    1       NaN   41973       HS-grad  ...            0            2  United-States  <=50K
+
+[1000 rows x 15 columns]
 ```
 
 ## 🤝  如何贡献
