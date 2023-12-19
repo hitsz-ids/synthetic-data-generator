@@ -35,10 +35,11 @@ def random_datetime():
     default=(_HERE / "dataset/benchmark.csv").as_posix(),
 )
 @click.option("--num_rows", default=1_000_000)
-@click.option("--int_cols", default=5)
-@click.option("--float_cols", default=3)
-@click.option("--string_cols", default=2)
-@click.option("--timestamp_cols", default=1)
+@click.option("--int_cols", default=20)
+@click.option("--float_cols", default=15)
+@click.option("--string_cols", default=10)
+@click.option("--string_discrete_nums", default=10)
+@click.option("--timestamp_cols", default=5)
 @click.option("--datetime_cols", default=0)
 @click.command()
 def generate_dateset(
@@ -47,6 +48,7 @@ def generate_dateset(
     int_cols,
     float_cols,
     string_cols,
+    string_discrete_nums,
     timestamp_cols,
     datetime_cols,
 ):
@@ -62,6 +64,8 @@ def generate_dateset(
     output_file = Path(output_file).expanduser().resolve()
     output_file.parent.mkdir(parents=True, exist_ok=True)
 
+    random_str_list = [random_string() for i in range(string_discrete_nums)]
+
     def _generate_one_line():
         return ",".join(
             map(
@@ -69,7 +73,7 @@ def generate_dateset(
                 itertools.chain(
                     (random_int() for _ in range(int_cols)),
                     (random_float() for _ in range(float_cols)),
-                    (random_string(25) for _ in range(string_cols)),
+                    (random.choice(random_str_list) for _ in range(string_cols)),
                     (random_timestamp() for _ in range(timestamp_cols)),
                     (random_datetime() for _ in range(datetime_cols)),
                 ),
