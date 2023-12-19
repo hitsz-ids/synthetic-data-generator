@@ -20,4 +20,4 @@ synthesizer = Synthesizer(
 )
 synthesizer.fit()
 # sampled_data = synthesizer.sample(1000)
-synthesizer.cleanup()  # Clean all cache
+# synthesizer.cleanup()  # Clean all cache
