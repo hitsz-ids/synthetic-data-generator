@@ -26,7 +26,7 @@ class NDArrayLoader:
 
     def store(self, ndarray: ndarray):
         """
-        Storing a column of ndarry to disk.
+        Spliting and storing columns of ndarry to disk, one by one.
         """
         self.cache_dir.mkdir(exist_ok=True, parents=True)
         for ndarray in np.split(ndarray, indices_or_sections=ndarray.shape[1], axis=1):
@@ -34,6 +34,9 @@ class NDArrayLoader:
             self.store_index += 1
 
     def load(self, index: int) -> ndarray:
+        """
+        Load ndarray from disk by index of column.
+        """
         return np.load(self._get_cache_filename(int(index)))
 
     def cleanup(self):

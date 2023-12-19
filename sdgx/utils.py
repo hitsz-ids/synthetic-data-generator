@@ -17,6 +17,15 @@ __all__ = ["download_demo_data", "get_demo_single_table", "cache", "Singleton"]
 
 
 def download_demo_data(data_dir: str | Path = "./dataset") -> Path:
+    """
+    Download demo data if not exist
+
+    Args:
+        data_dir(str | Path): data directory
+
+    Returns:
+        pathlib.Path: demo data path
+    """
     data_dir = Path(data_dir).expanduser().resolve()
     demo_data_path = data_dir / "adult.csv"
     if not demo_data_path.exists():
@@ -31,6 +40,17 @@ def download_demo_data(data_dir: str | Path = "./dataset") -> Path:
 
 
 def get_demo_single_table(data_dir: str | Path = "./dataset"):
+    """
+    Get demo single table as DataFrame and discrete columns names
+
+    Args:
+        data_dir(str | Path): data directory
+
+    Returns:
+
+        pd.DataFrame: demo single table
+        list: discrete columns
+    """
     demo_data_path = download_demo_data(data_dir)
     pd_obj = pd.read_csv(demo_data_path)
     discrete_cols = [
@@ -48,6 +68,10 @@ def get_demo_single_table(data_dir: str | Path = "./dataset"):
 
 
 class Singleton(type):
+    """
+    metaclass for singleton, thread-safe.
+    """
+
     _instances = {}
     _lock = threading.Lock()
 

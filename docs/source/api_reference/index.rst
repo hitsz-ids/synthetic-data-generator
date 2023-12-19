@@ -15,3 +15,4 @@ API Reference
     Metadata and Inspectors <data_models/index>
     Manager <manager>
     Exceptions <exceptions>
+    Utils <utils>
