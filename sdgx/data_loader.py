@@ -8,6 +8,7 @@ import pandas as pd
 from sdgx.cachers.base import Cacher
 from sdgx.cachers.manager import CacherManager
 from sdgx.data_connectors.base import DataConnector
+from sdgx.data_connectors.generator_connector import GeneratorConnector
 from sdgx.utils import cache
 
 
@@ -44,6 +45,10 @@ class DataLoader:
         self.cacher = cacher or self.cache_manager.init_cacher(cache_mode, **cacher_kwargs)
 
         self.cacher.clear_invalid_cache()
+
+        if isinstance(data_connector, GeneratorConnector):
+            # Warmup cache
+            self.load_all()
 
     def iter(self) -> Generator[pd.DataFrame, None, None]:
         """
@@ -83,16 +88,9 @@ class DataLoader:
 
     def __getitem__(self, key: list | slice | tuple) -> pd.DataFrame:
         """
-        Support get data by index and slice
+        Support get data by index and slice.
 
-        Warning:
-
-            This is very tricky when using :ref:`GeneratorConnector` with a :ref:`Cacher`.
-            When calling ``len``, will iterate and store all data in cache.
-            Then we can ``load`` the data from cache. This makes accessing data in correct index.
-
-            If using :ref:`GeneratorConnector` with :ref:`NoCache`, the index will be wrong
-            and this may totally broken.
+        We will warmup cache for GeneratorConnector so that we can randomly access data.
 
         """
         if isinstance(key, list):

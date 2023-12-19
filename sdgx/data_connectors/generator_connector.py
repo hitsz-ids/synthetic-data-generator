@@ -37,7 +37,7 @@ class GeneratorConnector(DataConnector):
         self.generator_caller = generator_caller
         self._generator = self.generator_caller()
 
-    def _read(self, offset=0, limit=None) -> pd.DataFrame:
+    def _read(self, offset: int = 0, limit: int | None = None) -> pd.DataFrame | None:
         """
         Ingore limit and allow sequential reading.
         """
