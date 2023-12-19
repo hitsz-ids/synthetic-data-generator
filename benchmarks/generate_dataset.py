@@ -39,7 +39,7 @@ def random_datetime():
 @click.option("--float_cols", default=3)
 @click.option("--string_cols", default=2)
 @click.option("--timestamp_cols", default=1)
-@click.option("--datetime_cols", default=1)
+@click.option("--datetime_cols", default=0)
 @click.command()
 def generate_dateset(
     output_file,
