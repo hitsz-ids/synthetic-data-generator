@@ -1,4 +1,6 @@
 import os
+
+os.environ["SDG_NDARRAY_CACHE_ROOT"] = "/tmp/sdgx/ndarray_cache"
 import shutil
 
 import pytest

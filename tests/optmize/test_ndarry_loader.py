@@ -7,7 +7,7 @@ from sdgx.models.components.optimize.ndarray_loader import NDArrayLoader
 @pytest.fixture
 def ndarray_loader(tmp_path, ndarray_list):
     cache_dir = tmp_path / "ndarrycache"
-    loader = NDArrayLoader(cache_dir=cache_dir)
+    loader = NDArrayLoader(cache_root=cache_dir)
     for ndarray in ndarray_list:
         loader.store(ndarray)
     yield loader
