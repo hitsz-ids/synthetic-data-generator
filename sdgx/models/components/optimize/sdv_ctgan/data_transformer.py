@@ -115,7 +115,7 @@ class DataTransformer(object):
             self._column_transform_info_list.append(column_transform_info)
 
     def _transform_continuous(self, column_transform_info, data):
-        logger.debug(f"Transforming column {column_transform_info.column_name}...")
+        logger.debug(f"Transforming continuous column {column_transform_info.column_name}...")
         column_name = data.columns[0]
         data[column_name] = data[column_name].to_numpy().flatten()
         gm = column_transform_info.transform
@@ -132,7 +132,7 @@ class DataTransformer(object):
         return output
 
     def _transform_discrete(self, column_transform_info, data):
-        logger.debug(f"Transforming column {column_transform_info.column_name}...")
+        logger.debug(f"Transforming discrete column {column_transform_info.column_name}...")
         ohe = column_transform_info.transform
         return ohe.transform(data).to_numpy()
 
