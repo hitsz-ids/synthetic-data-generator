@@ -1,3 +1,7 @@
+import os
+
+os.environ["SDGX_LOG_LEVEL"] = "DEBUG"
+
 from sdgx.data_connectors.csv_connector import CsvConnector
 from sdgx.models.ml.single_table.ctgan import CTGANSynthesizerModel
 from sdgx.synthesizer import Synthesizer
@@ -6,7 +10,7 @@ from sdgx.utils import download_demo_data
 dataset_csv = download_demo_data()
 data_connector = CsvConnector(path=dataset_csv)
 synthesizer = Synthesizer(
-    model=CTGANSynthesizerModel(epochs=1),  # For quick demo
+    model=CTGANSynthesizerModel(epochs=2),  # For quick demo
     data_connector=data_connector,
 )
 synthesizer.fit()

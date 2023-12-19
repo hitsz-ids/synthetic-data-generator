@@ -57,10 +57,8 @@ class NDArrayLoader:
         return np.load(self._get_cache_filename(int(index)))
 
     def cleanup(self):
-        for i in range(self.store_index):
-            self._get_cache_filename(i).unlink(missing_ok=True)
-        self.store_index = 0
         shutil.rmtree(self.cache_dir, ignore_errors=True)
+        self.store_index = 0
 
     def iter(self) -> Generator[ndarray, None, None]:
         for i in range(self.store_index):
