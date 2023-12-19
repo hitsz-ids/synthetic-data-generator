@@ -234,3 +234,8 @@ class Synthesizer:
     def cleanup(self):
         if self.dataloader:
             self.dataloader.finalize(clear_cache=True)
+        # Release resources
+        del self.model
+
+    def __del__(self):
+        self.cleanup()
