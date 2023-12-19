@@ -52,7 +52,6 @@ class DataTransformer(object):
             namedtuple:
                 A ``ColumnTransformInfo`` object.
         """
-        logger.debug(f"Fitting continuous column {column_name}...")
         column_name = data.columns[0]
         gm = ClusterBasedNormalizer(model_missing_values=True, max_clusters=min(len(data), 10))
         gm.fit(data, column_name)
@@ -77,7 +76,6 @@ class DataTransformer(object):
             namedtuple:
                 A ``ColumnTransformInfo`` object.
         """
-        logger.debug(f"Fitting discrete column {column_name}...")
         column_name = data.columns[0]
         ohe = OneHotEncoder()
         ohe.fit(data, column_name)
@@ -107,8 +105,10 @@ class DataTransformer(object):
         self._column_transform_info_list = []
         for column_name in data_loader.columns():
             if column_name in discrete_columns:
+                logger.debug(f"Fitting discrete column {column_name}...")
                 column_transform_info = self._fit_discrete(data_loader[[column_name]])
             else:
+                logger.debug(f"Fitting continuous column {column_name}...")
                 column_transform_info = self._fit_continuous(data_loader[[column_name]])
 
             self.output_info_list.append(column_transform_info.output_info)
