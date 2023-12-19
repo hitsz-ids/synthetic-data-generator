@@ -16,7 +16,7 @@ data_connector = CsvConnector(path=dataset_csv)
 synthesizer = Synthesizer(
     model=CTGANSynthesizerModel,
     data_connector=data_connector,
-    model_kwargs={"epochs": 10, "device": "cpu"},
+    model_kwargs={"epochs": 1, "device": "cpu"},
 )
 synthesizer.fit()
 # sampled_data = synthesizer.sample(1000)
