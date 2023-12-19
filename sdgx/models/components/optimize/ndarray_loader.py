@@ -5,6 +5,7 @@ import shutil
 from functools import cached_property
 from pathlib import Path
 from typing import Generator
+from uuid import uuid4
 
 import numpy as np
 from numpy import ndarray
@@ -29,7 +30,7 @@ class NDArrayLoader:
         """
         Prevent collision of cache files.
         """
-        return str(id(self))
+        return uuid4().hex
 
     @cached_property
     def cache_dir(self) -> Path:
