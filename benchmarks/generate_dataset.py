@@ -64,7 +64,7 @@ def generate_dateset(
     output_file = Path(output_file).expanduser().resolve()
     output_file.parent.mkdir(parents=True, exist_ok=True)
 
-    random_str_list = [random_string() for i in range(string_discrete_nums)]
+    random_str_list = [random_string(25) for i in range(string_discrete_nums)]
 
     def _generate_one_line():
         return ",".join(
