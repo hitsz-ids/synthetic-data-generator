@@ -194,7 +194,6 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
         self._epochs = epochs
         self.pac = pac
 
-        device = device
         self._device = torch.device(device)
 
         # Following components are initialized in `_pre_fit`
