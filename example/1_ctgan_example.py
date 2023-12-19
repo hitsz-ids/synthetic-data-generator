@@ -10,7 +10,7 @@ from sdgx.utils import download_demo_data
 dataset_csv = download_demo_data()
 data_connector = CsvConnector(path=dataset_csv)
 synthesizer = Synthesizer(
-    model=CTGANSynthesizerModel(epochs=2),  # For quick demo
+    model=CTGANSynthesizerModel(epochs=1),  # For quick demo
     data_connector=data_connector,
 )
 synthesizer.fit()
