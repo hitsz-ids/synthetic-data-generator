@@ -254,3 +254,4 @@ cython_debug/
 *.log
 
 .sdgx_cache
+.ndarry_cache

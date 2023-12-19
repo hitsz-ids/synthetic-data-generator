@@ -2,14 +2,14 @@
 from __future__ import annotations
 
 from collections import namedtuple
-from typing import Any, Generator
 
 import numpy as np
 import pandas as pd
 from joblib import Parallel, delayed
 
-from sdgx.data_connectors.base import DataConnector
 from sdgx.data_loader import DataLoader
+from sdgx.log import logger
+from sdgx.models.components.optimize.ndarray_loader import NDArrayLoader
 from sdgx.models.components.sdv_rdt.transformers import (
     ClusterBasedNormalizer,
     OneHotEncoder,
@@ -133,23 +133,23 @@ class DataTransformer(object):
         ohe = column_transform_info.transform
         return ohe.transform(data).to_numpy()
 
-    def _synchronous_transform(self, raw_data, column_transform_info_list):
+    def _synchronous_transform(self, raw_data, column_transform_info_list) -> NDArrayLoader:
         """Take a Pandas DataFrame and transform columns synchronous.
 
         Outputs a list with Numpy arrays.
         """
-        column_data_list = []
+        loader = NDArrayLoader()
         for column_transform_info in column_transform_info_list:
             column_name = column_transform_info.column_name
             data = raw_data[[column_name]]
             if column_transform_info.column_type == "continuous":
-                column_data_list.append(self._transform_continuous(column_transform_info, data))
+                loader.store(self._transform_continuous(column_transform_info, data).astype(float))
             else:
-                column_data_list.append(self._transform_discrete(column_transform_info, data))
+                loader.store(self._transform_discrete(column_transform_info, data).astype(float))
 
-        return column_data_list
+        return loader
 
-    def _parallel_transform(self, raw_data, column_transform_info_list):
+    def _parallel_transform(self, raw_data, column_transform_info_list) -> NDArrayLoader:
         """Take a Pandas DataFrame and transform columns in parallel.
 
         Outputs a list with Numpy arrays.
@@ -164,25 +164,29 @@ class DataTransformer(object):
             else:
                 process = delayed(self._transform_discrete)(column_transform_info, data)
             processes.append(process)
+        try:
+            # For Future versions of joblib
+            p = Parallel(n_jobs=-1, return_as="generator_unordered")
+            logger.warning("Using generator_unordered in joblib, time to remove this exception!")
+        except ValueError:
+            p = Parallel(n_jobs=-1, return_as="generator")
 
-        return Parallel(n_jobs=-1)(processes)
+        loader = NDArrayLoader()
+        for ndarray in p(processes):
+            loader.store(ndarray.astype(float))
+        return loader
 
-    def transform(self, dataloader: DataLoader):
+    def transform(self, dataloader: DataLoader) -> NDArrayLoader:
         """Take raw data and output a matrix data."""
 
         # Only use parallelization with larger data sizes.
         # Otherwise, the transformation will be slower.
         if dataloader.shape[0] < 500:
-            column_data_list = self._synchronous_transform(
-                dataloader, self._column_transform_info_list
-            )
+            loader = self._synchronous_transform(dataloader, self._column_transform_info_list)
         else:
-            column_data_list = self._parallel_transform(
-                dataloader, self._column_transform_info_list
-            )
+            loader = self._parallel_transform(dataloader, self._column_transform_info_list)
 
-        # FIXME: Return a dataloader to support chunking
-        return np.concatenate(column_data_list, axis=1).astype(float)
+        return loader
 
     def _inverse_transform_continuous(self, column_transform_info, column_data, sigmas, st):
         gm = column_transform_info.transform

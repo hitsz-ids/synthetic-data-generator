@@ -5,9 +5,11 @@ from typing import Any, Generator
 
 import pandas as pd
 
-from sdgx.cachers.base import Cacher
+from sdgx.cachers.base import Cacher, NoCache
 from sdgx.cachers.manager import CacherManager
 from sdgx.data_connectors.base import DataConnector
+from sdgx.data_connectors.generator_connector import GeneratorConnector
+from sdgx.exceptions import DataLoaderInitError
 from sdgx.utils import cache
 
 
@@ -23,6 +25,63 @@ class DataLoader:
         cacher (:ref:`Cacher`, optional): The cacher. Defaults to None.
         cache_mode (str, optional): The cache mode(cachers' name). Defaults to "DiskCache", more info in :ref:`DiskCache`.
         cacher_kwargs (dict, optional): The kwargs for cacher. Defaults to None
+
+    Example:
+
+        Load and cache data from existing csv file or other data source.
+
+        .. code-block:: python
+
+            from sdgx.data_loader import DataLoader
+            from sdgx.data_connectors.csv_connector import CsvConnector
+            from sdgx.utils import download_demo_data
+
+            dataset_csv = download_demo_data()
+            data_connector = CsvConnector(path=dataset_csv)
+
+            # Use DataConnector to initialize
+
+            dataloader = DataLoader(data_connector)
+
+            # Access data
+
+            dataloader.load_all()  # This will read all data from csv, and cache it.
+            dataloader.load_all()  # This will read all data from cache.
+
+            dataloader[:10] # dataloader support slicing
+
+            for df in dataloader.iter():  # dataloader support iteration
+                print(df.shape)
+
+    Advanced usage:
+
+        Load and cache data from a generator.
+
+        .. code-block:: python
+
+            from sdgx.data_loader import DataLoader
+            from sdgx.data_connectors.generator_connector import GeneratorConnector
+
+            def generator() -> Generator[pd.DataFrame, None, None]:
+                for i in range(100):
+                    yield pd.DataFrame({"a": [i], "b": [i]})
+
+            data_connector = GeneratorConnector(generator)
+
+            # Use DataConnector to initialize.
+            # Generator is not support random access, but we can achieve it by caching.
+            dataloader = DataLoader(data_connector)
+
+            # Access data
+            dataloader.load_all()  # This will read all data from cache
+            dataloader.load_all()  # This will read all data from cache.
+
+            dataloader[:10] # dataloader support slicing
+
+            for df in dataloader.iter():  # dataloader support iteration
+                print(df.shape)
+
+
     """
 
     def __init__(
@@ -44,6 +103,12 @@ class DataLoader:
         self.cacher = cacher or self.cache_manager.init_cacher(cache_mode, **cacher_kwargs)
 
         self.cacher.clear_invalid_cache()
+
+        if isinstance(data_connector, GeneratorConnector):
+            if isinstance(cacher, NoCache):
+                raise DataLoaderInitError("NoCache can't be used with GeneratorConnector")
+            # Warmup cache for generator, this allows random access
+            self.load_all()
 
     def iter(self) -> Generator[pd.DataFrame, None, None]:
         """
@@ -83,17 +148,7 @@ class DataLoader:
 
     def __getitem__(self, key: list | slice | tuple) -> pd.DataFrame:
         """
-        Support get data by index and slice
-
-        Warning:
-
-            This is very tricky when using :ref:`GeneratorConnector` with a :ref:`Cacher`.
-            When calling ``len``, will iterate and store all data in cache.
-            Then we can ``load`` the data from cache. This makes accessing data in correct index.
-
-            If using :ref:`GeneratorConnector` with :ref:`NoCache`, the index will be wrong
-            and this may totally broken.
-
+        Support get data by index and slice.
         """
         if isinstance(key, list):
             sli = None

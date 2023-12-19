@@ -52,13 +52,12 @@ class CsvConnector(DataConnector):
         self.header = header
         self.read_csv_kwargs = read_csv_kwargs
 
-    def _read(self, offset: int = 0, limit: int | None = None) -> pd.DataFrame:
-        """ """
+    def _read(self, offset: int = 0, limit: int | None = None) -> pd.DataFrame | None:
         return pd.read_csv(
             self.path,
             sep=self.sep,
             header=self.header,
-            skiprows=range(1, offset),
+            skiprows=range(1, offset),  # don't skip header
             nrows=limit,
             **self.read_csv_kwargs,
         )
@@ -82,7 +81,7 @@ class CsvConnector(DataConnector):
             self.path,
             sep=self.sep,
             header=self.header,
-            skiprows=range(1, offset),
+            skiprows=range(1, offset),  # don't skip header
             chunksize=chunksize,
             **self.read_csv_kwargs,
         ):

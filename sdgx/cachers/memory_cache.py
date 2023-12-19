@@ -59,6 +59,8 @@ class MemoryCache(Cacher):
             return cached_data
 
         data = data_connector.read(offset=offset, limit=max(self.blocksize, chunksize))
+        if data is None:
+            return data
         self._refresh(offset, data)
         if len(data) < chunksize:
             return data
@@ -70,7 +72,7 @@ class MemoryCache(Cacher):
         offset = 0
         while True:
             data = self.load(offset, chunksize, data_connector)
-            if len(data) == 0:
+            if data is not None and len(data) == 0:
                 break
             yield data
             offset += len(data)

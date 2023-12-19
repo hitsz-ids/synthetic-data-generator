@@ -21,6 +21,7 @@ from torch.nn import (
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.metadata import Metadata
 from sdgx.log import logger
+from sdgx.models.components.optimize.ndarray_loader import NDArrayLoader
 from sdgx.models.components.optimize.sdv_ctgan.data_sampler import DataSampler
 from sdgx.models.components.optimize.sdv_ctgan.data_transformer import DataTransformer
 from sdgx.models.components.sdv_ctgan.synthesizers.base import (
@@ -203,13 +204,14 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
         self._transformer = None
         self._data_sampler = None
         self._generator = None
+        self._ndarry_loader = None
 
     def fit(self, metadata: Metadata, dataloader: DataLoader, *args, **kwargs):
         discrete_columns = metadata.get("discrete_columns", [])
-        dataloader = self._pre_fit(dataloader, discrete_columns)
-        self._fit(dataloader, discrete_columns)
+        self._pre_fit(dataloader, discrete_columns)
+        self._fit(len(self._ndarry_loader))
 
-    def _pre_fit(self, dataloader: DataLoader, discrete_columns: list[str] = None):
+    def _pre_fit(self, dataloader: DataLoader, discrete_columns: list[str] = None) -> NDArrayLoader:
         if not discrete_columns:
             discrete_columns = []
 
@@ -218,21 +220,22 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
         self._transformer = DataTransformer()
         self._transformer.fit(dataloader, discrete_columns)
 
-        dataloader = self._transformer.transform(dataloader)
+        self._ndarry_loader = self._transformer.transform(dataloader)
 
         self._data_sampler = DataSampler(
-            dataloader, self._transformer.output_info_list, self._log_frequency
+            self._ndarry_loader, self._transformer.output_info_list, self._log_frequency
         )
 
         # Initialize Generator
         data_dim = self._transformer.output_dimensions
         self._generator = Generator(
-            self._embedding_dim + self._data_sampler.dim_cond_vec(), self._generator_dim, data_dim
+            self._embedding_dim + self._data_sampler.dim_cond_vec(),
+            self._generator_dim,
+            data_dim,
         ).to(self._device)
-        return dataloader
 
     @random_state
-    def _fit(self, dataloader: DataLoader, discrete_columns=None):
+    def _fit(self, data_size: int):
         """Fit the CTGAN Synthesizer models to the training data.
 
         Args:
@@ -242,7 +245,9 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
         epochs = self._epochs
         data_dim = self._transformer.output_dimensions
         discriminator = Discriminator(
-            data_dim + self._data_sampler.dim_cond_vec(), self._discriminator_dim, pac=self.pac
+            data_dim + self._data_sampler.dim_cond_vec(),
+            self._discriminator_dim,
+            pac=self.pac,
         ).to(self._device)
 
         optimizerG = optim.Adam(
@@ -262,7 +267,7 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
         mean = torch.zeros(self._batch_size, self._embedding_dim, device=self._device)
         std = mean + 1
 
-        steps_per_epoch = max(len(dataloader) // self._batch_size, 1)
+        steps_per_epoch = max(data_size // self._batch_size, 1)
         for i in range(epochs):
             for id_ in range(steps_per_epoch):
                 for n in range(self._discriminator_steps):

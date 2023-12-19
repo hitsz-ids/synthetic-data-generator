@@ -183,7 +183,8 @@ class Synthesizer:
         def chunk_generator() -> Generator[pd.DataFrame, None, None]:
             for chunk in self.dataloader.iter():
                 for d in self.data_processors:
-                    yield d.convert(chunk)
+                    chunk = d.convert(chunk)
+                yield chunk
 
         processed_dataloader = DataLoader(
             GeneratorConnector(chunk_generator),
@@ -214,15 +215,22 @@ class Synthesizer:
                 sample_data = d.reverse_convert(sample_data)
             return sample_data
 
-        sample_times = count // chunksize
-        for _ in range(sample_times):
-            sample_data = self.model.sample(chunksize, **model_fit_kwargs)
-            for d in self.data_processors:
-                sample_data = d.reverse_convert(sample_data)
-            yield sample_data
+        def generator_sample_caller():
+            sample_times = count // chunksize
+            for _ in range(sample_times):
+                sample_data = self.model.sample(chunksize, **model_fit_kwargs)
+                for d in self.data_processors:
+                    sample_data = d.reverse_convert(sample_data)
+                yield sample_data
 
-        if count % chunksize > 0:
-            sample_data = self.model.sample(count % chunksize, **model_fit_kwargs)
-            for d in self.data_processors:
-                sample_data = d.reverse_convert(sample_data)
-            yield sample_data
+            if count % chunksize > 0:
+                sample_data = self.model.sample(count % chunksize, **model_fit_kwargs)
+                for d in self.data_processors:
+                    sample_data = d.reverse_convert(sample_data)
+                yield sample_data
+
+        return generator_sample_caller()
+
+    def cleanup(self):
+        if self.dataloader:
+            self.dataloader.finalize(clear_cache=True)

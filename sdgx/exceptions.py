@@ -56,3 +56,9 @@ class MetadataInitError(SdgxError):
     """
     Exception to indicate that exception when initializing metadata.
     """
+
+
+class DataLoaderInitError(SdgxError):
+    """
+    Exception to indicate that exception when initializing dataloader.
+    """

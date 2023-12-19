@@ -17,7 +17,7 @@ class DataConnector:
     Identity of data source, e.g. table name, hash of content
     """
 
-    def _read(self, offset: int = 0, limit: int | None = None) -> pd.DataFrame:
+    def _read(self, offset: int = 0, limit: int | None = None) -> pd.DataFrame | None | None:
         """
         Subclass must implement this for reading data.
 
@@ -54,7 +54,7 @@ class DataConnector:
         """
         return self._iter(offset, chunksize)
 
-    def read(self, offset: int = 0, limit: int | None = None) -> pd.DataFrame:
+    def read(self, offset: int = 0, limit: int | None = None) -> pd.DataFrame | None:
         """
         Interface for reading data.
 

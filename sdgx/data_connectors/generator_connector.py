@@ -11,16 +11,19 @@ from sdgx.data_connectors.base import DataConnector
 
 class GeneratorConnector(DataConnector):
     """
-    A virtual data connector that wrap `Generator <https://docs.python.org/3/glossary.html#term-generator>`_
+    A virtual data connector that wrap
+    `Generator <https://docs.python.org/3/glossary.html#term-generator>`_
     into a DataConnector.
 
     Passing ``offset=0`` to ``read`` will reset the generator.
 
     Warning:
         ``offset`` and ``limit`` are ignored as ``Generator`` not supporting random access.
+        But we can use :ref:`Cacher` to support it. See :ref:`Data Loader` for more details.
 
     Note:
-        This connector is not been registered by default. So only be used with the library way.
+        This connector is not been registered by default.
+        So only be used with the library way.
     """
 
     @cached_property
@@ -37,7 +40,7 @@ class GeneratorConnector(DataConnector):
         self.generator_caller = generator_caller
         self._generator = self.generator_caller()
 
-    def _read(self, offset=0, limit=None) -> pd.DataFrame:
+    def _read(self, offset: int = 0, limit: int | None = None) -> pd.DataFrame | None:
         """
         Ingore limit and allow sequential reading.
         """

@@ -76,7 +76,7 @@ def test_fit(synthesizer):
 
 
 def test_sample(synthesizer):
-    assert synthesizer.sample(10)
+    assert synthesizer.sample(10) is not None
 
 
 def test_save_and_load(synthesizer, save_dir):

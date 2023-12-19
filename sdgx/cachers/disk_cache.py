@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import shutil
 from functools import lru_cache
 from pathlib import Path
 from typing import Generator
@@ -43,12 +44,13 @@ class DiskCache(Cacher):
         self.cache_dir = Path(cache_dir)
         self.cache_dir.mkdir(parents=True, exist_ok=True)
 
-    def clear_cache(self):
+    def clear_cache(self) -> None:
         """
         Clear all cache in cache_dir.
         """
         for f in self.cache_dir.glob("*.parquet"):
             f.unlink()
+        shutil.rmtree(self.cache_dir, ignore_errors=True)
 
     def clear_invalid_cache(self):
         """
@@ -74,6 +76,7 @@ class DiskCache(Cacher):
         """
         Refresh cache, will write data to cache file in parquet format.
         """
+        self.cache_dir.mkdir(parents=True, exist_ok=True)
         if len(data) < self.blocksize:
             data.to_parquet(self._get_cache_filename(offset))
         elif len(data) > self.blocksize:
@@ -103,6 +106,8 @@ class DiskCache(Cacher):
                 return cached_data[:chunksize]
             return cached_data
         data = data_connector.read(offset=offset, limit=max(self.blocksize, chunksize))
+        if data is None:
+            return data
         self._refresh(offset, data)
         if len(data) < chunksize:
             return data
@@ -117,7 +122,7 @@ class DiskCache(Cacher):
         offset = 0
         while True:
             data = self.load(offset, chunksize, data_connector)
-            if len(data) == 0:
+            if data is None or len(data) == 0:
                 break
             yield data
             offset += len(data)

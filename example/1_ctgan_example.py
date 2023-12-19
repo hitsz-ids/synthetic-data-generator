@@ -1,27 +1,26 @@
-# To run this example, you can use:
-#   ipython - i example/1_ctgan_example.py
-# then view the sampled_data
+from sdgx.data_connectors.csv_connector import CsvConnector
+from sdgx.models.ml.single_table.ctgan import CTGANSynthesizerModel
+from sdgx.synthesizer import Synthesizer
+from sdgx.utils import download_demo_data
 
-import numpy as np
+dataset_csv = download_demo_data()
+data_connector = CsvConnector(path=dataset_csv)
+synthesizer = Synthesizer(
+    model=CTGANSynthesizerModel(epochs=1),  # For quick demo
+    data_connector=data_connector,
+)
+synthesizer.fit()
+sampled_data = synthesizer.sample(1000)
+synthesizer.cleanup()  # Clean all cache
+
 
 from sdgx.metrics.column.jsd import JSD
-from sdgx.models.single_table.ctgan import CTGAN
-from sdgx.utils.io.csv_utils import *
 
-# 针对 csv 格式的小规模数据
-# 目前我们以 df 作为输入的数据的格式
-demo_data, discrete_cols = get_demo_single_table()
 JSD = JSD()
 
-model = CTGAN(epochs=10)
-model.fit(demo_data, discrete_cols)
 
-sampled_data = model.sample(1000)
-
-# selected_columns = ["education-num", "fnlwgt"]
-# isDiscrete = False
 selected_columns = ["workclass"]
 isDiscrete = True
-metrics = JSD.calculate(demo_data, sampled_data, selected_columns, isDiscrete)
+metrics = JSD.calculate(data_connector.read(), sampled_data, selected_columns, isDiscrete)
 
 print("JSD metric of column %s: %g" % (selected_columns[0], metrics))
