@@ -327,26 +327,37 @@ class Synthesizer:
             model_fit_kwargs = {}
 
         if chunksize is None:
-            sample_data = self.model.sample(count, **model_fit_kwargs)
-            for d in self.data_processors:
-                sample_data = d.reverse_convert(sample_data)
-            return sample_data
+            return self._sample_once(count, model_fit_kwargs)
 
         def generator_sample_caller():
             sample_times = count // chunksize
             for _ in range(sample_times):
-                sample_data = self.model.sample(chunksize, **model_fit_kwargs)
+                sample_data = self._sample_once(chunksize, model_fit_kwargs)
                 for d in self.data_processors:
                     sample_data = d.reverse_convert(sample_data)
                 yield sample_data
 
             if count % chunksize > 0:
-                sample_data = self.model.sample(count % chunksize, **model_fit_kwargs)
+                sample_data = self._sample_once(count % chunksize, model_fit_kwargs)
                 for d in self.data_processors:
                     sample_data = d.reverse_convert(sample_data)
                 yield sample_data
 
         return generator_sample_caller()
+
+    def _sample_once(
+        self, count: int, model_fit_kwargs: None | dict[str, Any] = None
+    ) -> pd.DataFrame:
+        missing_count = count
+        sample_data_list = []
+        while missing_count > 0:
+            sample_data = self.model.sample(int(missing_count * 1.2), **model_fit_kwargs)
+            for d in self.data_processors:
+                sample_data = d.reverse_convert(sample_data)
+            sample_data_list.append(sample_data)
+            missing_count = count - len(sample_data)
+
+        return pd.concat(sample_data_list)[:count]
 
     def cleanup(self):
         """

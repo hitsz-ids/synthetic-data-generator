@@ -2,9 +2,9 @@ Models
 ========================================================
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
 
-    SynthesizerModel <base>
+    Base Class for SynthesizerModel <base>
 
 
 Built-in ML Models

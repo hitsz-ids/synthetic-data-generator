@@ -57,6 +57,10 @@ Quick demo
 
 .. code-block:: python
 
+   """
+   Example for CTGAN
+   """
+
    from sdgx.data_connectors.csv_connector import CsvConnector
    from sdgx.models.ml.single_table.ctgan import CTGANSynthesizerModel
    from sdgx.synthesizer import Synthesizer
