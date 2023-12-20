@@ -157,9 +157,15 @@ class Synthesizer:
         """
         save_dir = Path(save_dir).expanduser().resolve()
         save_dir.mkdir(parents=True, exist_ok=True)
+
+        metadata_save_dir = save_dir / self.METADATA_SAVE_NAME
+        metadata_save_dir.mkdir(parents=True, exist_ok=True)
         if self.metadata:
-            self.metadata.save(save_dir / self.METADATA_SAVE_NAME)
-        self.model.save(save_dir / self.MODEL_SAVE_DIR)
+            self.metadata.save(metadata_save_dir)
+
+        model_save_dir = save_dir / self.MODEL_SAVE_DIR
+        model_save_dir.mkdir(parents=True, exist_ok=True)
+        self.model.save(model_save_dir)
         return save_dir
 
     @classmethod
