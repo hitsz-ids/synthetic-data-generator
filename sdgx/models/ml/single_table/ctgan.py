@@ -161,6 +161,8 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
             Device to run the training on. Preferred to be 'cuda' for GPU if available.
     """
 
+    MODEL_SAVE_NAME = "ctgan.pkl"
+
     def __init__(
         self,
         embedding_dim=128,
@@ -410,12 +412,13 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
 
         return self._transformer.inverse_transform(data)
 
-    def save(self, path: str | Path):
-        return SDVBaseSynthesizer.save(self, path)
+    def save(self, save_dir: str | Path):
+        save_dir.mkdir(parents=True, exist_ok=True)
+        return SDVBaseSynthesizer.save(self, save_dir / self.MODEL_SAVE_NAME)
 
     @classmethod
-    def load(cls, path: str | Path) -> "CTGANSynthesizerModel":
-        return SDVBaseSynthesizer.load(path)
+    def load(cls, save_dir: str | Path) -> "CTGANSynthesizerModel":
+        return SDVBaseSynthesizer.load(save_dir / cls.MODEL_SAVE_NAME)
 
     @staticmethod
     def _gumbel_softmax(logits, tau=1, hard=False, eps=1e-10, dim=-1):
