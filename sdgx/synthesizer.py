@@ -348,14 +348,27 @@ class Synthesizer:
     def _sample_once(
         self, count: int, model_fit_kwargs: None | dict[str, Any] = None
     ) -> pd.DataFrame:
+        """
+        Sample data once.
+
+        DataProcessors may drop some broken data after reverse_convert.
+        So we oversample first and then take the first `count` samples.
+
+        TODO:
+
+            - Use an adaptive scale for oversampling will be better for performance.
+
+        """
         missing_count = count
+        max_trails = 5
         sample_data_list = []
-        while missing_count > 0:
+        while missing_count > 0 and max_trails > 0:
             sample_data = self.model.sample(int(missing_count * 1.2), **model_fit_kwargs)
             for d in self.data_processors:
                 sample_data = d.reverse_convert(sample_data)
             sample_data_list.append(sample_data)
-            missing_count = count - len(sample_data)
+            missing_count = missing_count - len(sample_data)
+            max_trails -= 1
 
         return pd.concat(sample_data_list)[:count]
 
