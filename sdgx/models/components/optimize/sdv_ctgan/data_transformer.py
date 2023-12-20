@@ -105,8 +105,10 @@ class DataTransformer(object):
         self._column_transform_info_list = []
         for column_name in data_loader.columns():
             if column_name in discrete_columns:
+                logger.debug(f"Fitting discrete column {column_name}...")
                 column_transform_info = self._fit_discrete(data_loader[[column_name]])
             else:
+                logger.debug(f"Fitting continuous column {column_name}...")
                 column_transform_info = self._fit_continuous(data_loader[[column_name]])
 
             self.output_info_list.append(column_transform_info.output_info)
@@ -114,6 +116,7 @@ class DataTransformer(object):
             self._column_transform_info_list.append(column_transform_info)
 
     def _transform_continuous(self, column_transform_info, data):
+        logger.debug(f"Transforming continuous column {column_transform_info.column_name}...")
         column_name = data.columns[0]
         data[column_name] = data[column_name].to_numpy().flatten()
         gm = column_transform_info.transform
@@ -130,6 +133,7 @@ class DataTransformer(object):
         return output
 
     def _transform_discrete(self, column_transform_info, data):
+        logger.debug(f"Transforming discrete column {column_transform_info.column_name}...")
         ohe = column_transform_info.transform
         return ohe.transform(data).to_numpy()
 

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 from pathlib import Path
 from typing import Any, Generator
 
@@ -85,7 +86,7 @@ class Synthesizer:
             raise SynthesizerInitError(
                 "model as instance and model_path cannot be specified at the same time"
             )
-        if isinstance(model, str):
+        if isinstance(model, str) or isinstance(model, type):
             self.model = self.model_manager.init_model(model, **(model_kwargs or {}))
         elif isinstance(model, SynthesizerModel):
             self.model = model
@@ -177,6 +178,8 @@ class Synthesizer:
                 inspector_init_kwargs=inspector_init_kwargs,
             )
         )
+
+        logger.info("Fitting data processors...")
         for d in self.data_processors:
             d.fit(metadata)
 
@@ -186,11 +189,15 @@ class Synthesizer:
                     chunk = d.convert(chunk)
                 yield chunk
 
+        logger.info("Initializing processed data loader...")
+        start_time = time.time()
         processed_dataloader = DataLoader(
             GeneratorConnector(chunk_generator),
             **self.processored_data_loaders_kwargs,
         )
+        logger.info(f"Initialized processed data loader in {time.time() - start_time}s")
         try:
+            logger.info("Starting model fit...")
             self.model.fit(metadata, processed_dataloader, **(model_fit_kwargs or {}))
         finally:
             processed_dataloader.finalize(clear_cache=True)
@@ -202,6 +209,7 @@ class Synthesizer:
         metadata: None | Metadata = None,
         model_fit_kwargs: None | dict[str, Any] = None,
     ) -> pd.DataFrame | Generator[pd.DataFrame, None, None]:
+        logger.info("Sampling...")
         metadata = metadata or self.metadata
         if metadata:
             for d in self.data_processors:

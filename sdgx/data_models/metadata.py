@@ -11,7 +11,7 @@ from pydantic import BaseModel
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.inspectors.manager import InspectorManager
 from sdgx.exceptions import MetadataInitError
-from sdgx.utils import cache
+from sdgx.utils import logger
 
 # TODO: Design metadata for relationships...
 # class DType(Enum):
@@ -56,6 +56,7 @@ class Metadata(BaseModel):
         exclude_inspectors: list[str] | None = None,
         inspector_init_kwargs: dict[str, Any] | None = None,
     ) -> "Metadata":
+        logger.info("Inspecting metadata...")
         inspectors = InspectorManager().init_inspcetors(
             include_inspectors, exclude_inspectors, **(inspector_init_kwargs or {})
         )

@@ -85,7 +85,6 @@ class DiskCache(Cacher):
         else:
             data.to_parquet(self._get_cache_filename(offset))
 
-    @lru_cache(maxsize=64)
     def load(self, offset: int, chunksize: int, data_connector: DataConnector) -> pd.DataFrame:
         """
         Load data from data_connector or cache
