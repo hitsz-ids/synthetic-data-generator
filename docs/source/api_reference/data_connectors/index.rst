@@ -1,13 +1,17 @@
 DataConnector
 ========================================================
 
+.. toctree::
+    :maxdepth: 1
+
+    Base Class for DataConnector <base>
+
 Built-in DataConnector
 -----------------------------
 
 .. toctree::
     :maxdepth: 2
 
-    DataConnector <base>
     CsvConnector <csv_connector>
     GeneratorConnector <generator_connector>
 

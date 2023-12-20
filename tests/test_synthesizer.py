@@ -20,7 +20,7 @@ class MockModel(SynthesizerModel):
         pass
 
     def sample(self, count, **kwargs) -> pd.DataFrame:
-        return pd.DataFrame()
+        return pd.DataFrame({"a": [i for i in range(count)], "b": [i * 2 for i in range(count)]})
 
     def save(self, save_dir: str | Path):
         save_dir = Path(save_dir).expanduser().resolve()

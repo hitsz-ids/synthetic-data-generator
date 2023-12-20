@@ -50,7 +50,7 @@ class DataConnector:
             chunksize (int, optional): Chunksize for reading. Defaults to 0.
 
         Returns:
-            Generator[pd.DataFrame, None, None]: Generator/Iterator for readed dataframe
+            typing.Generator[pd.DataFrame, None, None]: Generator/Iterator for readed dataframe
         """
         return self._iter(offset, chunksize)
 

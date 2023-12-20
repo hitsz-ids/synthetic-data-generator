@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.abspath(".."))
 
 # -- Project information -----------------------------------------------------
 
-project = "synthetic-data-generator"
+project = "Synthetic Data Generator"
 copyright = "2023, hitsz-ids"
 author = "hitsz-ids"
 
@@ -61,7 +61,7 @@ exclude_patterns = []
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "sphinx_rtd_theme"
+html_theme = "pydata_sphinx_theme"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -69,5 +69,15 @@ html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
 
 todo_include_todos = True
-
 html_logo = "_static/sdg_logo.png"
+html_theme_options = {
+    "github_url": "https://github.com/hitsz-ids/synthetic-data-generator",
+    "use_edit_page_button": True,
+}
+
+html_context = {
+    "github_user": "hitsz-ids",
+    "github_repo": "synthetic-data-generator",
+    "github_version": "main",
+    "doc_path": "docs/source",
+}
