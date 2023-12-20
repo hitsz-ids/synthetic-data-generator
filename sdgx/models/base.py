@@ -15,9 +15,9 @@ class SynthesizerModel:
     def sample(self, count: int, *args, **kwargs) -> pd.DataFrame:
         raise NotImplementedError
 
-    def save(self, path: str | Path):
+    def save(self, save_dir: str | Path):
         raise NotImplementedError
 
     @classmethod
-    def load(cls, path: str | Path) -> "SynthesizerModel":
+    def load(cls, save_dir: str | Path) -> "SynthesizerModel":
         raise NotImplementedError

@@ -25,7 +25,7 @@ class Synthesizer:
     """
 
     METADATA_SAVE_NAME = "metadata.json"
-    MODEL_SAVE_NAME = "model.pkl"
+    MODEL_SAVE_DIR = "model"
 
     def __init__(
         self,
@@ -83,15 +83,19 @@ class Synthesizer:
         # Init model
         self.model_manager = ModelManager()
         if isinstance(model, SynthesizerModel) and model_path:
+            # Initialized model cannot load from model_path
             raise SynthesizerInitError(
                 "model as instance and model_path cannot be specified at the same time"
             )
-        if isinstance(model, str) or isinstance(model, type):
+        if isinstance(model, str) or isinstance(model, type) and model_path:
+            # Load model by cls or str
+            self.model = self.model_manager.load(model, model_path)
+        elif isinstance(model, str) or isinstance(model, type):
+            # Init model by cls or str
             self.model = self.model_manager.init_model(model, **(model_kwargs or {}))
         elif isinstance(model, SynthesizerModel):
+            # Already initialized model
             self.model = model
-        elif model_path:
-            self.model_manager.load(model, model_path)
         else:
             raise SynthesizerInitError("model or model_path must be specified")
 
@@ -106,7 +110,7 @@ class Synthesizer:
         save_dir.mkdir(parents=True, exist_ok=True)
         if self.metadata:
             self.metadata.save(save_dir / self.METADATA_SAVE_NAME)
-        self.model.save(save_dir / self.MODEL_SAVE_NAME)
+        self.model.save(save_dir / self.MODEL_SAVE_DIR)
         return save_dir
 
     @classmethod
@@ -130,7 +134,7 @@ class Synthesizer:
 
         if not load_dir.exists():
             raise SynthesizerInitError(f"{load_dir.as_posix()} does not exist")
-        model_path = load_dir / cls.MODEL_SAVE_NAME
+        model_path = load_dir / cls.MODEL_SAVE_DIR
         if not model_path.exists():
             raise SynthesizerInitError(
                 f"{model_path.as_posix()} does not exist, cannot load model."
@@ -142,7 +146,7 @@ class Synthesizer:
 
         return Synthesizer(
             model=model,
-            model_path=load_dir / cls.MODEL_SAVE_NAME,
+            model_path=load_dir / cls.MODEL_SAVE_DIR,
             metadata=metadata,
             metadata_path=metadata_path,
             data_connector=data_connector,

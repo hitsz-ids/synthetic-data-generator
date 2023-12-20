@@ -24,6 +24,7 @@ dependencies = [
     "loguru",
     "pyarrow",
     "pydantic>=2",
+    "cloudpickle",
 ]
 dynamic = ["version"]
 classifiers = [
