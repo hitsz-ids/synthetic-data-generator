@@ -19,6 +19,8 @@ class DataLoader:
 
     Default Cacher is :ref:`DiskCache`. Use ``cacher`` or ``cache_mode`` to specify a :ref:`Cacher`.
 
+    GeneratorConnector must combine with Cacher, we will warmup cache for generator to support random access.
+
     Args:
         data_connector (:ref:`DataConnector`): The data connector
         chunksize (int, optional): The chunksize of the cacher. Defaults to 1000.

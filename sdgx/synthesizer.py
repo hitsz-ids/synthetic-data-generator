@@ -21,28 +21,71 @@ from sdgx.models.manager import ModelManager
 
 class Synthesizer:
     """
-    Synthesizer takes all logic of preprocessing data, fit model and sample
+    Synthesizer is the high level interface for synthesizing data.
+
+    We provided several example usage in our `Github repository <https://github.com/hitsz-ids/synthetic-data-generator/tree/main/example>`_.
+
+    Args:
+
+        model (str | SynthesizerModel | type[SynthesizerModel]): The name of the model or the model itself. Type of model must be :class:`~sdgx.models.base.SynthesizerModel`.
+            When model is a string, it must be registered in :class:`~sdgx.models.manager.ModelManager`.
+        model_path (str | Path, optional): The path to the model file. Defaults to None. Used to load the model if ``model`` is a string or type of :class:`~sdgx.models.base.SynthesizerModel`.
+        model_kwargs (dict[str, Any], optional): The keyword arguments for model. Defaults to None.
+        metadata (Metadata, optional): The metadata to use. Defaults to None.
+        metadata_path (str | Path, optional): The path to the metadata file. Defaults to None. Used to load the metadata if ``metadata`` is None.
+        data_connector (DataConnector | type[DataConnector] | str, optional): The data connector to use. Defaults to None.
+            When data_connector is a string, it must be registered in :class:`~sdgx.data_connectors.manager.DataConnectorManager`.
+        data_connectors_kwargs (dict[str, Any], optional): The keyword arguments for data connectors. Defaults to None.
+        raw_data_loaders_kwargs (dict[str, Any], optional): The keyword arguments for raw data loaders. Defaults to None.
+        processored_data_loaders_kwargs (dict[str, Any], optional): The keyword arguments for processed data loaders. Defaults to None.
+        data_processors (list[str | DataProcessor | type[DataProcessor]], optional): The data processors to use. Defaults to None.
+            When data_processor is a string, it must be registered in :class:`~sdgx.data_processors.manager.DataProcessorManager`.
+        data_processors_kwargs (dict[str, dict[str, Any]], optional): The keyword arguments for data processors. Defaults to None.
+
+    Example:
+
+        .. code-block:: python
+
+            from sdgx.data_connectors.csv_connector import CsvConnector
+            from sdgx.models.ml.single_table.ctgan import CTGANSynthesizerModel
+            from sdgx.synthesizer import Synthesizer
+            from sdgx.utils import download_demo_data
+
+            dataset_csv = download_demo_data()
+            data_connector = CsvConnector(path=dataset_csv)
+            synthesizer = Synthesizer(
+                model=CTGANSynthesizerModel(epochs=1),  # For quick demo
+                data_connector=data_connector,
+            )
+            synthesizer.fit()
+            sampled_data = synthesizer.sample(1000)
     """
 
     METADATA_SAVE_NAME = "metadata.json"
+    """
+    Default name for metadata file
+    """
     MODEL_SAVE_DIR = "model"
+    """
+    Default name for model directory
+    """
 
     def __init__(
         self,
         model: str | SynthesizerModel | type[SynthesizerModel],
         model_path: None | str | Path = None,
+        model_kwargs: None | dict[str, Any] = None,
         metadata: None | Metadata = None,
         metadata_path: None | str | Path = None,
-        data_connector: None | str | DataConnector = None,
+        data_connector: None | str | DataConnector | type[DataConnector] = None,
         data_connectors_kwargs: None | dict[str, Any] = None,
         raw_data_loaders_kwargs: None | dict[str, Any] = None,
         processored_data_loaders_kwargs: None | dict[str, Any] = None,
-        data_processors: None | list[str | DataProcessor] = None,
+        data_processors: None | list[str | DataProcessor | type[DataProcessor]] = None,
         data_processors_kwargs: None | dict[str, dict[str, Any]] = None,
-        model_kwargs: None | dict[str, Any] = None,
     ):
         # Init data connectors
-        if isinstance(data_connector, str):
+        if isinstance(data_connector, str) or isinstance(data_connector, type):
             data_connector = DataConnectorManager().init_data_connector(
                 data_connector, **(data_connectors_kwargs or {})
             )
@@ -79,7 +122,7 @@ class Synthesizer:
             self.metadata = Metadata.load(metadata_path)
         else:
             self.metadata = None
-
+        self._metadata_in_fit = None
         # Init model
         self.model_manager = ModelManager()
         if isinstance(model, SynthesizerModel) and model_path:
@@ -105,6 +148,12 @@ class Synthesizer:
     def save(self, save_dir: str | Path) -> Path:
         """
         Dump metadata and model to file
+
+        Args:
+            save_dir (str | Path): The directory to save the model.
+
+        Returns:
+            Path: The directory to save the synthesizer.
         """
         save_dir = Path(save_dir).expanduser().resolve()
         save_dir.mkdir(parents=True, exist_ok=True)
@@ -119,15 +168,32 @@ class Synthesizer:
         load_dir: str | Path,
         model: str | type[SynthesizerModel],
         metadata: None | Metadata = None,
-        data_connector: None | str | DataConnector = None,
+        data_connector: None | str | DataConnector | type[DataConnector] = None,
         data_connectors_kwargs: None | dict[str, Any] = None,
         raw_data_loaders_kwargs: None | dict[str, Any] = None,
         processored_data_loaders_kwargs: None | dict[str, Any] = None,
-        data_processors: None | list[str | DataProcessor] = None,
+        data_processors: None | list[str | DataProcessor | type[DataProcessor]] = None,
         data_processors_kwargs: None | dict[str, dict[str, Any]] = None,
     ) -> "Synthesizer":
         """
-        Load metadata and model from file
+        Load metadata and model, allow rebuilding Synthesizer for finetuning or other use cases.
+
+        Args:
+            load_dir (str | Path): The directory to load the model.
+            model (str | type[SynthesizerModel]): The name of the model or the model itself. Type of model must be :class:`~sdgx.models.base.SynthesizerModel`.
+                When model is a string, it must be registered in :class:`~sdgx.models.manager.ModelManager`.
+            metadata (Metadata, optional): The metadata to use. Defaults to None.
+            data_connector (DataConnector | type[DataConnector] | str, optional): The data connector to use. Defaults to None.
+                When data_connector is a string, it must be registered in :class:`~sdgx.data_connectors.manager.DataConnectorManager`.
+            data_connectors_kwargs (dict[str, Any], optional): The keyword arguments for data connectors. Defaults to None.
+            raw_data_loaders_kwargs (dict[str, Any], optional): The keyword arguments for raw data loaders. Defaults to None.
+            processored_data_loaders_kwargs (dict[str, Any], optional): The keyword arguments for processed data loaders. Defaults to None.
+            data_processors (list[str | DataProcessor | type[DataProcessor]], optional): The data processors to use. Defaults to None.
+                When data_processor is a string, it must be registered in :class:`~sdgx.data_processors.manager.DataProcessorManager`.
+            data_processors_kwargs (dict[str, dict[str, Any]], optional): The keyword arguments for data processors. Defaults to None.
+
+        Returns:
+            Synthesizer: The synthesizer instance.
         """
 
         load_dir = Path(load_dir).expanduser().resolve()
@@ -166,6 +232,27 @@ class Synthesizer:
         inspector_init_kwargs: None | dict[str, Any] = None,
         model_fit_kwargs: None | dict[str, Any] = None,
     ):
+        """
+        Fit the synthesizer with metadata and data processors.
+
+        Raw data will be loaded from the dataloader and processed by the data processors in a Generator.
+        The Generator, which prevents the processed data, will be wrapped into a DataLoader, aka ProcessedDataLoader.
+        The ProcessedDataLoader will be used to fit the model.
+
+        For more information about DataLoaders, please refer to the :class:`~sdgx.data_loaders.base.DataLoader`.
+
+        For more information about DataProcessors, please refer to the :class:`~sdgx.data_processors.base.DataProcessor`.
+
+        For more information about DataConnectors, please refer to the :class:`~sdgx.data_connectors.base.DataConnector`. Especially, the :class:`~sdgx.data_connectors.generator_connector.GeneratorConnector`.
+
+        Args:
+            metadata (Metadata, optional): The metadata to use. Defaults to None. If None, it will be inferred from the dataloader with the :func:`~sdgx.data_models.metadata.Metadata.from_dataloader` method.
+            inspector_max_chunk (int, optional): The maximum number of chunks to inspect. Defaults to 10.
+            metadata_include_inspectors (list[str], optional): The list of metadata inspectors to include. Defaults to None.
+            metadata_exclude_inspectors (list[str], optional): The list of metadata inspectors to exclude. Defaults to None.
+            inspector_init_kwargs (dict[str, Any], optional): The keyword arguments for metadata inspectors. Defaults to None.
+            model_fit_kwargs (dict[str, Any], optional): The keyword arguments for model.fit. Defaults to None.
+        """
         if self.dataloader is None:
             raise SynthesizerInitError(
                 "Cannot fit without dataloader, check `data_connector` parameter when initializing Synthesizer"
@@ -182,6 +269,7 @@ class Synthesizer:
                 inspector_init_kwargs=inspector_init_kwargs,
             )
         )
+        self._metadata_in_fit = metadata
 
         logger.info("Fitting data processors...")
         for d in self.data_processors:
@@ -213,8 +301,21 @@ class Synthesizer:
         metadata: None | Metadata = None,
         model_fit_kwargs: None | dict[str, Any] = None,
     ) -> pd.DataFrame | Generator[pd.DataFrame, None, None]:
+        """
+        Sample data from the synthesizer.
+
+        Args:
+            count (int): The number of samples to generate.
+            chunksize (int, optional): The chunksize to use. Defaults to None. If is not None, the data will be sampled in chunks.
+                And will return a generator that yields chunks of samples.
+            metadata (Metadata, optional): The metadata to use. Defaults to None. If None, will use the metadata in fit first.
+            model_fit_kwargs (dict[str, Any], optional): The keyword arguments for model.fit. Defaults to None.
+
+        Returns:
+            pd.DataFrame | typing.Generator[pd.DataFrame, None, None]: The sampled data. When chunksize is not None, it will be a generator.
+        """
         logger.info("Sampling...")
-        metadata = metadata or self.metadata
+        metadata = metadata or self._metadata_in_fit or self.metadata
         if metadata:
             for d in self.data_processors:
                 d.fit(metadata)
@@ -244,6 +345,12 @@ class Synthesizer:
         return generator_sample_caller()
 
     def cleanup(self):
+        """
+        Cleanup resources. This will cause model unavailable and clear the cache.
+
+        It useful when Synthesizer object is no longer needed and may hold large resources like GPUs.
+        """
+
         if self.dataloader:
             self.dataloader.finalize(clear_cache=True)
         # Release resources
