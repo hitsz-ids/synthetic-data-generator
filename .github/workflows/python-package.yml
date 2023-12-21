@@ -28,6 +28,8 @@ jobs:
       - name: Test with pytest
         run: |
           pytest -vv --cov-config=.coveragerc --cov=sdgx/ tests
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
       - name: Install dependencies for building
         run: |
           pip install build twine hatch
