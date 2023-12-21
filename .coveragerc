@@ -2,3 +2,4 @@
 omit =
     */tests/*
     */sdgx/models/components/sdv_*
+    */sdgx/models/statistics/*
