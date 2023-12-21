@@ -116,13 +116,15 @@ class Synthesizer:
             )
 
         # Load metadata
+        # metadata also can be changed in ``fit`` or ``sample``
+        # Always use the latest metadata configured.
         if metadata:
             self.metadata = metadata
         elif metadata_path:
             self.metadata = Metadata.load(metadata_path)
         else:
             self.metadata = None
-        self._metadata_in_fit = None
+
         # Init model
         self.model_manager = ModelManager()
         if isinstance(model, SynthesizerModel) and model_path:
@@ -130,15 +132,19 @@ class Synthesizer:
             raise SynthesizerInitError(
                 "model as instance and model_path cannot be specified at the same time"
             )
-        if isinstance(model, str) or isinstance(model, type) and model_path:
+        if (isinstance(model, str) or isinstance(model, type)) and model_path:
             # Load model by cls or str
             self.model = self.model_manager.load(model, model_path)
+            if model_kwargs:
+                logger.warning("model_kwargs will be ignored when loading model from model_path")
         elif isinstance(model, str) or isinstance(model, type):
             # Init model by cls or str
             self.model = self.model_manager.init_model(model, **(model_kwargs or {}))
         elif isinstance(model, SynthesizerModel):
             # Already initialized model
             self.model = model
+            if model_kwargs:
+                logger.warning("model_kwargs will be ignored when using already initialized model")
         else:
             raise SynthesizerInitError("model or model_path must be specified")
 
@@ -216,7 +222,7 @@ class Synthesizer:
 
         return Synthesizer(
             model=model,
-            model_path=load_dir / cls.MODEL_SAVE_DIR,
+            model_path=model_path,
             metadata=metadata,
             metadata_path=metadata_path,
             data_connector=data_connector,
@@ -273,7 +279,7 @@ class Synthesizer:
                 inspector_init_kwargs=inspector_init_kwargs,
             )
         )
-        self._metadata_in_fit = metadata
+        self.metadata = metadata  # Ensure update metadata
 
         logger.info("Fitting data processors...")
         for d in self.data_processors:
@@ -319,7 +325,8 @@ class Synthesizer:
             pd.DataFrame | typing.Generator[pd.DataFrame, None, None]: The sampled data. When chunksize is not None, it will be a generator.
         """
         logger.info("Sampling...")
-        metadata = metadata or self._metadata_in_fit or self.metadata
+        metadata = metadata or self.metadata
+        self.metadata = metadata  # Ensure update metadata
         if metadata:
             for d in self.data_processors:
                 d.fit(metadata)
