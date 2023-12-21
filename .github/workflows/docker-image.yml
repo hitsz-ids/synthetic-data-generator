@@ -13,7 +13,17 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-
+      # Self versioning
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.x"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine hatch
+      - name: Versioning package
+        run: hatch version ${{ github.ref_name }}
       # Build docker images
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
