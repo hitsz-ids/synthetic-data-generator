@@ -1,13 +1,36 @@
+from __future__ import annotations
+
 import json
+from functools import wraps
 from pathlib import Path
 
 import click
 import pandas
 
 from sdgx.cachers.manager import CacherManager
+from sdgx.cli.exporters.manager import ExporterManager
+from sdgx.cli.message import ExceptionMessage, NormalMessage
 from sdgx.data_connectors.manager import DataConnectorManager
 from sdgx.data_processors.manager import DataProcessorManager
 from sdgx.models.manager import ModelManager
+
+
+def json_exit(func):
+    @click.option("--json_output", type=bool, default=False, help="Exit with json output.")
+    @wraps(func)
+    def wrapper(json_output, *args, **kwargs):
+        try:
+            func(*args, **kwargs)
+        except Exception as e:
+            if json_output:
+                ExceptionMessage.from_exception(e).send()
+            exit(getattr(e, "EXIT_CODE", -1))
+        else:
+            if json_output:
+                NormalMessage().send()
+            exit(0)
+
+    return wrapper
 
 
 @click.command()
@@ -46,6 +69,7 @@ from sdgx.models.manager import ModelManager
     help="Path to save the model.",
     required=True,
 )
+@json_exit
 def fit(
     model,
     model_params,
@@ -71,6 +95,7 @@ def fit(
 
 
 @click.command()
+@json_exit
 def sample(
     model_path,
     output_path,
@@ -85,12 +110,14 @@ def sample(
 
 
 @click.command()
+@json_exit
 def list_models():
     for model_name, model_cls in ModelManager().registed_models.items():
         print(f"{model_name} is registed as class: {model_cls}.")
 
 
 @click.command()
+@json_exit
 def list_data_connectors():
     for (
         model_name,
@@ -100,6 +127,7 @@ def list_data_connectors():
 
 
 @click.command()
+@json_exit
 def list_data_processors():
     for (
         model_name,
@@ -109,8 +137,16 @@ def list_data_processors():
 
 
 @click.command()
+@json_exit
 def list_cachers():
     for model_name, model_cls in CacherManager().registed_cachers.items():
+        print(f"{model_name} is registed as class: {model_cls}.")
+
+
+@click.command()
+@json_exit
+def list_exporters():
+    for model_name, model_cls in ExporterManager().registed_exporters.items():
         print(f"{model_name} is registed as class: {model_cls}.")
 
 
@@ -125,6 +161,7 @@ cli.add_command(list_models)
 cli.add_command(list_data_connectors)
 cli.add_command(list_data_processors)
 cli.add_command(list_cachers)
+cli.add_command(list_exporters)
 
 
 if __name__ == "__main__":
