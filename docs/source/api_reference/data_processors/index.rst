@@ -1,13 +1,18 @@
 DataProcessor
 ========================================================
 
+.. toctree::
+    :maxdepth: 1
+
+    Base Class for DataProcessor <base>
+
+
 Built-in DataProcessor
 -----------------------------
 
 .. toctree::
     :maxdepth: 2
 
-    DataProcessor <base>
 
 Custom DataProcessor Relevant
 -----------------------------

@@ -1,10 +1,16 @@
 """
-Example for CTGAN
+Example for fit and save a model, then load it for sampling.
 """
+
+import time
+from pathlib import Path
+
 from sdgx.data_connectors.csv_connector import CsvConnector
 from sdgx.models.ml.single_table.ctgan import CTGANSynthesizerModel
 from sdgx.synthesizer import Synthesizer
 from sdgx.utils import download_demo_data
+
+_HERE = Path(__file__).parent
 
 # This will download demo data to ./dataset
 dataset_csv = download_demo_data()
@@ -18,25 +24,13 @@ synthesizer = Synthesizer(
     data_connector=data_connector,
 )
 
-# Fit the model
+# Fit and save model
 synthesizer.fit()
+date = time.strftime("%Y%m%d-%H%M%S")
+save_dir = _HERE / f"./ctgan-{date}-model"
+synthesizer.save(save_dir)
 
-# Sample
+# Load model, then sample
+synthesizer = Synthesizer.load(save_dir, model=CTGANSynthesizerModel)
 sampled_data = synthesizer.sample(1000)
 print(sampled_data)
-
-# Optional, clean all cache and release resources of model
-synthesizer.cleanup()
-
-# Optional, use JSD metric
-
-from sdgx.metrics.column.jsd import JSD
-
-JSD = JSD()
-
-
-selected_columns = ["workclass"]
-isDiscrete = True
-metrics = JSD.calculate(data_connector.read(), sampled_data, selected_columns, isDiscrete)
-
-print("JSD metric of column %s: %g" % (selected_columns[0], metrics))

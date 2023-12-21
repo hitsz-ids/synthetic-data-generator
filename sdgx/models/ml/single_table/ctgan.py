@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 from pathlib import Path
 
 import numpy as np
@@ -151,8 +152,6 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
         log_frequency (boolean):
             Whether to use log frequency of categorical levels in conditional
             sampling. Defaults to ``True``.
-        verbose (boolean):
-            Whether to have print statements for progress results. Defaults to ``False``.
         epochs (int):
             Number of training epochs. Defaults to 300.
         pac (int):
@@ -161,6 +160,8 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
         device (str):
             Device to run the training on. Preferred to be 'cuda' for GPU if available.
     """
+
+    MODEL_SAVE_NAME = "ctgan.pkl"
 
     def __init__(
         self,
@@ -174,7 +175,6 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
         batch_size=500,
         discriminator_steps=1,
         log_frequency=True,
-        verbose=False,
         epochs=300,
         pac=10,
         device="cuda" if torch.cuda.is_available() else "cpu",
@@ -193,11 +193,9 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
         self._batch_size = batch_size
         self._discriminator_steps = discriminator_steps
         self._log_frequency = log_frequency
-        self._verbose = verbose
         self._epochs = epochs
         self.pac = pac
 
-        device = device
         self._device = torch.device(device)
 
         # Following components are initialized in `_pre_fit`
@@ -218,8 +216,9 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
         self._validate_discrete_columns(dataloader.columns(), discrete_columns)
         # Fit Transformer and DataSampler
         self._transformer = DataTransformer()
+        logger.info("Fitting model's transformer...")
         self._transformer.fit(dataloader, discrete_columns)
-
+        logger.info("Transforming data...")
         self._ndarry_loader = self._transformer.transform(dataloader)
 
         self._data_sampler = DataSampler(
@@ -267,8 +266,10 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
         mean = torch.zeros(self._batch_size, self._embedding_dim, device=self._device)
         std = mean + 1
 
+        logger.info("Starting training, epochs: {}".format(epochs))
         steps_per_epoch = max(data_size // self._batch_size, 1)
         for i in range(epochs):
+            start_time = time.time()
             for id_ in range(steps_per_epoch):
                 for n in range(self._discriminator_steps):
                     fakez = torch.normal(mean=mean, std=std)
@@ -345,11 +346,11 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
                 loss_g.backward()
                 optimizerG.step()
 
-            if self._verbose:
-                logger.info(
-                    f"Epoch {i+1}, Loss G: {loss_g.detach().cpu(): .4f},"  # noqa: T001
-                    f"Loss D: {loss_d.detach().cpu(): .4f}",
-                )
+            logger.debug(
+                f"Epoch {i+1}, Loss G: {loss_g.detach().cpu(): .4f},"  # noqa: T001
+                f"Loss D: {loss_d.detach().cpu(): .4f},"
+                f"Time: {time.time() - start_time: .4f}",
+            )
 
     def sample(self, count: int, *args, **kwargs) -> pd.DataFrame:
         return self._sample(count, *args, **kwargs)
@@ -411,12 +412,13 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
 
         return self._transformer.inverse_transform(data)
 
-    def save(self, path: str | Path):
-        return SDVBaseSynthesizer.save(self, path)
+    def save(self, save_dir: str | Path):
+        save_dir.mkdir(parents=True, exist_ok=True)
+        return SDVBaseSynthesizer.save(self, save_dir / self.MODEL_SAVE_NAME)
 
     @classmethod
-    def load(cls, path: str | Path) -> "CTGANSynthesizerModel":
-        return SDVBaseSynthesizer.load(path)
+    def load(cls, save_dir: str | Path) -> "CTGANSynthesizerModel":
+        return SDVBaseSynthesizer.load(save_dir / cls.MODEL_SAVE_NAME)
 
     @staticmethod
     def _gumbel_softmax(logits, tau=1, hard=False, eps=1e-10, dim=-1):

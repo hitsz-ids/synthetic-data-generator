@@ -14,21 +14,23 @@ from sdgx.synthesizer import Synthesizer
 
 
 class MockModel(SynthesizerModel):
+    MODEL_SAVE_NAME = "mockmoel.pth"
+
     def fit(self, metadata, dataloader, **kwargs):
         pass
 
     def sample(self, count, **kwargs) -> pd.DataFrame:
-        return pd.DataFrame()
+        return pd.DataFrame({"a": [i for i in range(count)], "b": [i * 2 for i in range(count)]})
 
     def save(self, save_dir: str | Path):
         save_dir = Path(save_dir).expanduser().resolve()
         save_dir.mkdir(parents=True, exist_ok=True)
-        save_dir.joinpath("mockmoel.pth").touch()
+        save_dir.joinpath(self.MODEL_SAVE_NAME).touch()
 
     @classmethod
-    def load(cls, path: str | Path):
-        path = Path(path).expanduser().resolve()
-        if not path.exists():
+    def load(cls, save_dir: str | Path):
+        save_dir = Path(save_dir).expanduser().resolve()
+        if not save_dir.joinpath(cls.MODEL_SAVE_NAME).exists():
             raise FileNotFoundError
         return MockModel()
 
@@ -82,7 +84,7 @@ def test_sample(synthesizer):
 def test_save_and_load(synthesizer, save_dir):
     assert synthesizer.save(save_dir)
     assert (save_dir / synthesizer.METADATA_SAVE_NAME).exists()
-    assert (save_dir / synthesizer.MODEL_SAVE_NAME).exists()
+    assert (save_dir / synthesizer.MODEL_SAVE_DIR).exists()
 
     synthesizer = Synthesizer.load(
         save_dir,

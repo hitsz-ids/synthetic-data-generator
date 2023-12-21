@@ -2,6 +2,7 @@
 
 import contextlib
 
+import cloudpickle
 import numpy as np
 import torch
 
@@ -64,18 +65,54 @@ class BaseSynthesizer:
 
     random_states = None
 
+    def __getstate__(self):
+        device_backup = self._device
+        self.set_device(torch.device("cpu"))
+        state = self.__dict__.copy()
+        self.set_device(device_backup)
+
+        random_states = self.random_states
+        if (
+            isinstance(random_states, tuple)
+            and isinstance(random_states[0], np.random.RandomState)
+            and isinstance(random_states[1], torch.Generator)
+        ):
+            state["_numpy_random_state"] = random_states[0].get_state()
+            state["_torch_random_state"] = random_states[1].get_state()
+            del state["random_states"]
+
+        return state
+
+    def __setstate__(self, state):
+        np_state = state.pop("_numpy_random_state", None)
+        torch_state = state.pop("_torch_random_state", None)
+        if np_state is not None and torch_state is not None:
+            current_torch_state = torch.Generator()
+            current_torch_state.set_state(torch_state)
+            current_numpy_state = np.random.RandomState()
+            current_numpy_state.set_state(np_state)
+            state["random_states"] = (current_numpy_state, current_torch_state)
+        self.__dict__ = state
+
+    def set_device(self, device):
+        """Set the `device` to be used ('GPU' or 'CPU')."""
+        self._device = device
+        if self._generator is not None:
+            self._generator.to(self._device)
+
     def save(self, path):
         """Save the model in the passed `path`."""
         device_backup = self._device
         self.set_device(torch.device("cpu"))
-        torch.save(self, path)
+        with open(path, "wb") as output:
+            cloudpickle.dump(self, output)
         self.set_device(device_backup)
 
     @classmethod
-    def load(cls, path):
+    def load(cls, path, device="cuda" if torch.cuda.is_available() else "cpu"):
         """Load the model stored in the passed `path`."""
-        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        model = torch.load(path)
+        with open(path, "rb") as f:
+            model = cloudpickle.load(f)
         model.set_device(device)
         return model
 
