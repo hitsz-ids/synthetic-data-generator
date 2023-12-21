@@ -22,7 +22,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install build twine hatch
       - name: Versioning package
-        run: hatch version ${{ github.ref }}
+        run: hatch version ${{ github.ref_name }}
       - name: Build package
         run: python -m build
       - name: Publish package
