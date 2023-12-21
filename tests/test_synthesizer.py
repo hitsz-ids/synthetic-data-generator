@@ -7,7 +7,7 @@ import pandas as pd
 import pytest
 
 from sdgx.data_connectors.generator_connector import GeneratorConnector
-from sdgx.data_models.metadata import Metadata
+from sdgx.data_models.metadata.base import Metadata
 from sdgx.data_processors.base import DataProcessor
 from sdgx.models.base import SynthesizerModel
 from sdgx.synthesizer import Synthesizer

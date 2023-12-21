@@ -7,7 +7,7 @@ import pytest
 
 from sdgx.data_connectors.csv_connector import CsvConnector
 from sdgx.data_loader import DataLoader
-from sdgx.data_models.metadata import Metadata
+from sdgx.data_models.metadata.base import Metadata
 from sdgx.utils import download_demo_data
 
 _HERE = os.path.dirname(__file__)

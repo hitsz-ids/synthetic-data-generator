@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from sdgx.data_models.metadata import Metadata
+from sdgx.data_models.metadata.base import Metadata
 
 
 class DataProcessor:

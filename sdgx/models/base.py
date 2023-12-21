@@ -5,7 +5,7 @@ from pathlib import Path
 import pandas as pd
 
 from sdgx.data_loader import DataLoader
-from sdgx.data_models.metadata import Metadata
+from sdgx.data_models.metadata.base import Metadata
 
 
 class SynthesizerModel:

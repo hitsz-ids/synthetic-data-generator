@@ -10,7 +10,7 @@ from sdgx.data_connectors.base import DataConnector
 from sdgx.data_connectors.generator_connector import GeneratorConnector
 from sdgx.data_connectors.manager import DataConnectorManager
 from sdgx.data_loader import DataLoader
-from sdgx.data_models.metadata import Metadata
+from sdgx.data_models.metadata.base import Metadata
 from sdgx.data_processors.base import DataProcessor
 from sdgx.data_processors.manager import DataProcessorManager
 from sdgx.exceptions import SynthesizerInitError

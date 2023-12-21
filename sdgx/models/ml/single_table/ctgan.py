@@ -20,7 +20,7 @@ from torch.nn import (
 )
 
 from sdgx.data_loader import DataLoader
-from sdgx.data_models.metadata import Metadata
+from sdgx.data_models.metadata.base import Metadata
 from sdgx.log import logger
 from sdgx.models.components.optimize.ndarray_loader import NDArrayLoader
 from sdgx.models.components.optimize.sdv_ctgan.data_sampler import DataSampler
