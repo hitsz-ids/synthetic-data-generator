@@ -62,3 +62,9 @@ class DataLoaderInitError(SdgxError):
     """
     Exception to indicate that exception when initializing dataloader.
     """
+
+
+class CannotExportError(SdgxError):
+    """
+    Exception to indicate that exception when exporting data.
+    """
