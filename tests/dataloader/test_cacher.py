@@ -9,7 +9,6 @@ import pytest
 
 from sdgx.cachers.base import Cacher, NoCache
 from sdgx.cachers.disk_cache import DiskCache
-from sdgx.cachers.memory_cache import MemoryCache
 from sdgx.data_connectors.csv_connector import CsvConnector
 
 
@@ -69,7 +68,6 @@ def data_connector(csv_file):
     "cacher_cls",
     [
         NoCache,
-        MemoryCache,
         DiskCache,
     ],
 )

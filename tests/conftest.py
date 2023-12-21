@@ -1,4 +1,5 @@
 import os
+from functools import partial
 
 os.environ["SDG_NDARRAY_CACHE_ROOT"] = "/tmp/sdgx/ndarray_cache"
 import shutil
@@ -26,6 +27,11 @@ def cacher_kwargs(tmp_path):
     cache_dir = tmp_path / "cache"
     yield {"cache_dir": cache_dir.as_posix()}
     shutil.rmtree(cache_dir, ignore_errors=True)
+
+
+@pytest.fixture
+def dataloader_builder(cacher_kwargs):
+    yield partial(DataLoader, cacher_kwargs=cacher_kwargs)
 
 
 @pytest.fixture
