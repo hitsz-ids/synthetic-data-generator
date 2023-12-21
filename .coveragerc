@@ -1,4 +1,4 @@
-[run]
+[report]
 omit =
     */tests/*
     */sdgx/models/components/sdv_*
