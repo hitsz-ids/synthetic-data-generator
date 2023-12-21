@@ -8,7 +8,7 @@ def manager():
     yield ExporterManager()
 
 
-def test_registed_cacher(manager: ExporterManager):
+def test_registed_exporter(manager: ExporterManager):
     assert manager._normalize_name("MyOwnExporter") in manager.registed_exporters
 
 

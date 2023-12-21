@@ -7,7 +7,7 @@ class MyOwnExporter(Exporter):
     ...
 
 
-from sdgx.cli.exporters import hookimpl
+from sdgx.cli.exporters.extension import hookimpl
 
 
 @hookimpl
