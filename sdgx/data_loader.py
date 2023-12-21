@@ -6,6 +6,7 @@ from typing import Any, Generator
 import pandas as pd
 
 from sdgx.cachers.base import Cacher, NoCache
+from sdgx.cachers.disk_cache import DiskCache
 from sdgx.cachers.manager import CacherManager
 from sdgx.data_connectors.base import DataConnector
 from sdgx.data_connectors.generator_connector import GeneratorConnector
@@ -86,12 +87,13 @@ class DataLoader:
 
     """
 
+    DEFAULT_CACHER = DiskCache
+
     def __init__(
         self,
         data_connector: DataConnector,
         chunksize: int = 10000,
-        cacher: Cacher | None = None,
-        cache_mode: str = "DiskCache",
+        cacher: Cacher | str | type[Cacher] | None = None,
         cacher_kwargs: None | dict[str, Any] = None,
     ) -> None:
         self.data_connector = data_connector
@@ -102,12 +104,17 @@ class DataLoader:
             cacher_kwargs = {}
         cacher_kwargs.setdefault("blocksize", self.chunksize)
         cacher_kwargs.setdefault("identity", self.data_connector.identity)
-        self.cacher = cacher or self.cache_manager.init_cacher(cache_mode, **cacher_kwargs)
+        if isinstance(cacher, Cacher):
+            self.cacher = cacher
+        elif isinstance(cacher, str) or isinstance(cacher, type):
+            self.cacher = self.cache_manager.init_cacher(cacher, **cacher_kwargs)
+        else:
+            self.cacher = self.cache_manager.init_cacher(self.DEFAULT_CACHER, **cacher_kwargs)
 
         self.cacher.clear_invalid_cache()
 
         if isinstance(data_connector, GeneratorConnector):
-            if isinstance(cacher, NoCache):
+            if isinstance(self.cacher, NoCache):
                 raise DataLoaderInitError("NoCache can't be used with GeneratorConnector")
             # Warmup cache for generator, this allows random access
             self.load_all()
@@ -148,23 +155,24 @@ class DataLoader:
         if clear_cache:
             self.cacher.clear_cache()
 
-    def __getitem__(self, key: list | slice | tuple) -> pd.DataFrame:
+    def __getitem__(self, key: int | slice | list) -> pd.DataFrame:
         """
         Support get data by index and slice.
         """
+        if isinstance(key, int):
+            return self.cacher.load(
+                offset=(key // self.chunksize) * self.chunksize,
+                chunksize=self.chunksize,
+                data_connector=self.data_connector,
+            )[0]
+
         if isinstance(key, list):
-            sli = None
-            rows = key
-        else:
-            sli = key
-            rows = None
+            return pd.concat((d[key] for d in self.iter()), ignore_index=True)
 
-        if not sli:
-            return pd.concat((d[rows] for d in self.iter()), ignore_index=True)
-
-        start = sli.start or 0
-        stop = sli.stop or len(self)
-        step = sli.step or 1
+        assert isinstance(key, slice)
+        start = key.start or 0
+        stop = key.stop or len(self)
+        step = key.step or 1
 
         offset = (start // self.chunksize) * self.chunksize
         n_iter = ((stop - start) // self.chunksize) + 1

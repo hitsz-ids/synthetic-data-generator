@@ -9,11 +9,11 @@ def manager():
 
 
 @pytest.mark.parametrize(
-    "supported_data_connector",
-    ["NoCache", "MemoryCache", "DiskCache"],
+    "supportd_cacher",
+    ["NoCache", "DiskCache"],
 )
-def test_manager(supported_data_connector, manager: CacherManager):
-    assert manager._normalize_name(supported_data_connector) in manager.registed_cachers
+def test_manager(supportd_cacher, manager: CacherManager):
+    assert manager._normalize_name(supportd_cacher) in manager.registed_cachers
 
 
 if __name__ == "__main__":

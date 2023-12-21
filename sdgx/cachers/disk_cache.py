@@ -104,9 +104,24 @@ class DiskCache(Cacher):
             if len(cached_data) >= chunksize:
                 return cached_data[:chunksize]
             return cached_data
-        data = data_connector.read(offset=offset, limit=max(self.blocksize, chunksize))
+        limit = max(self.blocksize, chunksize)
+        data = data_connector.read(offset=offset, limit=limit)
         if data is None:
             return data
+        while len(data) < limit:
+            # When generator size is less than blocksize
+            # Continue to read until fit the limit
+            next_data = data_connector.read(offset=offset + len(data), limit=limit - len(data))
+            if next_data is None or len(next_data) == 0:
+                break
+            data = pd.concat(
+                [
+                    data,
+                    next_data,
+                ],
+                ignore_index=True,
+            )
+
         self._refresh(offset, data)
         if len(data) < chunksize:
             return data

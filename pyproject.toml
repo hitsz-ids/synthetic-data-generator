@@ -36,7 +36,7 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-test = ["pytest", "pytest-cov"]
+test = ["pytest", "pytest-cov", "coverage<7"]
 docs = [
     "Sphinx",
     "pydata-sphinx-theme",
