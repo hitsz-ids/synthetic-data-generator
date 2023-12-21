@@ -1,11 +1,11 @@
 import pytest
 
-from sdgx.cli.exporters.manager import ExporterManager
+from sdgx.data_exporters.manager import DataExporterManager
 
 
 @pytest.fixture
 def manager():
-    yield ExporterManager()
+    yield DataExporterManager()
 
 
 @pytest.mark.parametrize(
@@ -14,7 +14,7 @@ def manager():
         "CsvExporter",
     ],
 )
-def test_manager(supportd_exporter, manager: ExporterManager):
+def test_manager(supportd_exporter, manager: DataExporterManager):
     assert manager._normalize_name(supportd_exporter) in manager.registed_exporters
 
 

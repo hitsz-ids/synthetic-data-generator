@@ -8,9 +8,9 @@ import click
 import pandas
 
 from sdgx.cachers.manager import CacherManager
-from sdgx.cli.exporters.manager import ExporterManager
 from sdgx.cli.message import ExceptionMessage, NormalMessage
 from sdgx.data_connectors.manager import DataConnectorManager
+from sdgx.data_exporters.manager import DataExporterManager
 from sdgx.data_processors.manager import DataProcessorManager
 from sdgx.models.manager import ModelManager
 
@@ -146,7 +146,7 @@ def list_cachers():
 @click.command()
 @json_exit
 def list_exporters():
-    for model_name, model_cls in ExporterManager().registed_exporters.items():
+    for model_name, model_cls in DataExporterManager().registed_exporters.items():
         print(f"{model_name} is registed as class: {model_cls}.")
 
 

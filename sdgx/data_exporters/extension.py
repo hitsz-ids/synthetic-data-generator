@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pluggy
 
-project_name = "sdgx.cli.exporter"
+project_name = "sdgx.cli.DataExporter"
 """
 The entry-point name of this extension.
 
@@ -35,10 +35,10 @@ def register(manager):
 
     .. code-block:: python
 
-        class MyOwnExporter(Exporter):
+        class MyOwnExporter(DataExporter):
             ...
 
-        from sdgx.cli.exporters.extension import hookimpl
+        from sdgx.exporters.extension import hookimpl
 
         @hookimpl
         def register(manager):
@@ -49,7 +49,7 @@ def register(manager):
 
     .. code-block:: toml
 
-        [project.entry-points."sdgx.cli.exporter"]
+        [project.entry-points."sdgx.cli.DataExporter"]
         {whatever-name} = "{package}.{path}.{to}.{file-with-hookimpl-function}"
 
 

@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from sdgx.cli.exporters.base import Exporter
+from sdgx.data_exporters.base import DataExporter
 
 
-class MyOwnExporter(Exporter):
+class MyOwnExporter(DataExporter):
     ...
 
 
-from sdgx.cli.exporters.extension import hookimpl
+from sdgx.data_exporters.extension import hookimpl
 
 
 @hookimpl

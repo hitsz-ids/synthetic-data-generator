@@ -1,14 +1,14 @@
 import pytest
 
-from sdgx.cli.exporters.manager import ExporterManager
+from sdgx.data_exporters.manager import DataExporterManager
 
 
 @pytest.fixture
 def manager():
-    yield ExporterManager()
+    yield DataExporterManager()
 
 
-def test_registed_exporter(manager: ExporterManager):
+def test_registed_exporter(manager: DataExporterManager):
     assert manager._normalize_name("MyOwnExporter") in manager.registed_exporters
 
 

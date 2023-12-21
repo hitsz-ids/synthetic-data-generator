@@ -28,3 +28,4 @@ Plugin-supported modules
 - :ref:`Data Processor <api_reference/data-processors-extension>`
 - :ref:`Inspector for Metadata <api_reference/data-models-inspectors-extension>`
 - :ref:`Model <api_reference/models-extension>`
+- :ref:`Data Exporter <api_reference/data-exporters-extension>`

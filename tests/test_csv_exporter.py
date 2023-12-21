@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from sdgx.cli.exporters.csv_exporter import CsvExporter
+from sdgx.data_exporters.csv_exporter import CsvExporter
 
 
 @pytest.fixture

@@ -5,11 +5,11 @@ from typing import Generator
 
 import pandas as pd
 
-from sdgx.cli.exporters.base import Exporter
+from sdgx.data_exporters.base import DataExporter
 from sdgx.exceptions import CannotExportError
 
 
-class CsvExporter(Exporter):
+class CsvExporter(DataExporter):
     def write(
         self,
         dst: str | Path,
@@ -25,7 +25,7 @@ class CsvExporter(Exporter):
             raise CannotExportError(f"Cannot export data of type {type(data)} to csv")
 
 
-from sdgx.cli.exporters.extension import hookimpl
+from sdgx.data_exporters.extension import hookimpl
 
 
 @hookimpl

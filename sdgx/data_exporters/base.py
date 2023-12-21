@@ -5,6 +5,6 @@ from typing import Any, Generator
 import pandas as pd
 
 
-class Exporter:
+class DataExporter:
     def write(self, dst: Any, data: pd.DataFrame | Generator[pd.DataFrame, None, None]) -> None:
         raise NotImplementedError
