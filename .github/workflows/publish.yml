@@ -43,3 +43,4 @@ jobs:
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: Bump to next micro version
+          branch: github.event.repository.default_branch
