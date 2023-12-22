@@ -412,7 +412,7 @@ def list_cachers():
 
 @click.command()
 @cli_wrapper
-def list_exporters():
+def list_data_exporters():
     for model_name, model_cls in DataExporterManager().registed_exporters.items():
         print(f"{model_name} is registed as class: {model_cls}.")
 
@@ -428,7 +428,7 @@ cli.add_command(list_models)
 cli.add_command(list_data_connectors)
 cli.add_command(list_data_processors)
 cli.add_command(list_cachers)
-cli.add_command(list_exporters)
+cli.add_command(list_data_exporters)
 
 
 if __name__ == "__main__":

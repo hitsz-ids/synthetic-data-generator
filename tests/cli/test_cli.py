@@ -7,8 +7,8 @@ from sdgx.cli.main import (
     fit,
     list_cachers,
     list_data_connectors,
+    list_data_exporters,
     list_data_processors,
-    list_exporters,
     list_models,
     sample,
 )
@@ -22,7 +22,7 @@ from sdgx.cli.message import NormalMessage
         list_cachers,
         list_data_connectors,
         list_data_processors,
-        list_exporters,
+        list_data_exporters,
         list_models,
     ],
 )
