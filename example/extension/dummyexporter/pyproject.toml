@@ -23,5 +23,5 @@ ignore = [".*"]
 [tool.hatch.version]
 path = "dummyexporter/__init__.py"
 
-[project.entry-points."sdgx.cli.DataExporter"]
+[project.entry-points."sdgx.data_exporter"]
 dummyexporter = "dummyexporter.dummyexporter"
