@@ -35,9 +35,9 @@ class Synthesizer:
         metadata_path (str | Path, optional): The path to the metadata file. Defaults to None. Used to load the metadata if ``metadata`` is None.
         data_connector (DataConnector | type[DataConnector] | str, optional): The data connector to use. Defaults to None.
             When data_connector is a string, it must be registered in :class:`~sdgx.data_connectors.manager.DataConnectorManager`.
-        data_connectors_kwargs (dict[str, Any], optional): The keyword arguments for data connectors. Defaults to None.
+        data_connector_kwargs (dict[str, Any], optional): The keyword arguments for data connectors. Defaults to None.
         raw_data_loaders_kwargs (dict[str, Any], optional): The keyword arguments for raw data loaders. Defaults to None.
-        processored_data_loaders_kwargs (dict[str, Any], optional): The keyword arguments for processed data loaders. Defaults to None.
+        processed_data_loaders_kwargs (dict[str, Any], optional): The keyword arguments for processed data loaders. Defaults to None.
         data_processors (list[str | DataProcessor | type[DataProcessor]], optional): The data processors to use. Defaults to None.
             When data_processor is a string, it must be registered in :class:`~sdgx.data_processors.manager.DataProcessorManager`.
         data_processors_kwargs (dict[str, dict[str, Any]], optional): The keyword arguments for data processors. Defaults to None.
@@ -78,16 +78,16 @@ class Synthesizer:
         metadata: None | Metadata = None,
         metadata_path: None | str | Path = None,
         data_connector: None | str | DataConnector | type[DataConnector] = None,
-        data_connectors_kwargs: None | dict[str, Any] = None,
+        data_connector_kwargs: None | dict[str, Any] = None,
         raw_data_loaders_kwargs: None | dict[str, Any] = None,
-        processored_data_loaders_kwargs: None | dict[str, Any] = None,
+        processed_data_loaders_kwargs: None | dict[str, Any] = None,
         data_processors: None | list[str | DataProcessor | type[DataProcessor]] = None,
-        data_processors_kwargs: None | dict[str, dict[str, Any]] = None,
+        data_processors_kwargs: None | dict[str, Any] = None,
     ):
         # Init data connectors
         if isinstance(data_connector, str) or isinstance(data_connector, type):
             data_connector = DataConnectorManager().init_data_connector(
-                data_connector, **(data_connectors_kwargs or {})
+                data_connector, **(data_connector_kwargs or {})
             )
         if data_connector:
             self.dataloader = DataLoader(
@@ -149,7 +149,7 @@ class Synthesizer:
             raise SynthesizerInitError("model or model_path must be specified")
 
         # Other arguments
-        self.processored_data_loaders_kwargs = processored_data_loaders_kwargs or {}
+        self.processed_data_loaders_kwargs = processed_data_loaders_kwargs or {}
 
     def save(self, save_dir: str | Path) -> Path:
         """
@@ -163,6 +163,7 @@ class Synthesizer:
         """
         save_dir = Path(save_dir).expanduser().resolve()
         save_dir.mkdir(parents=True, exist_ok=True)
+        logger.info(f"Saving synthesizer to {save_dir}")
 
         if self.metadata:
             self.metadata.save(save_dir / self.METADATA_SAVE_NAME)
@@ -179,14 +180,16 @@ class Synthesizer:
         model: str | type[SynthesizerModel],
         metadata: None | Metadata = None,
         data_connector: None | str | DataConnector | type[DataConnector] = None,
-        data_connectors_kwargs: None | dict[str, Any] = None,
+        data_connector_kwargs: None | dict[str, Any] = None,
         raw_data_loaders_kwargs: None | dict[str, Any] = None,
-        processored_data_loaders_kwargs: None | dict[str, Any] = None,
+        processed_data_loaders_kwargs: None | dict[str, Any] = None,
         data_processors: None | list[str | DataProcessor | type[DataProcessor]] = None,
         data_processors_kwargs: None | dict[str, dict[str, Any]] = None,
     ) -> "Synthesizer":
         """
         Load metadata and model, allow rebuilding Synthesizer for finetuning or other use cases.
+
+        We need ``model`` as not every model support *pickle* way to save and load.
 
         Args:
             load_dir (str | Path): The directory to load the model.
@@ -195,9 +198,9 @@ class Synthesizer:
             metadata (Metadata, optional): The metadata to use. Defaults to None.
             data_connector (DataConnector | type[DataConnector] | str, optional): The data connector to use. Defaults to None.
                 When data_connector is a string, it must be registered in :class:`~sdgx.data_connectors.manager.DataConnectorManager`.
-            data_connectors_kwargs (dict[str, Any], optional): The keyword arguments for data connectors. Defaults to None.
+            data_connector_kwargs (dict[str, Any], optional): The keyword arguments for data connectors. Defaults to None.
             raw_data_loaders_kwargs (dict[str, Any], optional): The keyword arguments for raw data loaders. Defaults to None.
-            processored_data_loaders_kwargs (dict[str, Any], optional): The keyword arguments for processed data loaders. Defaults to None.
+            processed_data_loaders_kwargs (dict[str, Any], optional): The keyword arguments for processed data loaders. Defaults to None.
             data_processors (list[str | DataProcessor | type[DataProcessor]], optional): The data processors to use. Defaults to None.
                 When data_processor is a string, it must be registered in :class:`~sdgx.data_processors.manager.DataProcessorManager`.
             data_processors_kwargs (dict[str, dict[str, Any]], optional): The keyword arguments for data processors. Defaults to None.
@@ -207,6 +210,7 @@ class Synthesizer:
         """
 
         load_dir = Path(load_dir).expanduser().resolve()
+        logger.info(f"Loading synthesizer from {load_dir}")
 
         if not load_dir.exists():
             raise SynthesizerInitError(f"{load_dir.as_posix()} does not exist")
@@ -226,9 +230,9 @@ class Synthesizer:
             metadata=metadata,
             metadata_path=metadata_path,
             data_connector=data_connector,
-            data_connectors_kwargs=data_connectors_kwargs,
+            data_connector_kwargs=data_connector_kwargs,
             raw_data_loaders_kwargs=raw_data_loaders_kwargs,
-            processored_data_loaders_kwargs=processored_data_loaders_kwargs,
+            processed_data_loaders_kwargs=processed_data_loaders_kwargs,
             data_processors=data_processors,
             data_processors_kwargs=data_processors_kwargs,
         )
@@ -295,7 +299,7 @@ class Synthesizer:
         start_time = time.time()
         processed_dataloader = DataLoader(
             GeneratorConnector(chunk_generator),
-            **self.processored_data_loaders_kwargs,
+            **self.processed_data_loaders_kwargs,
         )
         logger.info(f"Initialized processed data loader in {time.time() - start_time}s")
         try:

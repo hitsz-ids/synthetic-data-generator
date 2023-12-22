@@ -61,7 +61,7 @@ def synthesizer(cacher_kwargs):
         data_connector=MockDataConnector(),
         raw_data_loaders_kwargs={"cacher_kwargs": cacher_kwargs},
         data_processors=[MockDataProcessor()],
-        processored_data_loaders_kwargs={"cacher_kwargs": cacher_kwargs},
+        processed_data_loaders_kwargs={"cacher_kwargs": cacher_kwargs},
         metadata=Metadata(),
     )
 

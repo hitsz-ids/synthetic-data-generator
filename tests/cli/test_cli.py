@@ -1,3 +1,5 @@
+import json
+
 import pytest
 from click.testing import CliRunner
 
@@ -30,10 +32,45 @@ def test_list_extension_api(command, json_output):
 
     assert result.exit_code == 0
     if json_output:
-        assert NormalMessage().model_dump_json() in result.output
-        assert NormalMessage().model_dump_json() == result.output.strip().split("\n")[-1]
+        assert NormalMessage()._dumo_json() in result.output
+        assert NormalMessage()._dumo_json() == result.output.strip().split("\n")[-1]
     else:
-        assert NormalMessage().model_dump_json() not in result.output
+        assert NormalMessage()._dumo_json() not in result.output
+
+
+@pytest.mark.parametrize("model", ["CTGAN"])
+@pytest.mark.parametrize("json_output", [True, False])
+def test_fit(model, demo_single_table_path, cacher_kwargs, json_output, tmp_path):
+    runner = CliRunner()
+    save_dir = tmp_path / f"unittest-{model}"
+    result = runner.invoke(
+        fit,
+        [
+            "--save_dir",
+            save_dir,
+            "--model",
+            model,
+            "--model_kwargs",
+            json.dumps({"epochs": 1}),
+            "--data_connector",
+            "csvconnector",
+            "--data_connector_kwargs",
+            json.dumps({"path": demo_single_table_path}),
+            "--raw_data_loaders_kwargs",
+            json.dumps({"cacher_kwargs": cacher_kwargs}),
+            "--processed_data_loaders_kwargs",
+            json.dumps({"cacher_kwargs": cacher_kwargs}),
+            "--json_output",
+            json_output,
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert save_dir.exists()
+    assert len(list(save_dir.iterdir())) > 0
+
+    if json_output:
+        assert json.loads(result.output.strip().split("\n")[-1])
 
 
 if __name__ == "__main__":
