@@ -12,7 +12,7 @@ class ExitMessage(BaseModel):
         return self.model_dump_json()
 
     def send(self):
-        print(self._dumo_json(), flush=True)
+        print(self._dumo_json(), flush=True, end="")
 
 
 class NormalMessage(ExitMessage):

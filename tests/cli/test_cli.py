@@ -40,7 +40,7 @@ def test_list_extension_api(command, json_output):
 
 @pytest.mark.parametrize("model", ["CTGAN"])
 @pytest.mark.parametrize("json_output", [True, False])
-def test_fit(model, demo_single_table_path, cacher_kwargs, json_output, tmp_path):
+def test_fit_save_load_sample(model, demo_single_table_path, cacher_kwargs, json_output, tmp_path):
     runner = CliRunner()
     save_dir = tmp_path / f"unittest-{model}"
     result = runner.invoke(
@@ -69,6 +69,26 @@ def test_fit(model, demo_single_table_path, cacher_kwargs, json_output, tmp_path
     assert save_dir.exists()
     assert len(list(save_dir.iterdir())) > 0
 
+    if json_output:
+        assert json.loads(result.output.strip().split("\n")[-1])
+
+    export_dst = tmp_path / "exported.csv"
+    result = runner.invoke(
+        sample,
+        [
+            "--load_dir",
+            save_dir,
+            "--model",
+            model,
+            "--json_output",
+            json_output,
+            "--export_dst",
+            export_dst.as_posix(),
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert export_dst.exists()
     if json_output:
         assert json.loads(result.output.strip().split("\n")[-1])
 

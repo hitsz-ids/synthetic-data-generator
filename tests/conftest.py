@@ -1,8 +1,9 @@
 import os
-from functools import partial
 
 os.environ["SDG_NDARRAY_CACHE_ROOT"] = "/tmp/sdgx/ndarray_cache"
+
 import shutil
+from functools import partial
 
 import pytest
 

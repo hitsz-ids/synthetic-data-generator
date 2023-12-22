@@ -57,13 +57,21 @@ class ManagerLoadModelError(ManagerError):
     ERROR_CODE = 3004
 
 
-class SynthesizerInitError(SdgxError):
+class SynthesizerError(SdgxError):
     """
     Exception to indicate that exception when synthesizing model.
     """
 
     EXIT_CODE = 103
+    ERROR_CODE = 4000
+
+
+class SynthesizerInitError(SynthesizerError):
     ERROR_CODE = 4001
+
+
+class SynthesizerSampleError(SynthesizerError):
+    ERROR_CODE = 4002
 
 
 class CacheError(SdgxError):

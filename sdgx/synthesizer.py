@@ -13,7 +13,7 @@ from sdgx.data_loader import DataLoader
 from sdgx.data_models.metadata import Metadata
 from sdgx.data_processors.base import DataProcessor
 from sdgx.data_processors.manager import DataProcessorManager
-from sdgx.exceptions import SynthesizerInitError
+from sdgx.exceptions import SynthesizerInitError, SynthesizerSampleError
 from sdgx.log import logger
 from sdgx.models.base import SynthesizerModel
 from sdgx.models.manager import ModelManager
@@ -313,7 +313,7 @@ class Synthesizer:
         count: int,
         chunksize: None | int = None,
         metadata: None | Metadata = None,
-        model_fit_kwargs: None | dict[str, Any] = None,
+        model_sample_args: None | dict[str, Any] = None,
     ) -> pd.DataFrame | Generator[pd.DataFrame, None, None]:
         """
         Sample data from the synthesizer.
@@ -323,7 +323,7 @@ class Synthesizer:
             chunksize (int, optional): The chunksize to use. Defaults to None. If is not None, the data will be sampled in chunks.
                 And will return a generator that yields chunks of samples.
             metadata (Metadata, optional): The metadata to use. Defaults to None. If None, will use the metadata in fit first.
-            model_fit_kwargs (dict[str, Any], optional): The keyword arguments for model.fit. Defaults to None.
+            model_sample_args (dict[str, Any], optional): The keyword arguments for model.sample. Defaults to None.
 
         Returns:
             pd.DataFrame | typing.Generator[pd.DataFrame, None, None]: The sampled data. When chunksize is not None, it will be a generator.
@@ -334,22 +334,25 @@ class Synthesizer:
         if metadata:
             for d in self.data_processors:
                 d.fit(metadata)
-        if not model_fit_kwargs:
-            model_fit_kwargs = {}
+        if not model_sample_args:
+            model_sample_args = {}
 
         if chunksize is None:
-            return self._sample_once(count, model_fit_kwargs)
+            return self._sample_once(count, model_sample_args)
+
+        if chunksize > count:
+            raise SynthesizerSampleError("chunksize must be less than or equal to count")
 
         def generator_sample_caller():
             sample_times = count // chunksize
             for _ in range(sample_times):
-                sample_data = self._sample_once(chunksize, model_fit_kwargs)
+                sample_data = self._sample_once(chunksize, model_sample_args)
                 for d in self.data_processors:
                     sample_data = d.reverse_convert(sample_data)
                 yield sample_data
 
             if count % chunksize > 0:
-                sample_data = self._sample_once(count % chunksize, model_fit_kwargs)
+                sample_data = self._sample_once(count % chunksize, model_sample_args)
                 for d in self.data_processors:
                     sample_data = d.reverse_convert(sample_data)
                 yield sample_data
@@ -357,7 +360,7 @@ class Synthesizer:
         return generator_sample_caller()
 
     def _sample_once(
-        self, count: int, model_fit_kwargs: None | dict[str, Any] = None
+        self, count: int, model_sample_args: None | dict[str, Any] = None
     ) -> pd.DataFrame:
         """
         Sample data once.
@@ -374,7 +377,7 @@ class Synthesizer:
         max_trails = 5
         sample_data_list = []
         while missing_count > 0 and max_trails > 0:
-            sample_data = self.model.sample(int(missing_count * 1.2), **model_fit_kwargs)
+            sample_data = self.model.sample(int(missing_count * 1.2), **model_sample_args)
             for d in self.data_processors:
                 sample_data = d.reverse_convert(sample_data)
             sample_data_list.append(sample_data)
@@ -393,7 +396,8 @@ class Synthesizer:
         if self.dataloader:
             self.dataloader.finalize(clear_cache=True)
         # Release resources
-        del self.model
+        if hasattr(self, "model"):
+            del self.model
 
     def __del__(self):
         self.cleanup()
