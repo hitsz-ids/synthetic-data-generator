@@ -1,4 +1,4 @@
-Data Exporter
+Base Class for DataExporter
 =======================
 
 .. autoclass:: sdgx.data_exporters.base.DataExporter
