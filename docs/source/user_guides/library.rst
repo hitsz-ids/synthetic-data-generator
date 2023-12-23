@@ -62,7 +62,7 @@ So you can modify the metadata of your dataset before fit model.
 .. TODO: Metadata has not been implemented yet.
 .. code-block:: python
 
-    from sdgx.data_models.metadata.base import Metadata
+    from sdgx.data_models.metadata import Metadata
     metadata = Metadata.from_dataframe(df)
 
 
