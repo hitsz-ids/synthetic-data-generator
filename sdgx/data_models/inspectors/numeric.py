@@ -23,7 +23,7 @@ class NumericInspector(Inspector):
         """
 
         self.numeric_columns = self.numeric_columns.union(
-            set(raw_data.select_dtypes(include=['float64', "int64"]).columns)
+            set(raw_data.select_dtypes(include=["float64", "int64"]).columns)
         )
         self.ready = True
 
