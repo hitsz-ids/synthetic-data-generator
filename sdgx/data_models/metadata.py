@@ -34,13 +34,13 @@ class Metadata(BaseModel):
 
     # for primary key
     # compatible with single primary key or composite primary key
-    primary_key: str
+    primary_key: str = "primary_key undefined"
     _composite_primary_key: bool = False
     primary_key_list: list = []
 
     # variables related to columns
     # column_list is used to store all columns' name
-    column_list: list[str]
+    column_list: list[str] = []
     # other columns lists are used to store column information
     # here are 5 basic data types
     id_columns: List[str] = []
