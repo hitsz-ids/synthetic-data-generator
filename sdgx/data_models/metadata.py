@@ -44,7 +44,7 @@ class Metadata(BaseModel):
     # other columns lists are used to store column information
     # here are 5 basic data types
     id_columns: List[str] = []
-    continues_columns: List[str] = []
+    numeric_columns: List[str] = []
     bool_columns: List[str] = []
     discrete_columns: List[str] = []
     datetime_columns: List[str] = []
