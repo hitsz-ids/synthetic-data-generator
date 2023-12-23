@@ -5,7 +5,6 @@ from typing import Any
 import pandas as pd
 from pandas._libs.tslibs.parsing import DateParseError
 
-
 from sdgx.data_models.inspectors.base import Inspector
 from sdgx.data_models.inspectors.extension import hookimpl
 
@@ -17,11 +16,11 @@ class DatetimeInspector(Inspector):
 
     @classmethod
     def can_convert_to_datetime(cls, input_col: pd.Series):
-        '''Whether a df column can be converted to datetime.
+        """Whether a df column can be converted to datetime.
 
-        Args: 
+        Args:
             input_col(pd.Series): A column of a dataframe.
-        '''
+        """
         try:
             pd.to_datetime(input_col)
             return True
@@ -37,12 +36,12 @@ class DatetimeInspector(Inspector):
             raw_data (pd.DataFrame): Raw data
         """
         self.datetime_columns = self.datetime_columns.union(
-            set(raw_data.infer_objects().select_dtypes(include=['datetime64']).columns)
+            set(raw_data.infer_objects().select_dtypes(include=["datetime64"]).columns)
         )
-        
+
         # for some other case
         # Some columns containing dates after infer are still marked as object
-        candidate_columns = set(raw_data.select_dtypes(include=['object']).columns)
+        candidate_columns = set(raw_data.select_dtypes(include=["object"]).columns)
         for col_name in candidate_columns:
             each_col = raw_data[col_name]
             if DatetimeInspector.can_convert_to_datetime(each_col):

@@ -23,14 +23,14 @@ class IDInspector(Inspector):
         """
 
         df_length = len(raw_data)
-        candidate_columns = set(raw_data.select_dtypes(include=['object', "int64"]).columns)
+        candidate_columns = set(raw_data.select_dtypes(include=["object", "int64"]).columns)
 
         for each_col_name in candidate_columns:
             target_col = raw_data[each_col_name]
             col_set_length = len(set(target_col))
             if col_set_length == df_length:
                 self.ID_columns.add(each_col_name)
-        
+
         self.ready = True
 
     def inspect(self) -> dict[str, Any]:
