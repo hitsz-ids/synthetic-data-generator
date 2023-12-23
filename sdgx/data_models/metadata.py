@@ -13,6 +13,7 @@ from sdgx.data_models.inspectors.manager import InspectorManager
 from sdgx.exceptions import MetadataInitError
 from sdgx.utils import logger
 
+
 class Metadata(BaseModel):
     """Metadata
 
@@ -20,7 +21,7 @@ class Metadata(BaseModel):
 
     For each column, there should be an instance of the Data Type object.
 
-    Args: 
+    Args:
         primary_key(str): The primary key, a field used to uniquely identify each row in the table.
         The primary key of each row must be unique and not empty.
 
@@ -107,7 +108,7 @@ class Metadata(BaseModel):
                 inspector.fit(chunk)
             if all(i.ready for i in inspectors) or i > max_chunk:
                 break
-        
+
         # If primary_key is not specified, use the first column.
         if primary_key is None:
             primary_key = dataloader.columns()[0]
@@ -147,38 +148,36 @@ class Metadata(BaseModel):
         path = Path(path).expanduser().resolve()
         attributes = json.load(path.open("r"))
         return Metadata().update(attributes)
-    
+
     def check(self):
-        '''Checks column info.
-        
-        When passing as input to the next module, perform necessary checks, including: 
+        """Checks column info.
+
+        When passing as input to the next module, perform necessary checks, including:
             -Is the primary key correctly defined.
             -Is there any missing definition of the column.
             -Are there any  unknown columns that have been incorrectly updated.
-        '''
+        """
         # Not implemented yet
 
         pass
-    
-    def update_primary_key(self,
-                           primary_key: str | list[str],
-                           composite_primary_key:bool = False):
-        '''Update the primary key of the table
+
+    def update_primary_key(self, primary_key: str | list[str], composite_primary_key: bool = False):
+        """Update the primary key of the table
 
         When update the primary key, the original primary key will be erased.
-        
+
         Args:
             primary_key(str | list[str]): the primary key or key list.
 
             composite_primary_key(bool): whether this table use composite primary key.
-        '''
+        """
 
         if composite_primary_key is False and not isinstance(primary_key, str):
-            raise ValueError('Primary key should be a string')
-        
+            raise ValueError("Primary key should be a string")
+
         if composite_primary_key is True and len(primary_key) == 0:
-            raise ValueError('Composite primary key list shoud NOT be empty.')
-        
+            raise ValueError("Composite primary key list shoud NOT be empty.")
+
         if composite_primary_key is True:
             self._composite_primary_key = True
             self.primary_key = None
@@ -186,5 +185,5 @@ class Metadata(BaseModel):
         else:
             self._composite_primary_key = False
             self.primary_key = primary_key
-        
+
         logger.info(f"Primary Key updated: {primary_key}.")

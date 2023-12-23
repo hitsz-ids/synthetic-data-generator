@@ -1,4 +1,2 @@
-
-class MultiTableCombiner():
-
+class MultiTableCombiner:
     pass
