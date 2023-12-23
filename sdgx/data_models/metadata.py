@@ -40,7 +40,7 @@ class Metadata(BaseModel):
 
     # variables related to columns
     # column_list is used to store all columns' name
-    column_list: list[str] = []
+    column_list: List[str] = []
     # other columns lists are used to store column information
     # here are 5 basic data types
     id_columns: List[str] = []
