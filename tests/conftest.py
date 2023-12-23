@@ -1,8 +1,9 @@
 import os
-from functools import partial
 
 os.environ["SDG_NDARRAY_CACHE_ROOT"] = "/tmp/sdgx/ndarray_cache"
+
 import shutil
+from functools import partial
 
 import pytest
 
@@ -19,7 +20,7 @@ DATA_DIR = os.path.join(_HERE, "dataset")
 
 @pytest.fixture
 def demo_single_table_path():
-    yield download_demo_data(DATA_DIR)
+    yield download_demo_data(DATA_DIR).as_posix()
 
 
 @pytest.fixture

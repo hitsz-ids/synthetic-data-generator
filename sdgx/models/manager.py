@@ -36,10 +36,12 @@ class ModelManager(Manager):
         return self.init(model_name, **kwargs)
 
     def load(self, model: type[SynthesizerModel] | str, model_path) -> SynthesizerModel:
-        if not isinstance(model, type) or isinstance(model, str):
+        if not (isinstance(model, type) or isinstance(model, str)):
             raise ManagerLoadModelError(
                 "model must be type of SynthesizerModel or str for model_name"
             )
+        if isinstance(model, str):
+            model = self._normalize_name(model)
 
         if isinstance(model, str) and model not in self.registed_models:
             raise ManagerLoadModelError(f"{model} is not registered.")

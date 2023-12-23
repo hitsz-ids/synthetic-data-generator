@@ -27,6 +27,7 @@ jobs:
           python -m pip install -e .[test]
       - name: Install all packages in example/extension
         run: |
+          python -m pip install -e example/extension/dummyexporter[test]
           python -m pip install -e example/extension/dummymetadatainspector[test]
           python -m pip install -e example/extension/dummycache[test]
           python -m pip install -e example/extension/dummydataconnector[test]
