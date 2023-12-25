@@ -18,12 +18,7 @@ class Relationship(BaseModel):
     parent_table: str
     child_table: str
 
-    # foreign keys
-    child_table_foreign_key: str = "foreign key undefined"
-
-    # for composite keys
-    composite_foreign_key: bool = False
-    child_table_composite_foreign_key: List[str] = []
+    foreign_keys: List[str] = []
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

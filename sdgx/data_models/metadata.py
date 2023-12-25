@@ -153,7 +153,7 @@ class Metadata(BaseModel):
         When passing as input to the next module, perform necessary checks, including:
             -Is the primary key correctly defined.
             -Is there any missing definition of the column.
-            -Are there any  unknown columns that have been incorrectly updated.
+            -Are there any unknown columns that have been incorrectly updated.
         """
         # Not implemented yet
 
