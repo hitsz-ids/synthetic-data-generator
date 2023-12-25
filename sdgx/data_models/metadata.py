@@ -196,7 +196,7 @@ class Metadata(BaseModel):
             if each_dtype_column not in self.column_list:
                 raise MetadaError(f"Found undefined column: {each_dtype_column}.")
 
-        logger.info("Metadata check finished.")
+        logger.debug("Metadata check succeed.")
 
     def update_primary_key(self, primary_keys: List[str]):
         """Update the primary key of the table
