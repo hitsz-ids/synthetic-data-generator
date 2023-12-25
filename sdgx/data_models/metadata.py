@@ -22,12 +22,8 @@ class Metadata(BaseModel):
     For each column, there should be an instance of the Data Type object.
 
     Args:
-        primary_key(str): The primary key, a field used to uniquely identify each row in the table.
+        primary_keys(List[str]): The primary key, a field used to uniquely identify each row in the table.
         The primary key of each row must be unique and not empty.
-
-        composite_primary_key(bool): Whether to enable the composite primary key feature.
-
-        primary_key_list(bool): List of composite primary keys.
 
         column_list(list[str]): list of the comlumn name in the table, other columns lists are used to store column information.
     """
@@ -39,6 +35,7 @@ class Metadata(BaseModel):
     # variables related to columns
     # column_list is used to store all columns' name
     column_list: List[str] = []
+    
     # other columns lists are used to store column information
     # here are 5 basic data types
     id_columns: List[str] = []
@@ -47,11 +44,9 @@ class Metadata(BaseModel):
     discrete_columns: List[str] = []
     datetime_columns: List[str] = []
 
-    # _column_dict = {}
-    _extend: Dict[str, Any] = {}
-
     # version info
     metadata_version: str = "1.0"
+    _extend: Dict[str, Any] = {}
 
     def get(self, key: str, default=None) -> Any:
         return getattr(self, key, getattr(self._extend, key, default))
@@ -76,7 +71,7 @@ class Metadata(BaseModel):
         cls,
         dataloader: DataLoader,
         max_chunk: int = 10,
-        primary_key: str = None,
+        primary_keys: List[str] = None,
         include_inspectors: list[str] | None = None,
         exclude_inspectors: list[str] | None = None,
         inspector_init_kwargs: dict[str, Any] | None = None,
@@ -107,11 +102,11 @@ class Metadata(BaseModel):
             if all(i.ready for i in inspectors) or i > max_chunk:
                 break
 
-        # If primary_key is not specified, use the first column.
-        if primary_key is None:
-            primary_key = dataloader.columns()[0]
+        # If primary_key is not specified, use the first column (in list).
+        if primary_keys is None:
+            primary_keys = [dataloader.columns()[0]]
 
-        metadata = Metadata(primary_key=primary_key, column_list=dataloader.columns())
+        metadata = Metadata(primary_keys=primary_keys, column_list=dataloader.columns())
         for inspector in inspectors:
             metadata.update(inspector.inspect())
 
@@ -131,7 +126,7 @@ class Metadata(BaseModel):
         for inspector in inspectors:
             inspector.fit(df)
 
-        metadata = Metadata(primary_key=df.columns[0], column_list=list(df.columns))
+        metadata = Metadata(primary_keys=[df.columns[0]], column_list=list(df.columns))
         for inspector in inspectors:
             metadata.update(inspector.inspect())
 
@@ -159,29 +154,22 @@ class Metadata(BaseModel):
 
         pass
 
-    def update_primary_key(self, primary_key: str | list[str], composite_primary_key: bool = False):
+    def update_primary_key(self, primary_keys: List[str]):
         """Update the primary key of the table
 
         When update the primary key, the original primary key will be erased.
 
         Args:
-            primary_key(str | list[str]): the primary key or key list.
-
-            composite_primary_key(bool): whether this table use composite primary key.
+            primary_keys(List[str]): the primary keys of this table.
         """
+        
+        if not isinstance(primary_keys, List):
+            raise ValueError("Primary key should be a list.")
+        
+        for each_key in primary_keys:
+            if each_key not in self.column_list:
+                raise ValueError("Primary key not exist in table columns.")
+        
+        self.primary_keys = primary_keys
 
-        if composite_primary_key is False and not isinstance(primary_key, str):
-            raise ValueError("Primary key should be a string")
-
-        if composite_primary_key is True and len(primary_key) == 0:
-            raise ValueError("Composite primary key list shoud NOT be empty.")
-
-        if composite_primary_key is True:
-            self._composite_primary_key = True
-            self.primary_key = None
-            self.primary_key_list = primary_key
-        else:
-            self._composite_primary_key = False
-            self.primary_key = primary_key
-
-        logger.info(f"Primary Key updated: {primary_key}.")
+        logger.info(f"Primary Key updated: {primary_keys}.")
