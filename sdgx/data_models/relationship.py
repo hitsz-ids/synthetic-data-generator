@@ -1,5 +1,5 @@
+from typing import List
 from pydantic import BaseModel
-
 
 class Relationship(BaseModel):
     """Relationship between tables
@@ -16,8 +16,12 @@ class Relationship(BaseModel):
     parent_table: str
     child_table: str
 
-    # keys
-    child_table_foreign_key: str
+    # foreign keys
+    child_table_foreign_key: str = "foreign key undefined"
+    
+    # for composite keys 
+    composite_foreign_key:bool = False
+    child_table_composite_foreign_key: List[str] = []
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
