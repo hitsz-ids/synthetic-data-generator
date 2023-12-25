@@ -1,7 +1,9 @@
 import os
 
 os.environ["SDG_NDARRAY_CACHE_ROOT"] = "/tmp/sdgx/ndarray_cache"
+
 import shutil
+from functools import partial
 
 import pytest
 
@@ -18,7 +20,7 @@ DATA_DIR = os.path.join(_HERE, "dataset")
 
 @pytest.fixture
 def demo_single_table_path():
-    yield download_demo_data(DATA_DIR)
+    yield download_demo_data(DATA_DIR).as_posix()
 
 
 @pytest.fixture
@@ -26,6 +28,11 @@ def cacher_kwargs(tmp_path):
     cache_dir = tmp_path / "cache"
     yield {"cache_dir": cache_dir.as_posix()}
     shutil.rmtree(cache_dir, ignore_errors=True)
+
+
+@pytest.fixture
+def dataloader_builder(cacher_kwargs):
+    yield partial(DataLoader, cacher_kwargs=cacher_kwargs)
 
 
 @pytest.fixture

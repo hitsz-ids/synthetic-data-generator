@@ -14,6 +14,7 @@ API Reference
     Data Processor <data_processors/index>
     Models <models/index>
     Metadata and Inspectors <data_models/index>
+    Data Exporter <data_exporters/index>
     Manager <manager>
     Exceptions <exceptions>
     Utils <utils>

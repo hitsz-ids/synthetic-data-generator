@@ -57,7 +57,7 @@ class CsvConnector(DataConnector):
             self.path,
             sep=self.sep,
             header=self.header,
-            skiprows=range(1, offset),  # don't skip header
+            skiprows=range(1, offset + 1),  # don't skip header
             nrows=limit,
             **self.read_csv_kwargs,
         )
@@ -81,7 +81,7 @@ class CsvConnector(DataConnector):
             self.path,
             sep=self.sep,
             header=self.header,
-            skiprows=range(1, offset),  # don't skip header
+            skiprows=range(1, offset + 1),  # don't skip header
             chunksize=chunksize,
             **self.read_csv_kwargs,
         ):

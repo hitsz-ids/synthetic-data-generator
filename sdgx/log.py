@@ -7,10 +7,15 @@ os.environ["LOGURU_LEVEL"] = USER_DEFINED_LOG_LEVEL
 
 from loguru import logger
 
-if LOG_TO_FILE:
+
+def add_log_file_handler():
     logger.add(
         "sdgx-{time}.log",
         rotation="10 MB",
     )
 
-__all__ = ["logger"]
+
+if LOG_TO_FILE:
+    add_log_file_handler()
+
+__all__ = ["logger", "LOG_TO_FILE", "add_log_file_handler", "USER_DEFINED_LOG_LEVEL"]

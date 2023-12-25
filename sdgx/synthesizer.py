@@ -13,7 +13,7 @@ from sdgx.data_loader import DataLoader
 from sdgx.data_models.metadata import Metadata
 from sdgx.data_processors.base import DataProcessor
 from sdgx.data_processors.manager import DataProcessorManager
-from sdgx.exceptions import SynthesizerInitError
+from sdgx.exceptions import SynthesizerInitError, SynthesizerSampleError
 from sdgx.log import logger
 from sdgx.models.base import SynthesizerModel
 from sdgx.models.manager import ModelManager
@@ -35,9 +35,9 @@ class Synthesizer:
         metadata_path (str | Path, optional): The path to the metadata file. Defaults to None. Used to load the metadata if ``metadata`` is None.
         data_connector (DataConnector | type[DataConnector] | str, optional): The data connector to use. Defaults to None.
             When data_connector is a string, it must be registered in :class:`~sdgx.data_connectors.manager.DataConnectorManager`.
-        data_connectors_kwargs (dict[str, Any], optional): The keyword arguments for data connectors. Defaults to None.
+        data_connector_kwargs (dict[str, Any], optional): The keyword arguments for data connectors. Defaults to None.
         raw_data_loaders_kwargs (dict[str, Any], optional): The keyword arguments for raw data loaders. Defaults to None.
-        processored_data_loaders_kwargs (dict[str, Any], optional): The keyword arguments for processed data loaders. Defaults to None.
+        processed_data_loaders_kwargs (dict[str, Any], optional): The keyword arguments for processed data loaders. Defaults to None.
         data_processors (list[str | DataProcessor | type[DataProcessor]], optional): The data processors to use. Defaults to None.
             When data_processor is a string, it must be registered in :class:`~sdgx.data_processors.manager.DataProcessorManager`.
         data_processors_kwargs (dict[str, dict[str, Any]], optional): The keyword arguments for data processors. Defaults to None.
@@ -78,16 +78,16 @@ class Synthesizer:
         metadata: None | Metadata = None,
         metadata_path: None | str | Path = None,
         data_connector: None | str | DataConnector | type[DataConnector] = None,
-        data_connectors_kwargs: None | dict[str, Any] = None,
+        data_connector_kwargs: None | dict[str, Any] = None,
         raw_data_loaders_kwargs: None | dict[str, Any] = None,
-        processored_data_loaders_kwargs: None | dict[str, Any] = None,
+        processed_data_loaders_kwargs: None | dict[str, Any] = None,
         data_processors: None | list[str | DataProcessor | type[DataProcessor]] = None,
-        data_processors_kwargs: None | dict[str, dict[str, Any]] = None,
+        data_processors_kwargs: None | dict[str, Any] = None,
     ):
         # Init data connectors
         if isinstance(data_connector, str) or isinstance(data_connector, type):
             data_connector = DataConnectorManager().init_data_connector(
-                data_connector, **(data_connectors_kwargs or {})
+                data_connector, **(data_connector_kwargs or {})
             )
         if data_connector:
             self.dataloader = DataLoader(
@@ -116,13 +116,15 @@ class Synthesizer:
             )
 
         # Load metadata
+        # metadata also can be changed in ``fit`` or ``sample``
+        # Always use the latest metadata configured.
         if metadata:
             self.metadata = metadata
         elif metadata_path:
             self.metadata = Metadata.load(metadata_path)
         else:
             self.metadata = None
-        self._metadata_in_fit = None
+
         # Init model
         self.model_manager = ModelManager()
         if isinstance(model, SynthesizerModel) and model_path:
@@ -130,20 +132,24 @@ class Synthesizer:
             raise SynthesizerInitError(
                 "model as instance and model_path cannot be specified at the same time"
             )
-        if isinstance(model, str) or isinstance(model, type) and model_path:
+        if (isinstance(model, str) or isinstance(model, type)) and model_path:
             # Load model by cls or str
             self.model = self.model_manager.load(model, model_path)
+            if model_kwargs:
+                logger.warning("model_kwargs will be ignored when loading model from model_path")
         elif isinstance(model, str) or isinstance(model, type):
             # Init model by cls or str
             self.model = self.model_manager.init_model(model, **(model_kwargs or {}))
         elif isinstance(model, SynthesizerModel):
             # Already initialized model
             self.model = model
+            if model_kwargs:
+                logger.warning("model_kwargs will be ignored when using already initialized model")
         else:
             raise SynthesizerInitError("model or model_path must be specified")
 
         # Other arguments
-        self.processored_data_loaders_kwargs = processored_data_loaders_kwargs or {}
+        self.processed_data_loaders_kwargs = processed_data_loaders_kwargs or {}
 
     def save(self, save_dir: str | Path) -> Path:
         """
@@ -157,6 +163,7 @@ class Synthesizer:
         """
         save_dir = Path(save_dir).expanduser().resolve()
         save_dir.mkdir(parents=True, exist_ok=True)
+        logger.info(f"Saving synthesizer to {save_dir}")
 
         if self.metadata:
             self.metadata.save(save_dir / self.METADATA_SAVE_NAME)
@@ -173,14 +180,16 @@ class Synthesizer:
         model: str | type[SynthesizerModel],
         metadata: None | Metadata = None,
         data_connector: None | str | DataConnector | type[DataConnector] = None,
-        data_connectors_kwargs: None | dict[str, Any] = None,
+        data_connector_kwargs: None | dict[str, Any] = None,
         raw_data_loaders_kwargs: None | dict[str, Any] = None,
-        processored_data_loaders_kwargs: None | dict[str, Any] = None,
+        processed_data_loaders_kwargs: None | dict[str, Any] = None,
         data_processors: None | list[str | DataProcessor | type[DataProcessor]] = None,
         data_processors_kwargs: None | dict[str, dict[str, Any]] = None,
     ) -> "Synthesizer":
         """
         Load metadata and model, allow rebuilding Synthesizer for finetuning or other use cases.
+
+        We need ``model`` as not every model support *pickle* way to save and load.
 
         Args:
             load_dir (str | Path): The directory to load the model.
@@ -189,9 +198,9 @@ class Synthesizer:
             metadata (Metadata, optional): The metadata to use. Defaults to None.
             data_connector (DataConnector | type[DataConnector] | str, optional): The data connector to use. Defaults to None.
                 When data_connector is a string, it must be registered in :class:`~sdgx.data_connectors.manager.DataConnectorManager`.
-            data_connectors_kwargs (dict[str, Any], optional): The keyword arguments for data connectors. Defaults to None.
+            data_connector_kwargs (dict[str, Any], optional): The keyword arguments for data connectors. Defaults to None.
             raw_data_loaders_kwargs (dict[str, Any], optional): The keyword arguments for raw data loaders. Defaults to None.
-            processored_data_loaders_kwargs (dict[str, Any], optional): The keyword arguments for processed data loaders. Defaults to None.
+            processed_data_loaders_kwargs (dict[str, Any], optional): The keyword arguments for processed data loaders. Defaults to None.
             data_processors (list[str | DataProcessor | type[DataProcessor]], optional): The data processors to use. Defaults to None.
                 When data_processor is a string, it must be registered in :class:`~sdgx.data_processors.manager.DataProcessorManager`.
             data_processors_kwargs (dict[str, dict[str, Any]], optional): The keyword arguments for data processors. Defaults to None.
@@ -201,6 +210,7 @@ class Synthesizer:
         """
 
         load_dir = Path(load_dir).expanduser().resolve()
+        logger.info(f"Loading synthesizer from {load_dir}")
 
         if not load_dir.exists():
             raise SynthesizerInitError(f"{load_dir.as_posix()} does not exist")
@@ -216,13 +226,13 @@ class Synthesizer:
 
         return Synthesizer(
             model=model,
-            model_path=load_dir / cls.MODEL_SAVE_DIR,
+            model_path=model_path,
             metadata=metadata,
             metadata_path=metadata_path,
             data_connector=data_connector,
-            data_connectors_kwargs=data_connectors_kwargs,
+            data_connector_kwargs=data_connector_kwargs,
             raw_data_loaders_kwargs=raw_data_loaders_kwargs,
-            processored_data_loaders_kwargs=processored_data_loaders_kwargs,
+            processed_data_loaders_kwargs=processed_data_loaders_kwargs,
             data_processors=data_processors,
             data_processors_kwargs=data_processors_kwargs,
         )
@@ -273,7 +283,7 @@ class Synthesizer:
                 inspector_init_kwargs=inspector_init_kwargs,
             )
         )
-        self._metadata_in_fit = metadata
+        self.metadata = metadata  # Ensure update metadata
 
         logger.info("Fitting data processors...")
         for d in self.data_processors:
@@ -289,7 +299,7 @@ class Synthesizer:
         start_time = time.time()
         processed_dataloader = DataLoader(
             GeneratorConnector(chunk_generator),
-            **self.processored_data_loaders_kwargs,
+            **self.processed_data_loaders_kwargs,
         )
         logger.info(f"Initialized processed data loader in {time.time() - start_time}s")
         try:
@@ -303,7 +313,7 @@ class Synthesizer:
         count: int,
         chunksize: None | int = None,
         metadata: None | Metadata = None,
-        model_fit_kwargs: None | dict[str, Any] = None,
+        model_sample_args: None | dict[str, Any] = None,
     ) -> pd.DataFrame | Generator[pd.DataFrame, None, None]:
         """
         Sample data from the synthesizer.
@@ -313,32 +323,36 @@ class Synthesizer:
             chunksize (int, optional): The chunksize to use. Defaults to None. If is not None, the data will be sampled in chunks.
                 And will return a generator that yields chunks of samples.
             metadata (Metadata, optional): The metadata to use. Defaults to None. If None, will use the metadata in fit first.
-            model_fit_kwargs (dict[str, Any], optional): The keyword arguments for model.fit. Defaults to None.
+            model_sample_args (dict[str, Any], optional): The keyword arguments for model.sample. Defaults to None.
 
         Returns:
             pd.DataFrame | typing.Generator[pd.DataFrame, None, None]: The sampled data. When chunksize is not None, it will be a generator.
         """
         logger.info("Sampling...")
-        metadata = metadata or self._metadata_in_fit or self.metadata
+        metadata = metadata or self.metadata
+        self.metadata = metadata  # Ensure update metadata
         if metadata:
             for d in self.data_processors:
                 d.fit(metadata)
-        if not model_fit_kwargs:
-            model_fit_kwargs = {}
+        if not model_sample_args:
+            model_sample_args = {}
 
         if chunksize is None:
-            return self._sample_once(count, model_fit_kwargs)
+            return self._sample_once(count, model_sample_args)
+
+        if chunksize > count:
+            raise SynthesizerSampleError("chunksize must be less than or equal to count")
 
         def generator_sample_caller():
             sample_times = count // chunksize
             for _ in range(sample_times):
-                sample_data = self._sample_once(chunksize, model_fit_kwargs)
+                sample_data = self._sample_once(chunksize, model_sample_args)
                 for d in self.data_processors:
                     sample_data = d.reverse_convert(sample_data)
                 yield sample_data
 
             if count % chunksize > 0:
-                sample_data = self._sample_once(count % chunksize, model_fit_kwargs)
+                sample_data = self._sample_once(count % chunksize, model_sample_args)
                 for d in self.data_processors:
                     sample_data = d.reverse_convert(sample_data)
                 yield sample_data
@@ -346,7 +360,7 @@ class Synthesizer:
         return generator_sample_caller()
 
     def _sample_once(
-        self, count: int, model_fit_kwargs: None | dict[str, Any] = None
+        self, count: int, model_sample_args: None | dict[str, Any] = None
     ) -> pd.DataFrame:
         """
         Sample data once.
@@ -363,7 +377,7 @@ class Synthesizer:
         max_trails = 5
         sample_data_list = []
         while missing_count > 0 and max_trails > 0:
-            sample_data = self.model.sample(int(missing_count * 1.2), **model_fit_kwargs)
+            sample_data = self.model.sample(int(missing_count * 1.2), **model_sample_args)
             for d in self.data_processors:
                 sample_data = d.reverse_convert(sample_data)
             sample_data_list.append(sample_data)
@@ -382,7 +396,8 @@ class Synthesizer:
         if self.dataloader:
             self.dataloader.finalize(clear_cache=True)
         # Release resources
-        del self.model
+        if hasattr(self, "model"):
+            del self.model
 
     def __del__(self):
         self.cleanup()

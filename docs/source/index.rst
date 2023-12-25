@@ -86,7 +86,7 @@ Quick demo
    print(sampled_data)
 
 
-You can refer our user guides for more details.
+We provided user guides with lots of examples for researchers, scientists and developers. Learn more if you are interested!
 
 .. toctree::
    :maxdepth: 3
