@@ -1,10 +1,11 @@
 from typing import Any, Dict, List
 
 from pydantic import BaseModel
-from sdgx.utils import logger
-from sdgx.exceptions import MultiTableCombinerError
+
 from sdgx.data_models.metadata import Metadata
 from sdgx.data_models.relationship import Relationship
+from sdgx.exceptions import MultiTableCombinerError
+from sdgx.utils import logger
 
 
 class MultiTableCombiner(BaseModel):
@@ -41,9 +42,13 @@ class MultiTableCombiner(BaseModel):
         table_names = list(self.metadata_dict.keys())
         for each_r in self.relationships:
             if each_r.parent_table not in table_names:
-                raise MultiTableCombinerError(f"Metadata of parent table {each_r.parent_table} is missing.")
+                raise MultiTableCombinerError(
+                    f"Metadata of parent table {each_r.parent_table} is missing."
+                )
             if each_r.child_table not in table_names:
-                raise MultiTableCombinerError(f"Metadata of child table {each_r.child_table} is missing.")
+                raise MultiTableCombinerError(
+                    f"Metadata of child table {each_r.child_table} is missing."
+                )
             table_names_from_relationships.add(each_r.parent_table)
             table_names_from_relationships.add(each_r.child_table)
 
@@ -51,5 +56,5 @@ class MultiTableCombiner(BaseModel):
         for each_t in table_names:
             if each_t not in table_names_from_relationships:
                 raise MultiTableCombinerError(f"Table {each_t} has not relationship.")
-        
-        logger.info('MultiTableCombiner check finished.')
+
+        logger.info("MultiTableCombiner check finished.")

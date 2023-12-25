@@ -118,11 +118,14 @@ class DataModelError(SdgxError):
     EXIT_CODE = 108
     ERROR_CODE = 9001
 
+
 class MetadaError(DataModelError):
     ERROR_CODE = 9002
 
+
 class RelationshipError(DataModelError):
     ERROR_CODE = 9003
+
 
 class MultiTableCombinerError(DataModelError):
     ERROR_CODE = 9004
