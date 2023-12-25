@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -142,18 +141,64 @@ class Metadata(BaseModel):
         path = Path(path).expanduser().resolve()
         attributes = json.load(path.open("r"))
         return Metadata().update(attributes)
+    
+    def check_single_primary_key(self, input_key: str):
+        """Check whether a primary key in column_list and has ID data type.
+
+        Args: 
+            input_key(str): the input primary_key str
+        """
+
+        if input_key not in self.column_list:
+            raise MetadaError(f'Primary Key {input_key} not Exist in columns.')
+        if input_key not in self.id_columns:
+            raise MetadaError(f'Primary Key {input_key} should has ID DataType.')
+        
+    def get_all_data_type_columns(self):
+        """Get all column names from `self.xxx_columns`.
+
+        All Lists with the suffix _columns in model fields and extend fields need to be collected.
+        All defined column names will be counted.
+        
+        Returns: 
+            all_dtype_cols(set): set of all column names.
+        """
+        all_dtype_cols = set()
+
+        # search the model fields and extend fields
+        for each_key in list(self.model_fields.keys()) + list(self._extend.keys()):
+            if each_key.endswith('_columns'):
+                column_names = self.get(each_key)
+                all_dtype_cols = all_dtype_cols.union(set(column_names))
+        
+        return all_dtype_cols
+        
 
     def check(self):
         """Checks column info.
 
         When passing as input to the next module, perform necessary checks, including:
-            -Is the primary key correctly defined.
-            -Is there any missing definition of the column.
+            -Is the primary key correctly defined(in column list) and has ID data type.
+            -Is there any missing definition of each column in table.
             -Are there any unknown columns that have been incorrectly updated.
         """
-        # Not implemented yet
-
-        pass
+        # check primary key in column_list and has ID data type 
+        for each_key in self.primary_keys:
+            self.check_single_primary_key(each_key)
+        
+        all_dtype_columns = self.get_all_data_type_columns()
+        
+        # check missing columns  
+        for each_column in self.column_list:
+            if each_column not in all_dtype_columns:
+                raise MetadaError(f'Undefined data type for column {each_column}.')
+        
+        # check unfamiliar columns in dtypes
+        for each_dtype_column in all_dtype_columns:
+            if each_dtype_column not in self.column_list:
+                raise MetadaError(f'Found undefined column: {each_dtype_column}.')
+        
+        logger.info('Metadata check finished.')
 
     def update_primary_key(self, primary_keys: List[str]):
         """Update the primary key of the table

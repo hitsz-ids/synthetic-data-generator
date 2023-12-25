@@ -1,6 +1,7 @@
 from typing import Any, Dict, List
 
 from pydantic import BaseModel
+from sdgx.utils import logger
 from sdgx.exceptions import MultiTableCombinerError
 from sdgx.data_models.metadata import Metadata
 from sdgx.data_models.relationship import Relationship
@@ -50,5 +51,5 @@ class MultiTableCombiner(BaseModel):
         for each_t in table_names:
             if each_t not in table_names_from_relationships:
                 raise MultiTableCombinerError(f"Table {each_t} has not relationship.")
-
-        return True
+        
+        logger.info('MultiTableCombiner check finished.')
