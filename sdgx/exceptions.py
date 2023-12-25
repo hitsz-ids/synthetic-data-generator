@@ -119,7 +119,7 @@ class DataModelError(SdgxError):
     ERROR_CODE = 9001
 
 
-class MetadaError(DataModelError):
+class MetadataInvalidError(DataModelError):
     ERROR_CODE = 9002
 
 

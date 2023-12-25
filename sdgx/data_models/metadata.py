@@ -9,7 +9,7 @@ from pydantic import BaseModel
 
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.inspectors.manager import InspectorManager
-from sdgx.exceptions import MetadaError, MetadataInitError
+from sdgx.exceptions import MetadataInvalidError, MetadataInitError
 from sdgx.utils import logger
 
 
@@ -149,9 +149,9 @@ class Metadata(BaseModel):
         """
 
         if input_key not in self.column_list:
-            raise MetadaError(f"Primary Key {input_key} not Exist in columns.")
+            raise MetadataInvalidError(f"Primary Key {input_key} not Exist in columns.")
         if input_key not in self.id_columns:
-            raise MetadaError(f"Primary Key {input_key} should has ID DataType.")
+            raise MetadataInvalidError(f"Primary Key {input_key} should has ID DataType.")
 
     def get_all_data_type_columns(self):
         """Get all column names from `self.xxx_columns`.
@@ -186,15 +186,13 @@ class Metadata(BaseModel):
 
         all_dtype_columns = self.get_all_data_type_columns()
 
-        # check missing columns
-        for each_column in self.column_list:
-            if each_column not in all_dtype_columns:
-                raise MetadaError(f"Undefined data type for column {each_column}.")
+        # check missing columns            
+        if set(self.column_list) - set(all_dtype_columns):
+            raise MetadataInvalidError(f"Undefined data type for column {set(self.column_list) - set(all_dtype_columns)}.")
 
         # check unfamiliar columns in dtypes
-        for each_dtype_column in all_dtype_columns:
-            if each_dtype_column not in self.column_list:
-                raise MetadaError(f"Found undefined column: {each_dtype_column}.")
+        if set(all_dtype_columns) - set(self.column_list):
+            raise MetadataInvalidError(f"Found undefined column: {set(all_dtype_columns) - set(self.column_list)}.")
 
         logger.debug("Metadata check succeed.")
 
@@ -208,11 +206,11 @@ class Metadata(BaseModel):
         """
 
         if not isinstance(primary_keys, List):
-            raise MetadaError("Primary key should be a list.")
+            raise MetadataInvalidError("Primary key should be a list.")
 
         for each_key in primary_keys:
             if each_key not in self.column_list:
-                raise MetadaError("Primary key not exist in table columns.")
+                raise MetadataInvalidError("Primary key not exist in table columns.")
 
         self.primary_keys = primary_keys
 
