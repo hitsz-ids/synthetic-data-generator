@@ -35,7 +35,7 @@ class Metadata(BaseModel):
     # variables related to columns
     # column_list is used to store all columns' name
     column_list: List[str] = []
-    
+
     # other columns lists are used to store column information
     # here are 5 basic data types
     id_columns: List[str] = []
@@ -162,14 +162,14 @@ class Metadata(BaseModel):
         Args:
             primary_keys(List[str]): the primary keys of this table.
         """
-        
+
         if not isinstance(primary_keys, List):
             raise ValueError("Primary key should be a list.")
-        
+
         for each_key in primary_keys:
             if each_key not in self.column_list:
                 raise ValueError("Primary key not exist in table columns.")
-        
+
         self.primary_keys = primary_keys
 
         logger.info(f"Primary Key updated: {primary_keys}.")
