@@ -108,3 +108,21 @@ class CannotExportError(SdgxError):
 
     EXIT_CODE = 107
     ERROR_CODE = 8001
+
+
+class DataModelError(SdgxError):
+    """
+    Exception to indicate that exception in all data models.
+    """
+
+    EXIT_CODE = 108
+    ERROR_CODE = 9001
+
+class MetadaError(DataModelError):
+    ERROR_CODE = 9002
+
+class RelationshipError(DataModelError):
+    ERROR_CODE = 9003
+
+class MultiTableCombinerError(DataModelError):
+    ERROR_CODE = 9004

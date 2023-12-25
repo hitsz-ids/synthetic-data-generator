@@ -8,6 +8,7 @@ from typing import Any, Dict, List
 import pandas as pd
 from pydantic import BaseModel
 
+from sdgx.exceptions import MetadaError
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.inspectors.manager import InspectorManager
 from sdgx.exceptions import MetadataInitError
@@ -164,11 +165,11 @@ class Metadata(BaseModel):
         """
 
         if not isinstance(primary_keys, List):
-            raise ValueError("Primary key should be a list.")
+            raise MetadaError("Primary key should be a list.")
 
         for each_key in primary_keys:
             if each_key not in self.column_list:
-                raise ValueError("Primary key not exist in table columns.")
+                raise MetadaError("Primary key not exist in table columns.")
 
         self.primary_keys = primary_keys
 

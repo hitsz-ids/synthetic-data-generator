@@ -2,6 +2,8 @@ from typing import List
 
 from pydantic import BaseModel
 
+from sdgx.exceptions import RelationshipError
+
 
 class Relationship(BaseModel):
     """Relationship between tables
@@ -24,4 +26,4 @@ class Relationship(BaseModel):
         super().__init__(**kwargs)
 
         if self.parent_table == self.child_table:
-            raise ValueError("child table and parent table cannot be the same")
+            raise RelationshipError("child table and parent table cannot be the same")
