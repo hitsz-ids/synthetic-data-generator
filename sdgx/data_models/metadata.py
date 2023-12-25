@@ -34,9 +34,7 @@ class Metadata(BaseModel):
 
     # for primary key
     # compatible with single primary key or composite primary key
-    primary_key: str = "primary_key undefined"
-    _composite_primary_key: bool = False
-    primary_key_list: list = []
+    primary_keys: List[str] = []
 
     # variables related to columns
     # column_list is used to store all columns' name
