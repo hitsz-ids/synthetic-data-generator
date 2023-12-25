@@ -9,7 +9,7 @@ from pydantic import BaseModel
 
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.inspectors.manager import InspectorManager
-from sdgx.exceptions import MetadataInvalidError, MetadataInitError
+from sdgx.exceptions import MetadataInitError, MetadataInvalidError
 from sdgx.utils import logger
 
 
@@ -186,13 +186,17 @@ class Metadata(BaseModel):
 
         all_dtype_columns = self.get_all_data_type_columns()
 
-        # check missing columns            
+        # check missing columns
         if set(self.column_list) - set(all_dtype_columns):
-            raise MetadataInvalidError(f"Undefined data type for column {set(self.column_list) - set(all_dtype_columns)}.")
+            raise MetadataInvalidError(
+                f"Undefined data type for column {set(self.column_list) - set(all_dtype_columns)}."
+            )
 
         # check unfamiliar columns in dtypes
         if set(all_dtype_columns) - set(self.column_list):
-            raise MetadataInvalidError(f"Found undefined column: {set(all_dtype_columns) - set(self.column_list)}.")
+            raise MetadataInvalidError(
+                f"Found undefined column: {set(all_dtype_columns) - set(self.column_list)}."
+            )
 
         logger.debug("Metadata check succeed.")
 
