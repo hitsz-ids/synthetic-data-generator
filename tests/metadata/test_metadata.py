@@ -25,12 +25,14 @@ def test_metadata(metadata: Metadata):
     assert metadata.numeric_columns == metadata.get("numeric_columns")
     assert metadata.model_dump_json()
 
+
 def test_metadata_primary_key(metadata: Metadata):
     # inspect fnlwgt to ID type (for test)
-    metadata.id_columns.append('fnlwgt')
+    metadata.id_columns.append("fnlwgt")
     # set fnlwgt as primary key
-    metadata.update_primary_key(['fnlwgt'])
-    assert metadata.primary_keys == ['fnlwgt']
+    metadata.update_primary_key(["fnlwgt"])
+    assert metadata.primary_keys == ["fnlwgt"]
+
 
 def test_metadata_check(metadata: Metadata):
     # For the example table, it does not contain a primary key
@@ -39,6 +41,7 @@ def test_metadata_check(metadata: Metadata):
     metadata.update_primary_key([])
     # do meatadata check
     metadata.check()
+
 
 if __name__ == "__main__":
     pytest.main(["-vv", "-s", __file__])

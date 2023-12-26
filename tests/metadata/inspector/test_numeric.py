@@ -19,7 +19,7 @@ def test_inspector(inspector: NumericInspector, raw_data):
     assert inspector.ready
     assert inspector.numeric_columns
     assert sorted(inspector.inspect()["numeric_columns"]) == sorted(
-        ["education-num","fnlwgt","hoursperweek","age","capitalgain","capitalloss"]
+        ["education-num", "fnlwgt", "hoursperweek", "age", "capitalgain", "capitalloss"]
     )
 
 
