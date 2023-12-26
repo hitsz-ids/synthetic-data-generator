@@ -19,8 +19,26 @@ def metadata(dataloader):
 
 def test_metadata(metadata: Metadata):
     assert metadata.discrete_columns == metadata.get("discrete_columns")
+    assert metadata.id_columns == metadata.get("id_columns")
+    assert metadata.datetime_columns == metadata.get("datetime_columns")
+    assert metadata.bool_columns == metadata.get("bool_columns")
+    assert metadata.numeric_columns == metadata.get("numeric_columns")
     assert metadata.model_dump_json()
 
+def test_metadata_primary_key(metadata: Metadata):
+    # inspect fnlwgt to ID type (for test)
+    metadata.id_columns.append('fnlwgt')
+    # set fnlwgt as primary key
+    metadata.update_primary_key(['fnlwgt'])
+    assert metadata.primary_keys == ['fnlwgt']
+
+def test_metadata_check(metadata: Metadata):
+    # For the example table, it does not contain a primary key
+    # but it can be used in  single-table data synthetic tasks.
+    # clear primary key
+    metadata.update_primary_key([])
+    # do meatadata check
+    metadata.check()
 
 if __name__ == "__main__":
     pytest.main(["-vv", "-s", __file__])

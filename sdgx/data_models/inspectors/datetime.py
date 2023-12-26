@@ -26,6 +26,9 @@ class DatetimeInspector(Inspector):
             return True
         except DateParseError:
             return False
+        # for other situations
+        except:
+            return False
 
     def fit(self, raw_data: pd.DataFrame):
         """Fit the inspector.
