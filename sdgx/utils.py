@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import socket
 import threading
 import urllib.request
+from contextlib import closing
 from pathlib import Path
 
 import pandas as pd
@@ -13,7 +15,14 @@ try:
 except ImportError:
     from functools import lru_cache as cache
 
-__all__ = ["download_demo_data", "get_demo_single_table", "cache", "Singleton"]
+__all__ = ["download_demo_data", "get_demo_single_table", "cache", "Singleton", "find_free_port"]
+
+
+def find_free_port():
+    with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
+        s.bind(("", 0))
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        return s.getsockname()[1]
 
 
 def download_demo_data(data_dir: str | Path = "./dataset") -> Path:
