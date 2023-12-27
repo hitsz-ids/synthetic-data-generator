@@ -123,7 +123,7 @@ class MetadataInvalidError(DataModelError):
     ERROR_CODE = 9002
 
 
-class RelationshipError(DataModelError):
+class RelationshipInitError(DataModelError):
     ERROR_CODE = 9003
 
 
