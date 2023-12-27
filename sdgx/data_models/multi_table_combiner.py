@@ -20,7 +20,7 @@ class MultiTableCombiner(BaseModel):
     metadata_version: str = "1.0"
 
     metadata_dict: Dict[str, Any] = {}
-    relationships: List[Any] = []
+    relationships: List[Relationship] = []
 
     def check(self):
         """Do necessary checks:
@@ -35,26 +35,24 @@ class MultiTableCombiner(BaseModel):
         if metadata_cnt != relationship_cnt + 1:
             raise MultiTableCombinerError("Number of tables should corresponds to relationships.")
 
-        # table name check
-        table_names_from_relationships = set()
+        table_names = set(self.metadata_dict.keys())
+        relationship_parents = set(r.parent_table for r in self.relationships)
+        relationship_children = set(r.child_table for r in self.relationships)
 
         # each relationship's table must have metadata
-        table_names = list(self.metadata_dict.keys())
-        for each_r in self.relationships:
-            if each_r.parent_table not in table_names:
-                raise MultiTableCombinerError(
-                    f"Metadata of parent table {each_r.parent_table} is missing."
-                )
-            if each_r.child_table not in table_names:
-                raise MultiTableCombinerError(
-                    f"Metadata of child table {each_r.child_table} is missing."
-                )
-            table_names_from_relationships.add(each_r.parent_table)
-            table_names_from_relationships.add(each_r.child_table)
+        if not table_names.issuperset(relationship_parents):
+            raise MultiTableCombinerError(
+                f"Relationships' parent table {relationship_parents - table_names} is missing."
+            )
+        if not table_names.issuperset(relationship_children):
+            raise MultiTableCombinerError(
+                f"Relationships' child table {relationship_children - table_names} is missing."
+            )
 
         # each table in metadata must in a relationship
-        for each_t in table_names:
-            if each_t not in table_names_from_relationships:
-                raise MultiTableCombinerError(f"Table {each_t} has not relationship.")
+        if not (relationship_parents + relationship_children).issuperset(table_names):
+            raise MultiTableCombinerError(
+                f"Table {table_names - (relationship_parents+relationship_children)} is missing in relationships."
+            )
 
         logger.info("MultiTableCombiner check finished.")

@@ -27,13 +27,15 @@ class Metadata(BaseModel):
         column_list(list[str]): list of the comlumn name in the table, other columns lists are used to store column information.
     """
 
-    # for primary key
-    # compatible with single primary key or composite primary key
     primary_keys: List[str] = []
+    """
+    primary_keys is used to store single primary key or composite primary key
+    """
 
-    # variables related to columns
-    # column_list is used to store all columns' name
     column_list: List[str] = []
+    """"
+    column_list is used to store all columns' name
+    """
 
     # other columns lists are used to store column information
     # here are 5 basic data types
@@ -46,6 +48,9 @@ class Metadata(BaseModel):
     # version info
     metadata_version: str = "1.0"
     _extend: Dict[str, Any] = {}
+    """
+    For extend information, use ``get`` and ``set``
+    """
 
     def get(self, key: str, default=None) -> Any:
         return getattr(self, key, getattr(self._extend, key, default))
