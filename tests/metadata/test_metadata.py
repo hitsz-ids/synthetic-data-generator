@@ -25,11 +25,12 @@ def test_metadata(metadata: Metadata):
     assert metadata.datetime_columns == metadata.get("datetime_columns")
     assert metadata.bool_columns == metadata.get("bool_columns")
     assert metadata.numeric_columns == metadata.get("numeric_columns")
+    assert metadata.set("a", 1) == metadata.get("a")
     assert metadata.model_dump_json()
 
 
-def test_metadata_save_load(metadata: Metadata):
-    test_path = Path("metadata_path_test.json")
+def test_metadata_save_load(metadata: Metadata, tmp_path: Path):
+    test_path = tmp_path / "metadata_path_test.json"
     metadata.save(test_path)
     # load from path
     new_meatadata = Metadata.load(test_path)
