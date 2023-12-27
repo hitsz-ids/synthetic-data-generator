@@ -40,7 +40,7 @@ def test_inspector_demo_data(inspector: IDInspector, raw_data):
     assert sorted(inspector.inspect()["id_columns"]) == sorted([])
 
 
-def test_inspector_generated_data(inspector: IDInspector, id_test_df):
+def test_inspector_generated_data(inspector: IDInspector, id_test_df: pd.DataFrame):
     # use generated id data
     inspector.fit(id_test_df)
     assert inspector.ID_columns
