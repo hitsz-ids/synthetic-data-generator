@@ -1,5 +1,7 @@
-import pytest
 from pathlib import Path
+
+import pytest
+
 from sdgx.data_connectors.csv_connector import CsvConnector
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.metadata import Metadata
@@ -25,12 +27,14 @@ def test_metadata(metadata: Metadata):
     assert metadata.numeric_columns == metadata.get("numeric_columns")
     assert metadata.model_dump_json()
 
+
 def test_metadata_save_load(metadata: Metadata):
-    test_path = Path('metadata_path_test.json')
+    test_path = Path("metadata_path_test.json")
     metadata.save(test_path)
     # load from path
     new_meatadata = Metadata.load(test_path)
     assert metadata.model_dump_json() == new_meatadata.model_dump_json()
+
 
 def test_metadata_primary_key(metadata: Metadata):
     # inspect fnlwgt to ID type (for test)
