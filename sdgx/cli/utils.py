@@ -43,7 +43,14 @@ def load_entry_point(distribution, group, name):
 
 
 def torch_run_warpper(func):
-    # FIXME: This is not compatible with click.testing.CliRunner
+    """
+    Experimental feature for native torchrun.
+
+    Alternatively, people can use `torchrun $(which sdgx)`
+
+    FIXME: This is not compatible with click.testing.CliRunner
+    """
+
     @click.option("--torchrun", type=bool, default=False, help="Use `torchrun` to run cli.")
     @click.option(
         "--torchrun_kwargs",
