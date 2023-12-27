@@ -56,7 +56,7 @@ def torch_run_warpper(func):
         "--torchrun_kwargs",
         type=str,
         default="{}",
-        help="Json string of torchrun kwargs.",
+        help="[Json String] torchrun kwargs.",
     )
     @wraps(func)
     def wrapper(torchrun, torchrun_kwargs, *args, **kwargs):
