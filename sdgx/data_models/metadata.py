@@ -87,8 +87,7 @@ class Metadata(BaseModel):
 
             max_chunk(int): max chunk count.
 
-            primary_key(list(str) | str): the primary key of this table.
-            Use the first column in table by default.
+            primary_keys(list[str]): primary keys, see :class:`~sdgx.data_models.metadata.Metadata` for more details.
 
             include_inspectors(list[str]): data type inspectors that should included in this metadata (table).
 

@@ -32,10 +32,10 @@ def test_list_extension_api(command, json_output):
 
     assert result.exit_code == 0
     if json_output:
-        assert NormalMessage()._dumo_json() in result.output
-        assert NormalMessage()._dumo_json() == result.output.strip().split("\n")[-1]
+        assert NormalMessage()._dump_json() in result.output
+        assert NormalMessage()._dump_json() == result.output.strip().split("\n")[-1]
     else:
-        assert NormalMessage()._dumo_json() not in result.output
+        assert NormalMessage()._dump_json() not in result.output
 
 
 @pytest.mark.parametrize("model", ["CTGAN"])
