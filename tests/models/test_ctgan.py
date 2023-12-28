@@ -17,17 +17,27 @@ def save_model_dir(tmp_path):
     shutil.rmtree(dirname, ignore_errors=True)
 
 
+def assert_sampled_data(dummy_single_table_data_loader, sampled_data, count):
+    assert len(sampled_data) == count
+    assert sampled_data.columns.tolist() == dummy_single_table_data_loader.columns()
+
+
 def test_ctgan(
     ctgan: CTGANSynthesizerModel,
-    demo_single_table_metadata,
-    demo_single_table_data_loader,
+    dummy_single_table_metadata,
+    dummy_single_table_data_loader,
     save_model_dir,
 ):
-    ctgan.fit(demo_single_table_metadata, demo_single_table_data_loader)
-    ctgan.sample(10)
+    ctgan.fit(dummy_single_table_metadata, dummy_single_table_data_loader)
+    sampled_data = ctgan.sample(10)
+    assert_sampled_data(dummy_single_table_data_loader, sampled_data, 10)
+
     ctgan.save(save_model_dir)
+    assert save_model_dir.exists()
+
     model = CTGANSynthesizerModel.load(save_model_dir)
-    model.sample(10)
+    sampled_data = model.sample(10)
+    assert_sampled_data(dummy_single_table_data_loader, sampled_data, 10)
 
 
 if __name__ == "__main__":

@@ -2,9 +2,12 @@ import os
 
 os.environ["SDG_NDARRAY_CACHE_ROOT"] = "/tmp/sdgx/ndarray_cache"
 
+import random
 import shutil
+import string
 from functools import partial
 
+import pandas as pd
 import pytest
 
 from sdgx.data_connectors.csv_connector import CsvConnector
@@ -16,6 +19,49 @@ _HERE = os.path.dirname(__file__)
 
 # Cache it locally for rerun the tests
 DATA_DIR = os.path.join(_HERE, "dataset")
+
+
+def ramdon_str():
+    return "".join(random.choice(string.ascii_letters) for _ in range(10))
+
+
+@pytest.fixture
+def dummy_single_table_path(tmp_path):
+    dummy_size = 10
+    role_set = ["admin", "user", "guest"]
+
+    df = pd.DataFrame(
+        {
+            "role": [random.choice(role_set) for _ in range(dummy_size)],
+            "name": [ramdon_str() for _ in range(dummy_size)],
+            "feature_x": [random.random() for _ in range(dummy_size)],
+            "feature_y": [random.random() for _ in range(dummy_size)],
+            "feature_z": [random.random() for _ in range(dummy_size)],
+        }
+    )
+    save_path = tmp_path / "dummy.csv"
+    df.to_csv(save_path, index=False, header=True)
+    yield save_path
+    save_path.unlink()
+
+
+@pytest.fixture
+def dummy_single_table_data_connector(dummy_single_table_path):
+    yield CsvConnector(
+        path=dummy_single_table_path,
+    )
+
+
+@pytest.fixture
+def dummy_single_table_data_loader(dummy_single_table_data_connector, cacher_kwargs):
+    d = DataLoader(dummy_single_table_data_connector, cacher_kwargs=cacher_kwargs)
+    yield d
+    d.finalize()
+
+
+@pytest.fixture
+def dummy_single_table_metadata(dummy_single_table_data_loader):
+    yield Metadata.from_dataloader(dummy_single_table_data_loader)
 
 
 @pytest.fixture
