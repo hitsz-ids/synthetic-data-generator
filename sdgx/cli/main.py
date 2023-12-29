@@ -7,7 +7,7 @@ from pathlib import Path
 import click
 
 from sdgx.cachers.manager import CacherManager
-from sdgx.cli.utils import cli_wrapper
+from sdgx.cli.utils import cli_wrapper, torch_run_warpper
 from sdgx.data_connectors.manager import DataConnectorManager
 from sdgx.data_exporters.manager import DataExporterManager
 from sdgx.data_processors.manager import DataProcessorManager
@@ -17,6 +17,7 @@ from sdgx.synthesizer import Synthesizer
 
 
 @click.command()
+@torch_run_warpper
 @click.option(
     "--save_dir",
     type=str,
@@ -226,6 +227,7 @@ def fit(
 
 
 @click.command()
+@torch_run_warpper
 @click.option(
     "--load_dir",
     type=str,

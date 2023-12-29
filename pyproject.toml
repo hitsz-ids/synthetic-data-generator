@@ -25,6 +25,7 @@ dependencies = [
     "pyarrow",
     "pydantic>=2",
     "cloudpickle",
+    "importlib_metadata",
 ]
 dynamic = ["version"]
 classifiers = [

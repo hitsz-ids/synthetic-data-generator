@@ -40,7 +40,10 @@ def test_list_extension_api(command, json_output):
 
 @pytest.mark.parametrize("model", ["CTGAN"])
 @pytest.mark.parametrize("json_output", [True, False])
-def test_fit_save_load_sample(model, demo_single_table_path, cacher_kwargs, json_output, tmp_path):
+@pytest.mark.parametrize("torchrun", [False])
+def test_fit_save_load_sample(
+    model, demo_single_table_path, cacher_kwargs, json_output, torchrun, tmp_path
+):
     runner = CliRunner()
     save_dir = tmp_path / f"unittest-{model}"
     result = runner.invoke(
@@ -62,6 +65,8 @@ def test_fit_save_load_sample(model, demo_single_table_path, cacher_kwargs, json
             json.dumps({"cacher_kwargs": cacher_kwargs}),
             "--json_output",
             json_output,
+            "--torchrun",
+            torchrun,
         ],
     )
 
@@ -84,6 +89,8 @@ def test_fit_save_load_sample(model, demo_single_table_path, cacher_kwargs, json
             json_output,
             "--export_dst",
             export_dst.as_posix(),
+            "--torchrun",
+            torchrun,
         ],
     )
 
