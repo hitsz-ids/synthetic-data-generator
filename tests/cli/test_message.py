@@ -8,7 +8,7 @@ from sdgx.exceptions import SdgxError
 
 @pytest.mark.parametrize("return_val", [0, "123", [1, 2, 3], {"a": 1, "b": 2}])
 def test_normal_message(return_val):
-    NormalMessage.from_return_val(return_val)._dumo_json == json.dumps(
+    NormalMessage.from_return_val(return_val)._dump_json == json.dumps(
         {
             "code": 0,
             "msg": "Success",
@@ -31,7 +31,7 @@ def test_exception_message(exception_caller):
         exception_caller()
     except Exception as e:
         msg = ExceptionMessage.from_exception(e)
-        assert msg._dumo_json()
+        assert msg._dump_json()
         assert msg.code != 0
         assert msg.payload
         assert "details" in msg.payload

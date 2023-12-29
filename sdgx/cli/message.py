@@ -8,11 +8,11 @@ class ExitMessage(BaseModel):
     msg: str
     payload: dict = {}
 
-    def _dumo_json(self) -> str:
+    def _dump_json(self) -> str:
         return self.model_dump_json()
 
     def send(self):
-        print(self._dumo_json(), flush=True, end="")
+        print(self._dump_json(), flush=True, end="")
 
 
 class NormalMessage(ExitMessage):
