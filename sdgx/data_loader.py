@@ -89,6 +89,16 @@ class DataLoader:
 
     DEFAULT_CACHER = DiskCache
 
+    @property
+    def identity(self):
+        """
+        Identity of the data loader.
+
+        Respect to the identity of the data connector, fallback to id(self).
+        """
+
+        return self.data_connector.identity or id(self)
+
     def __init__(
         self,
         data_connector: DataConnector,

@@ -14,9 +14,8 @@ from sdgx.utils import logger
 
 
 class Metadata(BaseModel):
-    """Metadata
-
-    This metadata is mainly used to describe the data types of all columns in a single data table.
+    """
+    Metadata is mainly used to describe the data types of all columns in a single data table.
 
     For each column, there should be an instance of the Data Type object.
 
@@ -135,9 +134,12 @@ class Metadata(BaseModel):
 
         return metadata
 
+    def _dump_json(self):
+        return self.model_dump_json()
+
     def save(self, path: str | Path):
         with path.open("w") as f:
-            f.write(self.model_dump_json())
+            f.write(self._dump_json())
 
     @classmethod
     def load(cls, path: str | Path) -> "Metadata":
