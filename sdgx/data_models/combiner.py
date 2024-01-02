@@ -119,15 +119,22 @@ class MetadataCombiner(BaseModel):
         metadata_subdir: str = "metadata",
         relationship_subdir: str = "relationship",
     ):
+        """ """
         save_dir = Path(save_dir).expanduser().resolve()
-        for name, metadata in self.named_metadata.items():
-            metadata.save(save_dir / metadata_subdir / f"{name}.json")
+        version_file = save_dir / "version"
+        version_file.write_text(self.metadata_version)
 
+        metadata_subdir = save_dir / metadata_subdir
+        relationship_subdir = save_dir / relationship_subdir
+
+        metadata_subdir.mkdir(parents=True, exist_ok=True)
+        for name, metadata in self.named_metadata.items():
+            metadata.save(metadata_subdir / f"{name}.json")
+
+        relationship_subdir.mkdir(parents=True, exist_ok=True)
         for relationship in self.relationships:
             relationship.save(
-                save_dir
-                / relationship_subdir
-                / f"{relationship.parent_table}_{relationship.child_table}.json"
+                relationship_subdir / f"{relationship.parent_table}_{relationship.child_table}.json"
             )
 
     @classmethod
@@ -136,11 +143,24 @@ class MetadataCombiner(BaseModel):
         save_dir: str | Path,
         metadata_subdir: str = "metadata",
         relationship_subdir: str = "relationship",
+        version: None | str = None,
     ) -> "MetadataCombiner":
         save_dir = Path(save_dir).expanduser().resolve()
+        if not version:
+            logger.debug("No version specified, try to load from version file.")
+            version_file = save_dir / "version"
+            if version_file.exists():
+                version = version_file.read_text().strip()
+            else:
+                logger.info("No version file found, assume version is 1.0")
+                version = "1.0"
 
         named_metadata = {p.stem: Metadata.load(p) for p in (save_dir / metadata_subdir).glob("*")}
 
         relationships = [Relationship.load(p) for p in (save_dir / relationship_subdir).glob("*")]
 
-        return cls(named_metadata=named_metadata, relationships=relationships)
+        return cls(
+            metadata_version=version,
+            named_metadata=named_metadata,
+            relationships=relationships,
+        )
