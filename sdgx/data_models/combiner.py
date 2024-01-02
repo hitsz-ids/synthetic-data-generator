@@ -1,4 +1,3 @@
-from collections import namedtuple
 from pathlib import Path
 from typing import Dict, List
 
@@ -10,7 +9,7 @@ from sdgx.data_models.inspectors.base import Inspector
 from sdgx.data_models.inspectors.manager import InspectorManager
 from sdgx.data_models.metadata import Metadata
 from sdgx.data_models.relationship import Relationship
-from sdgx.exceptions import MultiTableCombinerError
+from sdgx.exceptions import MetadataCombinerInitError, MetadataCombinerInvalidError
 from sdgx.utils import logger
 
 
@@ -42,7 +41,9 @@ class MetadataCombiner(BaseModel):
         relationship_cnt = len(self.relationships)
         metadata_cnt = len(self.named_metadata.keys())
         if metadata_cnt != relationship_cnt + 1:
-            raise MultiTableCombinerError("Number of tables should corresponds to relationships.")
+            raise MetadataCombinerInvalidError(
+                "Number of tables should corresponds to relationships."
+            )
 
         table_names = set(self.named_metadata.keys())
         relationship_parents = set(r.parent_table for r in self.relationships)
@@ -50,17 +51,17 @@ class MetadataCombiner(BaseModel):
 
         # each relationship's table must have metadata
         if not table_names.issuperset(relationship_parents):
-            raise MultiTableCombinerError(
+            raise MetadataCombinerInvalidError(
                 f"Relationships' parent table {relationship_parents - table_names} is missing."
             )
         if not table_names.issuperset(relationship_children):
-            raise MultiTableCombinerError(
+            raise MetadataCombinerInvalidError(
                 f"Relationships' child table {relationship_children - table_names} is missing."
             )
 
         # each table in metadata must in a relationship
         if not (relationship_parents + relationship_children).issuperset(table_names):
-            raise MultiTableCombinerError(
+            raise MetadataCombinerInvalidError(
                 f"Table {table_names - (relationship_parents+relationship_children)} is missing in relationships."
             )
 
@@ -80,6 +81,7 @@ class MetadataCombiner(BaseModel):
             dataloaders = [dataloaders]
 
         metadata_from_dataloader_kwargs = metadata_from_dataloader_kwargs or {}
+        metadata_from_dataloader_kwargs.setdefault("max_chunk", max_chunk)
         named_metadata = {
             d.identity: Metadata.from_dataloader(d, **metadata_from_dataloader_kwargs)
             for d in dataloaders
@@ -105,10 +107,39 @@ class MetadataCombiner(BaseModel):
     def from_dataframe(
         cls,
         dataframes: list[pd.DataFrame],
+        names: list[str],
+        metadata_from_dataloader_kwargs: None | dict = None,
+        relationshipe_inspector: None | str | type[Inspector] = "DefaultRelationshipInspector",
+        relationships_inspector_kwargs: None | dict = None,
+        relationships: None | list[Relationship] = None,
     ) -> "MetadataCombiner":
         if not isinstance(dataframes, list):
             dataframes = [dataframes]
-        ...
+        if not isinstance(names, list):
+            names = [names]
+
+        metadata_from_dataloader_kwargs = metadata_from_dataloader_kwargs or {}
+
+        if len(dataframes) != len(names):
+            raise MetadataCombinerInitError("dataframes and names should have same length.")
+
+        named_metadata = {
+            n: Metadata.from_dataframe(d, **metadata_from_dataloader_kwargs)
+            for n, d in zip(names, dataframes)
+        }
+
+        if relationships is None and relationshipe_inspector is not None:
+            if relationships_inspector_kwargs is None:
+                relationships_inspector_kwargs = {}
+
+            inspector = InspectorManager().init(
+                relationshipe_inspector, **relationships_inspector_kwargs
+            )
+            for d in dataframes:
+                inspector.fit(d)
+            relationships = inspector.inspect()["relationships"]
+
+        return cls(named_metadata=named_metadata, relationships=relationships)
 
     def _dump_json(self):
         return self.model_dump_json()
@@ -119,7 +150,6 @@ class MetadataCombiner(BaseModel):
         metadata_subdir: str = "metadata",
         relationship_subdir: str = "relationship",
     ):
-        """ """
         save_dir = Path(save_dir).expanduser().resolve()
         version_file = save_dir / "version"
         version_file.write_text(self.metadata_version)
