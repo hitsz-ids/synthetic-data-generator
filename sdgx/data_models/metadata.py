@@ -45,7 +45,7 @@ class Metadata(BaseModel):
     datetime_columns: List[str] = []
 
     # version info
-    metadata_version: str = "1.0"
+    version: str = "1.0"
     _extend: Dict[str, Any] = {}
     """
     For extend information, use ``get`` and ``set``
@@ -145,7 +145,15 @@ class Metadata(BaseModel):
     def load(cls, path: str | Path) -> "Metadata":
         path = Path(path).expanduser().resolve()
         attributes = json.load(path.open("r"))
+        version = attributes.get("version", None)
+        if version:
+            cls.upgrade(version, attributes)
+
         return Metadata().update(attributes)
+
+    @classmethod
+    def upgrade(cls, old_version: str, fields: dict[str, Any]) -> None:
+        pass
 
     def check_single_primary_key(self, input_key: str):
         """Check whether a primary key in column_list and has ID data type.

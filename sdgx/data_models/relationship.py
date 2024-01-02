@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import List
+from typing import Any, List
 
 from pydantic import BaseModel
 
@@ -18,7 +18,7 @@ class Relationship(BaseModel):
     Child table's foreign key should be defined here.
     """
 
-    metadata_version: str = "1.0"
+    version: str = "1.0"
 
     # table names
     parent_table: str
@@ -27,7 +27,7 @@ class Relationship(BaseModel):
     foreign_keys: List[str] = []
 
     @classmethod
-    def build(cls, parent_table: str, child_table: str, foreign_keys: List[str]) -> "Relationship":
+    def build(cls, parent_table: str, child_table: str, foreign_keys: list[str]) -> "Relationship":
         if not parent_table:
             raise RelationshipInitError("parent table cannot be empty")
         if not child_table:
@@ -36,6 +36,8 @@ class Relationship(BaseModel):
             raise RelationshipInitError("foreign keys cannot be empty")
         if parent_table == child_table:
             raise RelationshipInitError("child table and parent table cannot be the same")
+
+        foreign_keys = list(set(foreign_keys))
 
         return cls(
             parent_table=parent_table,
@@ -54,4 +56,12 @@ class Relationship(BaseModel):
     def load(cls, path: str | Path) -> "Relationship":
         path = Path(path).expanduser().resolve()
         fields = json.load(path.open("r"))
+        version = fields.pop("version", None)
+        if version:
+            cls.upgrade(version, fields)
+
         return Relationship.build(**fields)
+
+    @classmethod
+    def upgrade(cls, old_version: str, fields: dict[str, Any]) -> None:
+        pass

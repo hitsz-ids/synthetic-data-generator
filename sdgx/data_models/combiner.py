@@ -23,7 +23,7 @@ class MetadataCombiner(BaseModel):
         relationships (List[Any])
     """
 
-    metadata_version: str = "1.0"
+    version: str = "1.0"
 
     named_metadata: Dict[str, Metadata] = {}
 
@@ -152,7 +152,7 @@ class MetadataCombiner(BaseModel):
     ):
         save_dir = Path(save_dir).expanduser().resolve()
         version_file = save_dir / "version"
-        version_file.write_text(self.metadata_version)
+        version_file.write_text(self.version)
 
         metadata_subdir = save_dir / metadata_subdir
         relationship_subdir = save_dir / relationship_subdir
@@ -189,8 +189,19 @@ class MetadataCombiner(BaseModel):
 
         relationships = [Relationship.load(p) for p in (save_dir / relationship_subdir).glob("*")]
 
+        cls.upgrade(version, named_metadata, relationships)
+
         return cls(
-            metadata_version=version,
+            version=version,
             named_metadata=named_metadata,
             relationships=relationships,
         )
+
+    @classmethod
+    def upgrade(
+        cls,
+        old_version: str,
+        named_metadata: dict[str, Metadata],
+        relationships: list[Relationship],
+    ) -> None:
+        pass
