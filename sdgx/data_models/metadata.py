@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from collections import defaultdict
 from collections.abc import Iterable
+from itertools import chain
 from pathlib import Path
 from typing import Any, Dict, Set
 
@@ -57,22 +58,43 @@ class Metadata(BaseModel):
     For extend information, use ``get`` and ``set``
     """
 
+    @property
+    def tag_fields(self) -> Iterable[str]:
+        return chain(
+            (k for k in self.model_fields if k.endswith("_columns")),
+            self._extend.keys(),
+        )
+
     def __eq__(self, other):
         if not isinstance(other, Metadata):
             return super().__eq__(other)
         return (
-            all(self.get(key) == other.get(key) for key in self.get_all_data_type_columns())
+            set(self.tag_fields) == set(other.tag_fields)
+            and all(
+                self.get(key) == other.get(key)
+                for key in set(chain(self.tag_fields, other.tag_fields))
+            )
             and self.version == other.version
         )
 
+    def query(self, field) -> Iterable[str]:
+        return (self.get(k) for k in self.tag_fields() if field in self.get(k))
+
     def get(self, key: str) -> Set[str]:
-        return getattr(self, key, self._extend[key])
+        if key == "_extend":
+            raise MetadataInitError("Cannot get _extend directly")
+
+        return getattr(self, key) if key in self.model_fields else self._extend[key]
 
     def set(self, key: str, value: Any):
         if key == "_extend":
             raise MetadataInitError("Cannot set _extend directly")
 
         old_value = self.get(key)
+        if key in self.model_fields and key not in self.tag_fields:
+            raise MetadataInitError(
+                f"Set {key} not in tag_fields, try set it directly as m.{key} = value"
+            )
 
         if isinstance(old_value, Iterable) and not isinstance(old_value, str):
             # list, set, tuple...
@@ -186,9 +208,8 @@ class Metadata(BaseModel):
         if version:
             cls.upgrade(version, attributes)
 
-        m = Metadata()
-        for k, v in attributes.items():
-            m.set(k, v)
+        m = Metadata(**attributes)
+
         return m
 
     @classmethod

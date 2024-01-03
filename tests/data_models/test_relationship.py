@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 
 from sdgx.data_models.relationship import Relationship
