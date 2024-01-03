@@ -76,6 +76,17 @@ class MetadataCombiner(BaseModel):
         relationships_inspector_kwargs: None | dict = None,
         relationships: None | list[Relationship] = None,
     ):
+        """
+        Combine multiple dataloaders with relationship.
+
+        Args:
+            dataloaders (list[DataLoader]): list of dataloaders
+            max_chunk (int): max chunk count for relationship inspector.
+            metadata_from_dataloader_kwargs (dict): kwargs for :func:`Metadata.from_dataloader`
+            relationshipe_inspector (str | type[Inspector]): relationship inspector
+            relationships_inspector_kwargs (dict): kwargs for :func:`InspectorManager.init`
+            relationships (list[Relationship]): list of relationships
+        """
         if not isinstance(dataloaders, list):
             dataloaders = [dataloaders]
 
@@ -112,6 +123,17 @@ class MetadataCombiner(BaseModel):
         relationships_inspector_kwargs: None | dict = None,
         relationships: None | list[Relationship] = None,
     ) -> "MetadataCombiner":
+        """
+        Combine multiple dataframes with relationship.
+
+        Args:
+            dataframes (list[pd.DataFrame]): list of dataframes
+            names (list[str]): list of names
+            metadata_from_dataloader_kwargs (dict): kwargs for :func:`Metadata.from_dataloader`
+            relationshipe_inspector (str | type[Inspector]): relationship inspector
+            relationships_inspector_kwargs (dict): kwargs for :func:`InspectorManager.init`
+            relationships (list[Relationship]): list of relationships
+        """
         if not isinstance(dataframes, list):
             dataframes = [dataframes]
         if not isinstance(names, list):
@@ -149,6 +171,16 @@ class MetadataCombiner(BaseModel):
         metadata_subdir: str = "metadata",
         relationship_subdir: str = "relationship",
     ):
+        """
+        Save metadata to json file.
+
+        This will create several subdirectories for metadata and relationship.
+
+        Args:
+            save_dir (str | Path): directory to save
+            metadata_subdir (str): subdirectory for metadata, default is "metadata"
+            relationship_subdir (str): subdirectory for relationship, default is "relationship"
+        """
         save_dir = Path(save_dir).expanduser().resolve()
         version_file = save_dir / "version"
         version_file.write_text(self.version)
@@ -174,6 +206,16 @@ class MetadataCombiner(BaseModel):
         relationship_subdir: str = "relationship",
         version: None | str = None,
     ) -> "MetadataCombiner":
+        """
+        Load metadata from json file.
+
+        Args:
+            save_dir (str | Path): directory to save
+            metadata_subdir (str): subdirectory for metadata, default is "metadata"
+            relationship_subdir (str): subdirectory for relationship, default is "relationship"
+            version (str): Manual version, if not specified, try to load from version file
+        """
+
         save_dir = Path(save_dir).expanduser().resolve()
         if not version:
             logger.debug("No version specified, try to load from version file.")
