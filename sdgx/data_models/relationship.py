@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any, List
+from typing import Any, Iterable, Set
 
 from pydantic import BaseModel
 
@@ -24,10 +24,12 @@ class Relationship(BaseModel):
     parent_table: str
     child_table: str
 
-    foreign_keys: List[str] = []
+    foreign_keys: Set[str] = set()
 
     @classmethod
-    def build(cls, parent_table: str, child_table: str, foreign_keys: list[str]) -> "Relationship":
+    def build(
+        cls, parent_table: str, child_table: str, foreign_keys: Iterable[str]
+    ) -> "Relationship":
         if not parent_table:
             raise RelationshipInitError("parent table cannot be empty")
         if not child_table:
@@ -37,7 +39,7 @@ class Relationship(BaseModel):
         if parent_table == child_table:
             raise RelationshipInitError("child table and parent table cannot be the same")
 
-        foreign_keys = list(set(foreign_keys))
+        foreign_keys = set(foreign_keys)
 
         return cls(
             parent_table=parent_table,

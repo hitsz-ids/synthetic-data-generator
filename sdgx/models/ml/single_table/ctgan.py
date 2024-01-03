@@ -205,7 +205,7 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
         self._ndarry_loader = None
 
     def fit(self, metadata: Metadata, dataloader: DataLoader, epochs=None, *args, **kwargs):
-        discrete_columns = metadata.get("discrete_columns", [])
+        discrete_columns = list(metadata.get("discrete_columns"))
         if epochs is not None:
             self._epochs = epochs
         self._pre_fit(dataloader, discrete_columns)

@@ -34,7 +34,7 @@ def test_build(parent_table, child_table, foreign_keys, exception):
 
         assert relationship.parent_table == parent_table
         assert relationship.child_table == child_table
-        assert relationship.foreign_keys == list(set(foreign_keys))
+        assert relationship.foreign_keys == set(foreign_keys)
 
 
 def test_save_and_load(tmpdir):

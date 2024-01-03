@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import json
+from collections import defaultdict
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, Set
 
 import pandas as pd
 from pydantic import BaseModel
@@ -19,6 +21,10 @@ class Metadata(BaseModel):
 
     For each column, there should be an instance of the Data Type object.
 
+    .. Note::
+
+        Use ``get``, ``set``, ``add``, ``delete`` to update the metadata.
+
     Args:
         primary_keys(List[str]): The primary key, a field used to uniquely identify each row in the table.
         The primary key of each row must be unique and not empty.
@@ -26,46 +32,75 @@ class Metadata(BaseModel):
         column_list(list[str]): list of the comlumn name in the table, other columns lists are used to store column information.
     """
 
-    primary_keys: List[str] = []
+    primary_keys: Set[str] = set()
     """
     primary_keys is used to store single primary key or composite primary key
     """
 
-    column_list: List[str] = []
+    column_list: Set[str] = set()
     """"
     column_list is used to store all columns' name
     """
 
     # other columns lists are used to store column information
     # here are 5 basic data types
-    id_columns: List[str] = []
-    numeric_columns: List[str] = []
-    bool_columns: List[str] = []
-    discrete_columns: List[str] = []
-    datetime_columns: List[str] = []
+    id_columns: Set[str] = set()
+    numeric_columns: Set[str] = set()
+    bool_columns: Set[str] = set()
+    discrete_columns: Set[str] = set()
+    datetime_columns: Set[str] = set()
 
     # version info
     version: str = "1.0"
-    _extend: Dict[str, Any] = {}
+    _extend: Dict[str, Set[str]] = defaultdict(set)
     """
     For extend information, use ``get`` and ``set``
     """
 
-    def get(self, key: str, default=None) -> Any:
-        return getattr(self, key, getattr(self._extend, key, default))
+    def __eq__(self, other):
+        if not isinstance(other, Metadata):
+            return super().__eq__(other)
+        return (
+            all(self.get(key) == other.get(key) for key in self.get_all_data_type_columns())
+            and self.version == other.version
+        )
+
+    def get(self, key: str) -> Set[str]:
+        return getattr(self, key, self._extend[key])
 
     def set(self, key: str, value: Any):
         if key == "_extend":
             raise MetadataInitError("Cannot set _extend directly")
+
+        old_value = self.get(key)
+
+        if isinstance(old_value, Iterable) and not isinstance(old_value, str):
+            # list, set, tuple...
+            value = value if isinstance(value, Iterable) and not isinstance(value, str) else [value]
+            value = type(old_value)(value)
 
         if key in self.model_fields:
             setattr(self, key, value)
         else:
             self._extend[key] = value
 
+    def add(self, key: str, values: str | Iterable[str]):
+        values = (
+            values if isinstance(values, Iterable) and not isinstance(values, str) else [values]
+        )
+
+        for value in values:
+            self.get(key).add(value)
+
+    def delete(self, key: str, value: str):
+        try:
+            self.get(key).remove(value)
+        except KeyError:
+            pass
+
     def update(self, attributes: dict[str, Any]):
         for k, v in attributes.items():
-            self.set(k, v)
+            self.add(k, v)
 
         return self
 
@@ -74,9 +109,9 @@ class Metadata(BaseModel):
         cls,
         dataloader: DataLoader,
         max_chunk: int = 10,
-        primary_keys: List[str] = None,
-        include_inspectors: list[str] | None = None,
-        exclude_inspectors: list[str] | None = None,
+        primary_keys: set[str] = None,
+        include_inspectors: Iterable[str] | None = None,
+        exclude_inspectors: Iterable[str] | None = None,
         inspector_init_kwargs: dict[str, Any] | None = None,
     ) -> "Metadata":
         """Initialize a metadata from DataLoader and Inspectors
@@ -104,14 +139,16 @@ class Metadata(BaseModel):
             if all(i.ready for i in inspectors) or i > max_chunk:
                 break
 
-        # If primary_key is not specified, use the first column (in list).
         if primary_keys is None:
-            primary_keys = [dataloader.columns()[0]]
+            primary_keys = set()
 
-        metadata = Metadata(primary_keys=primary_keys, column_list=dataloader.columns())
+        metadata = Metadata(primary_keys=primary_keys, column_list=set(dataloader.columns()))
         for inspector in inspectors:
             metadata.update(inspector.inspect())
+        if not primary_keys:
+            metadata.update_primary_key(metadata.id_columns)
 
+        metadata.check()
         return metadata
 
     @classmethod
@@ -128,10 +165,10 @@ class Metadata(BaseModel):
         for inspector in inspectors:
             inspector.fit(df)
 
-        metadata = Metadata(primary_keys=[df.columns[0]], column_list=list(df.columns))
+        metadata = Metadata(primary_keys=[df.columns[0]], column_list=set(df.columns))
         for inspector in inspectors:
             metadata.update(inspector.inspect())
-
+        metadata.check()
         return metadata
 
     def _dump_json(self):
@@ -149,7 +186,10 @@ class Metadata(BaseModel):
         if version:
             cls.upgrade(version, attributes)
 
-        return Metadata().update(attributes)
+        m = Metadata()
+        for k, v in attributes.items():
+            m.set(k, v)
+        return m
 
     @classmethod
     def upgrade(cls, old_version: str, fields: dict[str, Any]) -> None:
@@ -214,21 +254,21 @@ class Metadata(BaseModel):
 
         logger.debug("Metadata check succeed.")
 
-    def update_primary_key(self, primary_keys: List[str]):
+    def update_primary_key(self, primary_keys: Iterable[str] | str):
         """Update the primary key of the table
 
         When update the primary key, the original primary key will be erased.
 
         Args:
-            primary_keys(List[str]): the primary keys of this table.
+            primary_keys(Iterable[str]): the primary keys of this table.
         """
 
-        if not isinstance(primary_keys, List):
-            raise MetadataInvalidError("Primary key should be a list.")
+        if not isinstance(primary_keys, Iterable) and not isinstance(primary_keys, str):
+            raise MetadataInvalidError("Primary key should be Iterable or str.")
+        primary_keys = set(primary_keys if isinstance(primary_keys, Iterable) else [primary_keys])
 
-        for each_key in primary_keys:
-            if each_key not in self.column_list:
-                raise MetadataInvalidError("Primary key not exist in table columns.")
+        if not primary_keys.issubset(self.column_list):
+            raise MetadataInvalidError("Primary key not exist in table columns.")
 
         self.primary_keys = primary_keys
 

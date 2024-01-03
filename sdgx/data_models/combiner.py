@@ -29,6 +29,10 @@ class MetadataCombiner(BaseModel):
 
     relationships: List[Relationship] = []
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.check()
+
     def check(self):
         """Do necessary checks:
 
@@ -37,13 +41,6 @@ class MetadataCombiner(BaseModel):
         """
         for m in self.named_metadata.values():
             m.check()
-
-        relationship_cnt = len(self.relationships)
-        metadata_cnt = len(self.named_metadata.keys())
-        if metadata_cnt != relationship_cnt + 1:
-            raise MetadataCombinerInvalidError(
-                "Number of tables should corresponds to relationships."
-            )
 
         table_names = set(self.named_metadata.keys())
         relationship_parents = set(r.parent_table for r in self.relationships)
@@ -60,7 +57,7 @@ class MetadataCombiner(BaseModel):
             )
 
         # each table in metadata must in a relationship
-        if not (relationship_parents + relationship_children).issuperset(table_names):
+        if not (relationship_parents | relationship_children).issuperset(table_names):
             raise MetadataCombinerInvalidError(
                 f"Table {table_names - (relationship_parents+relationship_children)} is missing in relationships."
             )
