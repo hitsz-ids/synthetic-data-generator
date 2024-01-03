@@ -24,7 +24,7 @@ class Metadata(BaseModel):
 
     .. Note::
 
-        Use ``get``, ``set``, ``add``, ``delete`` to update the metadata.
+        Use ``get``, ``set``, ``add``, ``delete`` to update tags in the metadata. And use `query` for querying a column for its tags.
 
     Args:
         primary_keys(List[str]): The primary key, a field used to uniquely identify each row in the table.
@@ -60,6 +60,10 @@ class Metadata(BaseModel):
 
     @property
     def tag_fields(self) -> Iterable[str]:
+        """
+        Return all tag fields in this metadata.
+        """
+
         return chain(
             (k for k in self.model_fields if k.endswith("_columns")),
             self._extend.keys(),
@@ -77,16 +81,58 @@ class Metadata(BaseModel):
             and self.version == other.version
         )
 
-    def query(self, field) -> Iterable[str]:
-        return (self.get(k) for k in self.tag_fields() if field in self.get(k))
+    def query(self, field: str) -> Iterable[str]:
+        """
+        Query all tags of a field.
+
+        Args:
+            field(str): The field to query.
+
+        Example:
+
+            .. code-block:: python
+
+                # Assume that user_id looks like 1,2,3,4
+                m.query("user_id") == ["id_columns", "numeric_columns"]
+        """
+        return (k for k in self.tag_fields() if field in self.get(k))
 
     def get(self, key: str) -> Set[str]:
+        """
+        Get all tags by key.
+
+        Args:
+            key(str): The key to get.
+
+        Example:
+
+            .. code-block:: python
+
+                # Get all id columns
+                m.get("id_columns") == {"user_id", "ticket_id"}
+        """
+
         if key == "_extend":
             raise MetadataInitError("Cannot get _extend directly")
 
         return getattr(self, key) if key in self.model_fields else self._extend[key]
 
     def set(self, key: str, value: Any):
+        """
+        Set tags, will convert value to set if value is not a set.
+
+        Args:
+            key(str): The key to set.
+            value(Any): The value to set.
+
+        Example:
+
+            .. code-block:: python
+
+                # Set all id columns
+                m.set("id_columns", {"user_id", "ticket_id"})
+        """
+
         if key == "_extend":
             raise MetadataInitError("Cannot set _extend directly")
 
@@ -107,6 +153,24 @@ class Metadata(BaseModel):
             self._extend[key] = value
 
     def add(self, key: str, values: str | Iterable[str]):
+        """
+        Add tags.
+
+        Args:
+            key(str): The key to add.
+            values(str | Iterable[str]): The value to add.
+
+        Example:
+
+            .. code-block:: python
+
+                # Add all id columns
+                m.add("id_columns", "user_id")
+                m.add("id_columns", "ticket_id")
+                # OR
+                m.add("id_columns", ["user_id", "ticket_id"])
+        """
+
         values = (
             values if isinstance(values, Iterable) and not isinstance(values, str) else [values]
         )
@@ -115,12 +179,30 @@ class Metadata(BaseModel):
             self.get(key).add(value)
 
     def delete(self, key: str, value: str):
+        """
+        Delete tags.
+
+        Args:
+            key(str): The key to delete.
+            value(str): The value to delete.
+
+        Example:
+
+            .. code-block:: python
+
+                # Delete misidentification id columns
+                m.delete("id_columns", "not_an_id_columns")
+
+        """
         try:
             self.get(key).remove(value)
         except KeyError:
             pass
 
     def update(self, attributes: dict[str, Any]):
+        """
+        Update tags.
+        """
         for k, v in attributes.items():
             self.add(k, v)
 
@@ -140,15 +222,10 @@ class Metadata(BaseModel):
 
         Args:
             dataloader(DataLoader): the input DataLoader.
-
             max_chunk(int): max chunk count.
-
             primary_keys(list[str]): primary keys, see :class:`~sdgx.data_models.metadata.Metadata` for more details.
-
-            include_inspectors(list[str]): data type inspectors that should included in this metadata (table).
-
-            exclude_inspectors(list[str]): data type inspectors that should NOT included in this metadata (table).
-
+            include_inspectors(list[str]): data type inspectors used in this metadata (table).
+            exclude_inspectors(list[str]): data type inspectors NOT used in this metadata (table).
             inspector_init_kwargs(dict): inspector args.
         """
         logger.info("Inspecting metadata...")
@@ -181,6 +258,15 @@ class Metadata(BaseModel):
         exclude_inspectors: list[str] | None = None,
         inspector_init_kwargs: dict[str, Any] | None = None,
     ) -> "Metadata":
+        """Initialize a metadata from DataFrame and Inspectors
+
+        Args:
+            df(pd.DataFrame): the input DataFrame.
+            include_inspectors(list[str]): data type inspectors used in this metadata (table).
+            exclude_inspectors(list[str]): data type inspectors NOT used in this metadata (table).
+            inspector_init_kwargs(dict): inspector args.
+        """
+
         inspectors = InspectorManager().init_inspcetors(
             include_inspectors, exclude_inspectors, **(inspector_init_kwargs or {})
         )
@@ -197,11 +283,19 @@ class Metadata(BaseModel):
         return self.model_dump_json()
 
     def save(self, path: str | Path):
+        """
+        Save metadata to json file.
+        """
+
         with path.open("w") as f:
             f.write(self._dump_json())
 
     @classmethod
     def load(cls, path: str | Path) -> "Metadata":
+        """
+        Load metadata from json file.
+        """
+
         path = Path(path).expanduser().resolve()
         attributes = json.load(path.open("r"))
         version = attributes.get("version", None)
