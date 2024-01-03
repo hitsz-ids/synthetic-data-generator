@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from pathlib import Path
 
 import pytest
@@ -25,8 +27,11 @@ def test_metadata(metadata: Metadata):
     assert metadata.datetime_columns == metadata.get("datetime_columns")
     assert metadata.bool_columns == metadata.get("bool_columns")
     assert metadata.numeric_columns == metadata.get("numeric_columns")
-    assert metadata.set("a", 1) == metadata.get("a")
-    assert metadata.model_dump_json()
+
+    metadata.set("a", "something")
+    assert metadata.get("a") == set(["something"])
+
+    assert metadata._dump_json()
 
 
 def test_metadata_save_load(metadata: Metadata, tmp_path: Path):
@@ -34,15 +39,15 @@ def test_metadata_save_load(metadata: Metadata, tmp_path: Path):
     metadata.save(test_path)
     # load from path
     new_meatadata = Metadata.load(test_path)
-    assert metadata.model_dump_json() == new_meatadata.model_dump_json()
+    assert metadata == new_meatadata
 
 
 def test_metadata_primary_key(metadata: Metadata):
     # inspect fnlwgt to ID type (for test)
-    metadata.id_columns.append("fnlwgt")
+    metadata.add("id_columns", "fnlwgt")
     # set fnlwgt as primary key
     metadata.update_primary_key(["fnlwgt"])
-    assert metadata.primary_keys == ["fnlwgt"]
+    assert metadata.primary_keys == set(["fnlwgt"])
 
 
 def test_metadata_check(metadata: Metadata):

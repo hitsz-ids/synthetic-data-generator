@@ -127,5 +127,13 @@ class RelationshipInitError(DataModelError):
     ERROR_CODE = 9003
 
 
-class MultiTableCombinerError(DataModelError):
+class MetadataCombinerError(DataModelError):
     ERROR_CODE = 9004
+
+
+class MetadataCombinerInvalidError(MetadataCombinerError):
+    ERROR_CODE = 9005
+
+
+class MetadataCombinerInitError(MetadataCombinerError):
+    ERROR_CODE = 9006
