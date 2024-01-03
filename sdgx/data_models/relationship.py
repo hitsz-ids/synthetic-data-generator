@@ -24,12 +24,21 @@ class Relationship(BaseModel):
     parent_table: str
     child_table: str
 
-    foreign_keys: Set[str] = set()
+    foreign_keys: Set[str]
 
     @classmethod
     def build(
         cls, parent_table: str, child_table: str, foreign_keys: Iterable[str]
     ) -> "Relationship":
+        """
+        Build relationship from parent table, child table and foreign keys
+
+        Args:
+            parent_table (str): parent table
+            child_table (str): child table
+            foreign_keys (Iterable[str]): foreign keys
+        """
+
         if not parent_table:
             raise RelationshipInitError("parent table cannot be empty")
         if not child_table:
@@ -51,11 +60,19 @@ class Relationship(BaseModel):
         return self.model_dump_json()
 
     def save(self, path: str | Path):
+        """
+        Save relationship to json file.
+        """
+
         with path.open("w") as f:
             f.write(self._dump_json())
 
     @classmethod
     def load(cls, path: str | Path) -> "Relationship":
+        """
+        Load relationship from json file.
+        """
+
         path = Path(path).expanduser().resolve()
         fields = json.load(path.open("r"))
         version = fields.pop("version", None)

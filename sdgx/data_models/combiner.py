@@ -245,4 +245,11 @@ class MetadataCombiner(BaseModel):
         named_metadata: dict[str, Metadata],
         relationships: list[Relationship],
     ) -> None:
+        """
+        Upgrade metadata from old version to new version
+
+        :ref:`Metadata.upgrade` and :ref:`Relationship.upgrade` will try upgrade when loading.
+        So here we just do Combiner's upgrade.
+        """
+
         pass
