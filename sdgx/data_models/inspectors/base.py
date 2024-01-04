@@ -18,7 +18,7 @@ class Inspector:
     def __init__(self, *args, **kwargs):
         self.ready: bool = False
 
-    def fit(self, raw_data: pd.DataFrame):
+    def fit(self, raw_data: pd.DataFrame, *args, **kwargs):
         """Fit the inspector.
 
         Args:
@@ -26,5 +26,5 @@ class Inspector:
         """
         return
 
-    def inspect(self) -> dict[str, Any]:
+    def inspect(self, *args, **kwargs) -> dict[str, Any]:
         """Inspect raw data and generate metadata."""

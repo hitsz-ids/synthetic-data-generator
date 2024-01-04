@@ -13,7 +13,7 @@ class IDInspector(Inspector):
         super().__init__(*args, **kwargs)
         self.ID_columns: set[str] = set()
 
-    def fit(self, raw_data: pd.DataFrame):
+    def fit(self, raw_data: pd.DataFrame, *args, **kwargs):
         """Fit the inspector.
 
         Gets the list of discrete columns from the raw data.
@@ -33,7 +33,7 @@ class IDInspector(Inspector):
 
         self.ready = True
 
-    def inspect(self) -> dict[str, Any]:
+    def inspect(self, *args, **kwargs) -> dict[str, Any]:
         """Inspect raw data and generate metadata."""
 
         return {"id_columns": list(self.ID_columns)}

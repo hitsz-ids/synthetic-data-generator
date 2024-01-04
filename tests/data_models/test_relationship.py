@@ -11,6 +11,7 @@ from sdgx.exceptions import RelationshipInitError
     [
         ("parent", "child", ["parent_id"], None),
         ("parent", "child", ["parent_id", "child_id"], None),
+        ("parent", "child", [("parent_id", "p_id_in_child")], None),
         ("parent", "parent", ["parent_id"], RelationshipInitError),
         ("parent", "parent", [], RelationshipInitError),
         ("", "child", ["parent_id"], RelationshipInitError),
@@ -36,7 +37,7 @@ def test_build(parent_table, child_table, foreign_keys, exception):
 
         assert relationship.parent_table == parent_table
         assert relationship.child_table == child_table
-        assert relationship.foreign_keys == set(foreign_keys)
+        assert relationship.foreign_keys == foreign_keys
 
 
 def test_save_and_load(tmpdir):

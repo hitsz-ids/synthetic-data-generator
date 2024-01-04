@@ -20,9 +20,9 @@ class MetadataCombiner(BaseModel):
     Combine different tables with relationship, used for describing the relationship between tables.
 
     Args:
-        named_metadata (Dict[str, Any]): Name of the table: Metadata
-
-        relationships (List[Any])
+        version (str): version
+        named_metadata (Dict[str, Any]): pairs of table name and metadata
+        relationships (List[Any]): list of relationships
     """
 
     version: str = "1.0"
@@ -106,7 +106,7 @@ class MetadataCombiner(BaseModel):
             )
             for d in dataloaders:
                 for i, chunk in enumerate(d.iter()):
-                    inspector.fit(chunk)
+                    inspector.fit(chunk, name=d.identity)
                     if inspector.ready or i > max_chunk:
                         break
             relationships = inspector.inspect()["relationships"]
@@ -156,8 +156,8 @@ class MetadataCombiner(BaseModel):
             inspector = InspectorManager().init(
                 relationshipe_inspector, **relationships_inspector_kwargs
             )
-            for d in dataframes:
-                inspector.fit(d)
+            for n, d in zip(names, dataframes):
+                inspector.fit(d, name=n)
             relationships = inspector.inspect()["relationships"]
 
         return cls(named_metadata=named_metadata, relationships=relationships)
@@ -182,6 +182,8 @@ class MetadataCombiner(BaseModel):
             relationship_subdir (str): subdirectory for relationship, default is "relationship"
         """
         save_dir = Path(save_dir).expanduser().resolve()
+        save_dir.mkdir(parents=True, exist_ok=True)
+
         version_file = save_dir / "version"
         version_file.write_text(self.version)
 
