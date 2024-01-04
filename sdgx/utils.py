@@ -8,11 +8,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from sdgx.data_models.relationship import Relationship
 from sdgx.log import logger
-
-# from sdgx.data_models.metadata import Metadata
-# from sdgx.data_models.combiner import MetadataCombiner
 
 try:
     from functools import cache
@@ -168,25 +164,14 @@ def get_demo_multi_table(data_dir: str | Path = "./dataset", dataset_name="rossm
     Returns:
 
         dict[str, pd.DataFrame]: multi-table data dict, the key is table name, value is DataFrame.
-        MetadataCombiner: metadata and relationships about demo data tables.
     """
-    demo_data_info = MULTI_TABLE_DEMO_DATA[dataset_name]
     multi_table_dict = {}
     # download if not exist
     demo_data_dict = download_multi_table_demo_data(data_dir, dataset_name)
-    # read
+    # read Data from path
     for table_name in demo_data_dict.keys():
         each_path = demo_data_dict[table_name]
         pd_obj = pd.read_csv(each_path)
         multi_table_dict[table_name] = pd_obj
-    # build relationship
-    demo_relationship = Relationship.build(
-        parent_table=demo_data_info["parent_table"],
-        child_table=demo_data_dict["child_table"],
-        foreign_keys=demo_data_dict["foreign_keys"],
-    )
-    # get metadata
-    # parent_metadata = Metadata.from_dataframe(demo_data_dict[demo_data_info["parent_table"]])
-    # child_metadata  = Metadata.from_dataframe(demo_data_dict[demo_data_info["child_table" ]])
 
     return multi_table_dict
