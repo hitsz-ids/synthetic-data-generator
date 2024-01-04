@@ -84,6 +84,6 @@ class MISim(MultiTableMetric):
             q (float): the input parameter q.
         """
         n_MI = None
-        
+        # test3
 
         return n_MI
