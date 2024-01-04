@@ -24,11 +24,19 @@ class Relationship(BaseModel):
     parent_table: str
     child_table: str
 
-    foreign_keys: Set[str]
+    foreign_keys: Set[str | tuple[str, str]]
+    """
+    foreign keys.
+
+    If key is a tuple, the first element is parent column name and the second element is child column name
+    """
 
     @classmethod
     def build(
-        cls, parent_table: str, child_table: str, foreign_keys: Iterable[str]
+        cls,
+        parent_table: str,
+        child_table: str,
+        foreign_keys: Iterable[str | tuple[str, str]],
     ) -> "Relationship":
         """
         Build relationship from parent table, child table and foreign keys
@@ -36,7 +44,7 @@ class Relationship(BaseModel):
         Args:
             parent_table (str): parent table
             child_table (str): child table
-            foreign_keys (Iterable[str]): foreign keys
+            foreign_keys (Iterable[str | tuple[str, str]]): foreign keys. If key is a tuple, the first element is parent column name and the second element is child column name
         """
 
         if not parent_table:

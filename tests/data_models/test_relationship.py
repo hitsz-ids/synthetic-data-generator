@@ -11,6 +11,7 @@ from sdgx.exceptions import RelationshipInitError
     [
         ("parent", "child", ["parent_id"], None),
         ("parent", "child", ["parent_id", "child_id"], None),
+        ("parent", "child", [("parent_id", "p_id_in_child")], None),
         ("parent", "parent", ["parent_id"], RelationshipInitError),
         ("parent", "parent", [], RelationshipInitError),
         ("", "child", ["parent_id"], RelationshipInitError),
