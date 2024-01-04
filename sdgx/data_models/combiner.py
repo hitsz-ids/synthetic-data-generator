@@ -20,9 +20,9 @@ class MetadataCombiner(BaseModel):
     Combine different tables with relationship, used for describing the relationship between tables.
 
     Args:
-        named_metadata (Dict[str, Any]): Name of the table: Metadata
-
-        relationships (List[Any])
+        version (str): version
+        named_metadata (Dict[str, Any]): pairs of table name and metadata
+        relationships (List[Any]): list of relationships
     """
 
     version: str = "1.0"
