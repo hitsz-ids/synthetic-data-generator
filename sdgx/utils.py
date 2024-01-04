@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import functools
 import socket
 import threading
 import urllib.request
+import warnings
 from contextlib import closing
 from pathlib import Path
+from typing import Callable
 
 import pandas as pd
 
@@ -90,3 +93,16 @@ class Singleton(type):
                 if cls not in cls._instances:
                     cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
         return cls._instances[cls]
+
+
+def ignore_warnings(category: Warning):
+    def ignore_warnings_decorator(func: Callable):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore", category=category)
+                return func(*args, **kwargs)
+
+        return wrapper
+
+    return ignore_warnings_decorator

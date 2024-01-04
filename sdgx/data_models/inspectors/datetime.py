@@ -7,6 +7,7 @@ from pandas._libs.tslibs.parsing import DateParseError
 
 from sdgx.data_models.inspectors.base import Inspector
 from sdgx.data_models.inspectors.extension import hookimpl
+from sdgx.utils import ignore_warnings
 
 
 class DatetimeInspector(Inspector):
@@ -15,6 +16,7 @@ class DatetimeInspector(Inspector):
         self.datetime_columns: set[str] = set()
 
     @classmethod
+    @ignore_warnings(category=UserWarning)
     def can_convert_to_datetime(cls, input_col: pd.Series):
         """Whether a df column can be converted to datetime.
 
