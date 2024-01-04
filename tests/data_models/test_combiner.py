@@ -16,8 +16,9 @@ class MockInspector(RelationshipInspector):
         return self.dummy_data
 
 
-def test_from_dataloader():
-    inspector = MockInspector(dummy_data=[])
+def test_from_dataloader(demo_relational_table_path):
+    table_a_path, table_b_path, relationship = demo_relational_table_path
+    inspector = MockInspector(dummy_data=relationship)
     combiner = MetadataCombiner.from_dataloader(
         dataloaders=[],
         max_chunk=10,
@@ -28,8 +29,9 @@ def test_from_dataloader():
     )
 
 
-def test_from_dataframe():
-    inspector = MockInspector(dummy_data=[])
+def test_from_dataframe(demo_relational_table_path):
+    table_a_path, table_b_path, relationship = demo_relational_table_path
+    inspector = MockInspector(dummy_data=relationship)
     combiner = MetadataCombiner.from_dataframe(
         dataframes=[],
         names=[],
@@ -38,6 +40,10 @@ def test_from_dataframe():
         relationships_inspector_kwargs={},
         relationships=[],
     )
+
+
+def test_custom_build():
+    pass
 
 
 if __name__ == "__main__":

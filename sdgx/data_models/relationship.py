@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any, Iterable, Set
+from typing import Any, Iterable, Set, Tuple
 
 from pydantic import BaseModel
 
@@ -24,7 +24,7 @@ class Relationship(BaseModel):
     parent_table: str
     child_table: str
 
-    foreign_keys: Set[str | tuple[str, str]]
+    foreign_keys: Set[str | Tuple[str, str]]
     """
     foreign keys.
 
