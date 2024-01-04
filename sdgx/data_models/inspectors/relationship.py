@@ -13,7 +13,7 @@ class RelationshipInspector(Inspector):
     def _build_relationship(self) -> list[Relationship]:
         return []
 
-    def fit(self, raw_data: pd.DataFrame, name: str, *args, **kwargs):
+    def fit(self, raw_data: pd.DataFrame, name: str | None = None, *args, **kwargs):
         pass
 
     def inspect(self, *args, **kwargs) -> dict[str, Any]:

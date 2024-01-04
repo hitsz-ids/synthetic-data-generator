@@ -156,8 +156,8 @@ class MetadataCombiner(BaseModel):
             inspector = InspectorManager().init(
                 relationshipe_inspector, **relationships_inspector_kwargs
             )
-            for i, d in enumerate(dataframes):
-                inspector.fit(d, name=names[i])
+            for n, d in zip(names, dataframes):
+                inspector.fit(d, name=n)
             relationships = inspector.inspect()["relationships"]
 
         return cls(named_metadata=named_metadata, relationships=relationships)

@@ -30,13 +30,12 @@ def test_from_dataloader(demo_relational_table_path):
         foreign_keys=pairs,
     )
 
-    inspector = MockInspector(dummy_data=[relationship])
     combiner = MetadataCombiner.from_dataloader(
         dataloaders=[dl_a, dl_b],
         max_chunk=10,
         metadata_from_dataloader_kwargs={},
-        relationshipe_inspector=inspector,
-        relationships_inspector_kwargs={},
+        relationshipe_inspector=MockInspector,
+        relationships_inspector_kwargs=dict(dummy_data=[relationship]),
     )
 
     assert dl_a.identity in combiner.named_metadata
@@ -51,14 +50,16 @@ def test_from_dataframe(demo_relational_table_path):
         child_table="table_b",
         foreign_keys=pair,
     )
-    inspector = MockInspector(dummy_data=pair)
+
+    tb_a = pd.read_csv(table_a_path)
+    tb_b = pd.read_csv(table_b_path)
 
     combiner = MetadataCombiner.from_dataframe(
-        dataframes=[table_a_path, table_b_path],
+        dataframes=[tb_a, tb_b],
         names=["table_a", "table_b"],
         metadata_from_dataloader_kwargs={},
-        relationshipe_inspector=inspector,
-        relationships_inspector_kwargs={},
+        relationshipe_inspector=MockInspector,
+        relationships_inspector_kwargs=dict(dummy_data=[relationship]),
     )
 
     assert "table_a" in combiner.named_metadata
@@ -66,7 +67,7 @@ def test_from_dataframe(demo_relational_table_path):
     assert combiner.relationships == [relationship]
 
 
-def test_custom_build_from_dataframe(demo_relational_table_path):
+def test_custom_build_from_dataloaders(demo_relational_table_path):
     table_a_path, table_b_path, pairs = demo_relational_table_path
     dl_a = DataLoader(CsvConnector(path=table_a_path))
     dl_b = DataLoader(CsvConnector(path=table_b_path))
@@ -75,17 +76,18 @@ def test_custom_build_from_dataframe(demo_relational_table_path):
         child_table=dl_b.identity,
         foreign_keys=pairs,
     )
-    inspector = MockInspector(
-        dummy_data=Relationship.build(
-            parent_table="balaP", child_table="balaC", foreign_keys=["balabala"]
-        )
-    )
-    combiner = MetadataCombiner.from_dataframe(
-        dataloaders=[],
+    combiner = MetadataCombiner.from_dataloader(
+        dataloaders=[dl_a, dl_b],
         metadata_from_dataloader_kwargs={},
-        relationshipe_inspector=inspector,
-        relationships_inspector_kwargs={},
-        relationships=relationship,
+        relationshipe_inspector=MockInspector,
+        relationships_inspector_kwargs=dict(
+            dummy_data=Relationship.build(
+                parent_table="balaP",
+                child_table="balaC",
+                foreign_keys=["balabala"],
+            )
+        ),
+        relationships=[relationship],
     )
     assert dl_a.identity in combiner.named_metadata
     assert dl_b.identity in combiner.named_metadata
@@ -99,17 +101,21 @@ def test_custom_build_from_dataframe(demo_relational_table_path):
         child_table="table_b",
         foreign_keys=pair,
     )
-    inspector = MockInspector(
-        dummy_data=Relationship.build(
-            parent_table="balaP", child_table="balaC", foreign_keys=["balabala"]
-        )
-    )
+    tb_a = pd.read_csv(table_a_path)
+    tb_b = pd.read_csv(table_b_path)
+
     combiner = MetadataCombiner.from_dataframe(
-        dataframes=[table_a_path, table_b_path],
+        dataframes=[tb_a, tb_b],
         names=["table_a", "table_b"],
         metadata_from_dataloader_kwargs={},
-        relationshipe_inspector=inspector,
-        relationships_inspector_kwargs={},
+        relationshipe_inspector=MockInspector,
+        relationships_inspector_kwargs=dict(
+            dummy_data=Relationship.build(
+                parent_table="balaP",
+                child_table="balaC",
+                foreign_keys=["balabala"],
+            )
+        ),
         relationships=[relationship],
     )
     assert "table_a" in combiner.named_metadata

@@ -12,6 +12,7 @@ from pydantic import BaseModel
 
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.inspectors.manager import InspectorManager
+from sdgx.data_models.inspectors.relationship import RelationshipInspector
 from sdgx.exceptions import MetadataInitError, MetadataInvalidError
 from sdgx.utils import logger
 
@@ -229,7 +230,15 @@ class Metadata(BaseModel):
             inspector_init_kwargs(dict): inspector args.
         """
         logger.info("Inspecting metadata...")
-        inspectors = InspectorManager().init_inspcetors(
+        im = InspectorManager()
+        exclude_inspectors = exclude_inspectors or []
+        exclude_inspectors.extend(
+            name
+            for name, inspector_type in im.registed_inspectors.items()
+            if issubclass(inspector_type, RelationshipInspector)
+        )
+
+        inspectors = im.init_inspcetors(
             include_inspectors, exclude_inspectors, **(inspector_init_kwargs or {})
         )
         for i, chunk in enumerate(dataloader.iter()):
@@ -267,7 +276,15 @@ class Metadata(BaseModel):
             inspector_init_kwargs(dict): inspector args.
         """
 
-        inspectors = InspectorManager().init_inspcetors(
+        im = InspectorManager()
+        exclude_inspectors = exclude_inspectors or []
+        exclude_inspectors.extend(
+            name
+            for name, inspector_type in im.registed_inspectors.items()
+            if issubclass(inspector_type, RelationshipInspector)
+        )
+
+        inspectors = im.init_inspcetors(
             include_inspectors, exclude_inspectors, **(inspector_init_kwargs or {})
         )
         for inspector in inspectors:
