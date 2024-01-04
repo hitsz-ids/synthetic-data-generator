@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any, Iterable, Set, Tuple, Union
+from typing import Any, Iterable, List, Set, Tuple, Union
 
 from pydantic import BaseModel
 
@@ -24,7 +24,7 @@ class Relationship(BaseModel):
     parent_table: str
     child_table: str
 
-    foreign_keys: Set[Union[str, Tuple[str, str]]]
+    foreign_keys: List[Union[str, Tuple[str, str]]]
     """
     foreign keys.
 
@@ -52,7 +52,7 @@ class Relationship(BaseModel):
         if not child_table:
             raise RelationshipInitError("child table cannot be empty")
 
-        foreign_keys = set(foreign_keys)
+        foreign_keys = list(foreign_keys)
         if not foreign_keys:
             raise RelationshipInitError("foreign keys cannot be empty")
         if parent_table == child_table:

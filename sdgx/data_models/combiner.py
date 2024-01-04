@@ -182,6 +182,8 @@ class MetadataCombiner(BaseModel):
             relationship_subdir (str): subdirectory for relationship, default is "relationship"
         """
         save_dir = Path(save_dir).expanduser().resolve()
+        save_dir.mkdir(parents=True, exist_ok=True)
+
         version_file = save_dir / "version"
         version_file.write_text(self.version)
 

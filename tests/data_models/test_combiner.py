@@ -20,7 +20,7 @@ class MockInspector(RelationshipInspector):
         return self.dummy_data
 
 
-def test_from_dataloader(demo_relational_table_path):
+def test_from_dataloader(demo_relational_table_path, tmp_path):
     table_a_path, table_b_path, pairs = demo_relational_table_path
     dl_a = DataLoader(CsvConnector(path=table_a_path))
     dl_b = DataLoader(CsvConnector(path=table_b_path))
@@ -42,8 +42,14 @@ def test_from_dataloader(demo_relational_table_path):
     assert dl_b.identity in combiner.named_metadata
     assert combiner.relationships == [relationship]
 
+    save_dir = tmp_path / "unittest-combinner"
+    combiner.save(save_dir)
+    assert save_dir.exists()
+    loaded_combiner = MetadataCombiner.load(save_dir)
+    assert combiner == loaded_combiner
 
-def test_from_dataframe(demo_relational_table_path):
+
+def test_from_dataframe(demo_relational_table_path, tmp_path):
     table_a_path, table_b_path, pair = demo_relational_table_path
     relationship = Relationship.build(
         parent_table="table_a",
@@ -66,8 +72,14 @@ def test_from_dataframe(demo_relational_table_path):
     assert "table_b" in combiner.named_metadata
     assert combiner.relationships == [relationship]
 
+    save_dir = tmp_path / "unittest-combinner"
+    combiner.save(save_dir)
+    assert save_dir.exists()
+    loaded_combiner = MetadataCombiner.load(save_dir)
+    assert combiner == loaded_combiner
 
-def test_custom_build_from_dataloaders(demo_relational_table_path):
+
+def test_custom_build_from_dataloaders(demo_relational_table_path, tmp_path):
     table_a_path, table_b_path, pairs = demo_relational_table_path
     dl_a = DataLoader(CsvConnector(path=table_a_path))
     dl_b = DataLoader(CsvConnector(path=table_b_path))
@@ -93,8 +105,14 @@ def test_custom_build_from_dataloaders(demo_relational_table_path):
     assert dl_b.identity in combiner.named_metadata
     assert combiner.relationships == [relationship]
 
+    save_dir = tmp_path / "unittest-combinner"
+    combiner.save(save_dir)
+    assert save_dir.exists()
+    loaded_combiner = MetadataCombiner.load(save_dir)
+    assert combiner == loaded_combiner
 
-def test_custom_build_from_dataframe(demo_relational_table_path):
+
+def test_custom_build_from_dataframe(demo_relational_table_path, tmp_path):
     table_a_path, table_b_path, pair = demo_relational_table_path
     relationship = Relationship.build(
         parent_table="table_a",
@@ -121,6 +139,12 @@ def test_custom_build_from_dataframe(demo_relational_table_path):
     assert "table_a" in combiner.named_metadata
     assert "table_b" in combiner.named_metadata
     assert combiner.relationships == [relationship]
+
+    save_dir = tmp_path / "unittest-combinner"
+    combiner.save(save_dir)
+    assert save_dir.exists()
+    loaded_combiner = MetadataCombiner.load(save_dir)
+    assert combiner == loaded_combiner
 
 
 if __name__ == "__main__":
