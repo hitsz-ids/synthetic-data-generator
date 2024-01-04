@@ -106,7 +106,7 @@ class MetadataCombiner(BaseModel):
             )
             for d in dataloaders:
                 for i, chunk in enumerate(d.iter()):
-                    inspector.fit(chunk)
+                    inspector.fit(chunk, name=d.identity)
                     if inspector.ready or i > max_chunk:
                         break
             relationships = inspector.inspect()["relationships"]
@@ -156,8 +156,8 @@ class MetadataCombiner(BaseModel):
             inspector = InspectorManager().init(
                 relationshipe_inspector, **relationships_inspector_kwargs
             )
-            for d in dataframes:
-                inspector.fit(d)
+            for i, d in enumerate(dataframes):
+                inspector.fit(d, name=names[i])
             relationships = inspector.inspect()["relationships"]
 
         return cls(named_metadata=named_metadata, relationships=relationships)

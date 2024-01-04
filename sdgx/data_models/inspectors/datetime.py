@@ -30,7 +30,7 @@ class DatetimeInspector(Inspector):
         except:
             return False
 
-    def fit(self, raw_data: pd.DataFrame):
+    def fit(self, raw_data: pd.DataFrame, *args, **kwargs):
         """Fit the inspector.
 
         Gets the list of discrete columns from the raw data.
@@ -52,7 +52,7 @@ class DatetimeInspector(Inspector):
 
         self.ready = True
 
-    def inspect(self) -> dict[str, Any]:
+    def inspect(self, *args, **kwargs) -> dict[str, Any]:
         """Inspect raw data and generate metadata."""
 
         return {"datetime_columns": list(self.datetime_columns)}
