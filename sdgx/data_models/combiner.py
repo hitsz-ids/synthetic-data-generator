@@ -71,7 +71,7 @@ class MetadataCombiner(BaseModel):
         cls,
         dataloaders: list[DataLoader],
         metadata_from_dataloader_kwargs: None | dict = None,
-        relationshipe_inspector: None | str | type[Inspector] = "DefaultRelationshipInspector",
+        relationshipe_inspector: None | str | type[Inspector] = "SubsetRelationshipInspector",
         relationships_inspector_kwargs: None | dict = None,
         relationships: None | list[Relationship] = None,
     ):
@@ -119,7 +119,7 @@ class MetadataCombiner(BaseModel):
         dataframes: list[pd.DataFrame],
         names: list[str],
         metadata_from_dataloader_kwargs: None | dict = None,
-        relationshipe_inspector: None | str | type[Inspector] = "DefaultRelationshipInspector",
+        relationshipe_inspector: None | str | type[Inspector] = "SubsetRelationshipInspector",
         relationships_inspector_kwargs: None | dict = None,
         relationships: None | list[Relationship] = None,
     ) -> "MetadataCombiner":

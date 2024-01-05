@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from sdgx.data_models.metadata import Metadata
 
 
-class DefaultRelationshipInspector(RelationshipInspector):
+class SubsetRelationshipInspector(RelationshipInspector):
     """
     Inspecting relationships by comparing two columns is subset or not. So it needs to inspect all data for prev
     """
@@ -67,4 +67,4 @@ class DefaultRelationshipInspector(RelationshipInspector):
 
 @hookimpl
 def register(manager):
-    manager.register("DefaultRelationshipInspector", DefaultRelationshipInspector)
+    manager.register("SubsetRelationshipInspector", SubsetRelationshipInspector)

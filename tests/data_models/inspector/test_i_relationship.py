@@ -1,14 +1,14 @@
 import pandas as pd
 import pytest
 
-from sdgx.data_models.inspectors.i_relationship import DefaultRelationshipInspector
+from sdgx.data_models.inspectors.i_relationship import SubsetRelationshipInspector
 from sdgx.data_models.metadata import Metadata
 from sdgx.data_models.relationship import Relationship
 
 
 @pytest.fixture
 def inspector():
-    yield DefaultRelationshipInspector()
+    yield SubsetRelationshipInspector()
 
 
 @pytest.fixture
@@ -34,7 +34,7 @@ def dummy_relationship(demo_relational_table_path):
     )
 
 
-def test_inspector(dummy_data, dummy_relationship, inspector: DefaultRelationshipInspector):
+def test_inspector(dummy_data, dummy_relationship, inspector: SubsetRelationshipInspector):
     for raw_data, name, metadata in dummy_data:
         inspector.fit(raw_data, name=name, metadata=metadata)
     relationships = inspector.inspect()["relationships"]
