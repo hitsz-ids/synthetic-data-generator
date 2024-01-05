@@ -243,7 +243,7 @@ class Metadata(BaseModel):
         )
         for i, chunk in enumerate(dataloader.iter()):
             for inspector in inspectors:
-                if not inspector.reday:
+                if not inspector.ready:
                     inspector.fit(chunk)
             if all(i.ready for i in inspectors) or i > max_chunk:
                 break
