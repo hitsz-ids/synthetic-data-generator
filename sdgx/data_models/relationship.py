@@ -56,7 +56,7 @@ class Relationship(BaseModel):
             raise RelationshipInitError("child table cannot be empty")
 
         foreign_keys = [
-            KeyTuple(*key) if isinstance(key, tuple) else KeyTuple(key, key) for key in foreign_keys
+            KeyTuple(key, key) if isinstance(key, str) else KeyTuple(*key) for key in foreign_keys
         ]
 
         if not foreign_keys:
