@@ -6,7 +6,7 @@ import pytest
 from sdgx.data_connectors.csv_connector import CsvConnector
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.combiner import MetadataCombiner
-from sdgx.data_models.inspectors.relationship import RelationshipInspector
+from sdgx.data_models.inspectors.base import RelationshipInspector
 from sdgx.data_models.relationship import Relationship
 
 
