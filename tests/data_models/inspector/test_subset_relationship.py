@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from sdgx.data_models.inspectors.i_relationship import SubsetRelationshipInspector
+from sdgx.data_models.inspectors.subset_relationship import SubsetRelationshipInspector
 from sdgx.data_models.metadata import Metadata
 from sdgx.data_models.relationship import Relationship
 
