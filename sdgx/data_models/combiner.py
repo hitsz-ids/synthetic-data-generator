@@ -70,7 +70,6 @@ class MetadataCombiner(BaseModel):
     def from_dataloader(
         cls,
         dataloaders: list[DataLoader],
-        max_chunk: int = 10,
         metadata_from_dataloader_kwargs: None | dict = None,
         relationshipe_inspector: None | str | type[Inspector] = "DefaultRelationshipInspector",
         relationships_inspector_kwargs: None | dict = None,
@@ -91,7 +90,6 @@ class MetadataCombiner(BaseModel):
             dataloaders = [dataloaders]
 
         metadata_from_dataloader_kwargs = metadata_from_dataloader_kwargs or {}
-        metadata_from_dataloader_kwargs.setdefault("max_chunk", max_chunk)
         named_metadata = {
             d.identity: Metadata.from_dataloader(d, **metadata_from_dataloader_kwargs)
             for d in dataloaders
@@ -105,14 +103,12 @@ class MetadataCombiner(BaseModel):
                 relationshipe_inspector, **relationships_inspector_kwargs
             )
             for d in dataloaders:
-                for i, chunk in enumerate(d.iter()):
+                for chunk in d.iter():
                     inspector.fit(
                         chunk,
                         name=d.identity,
                         metadata=named_metadata[d.identity],
                     )
-                    if inspector.ready or i > max_chunk:
-                        break
             relationships = inspector.inspect()["relationships"]
 
         return cls(named_metadata=named_metadata, relationships=relationships)
