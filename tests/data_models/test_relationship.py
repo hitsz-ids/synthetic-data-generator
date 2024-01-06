@@ -2,21 +2,26 @@ from __future__ import annotations
 
 import pytest
 
-from sdgx.data_models.relationship import Relationship
+from sdgx.data_models.relationship import KeyTuple, Relationship
 from sdgx.exceptions import RelationshipInitError
 
 
 @pytest.mark.parametrize(
     "parent_table, child_table, foreign_keys, exception",
     [
-        ("parent", "child", ["parent_id"], None),
-        ("parent", "child", ["parent_id", "child_id"], None),
-        ("parent", "child", [("parent_id", "p_id_in_child")], None),
-        ("parent", "parent", ["parent_id"], RelationshipInitError),
+        ("parent", "child", [KeyTuple("parent_id", "parent_id")], None),
+        (
+            "parent",
+            "child",
+            [KeyTuple("parent_id", "parent_id"), KeyTuple("child_id", "child_id")],
+            None,
+        ),
+        ("parent", "child", [KeyTuple("parent_id", "p_id_in_child")], None),
+        ("parent", "parent", [KeyTuple("parent_id", "parent_id")], RelationshipInitError),
         ("parent", "parent", [], RelationshipInitError),
-        ("", "child", ["parent_id"], RelationshipInitError),
-        ("parent", "", ["parent_id"], RelationshipInitError),
-        ("", "", ["parent_id"], RelationshipInitError),
+        ("", "child", [KeyTuple("parent_id", "parent_id")], RelationshipInitError),
+        ("parent", "", [KeyTuple("parent_id", "parent_id")], RelationshipInitError),
+        ("", "", [KeyTuple("parent_id", "parent_id")], RelationshipInitError),
         ("", "", [], RelationshipInitError),
     ],
 )

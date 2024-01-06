@@ -11,8 +11,8 @@ import pandas as pd
 from pydantic import BaseModel
 
 from sdgx.data_loader import DataLoader
+from sdgx.data_models.inspectors.base import RelationshipInspector
 from sdgx.data_models.inspectors.manager import InspectorManager
-from sdgx.data_models.inspectors.relationship import RelationshipInspector
 from sdgx.exceptions import MetadataInitError, MetadataInvalidError
 from sdgx.utils import logger
 
@@ -243,7 +243,8 @@ class Metadata(BaseModel):
         )
         for i, chunk in enumerate(dataloader.iter()):
             for inspector in inspectors:
-                inspector.fit(chunk)
+                if not inspector.ready:
+                    inspector.fit(chunk)
             if all(i.ready for i in inspectors) or i > max_chunk:
                 break
 

@@ -6,7 +6,7 @@ import pytest
 from sdgx.data_connectors.csv_connector import CsvConnector
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.combiner import MetadataCombiner
-from sdgx.data_models.inspectors.relationship import RelationshipInspector
+from sdgx.data_models.inspectors.base import RelationshipInspector
 from sdgx.data_models.relationship import Relationship
 
 
@@ -32,7 +32,6 @@ def test_from_dataloader(demo_relational_table_path, tmp_path):
 
     combiner = MetadataCombiner.from_dataloader(
         dataloaders=[dl_a, dl_b],
-        max_chunk=10,
         metadata_from_dataloader_kwargs={},
         relationshipe_inspector=MockInspector,
         relationships_inspector_kwargs=dict(dummy_data=[relationship]),
