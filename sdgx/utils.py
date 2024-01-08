@@ -157,7 +157,9 @@ def download_multi_table_demo_data(
     }
 
 
-def get_demo_multi_table(data_dir: str | Path = "./dataset", dataset_name="rossman")-> dict[str, pd.DataFrame]:
+def get_demo_multi_table(
+    data_dir: str | Path = "./dataset", dataset_name="rossman"
+) -> dict[str, pd.DataFrame]:
     """
     Get multi-table demo data as DataFrame and relationship
 
