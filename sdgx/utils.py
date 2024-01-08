@@ -114,7 +114,7 @@ class Singleton(type):
                     cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
         return cls._instances[cls]
 
-      
+
 def download_multi_table_demo_data(
     data_dir: str | Path = "./dataset", dataset_name="rossman"
 ) -> dict[str, Path]:
@@ -179,6 +179,7 @@ def get_demo_multi_table(data_dir: str | Path = "./dataset", dataset_name="rossm
 
     return multi_table_dict
 
+
 def ignore_warnings(category: Warning):
     def ignore_warnings_decorator(func: Callable):
         @functools.wraps(func)
@@ -190,4 +191,3 @@ def ignore_warnings(category: Warning):
         return wrapper
 
     return ignore_warnings_decorator
-
