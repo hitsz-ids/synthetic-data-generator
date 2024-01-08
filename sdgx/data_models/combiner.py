@@ -20,9 +20,9 @@ class MetadataCombiner(BaseModel):
     Combine different tables with relationship, used for describing the relationship between tables.
 
     Args:
-        named_metadata (Dict[str, Any]): Name of the table: Metadata
-
-        relationships (List[Any])
+        version (str): version
+        named_metadata (Dict[str, Any]): pairs of table name and metadata
+        relationships (List[Any]): list of relationships
     """
 
     version: str = "1.0"
@@ -70,9 +70,8 @@ class MetadataCombiner(BaseModel):
     def from_dataloader(
         cls,
         dataloaders: list[DataLoader],
-        max_chunk: int = 10,
         metadata_from_dataloader_kwargs: None | dict = None,
-        relationshipe_inspector: None | str | type[Inspector] = "DefaultRelationshipInspector",
+        relationshipe_inspector: None | str | type[Inspector] = "SubsetRelationshipInspector",
         relationships_inspector_kwargs: None | dict = None,
         relationships: None | list[Relationship] = None,
     ):
@@ -91,7 +90,6 @@ class MetadataCombiner(BaseModel):
             dataloaders = [dataloaders]
 
         metadata_from_dataloader_kwargs = metadata_from_dataloader_kwargs or {}
-        metadata_from_dataloader_kwargs.setdefault("max_chunk", max_chunk)
         named_metadata = {
             d.identity: Metadata.from_dataloader(d, **metadata_from_dataloader_kwargs)
             for d in dataloaders
@@ -105,10 +103,12 @@ class MetadataCombiner(BaseModel):
                 relationshipe_inspector, **relationships_inspector_kwargs
             )
             for d in dataloaders:
-                for i, chunk in enumerate(d.iter()):
-                    inspector.fit(chunk)
-                    if inspector.ready or i > max_chunk:
-                        break
+                for chunk in d.iter():
+                    inspector.fit(
+                        chunk,
+                        name=d.identity,
+                        metadata=named_metadata[d.identity],
+                    )
             relationships = inspector.inspect()["relationships"]
 
         return cls(named_metadata=named_metadata, relationships=relationships)
@@ -119,7 +119,7 @@ class MetadataCombiner(BaseModel):
         dataframes: list[pd.DataFrame],
         names: list[str],
         metadata_from_dataloader_kwargs: None | dict = None,
-        relationshipe_inspector: None | str | type[Inspector] = "DefaultRelationshipInspector",
+        relationshipe_inspector: None | str | type[Inspector] = "SubsetRelationshipInspector",
         relationships_inspector_kwargs: None | dict = None,
         relationships: None | list[Relationship] = None,
     ) -> "MetadataCombiner":
@@ -156,8 +156,12 @@ class MetadataCombiner(BaseModel):
             inspector = InspectorManager().init(
                 relationshipe_inspector, **relationships_inspector_kwargs
             )
-            for d in dataframes:
-                inspector.fit(d)
+            for n, d in zip(names, dataframes):
+                inspector.fit(
+                    d,
+                    name=n,
+                    metadata=named_metadata[n],
+                )
             relationships = inspector.inspect()["relationships"]
 
         return cls(named_metadata=named_metadata, relationships=relationships)
@@ -182,6 +186,8 @@ class MetadataCombiner(BaseModel):
             relationship_subdir (str): subdirectory for relationship, default is "relationship"
         """
         save_dir = Path(save_dir).expanduser().resolve()
+        save_dir.mkdir(parents=True, exist_ok=True)
+
         version_file = save_dir / "version"
         version_file.write_text(self.version)
 
