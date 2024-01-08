@@ -13,7 +13,7 @@ import pytest
 from sdgx.data_connectors.csv_connector import CsvConnector
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.metadata import Metadata
-from sdgx.utils import download_demo_data
+from sdgx.utils import download_demo_data, download_multi_table_demo_data
 
 _HERE = os.path.dirname(__file__)
 
@@ -132,3 +132,29 @@ def demo_single_table_data_loader(demo_single_table_data_connector, cacher_kwarg
 @pytest.fixture
 def demo_single_table_metadata(demo_single_table_data_loader):
     yield Metadata.from_dataloader(demo_single_table_data_loader)
+
+
+@pytest.fixture
+def demo_multi_table_path():
+    yield download_multi_table_demo_data(DATA_DIR)
+
+
+@pytest.fixture
+def demo_multi_table_data_connector(demo_multi_table_path):
+    connector_dict = {}
+    for each_table in demo_multi_table_path.keys():
+        each_path = demo_multi_table_path[each_table]
+        connector_dict[each_table] = CsvConnector(path=each_path)
+    yield connector_dict
+
+
+@pytest.fixture
+def demo_multi_table_data_loader(demo_multi_table_data_connector, cacher_kwargs):
+    loader_dict = {}
+    for each_table in demo_multi_table_data_connector.keys():
+        each_connector = demo_multi_table_data_connector[each_table]
+        each_d = DataLoader(each_connector, cacher_kwargs=cacher_kwargs)
+        loader_dict[each_table] = each_d
+    yield loader_dict
+    for each_table in demo_multi_table_data_connector.keys():
+        demo_multi_table_data_connector[each_table].finalize()
