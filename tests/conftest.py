@@ -115,7 +115,7 @@ def demo_multi_table_data_connector(demo_multi_table_path):
 
 
 @pytest.fixture
-def demo_single_table_data_loader(demo_multi_table_data_connector, cacher_kwargs):
+def demo_multi_table_data_loader(demo_multi_table_data_connector, cacher_kwargs):
     loader_dict = {}
     for each_table in demo_multi_table_data_connector.keys():
         each_connector = demo_multi_table_data_connector[each_table]
