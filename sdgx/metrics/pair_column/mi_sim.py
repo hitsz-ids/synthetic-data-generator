@@ -9,7 +9,7 @@ from sklearn.metrics.cluster import normalized_mutual_info_score
 from sdgx.metrics.pair.base import MultiTableMetric
 
 
-class MISim(ColumnMetric):
+class MISim(PairMetric):
     """MISim : Mutual Information Similarity
 
     This class is used to calculate the Mutual Information Similarity between the target columns of real data and synthetic data.
@@ -81,6 +81,7 @@ class MISim(ColumnMetric):
         # test
         MISim.check_output(MI_sim)
         """
+        MISim.check_output(MI_sim)
         return MI_sim
 
     @classmethod
