@@ -6,7 +6,7 @@ import pandas as pd
 from scipy.stats import entropy
 from sklearn.metrics.cluster import normalized_mutual_info_score
 
-from sdgx.metrics.pair.base import PairMetric
+from sdgx.metrics.pair_column.base import PairMetric
 
 
 def Jaccard_index(A, B):
