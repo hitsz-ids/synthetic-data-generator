@@ -53,9 +53,7 @@ class PairMetric(object):
         return None, None
 
     @classmethod
-    def calculate(
-        cls, real_data: pd.DataFrame, synthetic_data: pd.DataFrame
-    ):
+    def calculate(cls, real_data: pd.DataFrame, synthetic_data: pd.DataFrame):
         """Calculate the metric value between pair-columns between real table and synthetic table.
 
         Args:
