@@ -10,9 +10,6 @@ from sdgx.metrics.multi_table.base import MultiTableMetric
 from sdgx.metrics.pair_column.mi_sim import MISim
 
 
-
-
-
 class MISim(MultiTableMetric):
     """MISim : Mutual Information Similarity
 
@@ -52,12 +49,12 @@ class MISim(MultiTableMetric):
 
         for i in range(len(columns)):
             for j in range(len(columns)):
-                syn_data = pd.concat([synthetic_data[columns[i]], synthetic_data[columns[j]]], axis=1)
+                syn_data = pd.concat(
+                    [synthetic_data[columns[i]], synthetic_data[columns[j]]], axis=1
+                )
                 real_data = pd.concat([real_data[columns[i]], real_data[columns[j]]], axis=1)
 
-                nMI_sim[i][j] = mi_sim_instance.calculate(
-                    real_data, syn_data ,metadata
-                )
+                nMI_sim[i][j] = mi_sim_instance.calculate(real_data, syn_data, metadata)
 
         MI_sim = np.sum(nMI_sim) / n / n
         # test
