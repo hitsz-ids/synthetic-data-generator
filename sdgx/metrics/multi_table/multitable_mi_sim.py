@@ -30,9 +30,7 @@ class MISim(MultiTableMetric):
 
     @classmethod
     def calculate(
-        real_data: pd.DataFrame,
-        synthetic_data: pd.DataFrame,
-        metadata:dict
+        real_data: pd.DataFrame, synthetic_data: pd.DataFrame, metadata: dict
     ) -> pd.DataFrame:
         """
         Calculate the JSD value between a real column and a synthetic column.

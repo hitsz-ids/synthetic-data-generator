@@ -50,7 +50,6 @@ class SinTabMISim(SingleTableMetric):
 
         for i in range(len(columns)):
             for j in range(len(columns)):
-
                 syn_data = pd.concat([synthetic_data[columns[i]], synthetic_data[columns[j]]], axis=1)
                 real_data = pd.concat([real_data[columns[i]], real_data[columns[j]]], axis=1)
 
