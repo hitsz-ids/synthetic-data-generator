@@ -36,7 +36,7 @@ synthetic_data_cotinuous = pd.DataFrame(
 # 创建 MISim 实例
 mi_sim = MISim()
 
-'''
+"""
 def test_MISim_discrete():
     cols = ["col1", "col2"]
     result = mi_sim.calculate(real_data_discrete, synthetic_data_discrete,metadata)
@@ -59,4 +59,4 @@ def test_MISim_continuous():
     assert result <= 1
     assert result1 == 1
     assert result2 == result
-'''
+"""
