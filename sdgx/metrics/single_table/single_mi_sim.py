@@ -1,12 +1,12 @@
+import time
+from datetime import datetime
+
 import numpy as np
 import pandas as pd
 from scipy.stats import entropy
 from sklearn.metrics.cluster import normalized_mutual_info_score
-from datetime import datetime
-import time
 
 from sdgx.metrics.single_table.base import SingleTableMetric
-
 
 
 class MISim(SingleTableMetric):
@@ -39,19 +39,23 @@ class MISim(SingleTableMetric):
         """
 
         # 传入概率分布数组
-        
+
         columns = synthetic_data.columns
         n = len(columns)
-        
-        nMI_sim = np.zeros((n,n))
-        
+
+        nMI_sim = np.zeros((n, n))
+
         for i in range(len(columns)):
             for j in range(len(columns)):
-                syn_MI_ij = normalized_mutual_info_score(synthetic_data[columns[i]], synthetic_data[columns[j]])
-                real_MI_ij = normalized_mutual_info_score(real_data[columns[i]], real_data[columns[j]])
-                nMI_sim[i][j] = Jaccard_index(syn_MI_ij,real_MI_ij)
-                
-        MI_sim = np.sum(nMI_sim)/n/n
+                syn_MI_ij = normalized_mutual_info_score(
+                    synthetic_data[columns[i]], synthetic_data[columns[j]]
+                )
+                real_MI_ij = normalized_mutual_info_score(
+                    real_data[columns[i]], real_data[columns[j]]
+                )
+                nMI_sim[i][j] = Jaccard_index(syn_MI_ij, real_MI_ij)
+
+        MI_sim = np.sum(nMI_sim) / n / n
         # test
         MISim.check_output(MI_sim)
 
@@ -65,7 +69,7 @@ class MISim(SingleTableMetric):
             raw_metric_value (float):  the calculated raw value of the JSD metric.
         """
         # instance = cls()
-        if raw_metric_value < self.lower_bound  or raw_metric_value >  self.upper_bound:
+        if raw_metric_value < self.lower_bound or raw_metric_value > self.upper_bound:
             raise ValueError
 
     # @classmethod
@@ -78,6 +82,5 @@ class MISim(SingleTableMetric):
     #         q (float): the input parameter q.
     #     """
     #     n_MI = None
-        
 
     #     return n_MI

@@ -7,6 +7,7 @@ class PairMetric(object):
     """PairMetric
     Metrics used to evaluate the quality of synthetic data columns.
     """
+
     upper_bound = None
     lower_bound = None
     metric_name = "Correlation"
@@ -29,9 +30,9 @@ class PairMetric(object):
         # check column_names
         real_cols = real_data.columns
         syn_cols = synthetic_data.columns
-        if set(real_cols) != set(syn_cols)  :
+        if set(real_cols) != set(syn_cols):
             raise TypeError("Columns of Dataframe are Different.")
-        
+
         # check column_types
         for col in real_cols:
             if real_metadata[col] != syn_metadata[col]:
