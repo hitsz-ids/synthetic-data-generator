@@ -1,17 +1,20 @@
+import time
+from datetime import datetime
+
 import numpy as np
 import pandas as pd
 from scipy.stats import entropy
 from sklearn.metrics.cluster import normalized_mutual_info_score
-from datetime import datetime
-import time
 
 from sdgx.metrics.multi_table.base import MultiTableMetric
 
-def Jaccard_index(A,B):
-    return min(A,B)/max(A,B)
 
-def time2int(datetime,form):
-    time_array = time.strptime(datetime,form)
+def Jaccard_index(A, B):
+    return min(A, B) / max(A, B)
+
+
+def time2int(datetime, form):
+    time_array = time.strptime(datetime, form)
     time_stamp = int(time.mktime(time_array))
     return time_stamp
 
@@ -48,33 +51,41 @@ class MISim(MultiTableMetric):
         """
 
         # 传入概率分布数组
-        
+
         columns = synthetic_data.columns
         n = len(columns)
-        
+
         for col in columns:
             data_type = self.metadata[col]
             if data_type == "numerical":
                 # max_value = real_data[col].max()
                 # min_value = real_data[col].min()
                 real_data[col] = pd.cut(a, self.numerical_bins, labels=range(self.numerical_bins))
-                synthetic_data[col] = pd.cut(a, self.numerical_bins, labels=range(self.numerical_bins))
-            
+                synthetic_data[col] = pd.cut(
+                    a, self.numerical_bins, labels=range(self.numerical_bins)
+                )
+
             elif data_type == "datetime":
                 real_data[col] = real_data[col].apply(time2int)
                 synthetic_data[col] = synthetic_data[col].apply(time2int)
                 real_data[col] = pd.cut(a, self.numerical_bins, labels=range(self.numerical_bins))
-                synthetic_data[col] = pd.cut(a, self.numerical_bins, labels=range(self.numerical_bins))
-        
-        nMI_sim = np.zeros((n,n))
-        
+                synthetic_data[col] = pd.cut(
+                    a, self.numerical_bins, labels=range(self.numerical_bins)
+                )
+
+        nMI_sim = np.zeros((n, n))
+
         for i in range(len(columns)):
             for j in range(len(columns)):
-                syn_MI_ij = normalized_mutual_info_score(synthetic_data[columns[i]], synthetic_data[columns[j]])
-                real_MI_ij = normalized_mutual_info_score(real_data[columns[i]], real_data[columns[j]])
-                nMI_sim[i][j] = Jaccard_index(syn_MI_ij,real_MI_ij)
-                
-        MI_sim = np.sum(nMI_sim)/n/n
+                syn_MI_ij = normalized_mutual_info_score(
+                    synthetic_data[columns[i]], synthetic_data[columns[j]]
+                )
+                real_MI_ij = normalized_mutual_info_score(
+                    real_data[columns[i]], real_data[columns[j]]
+                )
+                nMI_sim[i][j] = Jaccard_index(syn_MI_ij, real_MI_ij)
+
+        MI_sim = np.sum(nMI_sim) / n / n
         # test
         MISim.check_output(MI_sim)
 
@@ -88,7 +99,7 @@ class MISim(MultiTableMetric):
             raw_metric_value (float):  the calculated raw value of the JSD metric.
         """
         # instance = cls()
-        if raw_metric_value < self.lower_bound  or raw_metric_value >  self.upper_bound:
+        if raw_metric_value < self.lower_bound or raw_metric_value > self.upper_bound:
             raise ValueError
 
     # @classmethod
@@ -101,6 +112,5 @@ class MISim(MultiTableMetric):
     #         q (float): the input parameter q.
     #     """
     #     n_MI = None
-        
 
     #     return n_MI
