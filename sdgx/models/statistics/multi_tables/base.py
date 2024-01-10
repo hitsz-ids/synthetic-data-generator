@@ -23,22 +23,6 @@ class MultiTableSynthesizer(SynthesizerModel):
     _parent_id = {}
     _table_synthesizers = {}
     _foreign_keys = {}
-    _learned_relationships = 0 
-    
-
-
-    def __init__(self) -> None:
-        super().__init__()
-        pass
-
-    def check(self): 
-        
-
-        pass 
-
-    def get_info(self):
-
-        pass 
     
     def fit(self, metadata: Metadata, dataloader: DataLoader, *args, **kwargs):
         """
@@ -74,18 +58,29 @@ class MultiTableSynthesizer(SynthesizerModel):
         pass  
 
 
+    # first implement these methods
+    #              |
+    #              V
+    def _calculate_parent_map(self):
+        pass
 
     def _calculate_parent_map(self):
         pass
 
-    def _recreate_child_synthesizer(self): 
+    def _get_foreign_keys(self):
 
         pass
+
+    def _get_all_foreign_keys(self): 
+
+        pass
+
 
     def _find_parent_id(self):  
 
         pass
-        # 类似 argument tables 
+
+
     def get_extended_table(self):
         # 
 
@@ -99,13 +94,20 @@ class MultiTableSynthesizer(SynthesizerModel):
     def _get_num_rows_from_parent(self):
 
         pass
+    #              ^
+    #              |
+    # first implement these methods
 
-
-    def _finalize(self): 
-
-        pass
-
-
+    def check(self): 
+    ''' Excute necessary checks
+    
+    - validate circular relationships
+    - validate child map_circular relationship
+    - validate all tables connect relationship
+    - validate column relationships foreign keys
+    '''
+        
+        pass 
 
         
 
