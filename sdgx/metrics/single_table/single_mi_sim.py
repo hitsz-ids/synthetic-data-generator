@@ -7,9 +7,10 @@ from scipy.stats import entropy
 from sklearn.metrics.cluster import normalized_mutual_info_score
 
 from sdgx.metrics.single_table.base import SingleTableMetric
+from sdgx.metrics.pair_column.mi_sim import MISim
 
 
-class MISim(SingleTableMetric):
+class SinTabMISim(SingleTableMetric):
     """MISim : Mutual Information Similarity
 
     This class is used to calculate the Mutual Information Similarity between the target columns of real data and synthetic data.
@@ -28,6 +29,7 @@ class MISim(SingleTableMetric):
     def calculate(
         real_data: pd.DataFrame,
         synthetic_data: pd.DataFrame,
+        metadata
     ) -> pd.DataFrame:
         """
         Calculate the JSD value between a real column and a synthetic column.
@@ -42,16 +44,16 @@ class MISim(SingleTableMetric):
 
         columns = synthetic_data.columns
         n = len(columns)
-
+        mi_sim_instance = MISim()
         nMI_sim = np.zeros((n, n))
 
         for i in range(len(columns)):
             for j in range(len(columns)):
-                syn_MI_ij = normalized_mutual_info_score(
-                    synthetic_data[columns[i]], synthetic_data[columns[j]]
+                syn_MI_ij = mi_sim_instance.calculate(
+                    synthetic_data[columns[i]], synthetic_data[columns[j]],metadata
                 )
-                real_MI_ij = normalized_mutual_info_score(
-                    real_data[columns[i]], real_data[columns[j]]
+                real_MI_ij = mi_sim_instance.calculate(
+                    real_data[columns[i]], real_data[columns[j]],metadata
                 )
                 nMI_sim[i][j] = Jaccard_index(syn_MI_ij, real_MI_ij)
 

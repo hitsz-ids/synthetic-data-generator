@@ -38,6 +38,7 @@ class MISim(MultiTableMetric):
     def calculate(
         real_data: pd.DataFrame,
         synthetic_data: pd.DataFrame,
+        metadata:dict
     ) -> pd.DataFrame:
         """
         Calculate the JSD value between a real column and a synthetic column.
@@ -56,7 +57,7 @@ class MISim(MultiTableMetric):
         n = len(columns)
 
         for col in columns:
-            data_type = self.metadata[col]
+            data_type = metadata[col]
             if data_type == "numerical":
                 # max_value = real_data[col].max()
                 # min_value = real_data[col].min()
