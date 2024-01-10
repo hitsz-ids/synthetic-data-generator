@@ -8,6 +8,14 @@ from sklearn.metrics.cluster import normalized_mutual_info_score
 
 from sdgx.metrics.pair.base import MultiTableMetric
 
+def Jaccard_index(A, B):
+    return min(A, B) / max(A, B)
+
+
+def time2int(datetime, form):
+    time_array = time.strptime(datetime, form)
+    time_stamp = int(time.mktime(time_array))
+    return time_stamp
 
 class MISim(PairMetric):
     """MISim : Mutual Information Similarity
@@ -28,13 +36,14 @@ class MISim(PairMetric):
     def calculate(
         real_data: pd.DataFrame,
         synthetic_data: pd.DataFrame,
-        metadata,
+        metadata: dict,
     ) -> float:
         """
         Calculate the JSD value between a real column and a synthetic column.
         Args:
             real_data (pd.DataFrame): The real data.
             synthetic_data (pd.DataFrame): The synthetic data.
+            metadata(dict): The metadata that describes the data type of each column
         Returns:
             MI_similarity (float): The metric value.
         """

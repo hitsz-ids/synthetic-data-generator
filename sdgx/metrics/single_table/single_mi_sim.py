@@ -36,6 +36,7 @@ class SinTabMISim(SingleTableMetric):
         Args:
             real_data (pd.DataFrame): The real data.
             synthetic_data (pd.DataFrame): The synthetic data.
+            metadata(dict): The metadata that describes the data type of each column
         Returns:
             MI_similarity (float): The metric value.
         """
@@ -49,13 +50,13 @@ class SinTabMISim(SingleTableMetric):
 
         for i in range(len(columns)):
             for j in range(len(columns)):
-                syn_MI_ij = mi_sim_instance.calculate(
-                    synthetic_data[columns[i]], synthetic_data[columns[j]],metadata
+
+                syn_data = pd.concat([synthetic_data[columns[i]], synthetic_data[columns[j]]], axis=1)
+                real_data = pd.concat([real_data[columns[i]], real_data[columns[j]]], axis=1)
+
+                nMI_sim[i][j] = mi_sim_instance.calculate(
+                    real_data, syn_data ,metadata
                 )
-                real_MI_ij = mi_sim_instance.calculate(
-                    real_data[columns[i]], real_data[columns[j]],metadata
-                )
-                nMI_sim[i][j] = Jaccard_index(syn_MI_ij, real_MI_ij)
 
         MI_sim = np.sum(nMI_sim) / n / n
         # test
