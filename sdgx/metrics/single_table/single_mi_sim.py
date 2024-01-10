@@ -6,8 +6,8 @@ import pandas as pd
 from scipy.stats import entropy
 from sklearn.metrics.cluster import normalized_mutual_info_score
 
-from sdgx.metrics.single_table.base import SingleTableMetric
 from sdgx.metrics.pair_column.mi_sim import MISim
+from sdgx.metrics.single_table.base import SingleTableMetric
 
 
 class SinTabMISim(SingleTableMetric):
@@ -26,11 +26,7 @@ class SinTabMISim(SingleTableMetric):
         self.numerical_bins = 50
 
     @classmethod
-    def calculate(
-        real_data: pd.DataFrame,
-        synthetic_data: pd.DataFrame,
-        metadata
-    ) -> pd.DataFrame:
+    def calculate(real_data: pd.DataFrame, synthetic_data: pd.DataFrame, metadata) -> pd.DataFrame:
         """
         Calculate the JSD value between a real column and a synthetic column.
         Args:
@@ -50,12 +46,12 @@ class SinTabMISim(SingleTableMetric):
 
         for i in range(len(columns)):
             for j in range(len(columns)):
-                syn_data = pd.concat([synthetic_data[columns[i]], synthetic_data[columns[j]]], axis=1)
+                syn_data = pd.concat(
+                    [synthetic_data[columns[i]], synthetic_data[columns[j]]], axis=1
+                )
                 real_data = pd.concat([real_data[columns[i]], real_data[columns[j]]], axis=1)
 
-                nMI_sim[i][j] = mi_sim_instance.calculate(
-                    real_data, syn_data ,metadata
-                )
+                nMI_sim[i][j] = mi_sim_instance.calculate(real_data, syn_data, metadata)
 
         MI_sim = np.sum(nMI_sim) / n / n
         # test

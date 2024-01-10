@@ -8,6 +8,7 @@ from sklearn.metrics.cluster import normalized_mutual_info_score
 
 from sdgx.metrics.pair.base import PairMetric
 
+
 def Jaccard_index(A, B):
     return min(A, B) / max(A, B)
 
@@ -16,6 +17,7 @@ def time2int(datetime, form):
     time_array = time.strptime(datetime, form)
     time_stamp = int(time.mktime(time_array))
     return time_stamp
+
 
 class MISim(PairMetric):
     """MISim : Mutual Information Similarity
