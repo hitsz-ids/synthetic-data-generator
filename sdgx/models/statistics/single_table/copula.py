@@ -24,7 +24,7 @@ from sdgx.models.components.utils import (
     unflatten_dict,
     validate_numerical_distributions,
 )
-from sdgx.models.statistics.base import SynthesizerModel
+from sdgx.models.statistics.single_table.base import SynthesizerModel
 
 LOGGER = logging.getLogger(__name__)
 
