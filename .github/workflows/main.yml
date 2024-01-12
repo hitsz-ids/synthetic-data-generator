@@ -23,3 +23,11 @@ jobs:
           ./run_actions.sh 2> error_logs.txt
 
       # Add any other existing steps
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }} # The token is required and should be stored as a GitHub secret
+          file: ./path/to/coverage/report/file # The path to the coverage report file
+          flags: appropriate_categorization # Optional, you can use this to categorize coverage reports
+          name: meaningful_workflow_name # Optional, you can use this to provide a name for the workflow
+          fail_ci_if_error: true # Optional, if set to true, the workflow will fail if the step fails
