@@ -235,6 +235,7 @@ class HyperTransformer:
             )
 
     @staticmethod
+    @staticmethod
     def _validate_config(config):
         if set(config.keys()) != {"sdtypes", "transformers"}:
             raise Error(
