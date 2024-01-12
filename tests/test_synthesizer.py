@@ -78,7 +78,9 @@ def test_fit(synthesizer):
 
 
 def test_sample(synthesizer):
-    assert synthesizer.sample(10) is not None
+    assert len(synthesizer.sample(10)) == 10
+    for df in synthesizer.sample(10, chunksize=5):
+        assert len(df) == 5
 
 
 def test_save_and_load(synthesizer, save_dir):

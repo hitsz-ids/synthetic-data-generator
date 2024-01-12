@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 import json
+from collections import namedtuple
 from pathlib import Path
-from typing import Any, Iterable, List, Set, Tuple, Union
+from typing import Any, Iterable, List, Union
 
 from pydantic import BaseModel
 
 from sdgx.exceptions import RelationshipInitError
+
+KeyTuple = namedtuple("KeyTuple", ["parent", "child"])
 
 
 class Relationship(BaseModel):
@@ -24,7 +27,7 @@ class Relationship(BaseModel):
     parent_table: str
     child_table: str
 
-    foreign_keys: List[Union[str, Tuple[str, str]]]
+    foreign_keys: List[KeyTuple]
     """
     foreign keys.
 
@@ -36,7 +39,7 @@ class Relationship(BaseModel):
         cls,
         parent_table: str,
         child_table: str,
-        foreign_keys: Iterable[str | tuple[str, str]],
+        foreign_keys: Iterable[str | tuple[str, str] | KeyTuple],
     ) -> "Relationship":
         """
         Build relationship from parent table, child table and foreign keys
@@ -52,7 +55,10 @@ class Relationship(BaseModel):
         if not child_table:
             raise RelationshipInitError("child table cannot be empty")
 
-        foreign_keys = list(foreign_keys)
+        foreign_keys = [
+            KeyTuple(key, key) if isinstance(key, str) else KeyTuple(*key) for key in foreign_keys
+        ]
+
         if not foreign_keys:
             raise RelationshipInitError("foreign keys cannot be empty")
         if parent_table == child_table:
