@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import time
 from pathlib import Path
-from typing import Any, Dict, Set, List
+from typing import Any, Dict, List, Set
 
 import numpy as np
 import pandas as pd
@@ -26,7 +26,7 @@ class MultiTableSynthesizerModel(BaseModel):
     parent_map: Dict = {}
     child_map: Dict = {}
     _augmented_tables: List = []
-    # the single table synthesizer 
+    # the single table synthesizer
     _synthesizer = GaussianCopulaSynthesizer
 
     def __init__(self, *args, **kwargs):
@@ -74,12 +74,13 @@ class MultiTableSynthesizerModel(BaseModel):
                 all_foreign_keys.append(each_relationship.foreign_keys)
 
         return all_foreign_keys
-    
-    def get_extented_columns(self, 
-                            child_table_name: str,
-                            tables_data_loader: Dict(str, DataLoader), 
-                            foreign_key: list(str), 
-                            ):
+
+    def get_extented_columns(
+        self,
+        child_table_name: str,
+        tables_data_loader: Dict(str, DataLoader),
+        foreign_key: list(str),
+    ):
         """Calculate the extension columns for given child table.
 
         The resulting dataframe will have an index that contains all the foreign key values.
@@ -101,15 +102,11 @@ class MultiTableSynthesizerModel(BaseModel):
             pd.DataFrame | Path: The extended table, without the parent table part
         """
 
-        
-
         pass
-    
-    def get_extended_table(self,
-                           table_name: str,
-                           tables_data_loader: Dict(str, DataLoader),
-                           disk_cache: bool = False
-                           ):
+
+    def get_extended_table(
+        self, table_name: str, tables_data_loader: Dict(str, DataLoader), disk_cache: bool = False
+    ):
         """Calculate the extension columns of the given table.
 
         For each of the table's foreign keys, generate the related extension columns,
@@ -122,7 +119,7 @@ class MultiTableSynthesizerModel(BaseModel):
         Returns:
             # NOTE Still draft
             pd.DataFrame | Path: the extended table after CPA.
-            
+
         """
         #
 
@@ -135,12 +132,10 @@ class MultiTableSynthesizerModel(BaseModel):
     #              |
     # first we implement these methods
 
-
-    def calculate_table_likehoods(self, child_table_rows, parent_table_rows, child_table_name, foreign_key):
-    
+    def calculate_table_likehoods(
+        self, child_table_rows, parent_table_rows, child_table_name, foreign_key
+    ):
         raise NotImplementedError
-    
-
 
     def check(self, check_circular=True):
         """Excute necessary checks
