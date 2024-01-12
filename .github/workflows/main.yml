@@ -1,0 +1,25 @@
+name: GitHub Actions Workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Add the new step to run the necessary actions and capture error logs
+      - name: Run Actions and Capture Error Logs
+        run: |
+          # Add the necessary commands to run the actions and capture error logs
+
+          # Example command to run actions and capture error logs
+          echo "Running actions..."
+          actions_command_here > error_logs.txt
+
+      # Add any other existing steps
