@@ -9,7 +9,7 @@ class TestGithubActions(unittest.TestCase):
         # Run the GitHub Actions workflow as a subprocess
         subprocess.run(["./run_actions.sh"], check=True)
         # Check if coverage report file exists
-        self.assertTrue(os.path.exists('coverage.xml'), 'Coverage report file does not exist.')
+        self.assertTrue(os.path.exists("coverage.xml"), "Coverage report file does not exist.")
 
         # Capture the error logs
         try:
@@ -30,12 +30,11 @@ class TestGithubActions(unittest.TestCase):
 
     def tearDown(self):
         # Delete the error logs file after the test has run
-        os.remove('error_logs.txt')
+        os.remove("error_logs.txt")
 
     def test_upload_coverage_report(self):
         # Run the GitHub Actions workflow and check the upload step
-        result = subprocess.run(['./run_actions.sh'], capture_output=True, text=True)
-        self.assertEqual(result.returncode, 0, 'Upload coverage to Codecov failed.')
+        result = subprocess.run(["./run_actions.sh"], capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, "Upload coverage to Codecov failed.")
         # Delete the error logs file after the test has run
-        os.remove('error_logs.txt')
-
+        os.remove("error_logs.txt")
