@@ -13,7 +13,7 @@ class SynthesizerModel:
     random_states = None
 
     def __init__(self, transformer=None, sampler=None) -> None:
-        self.model = None  
+        self.model = None
         self.status = "UNFINED"
         self.model_type = "MODEL_TYPE_UNDEFINED"
         # self.epochs = epochs
