@@ -11,7 +11,13 @@ class TestGithubActions(unittest.TestCase):
 
         # Capture the error logs
         try:
-            subprocess.run(["./run_actions.sh"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+            subprocess.run(
+                ["./run_actions.sh"],
+                check=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                universal_newlines=True,
+            )
         except subprocess.CalledProcessError as e:
             error_logs = e.stderr
         else:
@@ -22,4 +28,4 @@ class TestGithubActions(unittest.TestCase):
 
     def tearDown(self):
         # Delete the error logs file after the test has run
-        os.remove('error_logs.txt')
+        os.remove("error_logs.txt")
