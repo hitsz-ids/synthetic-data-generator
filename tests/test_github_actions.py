@@ -1,5 +1,6 @@
 import os
 import subprocess
+import sys
 import unittest
 
 
@@ -8,12 +9,16 @@ class TestGithubActions(unittest.TestCase):
         # Run the GitHub Actions workflow as a subprocess
         subprocess.run(["./run_actions.sh"], check=True)
 
-        # Open the error logs file
-        with open('error_logs.txt', 'r') as file:
-            error_logs = file.read()
+        # Capture the error logs
+        try:
+            subprocess.run(["./run_actions.sh"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+        except subprocess.CalledProcessError as e:
+            error_logs = e.stderr
+        else:
+            error_logs = ""
 
         # Check if there are any errors
-        self.assertEqual(error_logs, "")
+        self.assertFalse(error_logs, f"Error logs found: {error_logs}")
 
     def tearDown(self):
         # Delete the error logs file after the test has run
