@@ -20,6 +20,6 @@ jobs:
 
           # Example command to run actions and capture error logs
           echo "Running actions..."
-          actions_command_here > error_logs.txt
+          ./run_actions.sh 2> error_logs.txt
 
       # Add any other existing steps
