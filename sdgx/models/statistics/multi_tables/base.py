@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 import time
+from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict, List
-from collections import defaultdict
-
 
 import numpy as np
 import pandas as pd
