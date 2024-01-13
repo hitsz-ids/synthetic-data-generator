@@ -26,7 +26,7 @@ class MultiTableSynthesizerModel(BaseModel):
     child_map: Dict = {}
     _augmented_tables: List = []
 
-    tables_data_loader: Dict[str, DataLoader] = defaultdict()
+    tables_data_loader: Dict[str, Any] = defaultdict()
     """
     tables_data_loader is a dict contains every table's data loader.
     """
