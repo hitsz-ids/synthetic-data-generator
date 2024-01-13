@@ -26,11 +26,9 @@ class MultiTableSynthesizerModel(BaseModel):
     _augmented_tables: List = []
 
     tables_data_loader: Dict(str, DataLoader)
-    '''
+    """
     tables_data_loader is a dict contains every table's data loader.
-    '''
-    
-
+    """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -39,7 +37,6 @@ class MultiTableSynthesizerModel(BaseModel):
 
         self.check()
 
-    
     # first implement these methods
     #              |
     #              V
@@ -77,7 +74,6 @@ class MultiTableSynthesizerModel(BaseModel):
                 all_foreign_keys.append(each_relationship.foreign_keys)
 
         return all_foreign_keys
-    
 
     def _get_num_rows_from_parent(self):
         pass
