@@ -1,9 +1,11 @@
 from __future__ import annotations
+
 import random
 
 import numpy as np
 import pandas as pd
 import pytest
+
 from sdgx.metrics.column.jsd import JSD
 
 
@@ -19,7 +21,7 @@ def test_data():
     df = pd.DataFrame(
         {
             "role": [random.choice(role_set) for _ in range(10)],
-            "feature_x": [random.random() for _ in range(10)]
+            "feature_x": [random.random() for _ in range(10)],
         }
     )
     return df
@@ -31,7 +33,7 @@ def jsd_instance():
 
 
 def test_jsd_discrete(dummy_data, test_data, jsd_instance):
-    cols = ['role']
+    cols = ["role"]
     result = jsd_instance.calculate(dummy_data, test_data, cols, discrete=True)
     result1 = jsd_instance.calculate(dummy_data, dummy_data, cols, discrete=True)
     result2 = jsd_instance.calculate(test_data, dummy_data, cols, discrete=True)
@@ -42,7 +44,7 @@ def test_jsd_discrete(dummy_data, test_data, jsd_instance):
     assert result2 == result
 
 
-def test_jsd_continuous(dummy_data,test_data, jsd_instance):
+def test_jsd_continuous(dummy_data, test_data, jsd_instance):
     cols = ["feature_x"]
     result = jsd_instance.calculate(dummy_data, test_data, cols, discrete=False)
     result1 = jsd_instance.calculate(dummy_data, dummy_data, cols, discrete=False)
