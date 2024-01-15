@@ -2,31 +2,28 @@ from __future__ import annotations
 
 import time
 from collections import defaultdict
-from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List
-
-import numpy as np
 import pandas as pd
 from pydantic import BaseModel
-
+from sdgx.utils import DataAccessType
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.combiner import MetadataCombiner
-from sdgx.data_models.metadata import Metadata
-from sdgx.data_models.relationship import Relationship
 from sdgx.log import logger
 
 
-class data_access_method(Enum):
-    """
-    数据接入方式
-    """
-
-    pd_data_frame = 1
-    sdgx_data_loader = 2
-
 
 class MultiTableSynthesizerModel(BaseModel):
+    """MultiTableSynthesizerModel
+    
+    The base model of multi-table statistic models.
+    """
+
+    data_access_method: DataAccessType = DataAccessType.pd_data_frame
+    '''
+    The type of the data access, now support pandas.DataFrame or sdgx.DataLoader.
+    '''
+
     metadata_combiner: MetadataCombiner = None
     """
     metadata_combiner is a sdgx builtin class, it stores all tables' metadata and relationships.
@@ -53,11 +50,15 @@ class MultiTableSynthesizerModel(BaseModel):
     _table_synthesizers is a dict to store model for each table.
     """
 
-    _foreign_keys = {}
+    parent_map: Dict = defaultdict()
+    '''
+    The mapping from all child tables to their parent table.
+    '''
 
-    parent_map: Dict = {}
-    child_map: Dict = {}
-    _augmented_tables: List = []
+    child_map: Dict = defaultdict()
+    '''
+    The mapping from all parent tabels to their child table.
+    '''
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -101,15 +102,10 @@ class MultiTableSynthesizerModel(BaseModel):
 
         return all_foreign_keys
 
-    def _get_num_rows_from_parent(self):
-        """
-        Get the number of rows to sample for the child from the parent row.
-        """
-
-        pass
-
     def _finalize(self):
-        pass
+        '''Finalize the 
+        '''
+        raise NotImplementedError
 
     def check(self, check_circular=True):
         """Excute necessary checks
