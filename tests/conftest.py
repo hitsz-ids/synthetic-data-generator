@@ -12,9 +12,9 @@ import pytest
 
 from sdgx.data_connectors.csv_connector import CsvConnector
 from sdgx.data_loader import DataLoader
+from sdgx.data_models.combiner import MetadataCombiner
 from sdgx.data_models.metadata import Metadata
 from sdgx.data_models.relationship import Relationship
-from sdgx.data_models.combiner import MetadataCombiner
 from sdgx.utils import download_demo_data, download_multi_table_demo_data
 
 _HERE = os.path.dirname(__file__)
@@ -161,28 +161,23 @@ def demo_multi_table_data_loader(demo_multi_table_data_connector, cacher_kwargs)
     for each_table in demo_multi_table_data_connector.keys():
         demo_multi_table_data_connector[each_table].finalize()
 
+
 @pytest.fixture
 def demo_multi_data_relationship():
-    yield Relationship.build(
-        parent_table= "store", 
-        child_table= 'train',
-        foreign_keys= ["Store"]
-    )
+    yield Relationship.build(parent_table="store", child_table="train", foreign_keys=["Store"])
+
 
 @pytest.fixture
 def demo_multi_table_data_metadata_combiner(
-    demo_multi_table_data_loader, 
-    demo_multi_data_relationship):
-    # 1. get metadata 
+    demo_multi_table_data_loader, demo_multi_data_relationship
+):
+    # 1. get metadata
     metadata_dict = {}
     for each_table_name in demo_multi_table_data_loader:
         each_metadata = Metadata.from_dataloader(demo_multi_table_data_loader[each_table_name])
         metadata_dict[each_table_name] = each_metadata
     # 2. define relationship - already defined
-    # 3. define combiner 
-    m = MetadataCombiner(
-        named_metadata = metadata_dict,
-        relationships = [demo_multi_data_relationship]
-        )
-    
-    yield m 
+    # 3. define combiner
+    m = MetadataCombiner(named_metadata=metadata_dict, relationships=[demo_multi_data_relationship])
+
+    yield m
