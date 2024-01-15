@@ -14,22 +14,53 @@ from sdgx.data_models.combiner import MetadataCombiner
 from sdgx.data_models.metadata import Metadata
 from sdgx.data_models.relationship import Relationship
 from sdgx.log import logger
+from enum import Enum
+
+
+class data_access_method(Enum):
+    '''
+    数据接入方式
+    '''
+    pd_data_frame = 1
+    sdgx_data_loader = 2
 
 
 class MultiTableSynthesizerModel(BaseModel):
-    _parent_id = {}
-    _table_synthesizers = {}
-    _foreign_keys = {}
 
     metadata_combiner: MetadataCombiner = None
-    parent_map: Dict = {}
-    child_map: Dict = {}
-    _augmented_tables: List = []
+    '''
+    metadata_combiner is a sdgx builtin class, it stores all tables' metadata and relationships.
+    '''
+
+    tables_data_frame: Dict[str, Any] = defaultdict()
+    """
+    tables_data_frame is a dict contains every table's csv data frame. 
+    For a small amount of data, this scheme can be used.
+    """
 
     tables_data_loader: Dict[str, Any] = defaultdict()
     """
     tables_data_loader is a dict contains every table's data loader.
     """
+
+    _parent_id: List = []
+    '''
+    _parent_id is used to store all parent table's parimary keys in list. 
+    '''
+
+    _table_synthesizers: Dict[str, Any] = {}
+    '''
+    _table_synthesizers is a dict to store model for each table.
+    '''
+
+    _foreign_keys = {}
+
+    
+    parent_map: Dict = {}
+    child_map: Dict = {}
+    _augmented_tables: List = []
+
+    
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -38,9 +69,6 @@ class MultiTableSynthesizerModel(BaseModel):
 
         self.check()
 
-    # first implement these methods
-    #              |
-    #              V
     def _calculate_parent_and_child_map(self):
         """Get the mapping from all parent tables to self._parent_map
         - key(str) is a child map;
@@ -77,16 +105,17 @@ class MultiTableSynthesizerModel(BaseModel):
         return all_foreign_keys
 
     def _get_num_rows_from_parent(self):
+        """
+        Get the number of rows to sample for the child from the parent row.
+        """
+
         pass
 
-    #              ^
-    #              |
-    # first we implement these methods
+    def _finalize(self):
 
-    def calculate_table_likehoods(
-        self, child_table_rows, parent_table_rows, child_table_name, foreign_key
-    ):
-        raise NotImplementedError
+        pass
+
+
 
     def check(self, check_circular=True):
         """Excute necessary checks
