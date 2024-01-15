@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import time
 from collections import defaultdict
+from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -14,27 +15,26 @@ from sdgx.data_models.combiner import MetadataCombiner
 from sdgx.data_models.metadata import Metadata
 from sdgx.data_models.relationship import Relationship
 from sdgx.log import logger
-from enum import Enum
 
 
 class data_access_method(Enum):
-    '''
+    """
     数据接入方式
-    '''
+    """
+
     pd_data_frame = 1
     sdgx_data_loader = 2
 
 
 class MultiTableSynthesizerModel(BaseModel):
-
     metadata_combiner: MetadataCombiner = None
-    '''
+    """
     metadata_combiner is a sdgx builtin class, it stores all tables' metadata and relationships.
-    '''
+    """
 
     tables_data_frame: Dict[str, Any] = defaultdict()
     """
-    tables_data_frame is a dict contains every table's csv data frame. 
+    tables_data_frame is a dict contains every table's csv data frame.
     For a small amount of data, this scheme can be used.
     """
 
@@ -44,23 +44,20 @@ class MultiTableSynthesizerModel(BaseModel):
     """
 
     _parent_id: List = []
-    '''
-    _parent_id is used to store all parent table's parimary keys in list. 
-    '''
+    """
+    _parent_id is used to store all parent table's parimary keys in list.
+    """
 
     _table_synthesizers: Dict[str, Any] = {}
-    '''
+    """
     _table_synthesizers is a dict to store model for each table.
-    '''
+    """
 
     _foreign_keys = {}
 
-    
     parent_map: Dict = {}
     child_map: Dict = {}
     _augmented_tables: List = []
-
-    
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -112,10 +109,7 @@ class MultiTableSynthesizerModel(BaseModel):
         pass
 
     def _finalize(self):
-
         pass
-
-
 
     def check(self, check_circular=True):
         """Excute necessary checks
