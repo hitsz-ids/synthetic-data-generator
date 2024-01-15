@@ -218,6 +218,7 @@ class Metadata(BaseModel):
         include_inspectors: Iterable[str] | None = None,
         exclude_inspectors: Iterable[str] | None = None,
         inspector_init_kwargs: dict[str, Any] | None = None,
+        check: bool = False
     ) -> "Metadata":
         """Initialize a metadata from DataLoader and Inspectors
 
@@ -257,7 +258,8 @@ class Metadata(BaseModel):
         if not primary_keys:
             metadata.update_primary_key(metadata.id_columns)
 
-        metadata.check()
+        if check:
+            metadata.check()
         return metadata
 
     @classmethod
@@ -267,6 +269,7 @@ class Metadata(BaseModel):
         include_inspectors: list[str] | None = None,
         exclude_inspectors: list[str] | None = None,
         inspector_init_kwargs: dict[str, Any] | None = None,
+        check: bool = False
     ) -> "Metadata":
         """Initialize a metadata from DataFrame and Inspectors
 
@@ -294,7 +297,8 @@ class Metadata(BaseModel):
         metadata = Metadata(primary_keys=[df.columns[0]], column_list=set(df.columns))
         for inspector in inspectors:
             metadata.update(inspector.inspect())
-        metadata.check()
+        if check:
+            metadata.check()
         return metadata
 
     def _dump_json(self):
