@@ -6,9 +6,9 @@ import threading
 import urllib.request
 import warnings
 from contextlib import closing
+from enum import Enum
 from pathlib import Path
 from typing import Callable
-from enum import Enum
 
 import pandas as pd
 
@@ -41,10 +41,12 @@ MULTI_TABLE_DEMO_DATA = {
     }
 }
 
+
 class DataAccessType(Enum):
     """
     Type of data access.
     """
+
     pd_data_frame = 1
     sdgx_data_loader = 2
 

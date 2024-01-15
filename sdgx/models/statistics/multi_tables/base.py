@@ -4,25 +4,26 @@ import time
 from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict, List
+
 import pandas as pd
 from pydantic import BaseModel
-from sdgx.utils import DataAccessType
+
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.combiner import MetadataCombiner
 from sdgx.log import logger
-
+from sdgx.utils import DataAccessType
 
 
 class MultiTableSynthesizerModel(BaseModel):
     """MultiTableSynthesizerModel
-    
+
     The base model of multi-table statistic models.
     """
 
     data_access_method: DataAccessType = DataAccessType.pd_data_frame
-    '''
+    """
     The type of the data access, now support pandas.DataFrame or sdgx.DataLoader.
-    '''
+    """
 
     metadata_combiner: MetadataCombiner = None
     """
@@ -51,14 +52,14 @@ class MultiTableSynthesizerModel(BaseModel):
     """
 
     parent_map: Dict = defaultdict()
-    '''
+    """
     The mapping from all child tables to their parent table.
-    '''
+    """
 
     child_map: Dict = defaultdict()
-    '''
+    """
     The mapping from all parent tabels to their child table.
-    '''
+    """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -103,8 +104,7 @@ class MultiTableSynthesizerModel(BaseModel):
         return all_foreign_keys
 
     def _finalize(self):
-        '''Finalize the 
-        '''
+        """Finalize the"""
         raise NotImplementedError
 
     def check(self, check_circular=True):

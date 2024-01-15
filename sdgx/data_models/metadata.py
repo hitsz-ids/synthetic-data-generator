@@ -218,7 +218,7 @@ class Metadata(BaseModel):
         include_inspectors: Iterable[str] | None = None,
         exclude_inspectors: Iterable[str] | None = None,
         inspector_init_kwargs: dict[str, Any] | None = None,
-        check: bool = False
+        check: bool = False,
     ) -> "Metadata":
         """Initialize a metadata from DataLoader and Inspectors
 
@@ -269,7 +269,7 @@ class Metadata(BaseModel):
         include_inspectors: list[str] | None = None,
         exclude_inspectors: list[str] | None = None,
         inspector_init_kwargs: dict[str, Any] | None = None,
-        check: bool = False
+        check: bool = False,
     ) -> "Metadata":
         """Initialize a metadata from DataFrame and Inspectors
 
