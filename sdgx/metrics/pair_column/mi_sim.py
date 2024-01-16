@@ -6,6 +6,9 @@ from sklearn.metrics.cluster import normalized_mutual_info_score
 from sdgx.metrics.pair_column.base import PairMetric
 from sdgx.utils import time2int
 
+from sklearn.preprocessing import LabelEncoder
+
+
 
 class MISim(PairMetric):
     """MISim : Mutual Information Similarity
@@ -55,6 +58,11 @@ class MISim(PairMetric):
             )
             src_col = src_col.to_numpy()
             tar_col = tar_col.to_numpy()
+        elif data_type == "category":
+            le = LabelEncoder()
+            src_col = le.fit_transform(src_col)
+            tar_col = le.fit_transform(tar_col)
+
 
         elif data_type == "datetime":
             src_col = src_col.apply(time2int)
@@ -65,9 +73,9 @@ class MISim(PairMetric):
             tar_col = pd.cut(
                 tar_col, instance.numerical_bins, labels=range(instance.numerical_bins)
             )
-            src_col = src_col.to_numpy()
-            tar_col = tar_col.to_numpy()
-
+            
+        src_col = src_col.to_numpy()
+        tar_col = tar_col.to_numpy()
         MI_sim = normalized_mutual_info_score(src_col, tar_col)
 
         return MI_sim
