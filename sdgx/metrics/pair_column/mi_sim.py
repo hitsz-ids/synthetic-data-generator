@@ -4,10 +4,7 @@ from scipy.stats import entropy
 from sklearn.metrics.cluster import normalized_mutual_info_score
 
 from sdgx.metrics.pair_column.base import PairMetric
-
-
 from sdgx.utils import time2int
-
 
 
 class MISim(PairMetric):
@@ -46,26 +43,16 @@ class MISim(PairMetric):
         col_name = src_col.name
         data_type = metadata[col_name]
         if data_type == "numerical":
-            src_col = pd.cut(
-                src_col, self.numerical_bins, labels=range(self.numerical_bins)
-            )
-            tar_col = pd.cut(
-                tar_col, self.numerical_bins, labels=range(self.numerical_bins)
-            )
+            src_col = pd.cut(src_col, self.numerical_bins, labels=range(self.numerical_bins))
+            tar_col = pd.cut(tar_col, self.numerical_bins, labels=range(self.numerical_bins))
 
         elif data_type == "datetime":
             src_col = src_col.apply(time2int)
             tar_col = tar_col.apply(time2int)
-            src_col = pd.cut(
-                src_col, self.numerical_bins, labels=range(self.numerical_bins)
-            )
-            tar_col = pd.cut(
-                tar_col, self.numerical_bins, labels=range(self.numerical_bins)
-            )
+            src_col = pd.cut(src_col, self.numerical_bins, labels=range(self.numerical_bins))
+            tar_col = pd.cut(tar_col, self.numerical_bins, labels=range(self.numerical_bins))
 
-        MI_sim = normalized_mutual_info_score(
-            src_col, tar_col
-        )
+        MI_sim = normalized_mutual_info_score(src_col, tar_col)
 
         return MI_sim
 

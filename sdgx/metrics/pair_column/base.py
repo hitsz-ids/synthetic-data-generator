@@ -16,9 +16,7 @@ class PairMetric(object):
         pass
 
     @classmethod
-    def check_input(
-        cls, src_col: pd.Series, tar_col: pd.Series, metadata:dict
-    ):
+    def check_input(cls, src_col: pd.Series, tar_col: pd.Series, metadata: dict):
         """Input check for table input.
         Args:
             src_data(pd.Series ): the source data column.
