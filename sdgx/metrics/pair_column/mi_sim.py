@@ -15,12 +15,12 @@ class MISim(PairMetric):
     Currently, we support discrete and continuous(need to be discretized) columns as inputs.
     """
 
-    def __init__(self) -> None:
+    def __init__(instance) -> None:
         super().__init__()
-        self.lower_bound = 0
-        self.upper_bound = 1
-        self.metric_name = "mutual_information_similarity"
-        self.numerical_bins = 50
+        instance.lower_bound = 0
+        instance.upper_bound = 1
+        instance.metric_name = "mutual_information_similarity"
+        instance.numerical_bins = 50
 
     @classmethod
     def calculate(
@@ -40,18 +40,19 @@ class MISim(PairMetric):
         """
 
         # 传入概率分布数组
+        instance = cls()
 
         col_name = src_col.name
         data_type = metadata[col_name]
         if data_type == "numerical":
-            src_col = pd.cut(src_col, self.numerical_bins, labels=range(self.numerical_bins))
-            tar_col = pd.cut(tar_col, self.numerical_bins, labels=range(self.numerical_bins))
+            src_col = pd.cut(src_col, instance.numerical_bins, labels=range(instance.numerical_bins))
+            tar_col = pd.cut(tar_col, instance.numerical_bins, labels=range(instance.numerical_bins))
 
         elif data_type == "datetime":
             src_col = src_col.apply(time2int)
             tar_col = tar_col.apply(time2int)
-            src_col = pd.cut(src_col, self.numerical_bins, labels=range(self.numerical_bins))
-            tar_col = pd.cut(tar_col, self.numerical_bins, labels=range(self.numerical_bins))
+            src_col = pd.cut(src_col, instance.numerical_bins, labels=range(instance.numerical_bins))
+            tar_col = pd.cut(tar_col, instance.numerical_bins, labels=range(instance.numerical_bins))
 
         MI_sim = normalized_mutual_info_score(src_col, tar_col)
 
