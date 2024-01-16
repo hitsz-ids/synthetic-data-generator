@@ -53,7 +53,7 @@ class MISim(PairMetric):
                 instance.numerical_bins,
                 labels=range(instance.numerical_bins),
             )
-            x = np.array(tar_col.array[0])
+            x = np.array(tar_col.array)
             tar_col = pd.cut(
                 x,
                 instance.numerical_bins,
@@ -64,13 +64,13 @@ class MISim(PairMetric):
 
         elif data_type == "category":
             le = LabelEncoder()
-            src_list = list(set(src_col.array[0]))
-            tar_list = list(set(tar_col.array[0]))
+            src_list = list(set(src_col.array))
+            tar_list = list(set(tar_col.array))
             fit_list = tar_list + src_list
             le.fit(fit_list)
 
-            src_col = le.transform(np.array(src_col.array[0]))
-            tar_col = le.transform(np.array(tar_col.array[0]))
+            src_col = le.transform(np.array(src_col.array))
+            tar_col = le.transform(np.array(tar_col.array))
 
         elif data_type == "datetime":
             src_col = src_col.apply(time2int)
