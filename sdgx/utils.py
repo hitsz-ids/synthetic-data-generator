@@ -25,8 +25,21 @@ __all__ = [
     "cache",
     "Singleton",
     "find_free_port",
+    "download_multi_table_demo_data",
+    "get_demo_single_table",
     "time2int",
 ]
+MULTI_TABLE_DEMO_DATA = {
+    "rossman": {
+        "parent_table": "store",
+        "child_table": "train",
+        "parent_url": "https://raw.githubusercontent.com/juniorcl/rossman-store-sales/main/databases/store.csv",
+        "child_url": "https://raw.githubusercontent.com/juniorcl/rossman-store-sales/main/databases/train.csv",
+        "parent_primary_keys": ["Store"],
+        "child_primary_keys": ["Store", "Date"],
+        "foreign_keys": ["Store"],
+    }
+}
 
 
 def find_free_port():
@@ -85,6 +98,7 @@ def get_demo_single_table(data_dir: str | Path = "./dataset"):
         "class",
     ]
     return pd_obj, discrete_cols
+
 
 
 def time2int(datetime, form):
