@@ -1,35 +1,32 @@
 from __future__ import annotations
 
-import time
+
 from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict, List
-
 import pandas as pd
-from pydantic import BaseModel
 
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.combiner import MetadataCombiner
 from sdgx.log import logger
-from sdgx.utils import DataAccessType
+from sdgx.models.base import SynthesizerModel
+from sdgx.exceptions import SynthesizerInitError 
 
 
-class MultiTableSynthesizerModel(BaseModel):
+
+class MultiTableSynthesizerModel(SynthesizerModel):
     """MultiTableSynthesizerModel
 
     The base model of multi-table statistic models.
     """
 
-    data_access_method: DataAccessType = DataAccessType.pd_data_frame
-    """
-    The type of the data access, now support pandas.DataFrame or sdgx.DataLoader.
-    """
-
     metadata_combiner: MetadataCombiner = None
     """
     metadata_combiner is a sdgx builtin class, it stores all tables' metadata and relationships.
+    
+    This parameter must be specified when initializing the multi-table class.
     """
-
+    
     tables_data_frame: Dict[str, Any] = defaultdict()
     """
     tables_data_frame is a dict contains every table's csv data frame.
@@ -61,11 +58,11 @@ class MultiTableSynthesizerModel(BaseModel):
     The mapping from all parent tabels to their child table.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, metadata_combiner: MetadataCombiner, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        self.metadata_combiner = metadata_combiner
         self._calculate_parent_and_child_map()
-
         self.check()
 
     def _calculate_parent_and_child_map(self):
@@ -110,21 +107,28 @@ class MultiTableSynthesizerModel(BaseModel):
     def check(self, check_circular=True):
         """Excute necessary checks
 
+        - check access type 
+        - check metadata_combiner
+        - check relationship
+        - check each metadata
         - validate circular relationships
         - validate child map_circular relationship
         - validate all tables connect relationship
         - validate column relationships foreign keys
         """
-
+        self._check_access_type()
+        
+        if not isinstance(self.metadata_combiner, MetadataCombiner):
+            raise SynthesizerInitError("Wrong Metadata Combiner found.")
         pass
 
-    def fit(self, dataloader: DataLoader, *args, **kwargs):
+    def fit(self, dataloader: Dict[str, DataLoader] , raw_data: Dict[str, pd.DataFrame], *args, **kwargs):
         """
         Fit the model using the given metadata and dataloader.
 
         Args:
-            metadata (Metadata): The metadata to use.
-            dataloader (DataLoader): The dataloader to use.
+            dataloader (Dict[str, DataLoader]): The dataloader to use to fit the model.
+            raw_data (Dict[str, pd.DataFrame]): The raw pd.DataFrame to use to fit the model. 
         """
         raise NotImplementedError
 
