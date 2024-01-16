@@ -60,7 +60,7 @@ class MISim(PairMetric):
             le = LabelEncoder()
             src_list = list(set(src_col.array[0]))
             tar_list = list(set(tar_col.array[0]))
-            fit_list = tar_list+src_list
+            fit_list = tar_list + src_list
             le.fit(fit_list)
 
             src_col = le.transform(src_col.array[0])
