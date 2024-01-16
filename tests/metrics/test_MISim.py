@@ -1,3 +1,6 @@
+from __future__ import annotations
+import random
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -5,58 +8,66 @@ import pytest
 from sdgx.metrics.pair_column.mi_sim import MISim
 
 # 创建测试数据
-real_data_discrete = pd.DataFrame(
-    {
-        "col1": ["a", "b", "c", "d", "e"],
-        "col2": ["a", "b", "b", "b", "e"],
-    }
-)
+@pytest.fixture
+def dummy_data_cate(dummy_single_table_path):
+    df = pd.read_csv(dummy_single_table_path)
+    yield df["role"]
 
-synthetic_data_discrete = pd.DataFrame(
-    {
-        "col1": ["a", "c", "d", "b", "b"],
-        "col2": ["a", "c", "a", "a", "e"],
-    }
-)
-
-real_data_cotinuous = pd.DataFrame(
-    {
-        "col1": [1, 1, 2, 2, 3],
-        "col2": [4, 4, 5, 5, 6],
-    }
-)
-
-synthetic_data_cotinuous = pd.DataFrame(
-    {
-        "col1": [1, 2, 2, 3, 3],
-        "col2": [4, 5, 5, 6, 6],
-    }
-)
-
-# 创建 MISim 实例
-mi_sim = MISim()
-
-"""
-def test_MISim_discrete():
-    cols = ["col1", "col2"]
-    result = mi_sim.calculate(real_data_discrete, synthetic_data_discrete,metadata)
-    result1 = mi_sim.calculate(real_data_discrete, real_data_discrete)
-    result2 = mi_sim.calculate(synthetic_data_discrete, real_data_discrete, discrete=True)
-
-    assert result >= 0
-    assert result <= 1
-    assert result1 == 1
-    assert result2 == result
+@pytest.fixture
+def dummy_data_num(dummy_single_table_path):
+    df = pd.read_csv(dummy_single_table_path)
+    yield df["feature_x"]
 
 
-def test_MISim_continuous():
-    cols = ["col1"]
-    result = mi_sim.calculate(real_data_cotinuous, synthetic_data_cotinuous, discrete=False)
-    result1 = mi_sim.calculate(real_data_cotinuous, real_data_cotinuous, discrete=False)
-    result2 = mi_sim.calculate(synthetic_data_cotinuous, real_data_cotinuous, discrete=False)
+
+@pytest.fixture
+def test_data_category():
+    role_set = ["admin", "user", "guest"]
+    # datatime_set = [""]
+    df = pd.Series(
+        {
+            "role": [random.choice(role_set) for _ in range(10)],
+        }
+    )
+    return df
+
+@pytest.fixture
+def test_data_num():
+    # datatime_set = [""]
+    df = pd.Series(
+        {
+            "feature_x": [random.random() for _ in range(10)],
+        }
+    )
+    return df
+
+@pytest.fixture
+def mi_sim_instance():
+    return MISim()
+
+
+
+
+def test_MISim_discrete(dummy_data_cate, test_data):
+    metadata = {"role":"category"}
+    result = mi_sim.calculate(dummy_data_cate, test_data,metadata)
+    result1 = mi_sim.calculate(dummy_data_cate, dummy_data_cate,metadata)
+    result2 = mi_sim.calculate(test_data, dummy_data_cate, discrete=True)
 
     assert result >= 0
     assert result <= 1
     assert result1 == 1
     assert result2 == result
-"""
+
+
+def test_MISim_continuous(dummy_data_num, test_data):
+    cols = ["feature_x"]
+    metadata = {"feature_x":"continuous"}
+    result = mi_sim.calculate(dummy_data_num, test_data, discrete=False)
+    result1 = mi_sim.calculate(dummy_data_num, dummy_data_num, discrete=False)
+    result2 = mi_sim.calculate(test_data, dummy_data_num, discrete=False)
+
+    assert result >= 0
+    assert result <= 1
+    assert result1 == 1
+    assert result2 == result

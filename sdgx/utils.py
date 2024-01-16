@@ -19,7 +19,7 @@ try:
 except ImportError:
     from functools import lru_cache as cache
 
-__all__ = ["download_demo_data", "get_demo_single_table", "cache", "Singleton", "find_free_port"]
+__all__ = ["download_demo_data", "get_demo_single_table", "cache", "Singleton", "find_free_port","time2int"]
 
 
 def find_free_port():
