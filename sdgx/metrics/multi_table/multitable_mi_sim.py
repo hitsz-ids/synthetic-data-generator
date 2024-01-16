@@ -64,7 +64,7 @@ class MISim(MultiTableMetric):
         """Check the output value.
 
         Args:
-            raw_metric_value (float):  the calculated raw value of the JSD metric.
+            raw_metric_value (float):  the calculated raw value of the mi_sim metric.
         """
         # instance = cls()
         if raw_metric_value < self.lower_bound or raw_metric_value > self.upper_bound:
