@@ -48,6 +48,7 @@ class MISim(PairMetric):
         col_name = src_col.name
         data_type = metadata[col_name]
 
+       
         if data_type == "numerical":
             src_col = pd.cut(
                 src_col, instance.numerical_bins, labels=range(instance.numerical_bins)
@@ -55,8 +56,7 @@ class MISim(PairMetric):
             tar_col = pd.cut(
                 tar_col, instance.numerical_bins, labels=range(instance.numerical_bins)
             )
-            src_col = src_col.to_numpy()
-            tar_col = tar_col.to_numpy()
+
         elif data_type == "category":
             le = LabelEncoder()
             src_col = le.fit_transform(src_col)
