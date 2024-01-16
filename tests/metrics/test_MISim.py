@@ -8,7 +8,6 @@ import pytest
 
 from sdgx.metrics.pair_column.mi_sim import MISim
 
-
 # 创建测试数据
 
 
@@ -44,9 +43,15 @@ def test_MISim_discrete(test_data_category, mi_sim_instance):
     metadata = {"role1": "category", "role2": "category"}
     col_src = "role1"
     col_tar = "role2"
-    result = mi_sim_instance.calculate(test_data_category[col_src],test_data_category[col_tar], metadata)
-    result1 = mi_sim_instance.calculate(test_data_category[col_src], test_data_category[col_src], metadata)
-    result2 = mi_sim_instance.calculate(test_data_category[col_tar], test_data_category[col_src], metadata)
+    result = mi_sim_instance.calculate(
+        test_data_category[col_src], test_data_category[col_tar], metadata
+    )
+    result1 = mi_sim_instance.calculate(
+        test_data_category[col_src], test_data_category[col_src], metadata
+    )
+    result2 = mi_sim_instance.calculate(
+        test_data_category[col_tar], test_data_category[col_src], metadata
+    )
 
     assert result >= 0
     assert result <= 1
@@ -55,17 +60,24 @@ def test_MISim_discrete(test_data_category, mi_sim_instance):
 
 
 def test_MISim_continuous(dummy_data_num, test_data_num, mi_sim_instance):
-    metadata = {"feature_x": "numerical","feature_y": "numerical"}
+    metadata = {"feature_x": "numerical", "feature_y": "numerical"}
     col_src = "feature_x"
     col_tar = "feature_y"
-    result = mi_sim_instance.calculate(test_data_category[col_src],test_data_category[col_tar], metadata)
-    result1 = mi_sim_instance.calculate(test_data_category[col_src], test_data_category[col_src], metadata)
-    result2 = mi_sim_instance.calculate(test_data_category[col_tar], test_data_category[col_src], metadata)
+    result = mi_sim_instance.calculate(
+        test_data_category[col_src], test_data_category[col_tar], metadata
+    )
+    result1 = mi_sim_instance.calculate(
+        test_data_category[col_src], test_data_category[col_src], metadata
+    )
+    result2 = mi_sim_instance.calculate(
+        test_data_category[col_tar], test_data_category[col_src], metadata
+    )
 
     assert result >= 0
     assert result <= 1
     assert result1 == 1
     assert result2 == result
+
 
 if __name__ == "__main__":
     pytest.main(["-vv", "-s", __file__])
