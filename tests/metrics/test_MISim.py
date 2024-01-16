@@ -64,13 +64,13 @@ def test_MISim_continuous(test_data_num, mi_sim_instance):
     col_src = "feature_x"
     col_tar = "feature_y"
     result = mi_sim_instance.calculate(
-        test_data_category[col_src], test_data_category[col_tar], metadata
+        test_data_num[col_src], test_data_num[col_tar], metadata
     )
     result1 = mi_sim_instance.calculate(
-        test_data_category[col_src], test_data_category[col_src], metadata
+        test_data_num[col_src], test_data_num[col_src], metadata
     )
     result2 = mi_sim_instance.calculate(
-        test_data_category[col_tar], test_data_category[col_src], metadata
+        test_data_num[col_tar], test_data_num[col_src], metadata
     )
 
     assert result >= 0
