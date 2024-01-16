@@ -5,6 +5,7 @@ import threading
 import urllib.request
 from contextlib import closing
 from pathlib import Path
+import time
 
 import pandas as pd
 
@@ -15,7 +16,7 @@ try:
 except ImportError:
     from functools import lru_cache as cache
 
-__all__ = ["download_demo_data", "get_demo_single_table", "cache", "Singleton", "find_free_port"]
+__all__ = ["download_demo_data", "get_demo_single_table", "cache", "Singleton", "find_free_port","time2int"]
 
 
 def find_free_port():
@@ -75,6 +76,10 @@ def get_demo_single_table(data_dir: str | Path = "./dataset"):
     ]
     return pd_obj, discrete_cols
 
+def time2int(datetime, form):
+    time_array = time.strptime(datetime, form)
+    time_stamp = int(time.mktime(time_array))
+    return time_stamp
 
 class Singleton(type):
     """

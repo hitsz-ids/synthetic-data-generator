@@ -1,6 +1,3 @@
-import time
-from datetime import datetime
-
 import numpy as np
 import pandas as pd
 from scipy.stats import entropy
@@ -54,7 +51,6 @@ class SinTabMISim(SingleTableMetric):
                 nMI_sim[i][j] = mi_sim_instance.calculate(real_data, syn_data, metadata)
 
         MI_sim = np.sum(nMI_sim) / n / n
-        # test
         MISim.check_output(MI_sim)
 
         return MI_sim
@@ -69,16 +65,3 @@ class SinTabMISim(SingleTableMetric):
         # instance = cls()
         if raw_metric_value < self.lower_bound or raw_metric_value > self.upper_bound:
             raise ValueError
-
-    # @classmethod
-    # def normailized_mutual_information(cls, p: float, q: float):
-    #     """Calculate the jensen_shannon_divergence of p and q.
-
-    #     Args:
-    #         p (float): the input parameter p.
-
-    #         q (float): the input parameter q.
-    #     """
-    #     n_MI = None
-
-    #     return n_MI

@@ -1,6 +1,3 @@
-import time
-from datetime import datetime
-
 import numpy as np
 import pandas as pd
 from scipy.stats import entropy
@@ -9,14 +6,8 @@ from sklearn.metrics.cluster import normalized_mutual_info_score
 from sdgx.metrics.pair_column.base import PairMetric
 
 
-def Jaccard_index(A, B):
-    return min(A, B) / max(A, B)
+from sdgx.utils import time2int
 
-
-def time2int(datetime, form):
-    time_array = time.strptime(datetime, form)
-    time_stamp = int(time.mktime(time_array))
-    return time_stamp
 
 
 class MISim(PairMetric):
@@ -36,63 +27,46 @@ class MISim(PairMetric):
 
     @classmethod
     def calculate(
-        real_data: pd.DataFrame,
-        synthetic_data: pd.DataFrame,
+        src_col: pd.DataFrame,
+        tar_col: pd.DataFrame,
         metadata: dict,
     ) -> float:
         """
         Calculate the JSD value between a real column and a synthetic column.
         Args:
-            real_data (pd.DataFrame): The real data.
-            synthetic_data (pd.DataFrame): The synthetic data.
-            metadata(dict): The metadata that describes the data type of each column
+            src_data(pd.Series ): the source data column.
+            tar_data(pd.Series): the target data column .
+            metadata(dict): The metadata that describes the data type of each columns
         Returns:
             MI_similarity (float): The metric value.
         """
 
         # 传入概率分布数组
 
-        columns = synthetic_data.columns
-        n = len(columns)
+        col_name = src_col.name
+        data_type = metadata[col_name]
+        if data_type == "numerical":
+            src_col = pd.cut(
+                src_col, self.numerical_bins, labels=range(self.numerical_bins)
+            )
+            tar_col = pd.cut(
+                tar_col, self.numerical_bins, labels=range(self.numerical_bins)
+            )
 
-        for col in columns:
-            # data_type = self.metadata[col]
-            if data_type == "numerical":
-                # max_value = real_data[col].max()
-                # min_value = real_data[col].min()
-                real_data[col] = pd.cut(
-                    real_data[col], self.numerical_bins, labels=range(self.numerical_bins)
-                )
-                synthetic_data[col] = pd.cut(
-                    synthetic_data[col], self.numerical_bins, labels=range(self.numerical_bins)
-                )
+        elif data_type == "datetime":
+            src_col = src_col.apply(time2int)
+            tar_col = tar_col.apply(time2int)
+            src_col = pd.cut(
+                src_col, self.numerical_bins, labels=range(self.numerical_bins)
+            )
+            tar_col = pd.cut(
+                tar_col, self.numerical_bins, labels=range(self.numerical_bins)
+            )
 
-            elif data_type == "datetime":
-                real_data[col] = real_data[col].apply(time2int)
-                synthetic_data[col] = synthetic_data[col].apply(time2int)
-                real_data[col] = pd.cut(
-                    real_data[col], self.numerical_bins, labels=range(self.numerical_bins)
-                )
-                synthetic_data[col] = pd.cut(
-                    synthetic_data[col], self.numerical_bins, labels=range(self.numerical_bins)
-                )
-
-        # nMI_sim = np.zeros((n,n))
-
-        # for i in range(len(columns)):
-        #     for j in range(len(columns)):
-        syn_MI = normalized_mutual_info_score(
-            synthetic_data[columns[0]], synthetic_data[columns[1]]
+        MI_sim = normalized_mutual_info_score(
+            src_col, tar_col
         )
-        real_MI = normalized_mutual_info_score(real_data[columns[0]], real_data[columns[1]])
 
-        MI_sim = Jaccard_index(syn_MI, real_MI)
-        """
-        MI_sim = np.sum(nMI_sim)/n/n
-        # test
-        MISim.check_output(MI_sim)
-        """
-        MISim.check_output(MI_sim)
         return MI_sim
 
     @classmethod
@@ -100,21 +74,6 @@ class MISim(PairMetric):
         """Check the output value.
 
         Args:
-            raw_metric_value (float):  the calculated raw value of the JSD metric.
+            raw_metric_value (float):  the calculated raw value of the MI similarity.
         """
-        # instance = cls()
-        if raw_metric_value < self.lower_bound or raw_metric_value > self.upper_bound:
-            raise ValueError
-
-    # @classmethod
-    # def normailized_mutual_information(cls, p: float, q: float):
-    #     """Calculate the jensen_shannon_divergence of p and q.
-
-    #     Args:
-    #         p (float): the input parameter p.
-
-    #         q (float): the input parameter q.
-    #     """
-    #     n_MI = None
-
-    #     return n_MI
+        pass

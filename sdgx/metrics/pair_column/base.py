@@ -17,38 +17,36 @@ class PairMetric(object):
 
     @classmethod
     def check_input(
-        cls, real_data: pd.DataFrame, synthetic_data: pd.DataFrame, real_metadata, syn_metadata
+        cls, src_col: pd.Series, tar_col: pd.Series, metadata:dict
     ):
         """Input check for table input.
         Args:
-            real_data(pd.DataFrame ): the real (original) data table.
-            synthetic_data(pd.DataFrame): the synthetic (generated) data table .
+            src_data(pd.Series ): the source data column.
+            tar_data(pd.Series): the target data column .
+            metadata(dict): The metadata that describes the data type of each column
         """
         # Input parameter must not contain None value
         if real_data is None or synthetic_data is None:
             raise TypeError("Input contains None.")
         # check column_names
-        real_cols = real_data.columns
-        syn_cols = synthetic_data.columns
-        if set(real_cols) != set(syn_cols):
-            raise TypeError("Columns of Dataframe are Different.")
+        tar_name = tar_col.name
+        src_name = src_col.name
 
         # check column_types
-        for col in real_cols:
-            if real_metadata[col] != syn_metadata[col]:
-                raise TypeError("Columns of Dataframe are Different.")
+        if metadata[tar_name] != metadata[src_name]:
+            raise TypeError("Type of Pair is Conflicting.")
 
-        # if type is pd.DataFrame, return directly
-        if isinstance(real_data, pd.DataFrame):
-            return real_data, synthetic_data
+        # if type is pd.Series, return directly
+        if isinstance(real_data, pd.Series):
+            return src_col, tar_col
 
         # if type is not pd.Series or pd.DataFrame tranfer it to Series
         try:
-            real_data = pd.DataFrame(real_data)
-            synthetic_data = pd.DataFrame(synthetic_data)
-            return real_data, synthetic_data
+            src_col = pd.Series(src_col)
+            tar_col = pd.Series(tar_col)
+            return src_col, tar_col
         except Exception as e:
-            logger.error(f"An error occurred while converting to pd.DataFrame: {e}")
+            logger.error(f"An error occurred while converting to pd.Series: {e}")
 
         return None, None
 
