@@ -58,8 +58,13 @@ class MISim(PairMetric):
 
         elif data_type == "category":
             le = LabelEncoder()
-            src_col = le.fit_transform(src_col.array[0])
-            tar_col = le.fit_transform(tar_col.array[0])
+            src_list = list(set(src_col.array[0]))
+            tar_list = list(set(tar_col.array[0]))
+            fit_list = tar_list+src_list
+            le.fit(fit_list)
+
+            src_col = le.transform(src_col.array[0])
+            tar_col = le.transform(tar_col.array[0])
 
         elif data_type == "datetime":
             src_col = src_col.apply(time2int)
