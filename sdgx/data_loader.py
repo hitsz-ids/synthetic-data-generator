@@ -28,6 +28,8 @@ class DataLoader:
         cacher (:ref:`Cacher`, optional): The cacher. Defaults to None.
         cache_mode (str, optional): The cache mode(cachers' name). Defaults to "DiskCache", more info in :ref:`DiskCache`.
         cacher_kwargs (dict, optional): The kwargs for cacher. Defaults to None
+        identity (str, optional): The identity of the data source.
+            When using :ref:`GeneratorConnector`, it can be pointed to the original data source, makes it possible to work with :ref:`MetadataCombiner`.
 
     Example:
 
@@ -95,10 +97,12 @@ class DataLoader:
         chunksize: int = 10000,
         cacher: Cacher | str | type[Cacher] | None = None,
         cacher_kwargs: None | dict[str, Any] = None,
+        identity: str | None = None,
     ) -> None:
         self.data_connector = data_connector
         self.chunksize = chunksize
         self.cache_manager = CacherManager()
+        self.identity = identity or self.data_connector.identity or str(id(self))
 
         if not cacher_kwargs:
             cacher_kwargs = {}

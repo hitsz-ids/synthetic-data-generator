@@ -106,7 +106,7 @@ class Manager(metaclass=Singleton):
             return
         self._registed_cls[cls_name] = cls
 
-    def init(self, cls_name, **kwargs: dict[str, Any]):
+    def init(self, c, **kwargs: dict[str, Any]):
         """
         Init a new subclass of self.register_type.
 
@@ -114,18 +114,21 @@ class Manager(metaclass=Singleton):
             NotFoundError: if cls_name is not registered
             InitializationError: if failed to initialize
         """
-        if isinstance(cls_name, type):
-            cls_type = cls_name
-        else:
-            cls_name = self._normalize_name(cls_name)
+        if isinstance(c, self.register_type):
+            return c
 
-            if not cls_name in self.registed_cls:
+        if isinstance(c, type):
+            cls_type = c
+        else:
+            c = self._normalize_name(c)
+
+            if not c in self.registed_cls:
                 raise NotFoundError
-            cls_type = self.registed_cls[cls_name]
+            cls_type = self.registed_cls[c]
         try:
             instance = cls_type(**kwargs)
             if not isinstance(instance, self.register_type):
-                raise InitializationError(f"{cls_name} is not a subclass of {self.register_type}.")
+                raise InitializationError(f"{c} is not a subclass of {self.register_type}.")
             return instance
         except Exception as e:
             raise InitializationError(e)

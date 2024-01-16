@@ -13,6 +13,10 @@ Built-in Inspector
     :maxdepth: 2
 
     DiscreteInspector <discrete>
+    NumericInspector <numeric>
+    BoolInspector <bool>
+    DatetimeInspector <datetime>
+    IDInspector <i_id>
 
 
 Custom Inspectors Relevant

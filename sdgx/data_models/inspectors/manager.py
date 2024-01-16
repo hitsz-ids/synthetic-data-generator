@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Iterable
 
 from sdgx.data_models import inspectors
 from sdgx.data_models.inspectors import extension
@@ -29,8 +29,8 @@ class InspectorManager(Manager):
 
     def init_inspcetors(
         self,
-        includes: list[str] | None = None,
-        excludes: list[str] | None = None,
+        includes: Iterable[str] | None = None,
+        excludes: Iterable[str] | None = None,
         **kwargs: Any,
     ) -> list[Inspector]:
         includes = includes or self.registed_inspectors.keys()

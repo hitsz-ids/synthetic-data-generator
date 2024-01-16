@@ -299,6 +299,7 @@ class Synthesizer:
         start_time = time.time()
         processed_dataloader = DataLoader(
             GeneratorConnector(chunk_generator),
+            identity=self.dataloader.identity,
             **self.processed_data_loaders_kwargs,
         )
         logger.info(f"Initialized processed data loader in {time.time() - start_time}s")
