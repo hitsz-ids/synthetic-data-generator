@@ -6,26 +6,26 @@ import pandas as pd
 
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.metadata import Metadata
-from sdgx.exceptions import SynthesizerInitError 
+from sdgx.exceptions import SynthesizerInitError
 
 
 class SynthesizerModel:
-
-    use_dataloader:bool = False
-    use_raw_data:bool = False
+    use_dataloader: bool = False
+    use_raw_data: bool = False
 
     def __init__(self, *args, **kwargs) -> None:
-
-        # specify data access type 
-        if 'use_dataloader' in kwargs.keys():
-            self.use_dataloader = kwargs['use_dataloader']
-        if 'use_raw_data' in kwargs.keys():
-            self.use_raw_data = kwargs['use_raw_data']
+        # specify data access type
+        if "use_dataloader" in kwargs.keys():
+            self.use_dataloader = kwargs["use_dataloader"]
+        if "use_raw_data" in kwargs.keys():
+            self.use_raw_data = kwargs["use_raw_data"]
 
     def _check_access_type(self):
         if self.use_dataloader == self.use_raw_data == False:
-            raise SynthesizerInitError("Data access type not specified, please use `use_raw_data: bool` or `use_dataloader: bool` to specify data access type.")
-        elif self.use_dataloader == self.use_raw_data == True: 
+            raise SynthesizerInitError(
+                "Data access type not specified, please use `use_raw_data: bool` or `use_dataloader: bool` to specify data access type."
+            )
+        elif self.use_dataloader == self.use_raw_data == True:
             raise SynthesizerInitError("Duplicate data access type found.")
 
     def fit(self, metadata: Metadata, dataloader: DataLoader, *args, **kwargs):

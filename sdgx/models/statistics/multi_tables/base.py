@@ -1,17 +1,16 @@
 from __future__ import annotations
 
-
 from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict, List
+
 import pandas as pd
 
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.combiner import MetadataCombiner
+from sdgx.exceptions import SynthesizerInitError
 from sdgx.log import logger
 from sdgx.models.base import SynthesizerModel
-from sdgx.exceptions import SynthesizerInitError 
-
 
 
 class MultiTableSynthesizerModel(SynthesizerModel):
@@ -23,10 +22,10 @@ class MultiTableSynthesizerModel(SynthesizerModel):
     metadata_combiner: MetadataCombiner = None
     """
     metadata_combiner is a sdgx builtin class, it stores all tables' metadata and relationships.
-    
+
     This parameter must be specified when initializing the multi-table class.
     """
-    
+
     tables_data_frame: Dict[str, Any] = defaultdict()
     """
     tables_data_frame is a dict contains every table's csv data frame.
@@ -107,7 +106,7 @@ class MultiTableSynthesizerModel(SynthesizerModel):
     def check(self, check_circular=True):
         """Excute necessary checks
 
-        - check access type 
+        - check access type
         - check metadata_combiner
         - check relationship
         - check each metadata
@@ -117,18 +116,20 @@ class MultiTableSynthesizerModel(SynthesizerModel):
         - validate column relationships foreign keys
         """
         self._check_access_type()
-        
+
         if not isinstance(self.metadata_combiner, MetadataCombiner):
             raise SynthesizerInitError("Wrong Metadata Combiner found.")
         pass
 
-    def fit(self, dataloader: Dict[str, DataLoader] , raw_data: Dict[str, pd.DataFrame], *args, **kwargs):
+    def fit(
+        self, dataloader: Dict[str, DataLoader], raw_data: Dict[str, pd.DataFrame], *args, **kwargs
+    ):
         """
         Fit the model using the given metadata and dataloader.
 
         Args:
             dataloader (Dict[str, DataLoader]): The dataloader to use to fit the model.
-            raw_data (Dict[str, pd.DataFrame]): The raw pd.DataFrame to use to fit the model. 
+            raw_data (Dict[str, pd.DataFrame]): The raw pd.DataFrame to use to fit the model.
         """
         raise NotImplementedError
 
