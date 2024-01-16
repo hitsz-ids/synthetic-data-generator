@@ -48,10 +48,14 @@ class MISim(PairMetric):
 
         if data_type == "numerical":
             src_col = pd.cut(
-                src_col.astype(float), instance.numerical_bins, labels=range(instance.numerical_bins)
+                src_col.astype(float),
+                instance.numerical_bins,
+                labels=range(instance.numerical_bins),
             )
             tar_col = pd.cut(
-                tar_col.astype(float), instance.numerical_bins, labels=range(instance.numerical_bins)
+                tar_col.astype(float),
+                instance.numerical_bins,
+                labels=range(instance.numerical_bins),
             )
             src_col = src_col.to_numpy()
             tar_col = tar_col.to_numpy()
