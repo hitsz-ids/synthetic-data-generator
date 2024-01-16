@@ -49,17 +49,17 @@ class PairMetric(object):
         return None, None
 
     @classmethod
-    def calculate(cls, real_data: pd.DataFrame, synthetic_data: pd.DataFrame):
+    def calculate(cls, src_col: pd.Series, tar_col: pd.Series,metadata):
         """Calculate the metric value between pair-columns between real table and synthetic table.
 
         Args:
-            real_data(pd.DataFrame or pd.Series): the real (original) data pair.
-
-            synthetic_data(pd.DataFrame or pd.Series): the synthetic (generated) data pair.
+            src_data(pd.Series ): the source data column.
+            tar_data(pd.Series): the target data column .
+            metadata(dict): The metadata that describes the data type of each column
         """
         # This method should first check the input
         # such as:
-        real_data, synthetic_data = PairMetric.check_input(real_data, synthetic_data)
+        real_data, synthetic_data = PairMetric.check_input(src_col, tar_col)
 
         raise NotImplementedError()
 

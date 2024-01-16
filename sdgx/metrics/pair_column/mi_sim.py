@@ -24,8 +24,8 @@ class MISim(PairMetric):
 
     @classmethod
     def calculate(
-        src_col: pd.DataFrame,
-        tar_col: pd.DataFrame,
+        src_col: pd.Series,
+        tar_col: pd.Series,
         metadata: dict,
     ) -> float:
         """
