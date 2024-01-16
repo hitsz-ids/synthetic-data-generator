@@ -47,7 +47,7 @@ class MISim(PairMetric):
         data_type = metadata[col_name]
 
         if data_type == "numerical":
-            x = np.array(src_col.array[0])
+            x = np.array(src_col.array)
             src_col = pd.cut(
                 x,
                 instance.numerical_bins,
@@ -85,7 +85,6 @@ class MISim(PairMetric):
             tar_col = tar_col.to_numpy()
 
         MI_sim = normalized_mutual_info_score(src_col, tar_col)
-
         return MI_sim
 
     @classmethod
