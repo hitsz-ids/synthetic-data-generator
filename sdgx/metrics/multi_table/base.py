@@ -70,7 +70,7 @@ class MultiTableMetric:
         """Check the output value.
         Args:
 
-            raw_metric_value (float):  the calculated raw value of the JSD metric.
+            raw_metric_value (float):  the calculated raw value of the Mutual Information Similarity.
         """
         raise NotImplementedError()
 
