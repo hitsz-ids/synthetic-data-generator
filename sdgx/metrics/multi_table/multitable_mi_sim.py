@@ -60,12 +60,12 @@ class MISim(MultiTableMetric):
         return MI_sim
 
     @classmethod
-    def check_output(raw_metric_value: float):
+    def check_output(cls,raw_metric_value: float):
         """Check the output value.
 
         Args:
-            raw_metric_value (float):  the calculated raw value of the mi_sim metric.
+            raw_metric_value (float):  the calculated raw value of the Mutual Information Similarity.
         """
-        # instance = cls()
-        if raw_metric_value < self.lower_bound or raw_metric_value > self.upper_bound:
+        instance = cls()
+        if raw_metric_value < instance.lower_bound or raw_metric_value > instance.upper_bound:
             raise ValueError

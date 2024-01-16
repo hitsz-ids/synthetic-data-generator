@@ -24,6 +24,7 @@ class MISim(PairMetric):
 
     @classmethod
     def calculate(
+        cls,
         src_col: pd.Series,
         tar_col: pd.Series,
         metadata: dict,
@@ -57,7 +58,7 @@ class MISim(PairMetric):
         return MI_sim
 
     @classmethod
-    def check_output(raw_metric_value: float):
+    def check_output(cls,raw_metric_value: float):
         """Check the output value.
 
         Args:
