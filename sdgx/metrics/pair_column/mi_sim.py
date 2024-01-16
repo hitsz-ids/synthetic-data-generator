@@ -63,8 +63,8 @@ class MISim(PairMetric):
             fit_list = tar_list + src_list
             le.fit(fit_list)
 
-            src_col = le.transform(src_col.array[0])
-            tar_col = le.transform(tar_col.array[0])
+            src_col = le.transform(np.array(src_col.array[0]))
+            tar_col = le.transform(np.array(tar_col.array[0]))
 
         elif data_type == "datetime":
             src_col = src_col.apply(time2int)
