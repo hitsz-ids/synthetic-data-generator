@@ -56,7 +56,7 @@ class SinTabMISim(SingleTableMetric):
         return MI_sim
 
     @classmethod
-    def check_output(cls,raw_metric_value: float):
+    def check_output(cls, raw_metric_value: float):
         """Check the output value.
 
         Args:
