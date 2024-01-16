@@ -100,7 +100,6 @@ def get_demo_single_table(data_dir: str | Path = "./dataset"):
     return pd_obj, discrete_cols
 
 
-
 def time2int(datetime, form):
     time_array = time.strptime(datetime, form)
     time_stamp = int(time.mktime(time_array))
