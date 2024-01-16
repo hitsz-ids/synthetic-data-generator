@@ -65,10 +65,10 @@ class MISim(PairMetric):
             src_col = src_col.apply(time2int)
             tar_col = tar_col.apply(time2int)
             src_col = pd.cut(
-                src_col, bins = instance.numerical_bins, labels=range(instance.numerical_bins)
+                src_col, bins=instance.numerical_bins, labels=range(instance.numerical_bins)
             )
             tar_col = pd.cut(
-                tar_col, bins = instance.numerical_bins, labels=range(instance.numerical_bins)
+                tar_col, bins=instance.numerical_bins, labels=range(instance.numerical_bins)
             )
             src_col = src_col.to_numpy()
             tar_col = tar_col.to_numpy()
