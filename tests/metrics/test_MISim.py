@@ -59,7 +59,7 @@ def test_MISim_discrete(test_data_category, mi_sim_instance):
     assert result2 == result
 
 
-def test_MISim_continuous(dummy_data_num, test_data_num, mi_sim_instance):
+def test_MISim_continuous(test_data_num, mi_sim_instance):
     metadata = {"feature_x": "numerical", "feature_y": "numerical"}
     col_src = "feature_x"
     col_tar = "feature_y"
