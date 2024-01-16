@@ -6,6 +6,10 @@ Use Synthetic Data Generator as a library
     Learn more about :ref:`Architecture <architecture>` of our project.
 
 
+.. Warming::
+
+    This guide is not complete yet. Welcome to contribute.
+
 Use SDG as a library allow researchers or developers to build their own project
 based on SDG. It's highly recommended to use SDG as a library if people have some
 basic programming experience.
@@ -160,6 +164,6 @@ Evaluation
 Next Step
 ---------------------------------------------------------------------------------
 
-- Learn more about :ref:`Synthetic single-table data <Synthetic single-table data>`
-- Learn more about :ref:`Synthetic multi-table data <Synthetic multi-table data>`
-- Learn more about :ref:`Evaluation synthetic data <Evaluation synthetic data>`
+- :ref:`Synthetic single-table data <Synthetic single-table data>`
+- :ref:`Synthetic multi-table data <Synthetic multi-table data>`
+- :ref:`Evaluation synthetic data <Evaluation synthetic data>`

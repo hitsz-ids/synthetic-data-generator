@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from sdgx.data_models.inspectors.id import IDInspector
+from sdgx.data_models.inspectors.i_id import IDInspector
 
 
 @pytest.fixture
