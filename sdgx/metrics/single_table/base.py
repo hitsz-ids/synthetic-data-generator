@@ -55,7 +55,7 @@ class SingleTableMetric:
 
         return None, None
 
-    def calculate(self, real_data: pd.DataFrame, synthetic_data: pd.DataFrame):
+    def calculate(cls, real_data: pd.DataFrame, synthetic_data: pd.DataFrame):
         """Calculate the metric value between a real table and a synthetic table.
 
         Args:
