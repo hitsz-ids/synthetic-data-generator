@@ -25,7 +25,7 @@ class SinTabMISim(SingleTableMetric):
     @classmethod
     def calculate(real_data: pd.DataFrame, synthetic_data: pd.DataFrame, metadata) -> pd.DataFrame:
         """
-        Calculate the JSD value between a real column and a synthetic column.
+        Calculate the Mutual Information Similarity between a real column and a synthetic column.
         Args:
             real_data (pd.DataFrame): The real data.
             synthetic_data (pd.DataFrame): The synthetic data.
@@ -60,7 +60,7 @@ class SinTabMISim(SingleTableMetric):
         """Check the output value.
 
         Args:
-            raw_metric_value (float):  the calculated raw value of the JSD metric.
+            raw_metric_value (float):  the calculated raw value of the Mutual Information Similarity.
         """
         # instance = cls()
         if raw_metric_value < self.lower_bound or raw_metric_value > self.upper_bound:

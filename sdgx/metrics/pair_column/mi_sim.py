@@ -29,7 +29,7 @@ class MISim(PairMetric):
         metadata: dict,
     ) -> float:
         """
-        Calculate the JSD value between a real column and a synthetic column.
+        Calculate the MI similarity for the source data colum and the target data column.
         Args:
             src_data(pd.Series ): the source data column.
             tar_data(pd.Series): the target data column .

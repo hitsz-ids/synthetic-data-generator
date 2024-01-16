@@ -48,7 +48,7 @@ def mi_sim_instance():
     return MISim()
 
 
-def test_MISim_discrete(dummy_data_cate, test_data_category):
+def test_MISim_discrete(dummy_data_cate, test_data_category,mi_sim_instance):
     metadata = {"role": "category"}
     result = mi_sim_instance.calculate(dummy_data_cate, test_data_category, metadata)
     result1 = mi_sim_instance.calculate(dummy_data_cate, dummy_data_cate, metadata)
@@ -60,7 +60,7 @@ def test_MISim_discrete(dummy_data_cate, test_data_category):
     assert result2 == result
 
 
-def test_MISim_continuous(dummy_data_num, test_data_num):
+def test_MISim_continuous(dummy_data_num, test_data_num,mi_sim_instance):
     metadata = {"feature_x": "numerical"}
     result = mi_sim_instance.calculate(dummy_data_num, test_data_num, metadata)
     result1 = mi_sim_instance.calculate(dummy_data_num, dummy_data_num, metadata)

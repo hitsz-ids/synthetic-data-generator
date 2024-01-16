@@ -27,7 +27,7 @@ class MISim(MultiTableMetric):
         real_data: pd.DataFrame, synthetic_data: pd.DataFrame, metadata: dict
     ) -> pd.DataFrame:
         """
-        Calculate the JSD value between a real column and a synthetic column.
+        Calculate the Mutual Information Similarity between a real column and a synthetic column.
         Args:
             real_data (pd.DataFrame): The real data.
             synthetic_data (pd.DataFrame): The synthetic data.
