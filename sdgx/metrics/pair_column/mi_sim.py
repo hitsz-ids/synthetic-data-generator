@@ -48,7 +48,6 @@ class MISim(PairMetric):
         col_name = src_col.name
         data_type = metadata[col_name]
 
-       
         if data_type == "numerical":
             src_col = pd.cut(
                 src_col, instance.numerical_bins, labels=range(instance.numerical_bins)
