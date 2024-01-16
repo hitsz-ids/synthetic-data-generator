@@ -53,24 +53,26 @@ class MISim(PairMetric):
             tar_col = pd.cut(
                 tar_col, instance.numerical_bins, labels=range(instance.numerical_bins)
             )
+            src_col = src_col.to_numpy()
+            tar_col = tar_col.to_numpy()
 
         elif data_type == "category":
             le = LabelEncoder()
-            src_col = le.fit_transform(src_col)
-            tar_col = le.fit_transform(tar_col)
+            src_col = le.fit_transform(src_col[col_name])
+            tar_col = le.fit_transform(tar_col[col_name])
 
         elif data_type == "datetime":
             src_col = src_col.apply(time2int)
             tar_col = tar_col.apply(time2int)
             src_col = pd.cut(
-                src_col, instance.numerical_bins, labels=range(instance.numerical_bins)
+                src_col, bins = instance.numerical_bins, labels=range(instance.numerical_bins)
             )
             tar_col = pd.cut(
-                tar_col, instance.numerical_bins, labels=range(instance.numerical_bins)
+                tar_col, bins = instance.numerical_bins, labels=range(instance.numerical_bins)
             )
+            src_col = src_col.to_numpy()
+            tar_col = tar_col.to_numpy()
 
-        src_col = src_col.to_numpy()
-        tar_col = tar_col.to_numpy()
         MI_sim = normalized_mutual_info_score(src_col, tar_col)
 
         return MI_sim
