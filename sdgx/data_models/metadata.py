@@ -388,7 +388,6 @@ class Metadata(BaseModel):
             if each_key.endswith("_columns"):
                 column_names = self.get(each_key)
                 all_dtype_cols = all_dtype_cols.union(set(column_names))
-
         return all_dtype_cols
 
     def check(self):
@@ -444,3 +443,41 @@ class Metadata(BaseModel):
         self.primary_keys = primary_keys
 
         logger.info(f"Primary Key updated: {primary_keys}.")
+
+    def get_summary(self):
+        # still draft
+        
+        pass
+    
+    def get_column_data_type(self, column_name: str):
+        ''' Get the exact type of specific column.
+        Args:
+            column_name(str): The query colmun name.
+        Returns:
+            str: The data type query result.
+        '''
+        if column_name not in self.column_list:
+            raise MetadataInvalidError(f"Column {column_name}not exists in metadata.")
+        current_type = None
+        current_level = 0
+        # find the dtype who has most high inspector level 
+        for each_key in list(self.model_fields.keys()) + list(self._extend.keys()):
+            if each_key != "pii_columns" and each_key.endswith("_columns") and column_name in self.get(each_key) and current_level < self.column_inspect_level[each_key]:
+                current_level = self.column_inspect_level[each_key]
+                current_type  = each_key
+        if not current_type:
+            raise MetadataInvalidError(f"Column {column_name} has no data type.")
+        return current_type.split('_columns')[0]
+    
+    def get_column_pii(self, column_name:str):
+        ''' Return if a column is a PII column.
+        Args:
+            column_name(str): The query colmun name.
+        Returns:
+            bool: The PII query result.
+        '''
+        if column_name not in self.column_list:
+            raise MetadataInvalidError(f"Column {column_name}not exists in metadata.")
+        if column_name in self.pii_columns:
+            return True
+        return False
