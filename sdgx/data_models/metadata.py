@@ -444,10 +444,17 @@ class Metadata(BaseModel):
 
         logger.info(f"Primary Key updated: {primary_keys}.")
 
-    def get_summary(self):
-        # still draft
-
-        pass
+    def dump(self):
+        """Dump model dict, can be used in downstream process, like processor.
+        
+        Returns:
+            dict: dumped dict.
+        """
+        model_dict = self.model_dump()
+        model_dict['column_data_type'] = {}
+        for each_col in self.column_list:
+            model_dict['column_data_type'][each_col] = self.get_column_data_type(each_col)
+        return model_dict
 
     def get_column_data_type(self, column_name: str):
         """Get the exact type of specific column.
