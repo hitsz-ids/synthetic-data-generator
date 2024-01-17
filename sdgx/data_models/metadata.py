@@ -446,14 +446,14 @@ class Metadata(BaseModel):
 
     def dump(self):
         """Dump model dict, can be used in downstream process, like processor.
-        
+
         Returns:
             dict: dumped dict.
         """
         model_dict = self.model_dump()
-        model_dict['column_data_type'] = {}
+        model_dict["column_data_type"] = {}
         for each_col in self.column_list:
-            model_dict['column_data_type'][each_col] = self.get_column_data_type(each_col)
+            model_dict["column_data_type"][each_col] = self.get_column_data_type(each_col)
         return model_dict
 
     def get_column_data_type(self, column_name: str):
