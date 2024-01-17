@@ -45,14 +45,14 @@ class Metadata(BaseModel):
     """
 
     column_inspect_level: Dict[str, int] = defaultdict()
-    '''
+    """
     column_inspect_level is used to store every inspector's level, to specify the true type of each column.
-    '''
+    """
 
     pii_columns: Set[set] = set()
-    '''
+    """
     pii_columns is used to store all PII columns' name
-    '''
+    """
 
     # other columns lists are used to store column information
     # here are 5 basic data types
@@ -271,10 +271,10 @@ class Metadata(BaseModel):
             if inspector.pii:
                 for each_key in inspect_res:
                     metadata.update({"pii_columns": inspect_res[each_key]})
-            # update inspect level 
+            # update inspect level
             for each_key in inspect_res:
                 metadata.column_inspect_level[each_key] = inspector.inspect_level
-            
+
         if not primary_keys:
             metadata.update_primary_key(metadata.id_columns)
 
@@ -323,10 +323,10 @@ class Metadata(BaseModel):
             if inspector.pii:
                 for each_key in inspect_res:
                     metadata.update({"pii_columns": inspect_res[each_key]})
-            # update inspect level 
+            # update inspect level
             for each_key in inspect_res:
                 metadata.column_inspect_level[each_key] = inspector.inspect_level
-        
+
         if check:
             metadata.check()
         return metadata

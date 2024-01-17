@@ -28,9 +28,9 @@ class Inspector:
     """
 
     pii = False
-    '''
+    """
     PII refers if a column contains private or sensitive information.m
-    '''
+    """
 
     def __init__(self, *args, **kwargs):
         self.ready: bool = False
