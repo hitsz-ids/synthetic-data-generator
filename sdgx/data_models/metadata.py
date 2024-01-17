@@ -44,6 +44,16 @@ class Metadata(BaseModel):
     column_list is used to store all columns' name
     """
 
+    column_inspect_level: Dict[str, int] = defaultdict()
+    '''
+    column_inspect_level is used to store every inspector's level, to specify the true type of each column.
+    '''
+
+    pii_columns: Set[set] = set()
+    '''
+    pii_columns is used to store all PII columns' name
+    '''
+
     # other columns lists are used to store column information
     # here are 5 basic data types
     id_columns: Set[str] = set()
@@ -254,7 +264,17 @@ class Metadata(BaseModel):
 
         metadata = Metadata(primary_keys=primary_keys, column_list=set(dataloader.columns()))
         for inspector in inspectors:
-            metadata.update(inspector.inspect())
+            inspect_res = inspector.inspect()
+            # update column type
+            metadata.update(inspect_res)
+            # update pii column
+            if inspector.pii:
+                for each_key in inspect_res:
+                    metadata.update({"pii_columns": inspect_res[each_key]})
+            # update inspect level 
+            for each_key in inspect_res:
+                metadata.column_inspect_level[each_key] = inspector.inspect_level
+            
         if not primary_keys:
             metadata.update_primary_key(metadata.id_columns)
 
@@ -296,7 +316,17 @@ class Metadata(BaseModel):
 
         metadata = Metadata(primary_keys=[df.columns[0]], column_list=set(df.columns))
         for inspector in inspectors:
-            metadata.update(inspector.inspect())
+            inspect_res = inspector.inspect()
+            # update column type
+            metadata.update(inspect_res)
+            # update pii column
+            if inspector.pii:
+                for each_key in inspect_res:
+                    metadata.update({"pii_columns": inspect_res[each_key]})
+            # update inspect level 
+            for each_key in inspect_res:
+                metadata.column_inspect_level[each_key] = inspector.inspect_level
+        
         if check:
             metadata.check()
         return metadata
@@ -374,7 +404,7 @@ class Metadata(BaseModel):
             self.check_single_primary_key(each_key)
 
         # for single primary key, it should has ID type
-        if len(self.primary_keys) == 1 and self.primary_keys[0] not in self.id_columns:
+        if len(self.primary_keys) == 1 and list(self.primary_keys)[0] not in self.id_columns:
             raise MetadataInvalidError(
                 f"Primary Key {self.primary_keys[0]} should has ID DataType."
             )
