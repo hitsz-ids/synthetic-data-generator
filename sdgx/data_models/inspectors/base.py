@@ -27,6 +27,11 @@ class Inspector:
     We will preset different inspector levels for different inspectors, usually more specific inspectors will get higher levels, and general inspectors (like discrete) will have inspect_level. In baseclass, the inspect_level is set to 1.
     """
 
+    pii = False
+    '''
+    PII refers if a column contains private or sensitive information.m
+    '''
+
     def __init__(self, *args, **kwargs):
         self.ready: bool = False
 
