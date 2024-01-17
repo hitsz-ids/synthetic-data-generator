@@ -341,9 +341,6 @@ class Metadata(BaseModel):
 
         if input_key not in self.column_list:
             raise MetadataInvalidError(f"Primary Key {input_key} not Exist in columns.")
-        
-
-
 
     def get_all_data_type_columns(self):
         """Get all column names from `self.xxx_columns`.
@@ -375,10 +372,12 @@ class Metadata(BaseModel):
         # check primary key in column_list
         for each_key in self.primary_keys:
             self.check_single_primary_key(each_key)
-        
+
         # for single primary key, it should has ID type
         if len(self.primary_keys) == 1 and self.primary_keys[0] not in self.id_columns:
-            raise MetadataInvalidError(f"Primary Key {self.primary_keys[0]} should has ID DataType.")
+            raise MetadataInvalidError(
+                f"Primary Key {self.primary_keys[0]} should has ID DataType."
+            )
 
         all_dtype_columns = self.get_all_data_type_columns()
 
