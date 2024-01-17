@@ -161,6 +161,15 @@ def demo_multi_table_data_loader(demo_multi_table_data_connector, cacher_kwargs)
     for each_table in demo_multi_table_data_connector.keys():
         demo_multi_table_data_connector[each_table].finalize()
 
+@pytest.fixture
+def demo_multi_data_parent_matadata(demo_multi_table_data_loader):
+    yield Metadata.from_dataloader(
+        demo_multi_table_data_loader['store'])
+    
+@pytest.fixture
+def demo_multi_data_child_matadata(demo_multi_table_data_loader):
+    yield Metadata.from_dataloader(
+        demo_multi_table_data_loader['train'])
 
 @pytest.fixture
 def demo_multi_data_relationship():
@@ -169,13 +178,14 @@ def demo_multi_data_relationship():
 
 @pytest.fixture
 def demo_multi_table_data_metadata_combiner(
-    demo_multi_table_data_loader, demo_multi_data_relationship
-):
+    demo_multi_data_parent_matadata: Metadata,
+    demo_multi_data_child_matadata: Metadata,
+    demo_multi_data_relationship: Relationship
+    ):
     # 1. get metadata
     metadata_dict = {}
-    for each_table_name in demo_multi_table_data_loader:
-        each_metadata = Metadata.from_dataloader(demo_multi_table_data_loader[each_table_name])
-        metadata_dict[each_table_name] = each_metadata
+    metadata_dict['store'] = demo_multi_data_parent_matadata
+    metadata_dict['train'] = demo_multi_data_child_matadata
     # 2. define relationship - already defined
     # 3. define combiner
     m = MetadataCombiner(named_metadata=metadata_dict, relationships=[demo_multi_data_relationship])

@@ -59,5 +59,47 @@ def test_metadata_check(metadata: Metadata):
     metadata.check()
 
 
+def test_demo_multi_table_data_metadata_parent(demo_multi_data_parent_matadata):
+    # self check
+    demo_multi_data_parent_matadata.check()
+    # check each col's data type 
+    assert demo_multi_data_parent_matadata.get_column_data_type('Store') == 'id'
+    assert demo_multi_data_parent_matadata.get_column_data_type('StoreType') == 'discrete'
+    assert demo_multi_data_parent_matadata.get_column_data_type('Assortment') == 'discrete'
+    assert demo_multi_data_parent_matadata.get_column_data_type('CompetitionDistance') == 'numeric'
+    assert demo_multi_data_parent_matadata.get_column_data_type('CompetitionOpenSinceMonth') == 'numeric'
+    assert demo_multi_data_parent_matadata.get_column_data_type('Promo2') == 'numeric'
+    assert demo_multi_data_parent_matadata.get_column_data_type('Promo2SinceWeek') == 'numeric'
+    assert demo_multi_data_parent_matadata.get_column_data_type('Promo2SinceYear') == 'numeric'
+    assert demo_multi_data_parent_matadata.get_column_data_type('PromoInterval') == 'discrete'
+    # check pii 
+    for each_col in demo_multi_data_parent_matadata.column_list:
+        assert demo_multi_data_parent_matadata.get_column_pii(each_col) is False
+    assert len(demo_multi_data_parent_matadata.pii_columns) is 0
+    # check dump 
+    assert 'column_data_type' in demo_multi_data_parent_matadata.dump().keys()
+
+
+def test_demo_multi_table_data_metadata_child(demo_multi_data_child_matadata):
+    # self check 
+    demo_multi_data_child_matadata.check()
+    # check each col's data type 
+    assert demo_multi_data_child_matadata.get_column_data_type('Store') == 'numeric'
+    assert demo_multi_data_child_matadata.get_column_data_type('Date') == 'datetime'
+    assert demo_multi_data_child_matadata.get_column_data_type('Customers') == 'numeric'
+    assert demo_multi_data_child_matadata.get_column_data_type('StateHoliday') == 'numeric'
+    assert demo_multi_data_child_matadata.get_column_data_type('Sales') == 'numeric'
+    assert demo_multi_data_child_matadata.get_column_data_type('Promo') == 'numeric'
+    assert demo_multi_data_child_matadata.get_column_data_type('DayOfWeek') == 'numeric'
+    assert demo_multi_data_child_matadata.get_column_data_type('Open') == 'numeric'
+    assert demo_multi_data_child_matadata.get_column_data_type('SchoolHoliday') == 'numeric'
+    # check pii 
+    for each_col in demo_multi_data_child_matadata.column_list:
+        assert demo_multi_data_child_matadata.get_column_pii(each_col) is False
+    assert len(demo_multi_data_child_matadata.pii_columns) is 0
+    # check dump 
+    assert 'column_data_type' in demo_multi_data_child_matadata.dump().keys()
+    
+
 if __name__ == "__main__":
     pytest.main(["-vv", "-s", __file__])
