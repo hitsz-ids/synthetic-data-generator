@@ -98,18 +98,18 @@ def test_MISim_continuous(test_data_num, mi_sim_instance):
     assert round(result2,9) == round(result,9)
 
 
-# def test_MISim_time(test_data_time, mi_sim_instance):
-#     metadata = {"time_x": "datetime", "time_y": "datetime"}
-#     col_src = "time_x"
-#     col_tar = "time_y"
-#     result = mi_sim_instance.calculate(test_data_time[col_src], test_data_time[col_tar], metadata)
-#     result1 = mi_sim_instance.calculate(test_data_time[col_src], test_data_time[col_src], metadata)
-#     result2 = mi_sim_instance.calculate(test_data_time[col_tar], test_data_time[col_src], metadata)
+def test_MISim_time(test_data_time, mi_sim_instance):
+    metadata = {"time_x": "datetime", "time_y": "datetime"}
+    col_src = "time_x"
+    col_tar = "time_y"
+    result = mi_sim_instance.calculate(test_data_time[col_src], test_data_time[col_tar], metadata)
+    result1 = mi_sim_instance.calculate(test_data_time[col_src], test_data_time[col_src], metadata)
+    result2 = mi_sim_instance.calculate(test_data_time[col_tar], test_data_time[col_src], metadata)
 
-#     assert result >= 0
-#     assert result <= 1
-#     assert result1 == 1
-#     assert result2 == result
+    assert result >= 0
+    assert result <= 1
+    assert result1 == 1
+    assert result2 == result
 
 
 if __name__ == "__main__":
