@@ -1,32 +1,32 @@
 from __future__ import annotations
 
-import random
 import math
+import random
+from datetime import datetime, timedelta
 
 import numpy as np
 import pandas as pd
 import pytest
-from datetime import datetime, timedelta
-import random
-
 
 from sdgx.metrics.pair_column.mi_sim import MISim
 
 # 创建测试数据
 
+
 def generate_random_time(start_date, end_date):
-    start_datetime = datetime.strptime(start_date, '%Y-%m-%d')
-    end_datetime = datetime.strptime(end_date, '%Y-%m-%d')
+    start_datetime = datetime.strptime(start_date, "%Y-%m-%d")
+    end_datetime = datetime.strptime(end_date, "%Y-%m-%d")
 
     random_time_delta = random.randint(0, int((end_datetime - start_datetime).total_seconds()))
     random_datetime = start_datetime + timedelta(seconds=random_time_delta)
 
     return random_datetime
 
+
 @pytest.fixture
 def test_data_time():
-    start_date = '1900-01-01'
-    end_date = '2023-12-31'
+    start_date = "1900-01-01"
+    end_date = "2023-12-31"
     df = pd.DataFrame(
         {
             "time_x": [generate_random_time(start_date, end_date) for _ in range(10)],
@@ -81,7 +81,7 @@ def test_MISim_discrete(test_data_category, mi_sim_instance):
     assert result >= 0
     assert result <= 1
     assert result1 == 1
-    assert round(result2,9) == round(result,9)
+    assert round(result2, 9) == round(result, 9)
 
 
 def test_MISim_continuous(test_data_num, mi_sim_instance):
@@ -95,7 +95,7 @@ def test_MISim_continuous(test_data_num, mi_sim_instance):
     assert result >= 0
     assert result <= 1
     assert result1 == 1
-    assert round(result2,9) == round(result,9)
+    assert round(result2, 9) == round(result, 9)
 
 
 def test_MISim_time(test_data_time, mi_sim_instance):
