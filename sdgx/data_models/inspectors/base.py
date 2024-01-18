@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from sdgx.data_models.metadata import Metadata
 
 from sdgx.data_models.relationship import Relationship
+from sdgx.exceptions import DataModelError
 
 
 class Inspector:
@@ -20,20 +21,36 @@ class Inspector:
         ready (bool): Ready to inspect, maybe all fields are fitted, or indicate if there is more data, inspector will be more precise.
     """
 
-    inspect_level: int = 1
-    """
-    Inspected level is a concept newly introduced in version 0.1.5. Since a single column in the table may be marked by different inspectors at the same time (for example: the email column may be recognized as email, but it may also be recognized as the id column, and it may also be recognized by different inspectors at the same time identified as a discrete column, which will cause confusion in subsequent processing), the inspect_leve is used when determining the specific type of a column.
-
-    We will preset different inspector levels for different inspectors, usually more specific inspectors will get higher levels, and general inspectors (like discrete) will have inspect_level. In baseclass, the inspect_level is set to 1.
-    """
-
     pii = False
     """
     PII refers if a column contains private or sensitive information.m
     """
 
+    _inspect_level: int = 10
+    """
+    Inspected level is a concept newly introduced in version 0.1.5. Since a single column in the table may be marked by different inspectors at the same time (for example: the email column may be recognized as email, but it may also be recognized as the id column, and it may also be recognized by different inspectors at the same time identified as a discrete column, which will cause confusion in subsequent processing), the inspect_leve is used when determining the specific type of a column.
+
+    We will preset different inspector levels for different inspectors, usually more specific inspectors will get higher levels, and general inspectors (like discrete) will have inspect_level. 
+
+    The value of the variable inspect_level is limited to 1-100. In baseclass and bool, discrete and numeric types, the inspect_level is set to 10. For datetime and id types, the inspect_level is set to 20. When a variable is marked multiple times At this time, the mark of the inspector with a higher inspect_level shall prevail. Such a markup method will also make it easier for developers to insert a custom inspector from the middle.
+    """
+
+    @property
+    def inspect_level(self):
+        return self._inspect_level
+
+    @inspect_level.setter
+    def inspect_level(self, value: int):
+        if value > 0 and value <= 100:
+            self._inspect_level = value
+        else:
+            raise DataModelError("The inspect_level should be set in [1, 100].")
+
     def __init__(self, *args, **kwargs):
         self.ready: bool = False
+        # add inspect_level check 
+        if self.inspect_level <= 0 or self.inspect_level > 100:
+            raise DataModelError("The inspect_level should be set in [1, 100].")
 
     def fit(self, raw_data: pd.DataFrame, *args, **kwargs):
         """Fit the inspector.

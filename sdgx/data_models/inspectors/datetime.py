@@ -11,7 +11,7 @@ from sdgx.utils import ignore_warnings
 
 
 class DatetimeInspector(Inspector):
-    inspect_level = 2
+    _inspect_level = 20
     """
     The inspect_level of DatetimeInspector is higher than DiscreteInspector.
 

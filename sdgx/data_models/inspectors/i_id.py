@@ -9,7 +9,7 @@ from sdgx.data_models.inspectors.extension import hookimpl
 
 
 class IDInspector(Inspector):
-    inspect_level = 2
+    _inspect_level = 20
     """
     The inspect_level of IDInspector is higher than NumericInspector.
 
