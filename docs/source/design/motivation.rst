@@ -58,11 +58,11 @@ What can we do?
 To address these challenges, we intend to design a new system that is efficient, scalable,
 and capable of simulating databases at the scale of tens of millions.
 This new system will be designed with a flexible architecture
-that can easily incorporate additional algorithms and support different types of data.
-Furthermore, it will be licensed under the `Apache 2.0 license <https://github.com/hitsz-ids/synthetic-data-generator/blob/main/LICENSE>`_,
-which allows for greater freedom in terms of modifications and derivative works.
+that can easily incorporate additional algorithms, support different types of data, and provide efficient scalability.
+Furthermore, it will be now licensed under the Apache License, Version 2.0
+which allows for greater freedom in terms of modifications and derivative works and is more permissive for open source contributions.
 
-By developing this new system, we aim to advance the research and development of synthetic data,
+In response to these challenges, we aim to design a new system, we aim to advance the research and development of synthetic data,
 providing a more robust and flexible tool for data scientists and researchers.
 This will not only enhance the quality and representativeness of synthetic data but also promote its use
 in a wider range of applications,
