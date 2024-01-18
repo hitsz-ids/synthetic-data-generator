@@ -55,7 +55,7 @@ class SingleTableMetric:
 
         return None, None
 
-    def calculate(self, real_data: pd.DataFrame, synthetic_data: pd.DataFrame):
+    def calculate(cls, real_data: pd.DataFrame, synthetic_data: pd.DataFrame):
         """Calculate the metric value between a real table and a synthetic table.
 
         Args:
@@ -71,7 +71,7 @@ class SingleTableMetric:
         """Check the output value.
 
         Args:
-            raw_metric_value (float):  the calculated raw value of the JSD metric.
+            raw_metric_value (float):  the calculated raw value of the Mutual Information Similarity.
         """
         raise NotImplementedError()
 

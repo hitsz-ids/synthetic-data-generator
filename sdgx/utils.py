@@ -3,6 +3,7 @@ from __future__ import annotations
 import functools
 import socket
 import threading
+import time
 import urllib.request
 import warnings
 from contextlib import closing
@@ -26,8 +27,8 @@ __all__ = [
     "find_free_port",
     "download_multi_table_demo_data",
     "get_demo_single_table",
+    "time2int",
 ]
-
 MULTI_TABLE_DEMO_DATA = {
     "rossman": {
         "parent_table": "store",
@@ -97,6 +98,12 @@ def get_demo_single_table(data_dir: str | Path = "./dataset"):
         "class",
     ]
     return pd_obj, discrete_cols
+
+
+def time2int(datetime, form="%Y-%m-%d %H:%M:%S"):
+    time_array = time.strptime(str(datetime), form)
+    time_stamp = int(time.mktime(time_array))
+    return time_stamp
 
 
 class Singleton(type):

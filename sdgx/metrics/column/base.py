@@ -61,10 +61,8 @@ class ColumnMetric(object):
         cls, real_data: pd.Series | pd.DataFrame, synthetic_data: pd.Series | pd.DataFrame
     ):
         """Calculate the metric value between columns between real table and synthetic table.
-
         Args:
             real_data(pd.DataFrame or pd.Series): the real (original) data table / column.
-
             synthetic_data(pd.DataFrame or pd.Series): the synthetic (generated) data table / column.
         """
         # This method should first check the input

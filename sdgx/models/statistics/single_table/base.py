@@ -13,8 +13,7 @@ class SynthesizerModel:
     random_states = None
 
     def __init__(self, transformer=None, sampler=None) -> None:
-        # 以下几个变量都需要在初始化 model 时进行更改
-        self.model = None  # 存放模型
+        self.model = None
         self.status = "UNFINED"
         self.model_type = "MODEL_TYPE_UNDEFINED"
         # self.epochs = epochs
