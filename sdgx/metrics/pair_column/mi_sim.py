@@ -63,6 +63,7 @@ class MISim(PairMetric):
             tar_col = tar_col.to_numpy()
 
         elif data_type == "category":
+            
             le = LabelEncoder()
             src_list = list(set(src_col.array))
             tar_list = list(set(tar_col.array))
