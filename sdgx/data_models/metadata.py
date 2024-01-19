@@ -44,7 +44,7 @@ class Metadata(BaseModel):
     column_list is used to store all columns' name
     """
 
-    column_inspect_level: Dict[str, int] = defaultdict()
+    column_inspect_level: Dict[str, int] = defaultdict(lambda: 10)
     """
     column_inspect_level is used to store every inspector's level, to specify the true type of each column.
     """
