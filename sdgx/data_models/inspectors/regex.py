@@ -96,14 +96,15 @@ class RegexInspector(Inspector):
         self.ready = True
 
     def _fit_column(self, column_data: pd.Series):
-        '''
+        """
         Regular expression matching for a single column, returning the matching ratio.
-        '''
+        """
         length = len(column_data)
         match_cnt = 0
         for i in column_data:
-            m = re.match( self.p, str(i))
-            if m: match_cnt += 1
+            m = re.match(self.p, str(i))
+            if m:
+                match_cnt += 1
         return match_cnt / length
 
     def inspect(self, *args, **kwargs) -> dict[str, Any]:
