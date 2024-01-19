@@ -46,11 +46,11 @@ class Inspector:
         else:
             raise DataModelError("The inspect_level should be set in [1, 100].")
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, inspect_level = None, *args, **kwargs):
         self.ready: bool = False
         # add inspect_level check
-        if self.inspect_level <= 0 or self.inspect_level > 100:
-            raise DataModelError("The inspect_level should be set in [1, 100].")
+        if inspect_level:
+            self.inspect_level = inspect_level
 
     def fit(self, raw_data: pd.DataFrame, *args, **kwargs):
         """Fit the inspector.
