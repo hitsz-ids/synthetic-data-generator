@@ -39,7 +39,7 @@ def test_inspector_demo_data(inspector: BoolInspector, raw_data):
     assert not inspector.bool_columns
     assert sorted(inspector.inspect()["bool_columns"]) == sorted([])
     assert inspector.inspect_level == 10
-    # test inspect_level.setter 
+    # test inspect_level.setter
     try:
         inspector.inspect_level = 120
     except Exception as e:

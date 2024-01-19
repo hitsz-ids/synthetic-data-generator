@@ -46,7 +46,7 @@ class Inspector:
         else:
             raise DataModelError("The inspect_level should be set in [1, 100].")
 
-    def __init__(self, inspect_level = None, *args, **kwargs):
+    def __init__(self, inspect_level=None, *args, **kwargs):
         self.ready: bool = False
         # add inspect_level check
         if inspect_level:
