@@ -1,5 +1,6 @@
-from sdgx.data_models.inspectors.regex import RegexInspector
 from sdgx.data_models.inspectors.extension import hookimpl
+from sdgx.data_models.inspectors.regex import RegexInspector
+
 
 class EmailInspector(RegexInspector):
     pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
