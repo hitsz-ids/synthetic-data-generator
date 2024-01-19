@@ -21,6 +21,7 @@ def test_inspector(inspector: NumericInspector, raw_data):
     assert sorted(inspector.inspect()["numeric_columns"]) == sorted(
         ["education-num", "fnlwgt", "hoursperweek", "age", "capitalgain", "capitalloss"]
     )
+    assert inspector.inspect_level == 10
 
 
 if __name__ == "__main__":

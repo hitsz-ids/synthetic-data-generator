@@ -31,6 +31,7 @@ def test_inspector(inspector: DiscreteInspector, raw_data):
             "class",
         ]
     )
+    assert inspector.inspect_level == 10
 
 
 if __name__ == "__main__":
