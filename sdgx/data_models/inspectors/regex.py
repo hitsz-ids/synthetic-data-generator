@@ -62,6 +62,7 @@ class RegexInspector(Inspector):
         # check pattern
         if self.pattern is None:
             raise InspectorInitError("Regular expression NOT found.")
+        self.p = re.compile(self.pattern)
 
         # set data_type_name
         if data_type_name:
@@ -82,19 +83,28 @@ class RegexInspector(Inspector):
     def fit(self, raw_data: pd.DataFrame, *args, **kwargs):
         """Fit the inspector.
 
-        Gets the list of regex columns from the raw data.
+        Finds the list of regex columns from the raw data.
 
         Args:
             raw_data (pd.DataFrame): Raw data
         """
-        # not implemented
+        for each_col in raw_data.columns:
+            each_match_rate = self._fit_column(raw_data[each_col])
+            if each_match_rate > self.match_percentage:
+                self.regex_columns.add(each_col)
 
         self.ready = True
 
     def _fit_column(self, column_data: pd.Series):
-        # not implemented
-
-        pass
+        '''
+        Regular expression matching for a single column, returning the matching ratio.
+        '''
+        length = len(column_data)
+        match_cnt = 0
+        for i in column_data:
+            m = re.match( self.p, str(i))
+            if m: match_cnt += 1
+        return match_cnt / length
 
     def inspect(self, *args, **kwargs) -> dict[str, Any]:
         """Inspect raw data and generate metadata."""
