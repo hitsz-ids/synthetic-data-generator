@@ -65,8 +65,8 @@ def download_demo_data(data_dir: str | Path = "./dataset") -> Path:
         # Download from datahub
         demo_data_path.parent.mkdir(parents=True, exist_ok=True)
 
-        logger.info("Downloading demo data from datahub.io to {}".format(demo_data_path))
-        url = "https://datahub.io/machine-learning/adult/r/adult.csv"
+        logger.info("Downloading demo data from github data source to {}".format(demo_data_path))
+        url = "https://raw.githubusercontent.com/saravrajavelu/Adult-Income-Analysis/master/adult.csv"
         urllib.request.urlretrieve(url, demo_data_path)
 
     return demo_data_path
@@ -95,7 +95,7 @@ def get_demo_single_table(data_dir: str | Path = "./dataset"):
         "race",
         "sex",
         "native-country",
-        "class",
+        "income",
     ]
     return pd_obj, discrete_cols
 
