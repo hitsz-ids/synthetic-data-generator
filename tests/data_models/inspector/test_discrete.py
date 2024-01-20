@@ -26,9 +26,9 @@ def test_inspector(inspector: DiscreteInspector, raw_data):
             "occupation",
             "relationship",
             "race",
-            "sex",
+            "gender",
             "native-country",
-            "class",
+            "income",
         ]
     )
 

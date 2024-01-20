@@ -95,7 +95,7 @@ def get_demo_single_table(data_dir: str | Path = "./dataset"):
         "occupation",
         "relationship",
         "race",
-        "sex",
+        "gender",
         "native-country",
         "income",
     ]
