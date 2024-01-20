@@ -24,17 +24,17 @@ def test_demo_dataloader(dataloader_builder: DataLoader, cacher, demo_single_tab
                 "workclass",
                 "fnlwgt",
                 "education",
-                "education-num",
+                "educational-num",
                 "marital-status",
                 "occupation",
                 "relationship",
                 "race",
-                "sex",
-                "capitalgain",
-                "capitalloss",
-                "hoursperweek",
+                "gender",
+                "capital-gain",
+                "capital-loss",
+                "hours-per-week",
                 "native-country",
-                "class",
+                "income",
             ]
         )
     )
