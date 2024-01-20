@@ -3,6 +3,7 @@ import pandas as pd
 import pytest
 
 from sdgx.data_models.inspectors.bool import BoolInspector
+from sdgx.exceptions import DataModelError
 
 
 @pytest.fixture
@@ -37,6 +38,12 @@ def test_inspector_demo_data(inspector: BoolInspector, raw_data):
     # should be empty set
     assert not inspector.bool_columns
     assert sorted(inspector.inspect()["bool_columns"]) == sorted([])
+    assert inspector.inspect_level == 10
+    # test inspect_level.setter
+    try:
+        inspector.inspect_level = 120
+    except Exception as e:
+        assert type(e) == DataModelError
 
 
 def test_inspector_generated_data(inspector: BoolInspector, bool_test_df: pd.DataFrame):
@@ -44,6 +51,11 @@ def test_inspector_generated_data(inspector: BoolInspector, bool_test_df: pd.Dat
     inspector.fit(bool_test_df)
     assert inspector.bool_columns
     assert sorted(inspector.inspect()["bool_columns"]) == sorted(["bool_random"])
+    assert inspector.inspect_level == 10
+    try:
+        inspector.inspect_level = 0
+    except Exception as e:
+        assert type(e) == DataModelError
 
 
 if __name__ == "__main__":

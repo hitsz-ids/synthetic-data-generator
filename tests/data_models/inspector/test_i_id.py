@@ -38,6 +38,7 @@ def test_inspector_demo_data(inspector: IDInspector, raw_data):
     # should be empty set
     assert not inspector.ID_columns
     assert sorted(inspector.inspect()["id_columns"]) == sorted([])
+    assert inspector.inspect_level == 20
 
 
 def test_inspector_generated_data(inspector: IDInspector, id_test_df: pd.DataFrame):
