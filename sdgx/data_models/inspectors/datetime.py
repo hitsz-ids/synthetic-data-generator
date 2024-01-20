@@ -11,6 +11,13 @@ from sdgx.utils import ignore_warnings
 
 
 class DatetimeInspector(Inspector):
+    _inspect_level = 20
+    """
+    The inspect_level of DatetimeInspector is higher than DiscreteInspector.
+
+    Often, difficult-to-recognize date or datetime objects are also recognized as descrete types by DatetimeInspector, causing the column to be marked repeatedly.
+    """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.datetime_columns: set[str] = set()

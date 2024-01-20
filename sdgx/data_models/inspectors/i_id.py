@@ -9,6 +9,13 @@ from sdgx.data_models.inspectors.extension import hookimpl
 
 
 class IDInspector(Inspector):
+    _inspect_level = 20
+    """
+    The inspect_level of IDInspector is higher than NumericInspector.
+
+    Often, some column, especially int type id column can also be recognized as numeric types by NumericInspector, causing the column to be marked repeatedly.
+    """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.ID_columns: set[str] = set()
