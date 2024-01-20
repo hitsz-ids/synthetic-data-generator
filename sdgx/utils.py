@@ -66,7 +66,9 @@ def download_demo_data(data_dir: str | Path = "./dataset") -> Path:
         demo_data_path.parent.mkdir(parents=True, exist_ok=True)
 
         logger.info("Downloading demo data from github data source to {}".format(demo_data_path))
-        url = "https://raw.githubusercontent.com/saravrajavelu/Adult-Income-Analysis/master/adult.csv"
+        url = (
+            "https://raw.githubusercontent.com/saravrajavelu/Adult-Income-Analysis/master/adult.csv"
+        )
         urllib.request.urlretrieve(url, demo_data_path)
 
     return demo_data_path
