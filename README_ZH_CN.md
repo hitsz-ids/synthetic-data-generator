@@ -195,3 +195,7 @@ SDG开源项目由**哈尔滨工业大学（深圳）数据安全研究院**发�
 ## 📄 许可证
 
 SDG开源项目使用 Apache-2.0 license，有关协议请参考[LICENSE](https://github.com/hitsz-ids/synthetic-data-generator/blob/main/LICENSE)。
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=hitsz-ids/synthetic-data-generator&type=Date)](https://star-history.com/#hitsz-ids/synthetic-data-generator&Date)
