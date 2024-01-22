@@ -4,24 +4,34 @@ from sdgx.data_models.inspectors.regex import RegexInspector
 
 class EmailInspector(RegexInspector):
     pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
+    
     data_type_name = "email"
+    
     _inspect_level = 30
+    
+    pii = True
 
 
 class ChinaMainlandIDInspector(RegexInspector):
-    # this pattern may be not right
+    # NOTE this pattern may be not right
     pattern = r"(^[1-9]\\d{5}(18|19|20)\\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\\d{3}[0-9Xx]$)|"
 
     data_type_name = "china_mainland_id"
 
     _inspect_level = 30
 
+    pii = True
+
+
 
 class ChinaMainlandMobilePhoneInspector(RegexInspector):
     pattern = r"^1[3-9]\d{9}$"
 
     data_type_name = "china_mainland_mobile_phone"
+    
     _inspect_level = 30
+
+    pii = True
 
 
 @hookimpl
