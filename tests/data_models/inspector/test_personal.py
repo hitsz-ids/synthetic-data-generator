@@ -1,14 +1,17 @@
 import datetime
-import random 
+import random
+
 import pandas as pd
 import pytest
-from sdgx.data_models.inspectors.personal import EmailInspector
-from sdgx.data_models.inspectors.personal import ChinaMainlandMobilePhoneInspector
-
-
-
 from faker import Faker
-fake = Faker(locale='zh_CN')
+
+from sdgx.data_models.inspectors.personal import (
+    ChinaMainlandMobilePhoneInspector,
+    EmailInspector,
+)
+
+fake = Faker(locale="zh_CN")
+
 
 @pytest.fixture
 def raw_data(demo_single_table_path):
@@ -30,7 +33,7 @@ def chn_personal_test_df():
         "mobile_phone_no",
         "chn_address",
         "job",
-        "company_name"
+        "company_name",
     ]
     for _ in range(row_cnt):
         each_gender = random.choice(["male", "female"])
@@ -40,21 +43,28 @@ def chn_personal_test_df():
             each_name = fake.last_name() + fake.name_female()
         each_birth_date = fake.date()
         each_age = today.year - int(each_birth_date[:4])
-        each_email = fake.email() 
+        each_email = fake.email()
         each_phone = fake.phone_number()
         each_sfz = fake.ssn()
         each_address = fake.address()
-        each_job = fake.job() 
-        each_corp = fake.company()     
+        each_job = fake.job()
+        each_corp = fake.company()
 
         each_x = [
-            each_sfz, each_name, each_gender, each_birth_date,
-            each_age, each_email, each_phone, each_address,
-            each_job, each_corp
+            each_sfz,
+            each_name,
+            each_gender,
+            each_birth_date,
+            each_age,
+            each_email,
+            each_phone,
+            each_address,
+            each_job,
+            each_corp,
         ]
 
         X.append(each_x)
-    
+
     yield pd.DataFrame(X, columns=header)
 
 
@@ -62,16 +72,17 @@ def test_email_inspector_demo_data(raw_data):
     inspector_Email = EmailInspector()
     inspector_Email.fit(raw_data)
     assert not inspector_Email.regex_columns
-    assert sorted(inspector_Email.inspect()['email_columns']) == sorted([])
-    assert inspector_Email.inspect_level == 30 
+    assert sorted(inspector_Email.inspect()["email_columns"]) == sorted([])
+    assert inspector_Email.inspect_level == 30
     assert inspector_Email.pii is True
+
 
 def test_email_inspector_generated_data(chn_personal_test_df: pd.DataFrame):
     inspector_Email = EmailInspector()
     inspector_Email.fit(chn_personal_test_df)
     assert inspector_Email.regex_columns
-    assert sorted(inspector_Email.inspect()['email_columns']) == sorted(["email"])
-    assert inspector_Email.inspect_level == 30 
+    assert sorted(inspector_Email.inspect()["email_columns"]) == sorted(["email"])
+    assert inspector_Email.inspect_level == 30
     assert inspector_Email.pii is True
 
 
