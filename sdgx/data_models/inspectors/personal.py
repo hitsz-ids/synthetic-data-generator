@@ -13,9 +13,8 @@ class ChinaMainlandIDInspector(RegexInspector):
     pattern = r"(^[1-9]\\d{5}(18|19|20)\\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\\d{3}[0-9Xx]$)|"
 
     data_type_name = "china_mainland_id"
-    
-    _inspect_level = 30
 
+    _inspect_level = 30
 
 
 class ChinaMainlandMobilePhoneInspector(RegexInspector):
