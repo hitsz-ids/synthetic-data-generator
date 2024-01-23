@@ -6,8 +6,10 @@ import pytest
 from faker import Faker
 
 from sdgx.data_models.inspectors.personal import (
+    ChinaMainlandIDInspector,
     ChinaMainlandMobilePhoneInspector,
-    EmailInspector,ChinaMainlandIDInspector,ChinaMainlandPostCode
+    ChinaMainlandPostCode,
+    EmailInspector,
 )
 
 fake = Faker(locale="zh_CN")
@@ -70,7 +72,8 @@ def chn_personal_test_df():
 
     yield pd.DataFrame(X, columns=header)
 
-# Email 
+
+# Email
 def test_email_inspector_demo_data(raw_data):
     inspector_Email = EmailInspector()
     inspector_Email.fit(raw_data)
@@ -88,7 +91,8 @@ def test_email_inspector_generated_data(chn_personal_test_df: pd.DataFrame):
     assert inspector_Email.inspect_level == 30
     assert inspector_Email.pii is True
 
-# Phone No 
+
+# Phone No
 def test_chn_phone_inspector_demo_data(raw_data):
     inspector_Phone = ChinaMainlandMobilePhoneInspector()
     inspector_Phone.fit(raw_data)
@@ -102,7 +106,9 @@ def test_chn_phone_inspector_generated_data(chn_personal_test_df: pd.DataFrame):
     inspector_Phone = ChinaMainlandMobilePhoneInspector()
     inspector_Phone.fit(chn_personal_test_df)
     assert inspector_Phone.regex_columns
-    assert sorted(inspector_Phone.inspect()["china_mainland_mobile_phone_columns"]) == sorted(["mobile_phone_no"])
+    assert sorted(inspector_Phone.inspect()["china_mainland_mobile_phone_columns"]) == sorted(
+        ["mobile_phone_no"]
+    )
     assert inspector_Phone.inspect_level == 30
     assert inspector_Phone.pii is True
 
@@ -125,6 +131,7 @@ def test_chn_ID_inspector_generated_data(chn_personal_test_df: pd.DataFrame):
     assert inspector_ID.inspect_level == 30
     assert inspector_ID.pii is True
 
+
 # PostCode
 def test_chn_postcode_inspector_demo_data(raw_data):
     inspector_PostCode = ChinaMainlandPostCode()
@@ -139,9 +146,12 @@ def test_chn_postcode_inspector_generated_data(chn_personal_test_df: pd.DataFram
     inspector_PostCode = ChinaMainlandPostCode()
     inspector_PostCode.fit(chn_personal_test_df)
     assert inspector_PostCode.regex_columns
-    assert sorted(inspector_PostCode.inspect()["china_mainland_postcode_columns"]) == sorted(["postcode"])
+    assert sorted(inspector_PostCode.inspect()["china_mainland_postcode_columns"]) == sorted(
+        ["postcode"]
+    )
     assert inspector_PostCode.inspect_level == 20
     assert inspector_PostCode.pii is False
+
 
 if __name__ == "__main__":
     pytest.main(["-vv", "-s", __file__])
