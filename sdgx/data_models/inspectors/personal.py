@@ -1,4 +1,4 @@
-import re 
+import re
 
 from sdgx.data_models.inspectors.extension import hookimpl
 from sdgx.data_models.inspectors.regex import RegexInspector
@@ -15,8 +15,9 @@ class EmailInspector(RegexInspector):
 
 
 class ChinaMainlandIDInspector(RegexInspector):
-    pattern = r"^[1-9]\d{5}(18|19|20)\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$"
-    
+    pattern = (
+        r"^[1-9]\d{5}(18|19|20)\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$"
+    )
 
     data_type_name = "china_mainland_id"
 
@@ -61,15 +62,17 @@ class ChinaMainlandUnifiedSocialCreditCode(RegexInspector):
 
     pii = True
 
-    pattern_ID = r"^[1-9]\d{5}(18|19|20)\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$"
+    pattern_ID = (
+        r"^[1-9]\d{5}(18|19|20)\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$"
+    )
 
     p_id = re.compile(pattern_ID)
-    
+
     def domain_verification(self, each_sample):
         if re.match(self.p_id, each_sample):
             return False
         return True
-    
+
 
 @hookimpl
 def register(manager):

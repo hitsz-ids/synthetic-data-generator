@@ -1,6 +1,7 @@
 import datetime
 import random
 import string
+
 import pandas as pd
 import pytest
 from faker import Faker
@@ -9,24 +10,27 @@ from sdgx.data_models.inspectors.personal import (
     ChinaMainlandIDInspector,
     ChinaMainlandMobilePhoneInspector,
     ChinaMainlandPostCode,
+    ChinaMainlandUnifiedSocialCreditCode,
     EmailInspector,
-    ChinaMainlandUnifiedSocialCreditCode
 )
 
 fake = Faker(locale="zh_CN")
+
 
 def generate_uniform_credit_code():
     # generate china mainland 统一社会信用代码 for test
     def generate():
         code = ""
-        code += random.choice(string.digits + 'AHJNPQRTUWXY')
-        code += random.choice(string.digits + 'AHJNPQRTUWXY')
+        code += random.choice(string.digits + "AHJNPQRTUWXY")
+        code += random.choice(string.digits + "AHJNPQRTUWXY")
         code += "".join(random.choices(string.digits, k=6))
         code += "".join(random.choices(string.digits, k=9))
-        code += random.choice(string.digits +'AHJNPQRTUWXY')
+        code += random.choice(string.digits + "AHJNPQRTUWXY")
         return code
+
     code = generate()
     return code
+
 
 @pytest.fixture
 def raw_data(demo_single_table_path):
@@ -50,7 +54,7 @@ def chn_personal_test_df():
         "postcode",
         "job",
         "company_name",
-        "uscc"
+        "uscc",
     ]
     for _ in range(row_cnt):
         each_gender = random.choice(["male", "female"])
@@ -81,7 +85,7 @@ def chn_personal_test_df():
             each_postcode,
             each_job,
             each_corp,
-            each_uscc
+            each_uscc,
         ]
 
         X.append(each_x)
@@ -167,6 +171,7 @@ def test_chn_postcode_inspector_generated_data(chn_personal_test_df: pd.DataFram
     )
     assert inspector_PostCode.inspect_level == 20
     assert inspector_PostCode.pii is False
+
 
 # 统一社会信用代码
 def test_chn_uscc_inspector_demo_data(raw_data):
