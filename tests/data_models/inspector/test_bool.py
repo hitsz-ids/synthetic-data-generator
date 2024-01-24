@@ -3,7 +3,7 @@ import pandas as pd
 import pytest
 
 from sdgx.data_models.inspectors.bool import BoolInspector
-from sdgx.exceptions import DataModelError
+from sdgx.exceptions import InspectorInitError
 
 
 @pytest.fixture
@@ -43,7 +43,7 @@ def test_inspector_demo_data(inspector: BoolInspector, raw_data):
     try:
         inspector.inspect_level = 120
     except Exception as e:
-        assert type(e) == DataModelError
+        assert type(e) == InspectorInitError
 
 
 def test_inspector_generated_data(inspector: BoolInspector, bool_test_df: pd.DataFrame):
@@ -55,7 +55,7 @@ def test_inspector_generated_data(inspector: BoolInspector, bool_test_df: pd.Dat
     try:
         inspector.inspect_level = 0
     except Exception as e:
-        assert type(e) == DataModelError
+        assert type(e) == InspectorInitError
 
 
 if __name__ == "__main__":

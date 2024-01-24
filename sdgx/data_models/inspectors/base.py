@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from sdgx.data_models.metadata import Metadata
 
 from sdgx.data_models.relationship import Relationship
-from sdgx.exceptions import DataModelError
+from sdgx.exceptions import InspectorInitError
 
 
 class Inspector:
@@ -44,7 +44,7 @@ class Inspector:
         if value > 0 and value <= 100:
             self._inspect_level = value
         else:
-            raise DataModelError("The inspect_level should be set in [1, 100].")
+            raise InspectorInitError("The inspect_level should be set in [1, 100].")
 
     def __init__(self, inspect_level=None, *args, **kwargs):
         self.ready: bool = False
