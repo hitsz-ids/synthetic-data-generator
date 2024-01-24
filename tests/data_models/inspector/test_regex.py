@@ -28,7 +28,7 @@ def test_int_regex_inspector_demo_data(int_inspector: RegexInspector, raw_data: 
     # should not be empty set
     assert int_inspector.regex_columns
     assert sorted(int_inspector.inspect()["int_columns"]) == sorted(
-        ["age", "capitalgain", "capitalloss", "education-num", "fnlwgt", "hoursperweek"]
+        ['age', 'capital-gain', 'capital-loss', 'educational-num', 'fnlwgt', 'hours-per-week']
     )
     assert int_inspector.inspect_level == 10
 
