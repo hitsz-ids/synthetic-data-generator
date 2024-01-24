@@ -1,6 +1,6 @@
 import datetime
 import random
-
+import string
 import pandas as pd
 import pytest
 from faker import Faker
@@ -10,10 +10,23 @@ from sdgx.data_models.inspectors.personal import (
     ChinaMainlandMobilePhoneInspector,
     ChinaMainlandPostCode,
     EmailInspector,
+    ChinaMainlandUnifiedSocialCreditCode
 )
 
 fake = Faker(locale="zh_CN")
 
+def generate_uniform_credit_code():
+    # generate china mainland 统一社会信用代码 for test
+    def generate():
+        code = ""
+        code += random.choice(string.digits + 'AHJNPQRTUWXY')
+        code += random.choice(string.digits + 'AHJNPQRTUWXY')
+        code += "".join(random.choices(string.digits, k=6))
+        code += "".join(random.choices(string.digits, k=9))
+        code += random.choice(string.digits +'AHJNPQRTUWXY')
+        return code
+    code = generate()
+    return code
 
 @pytest.fixture
 def raw_data(demo_single_table_path):
@@ -37,6 +50,7 @@ def chn_personal_test_df():
         "postcode",
         "job",
         "company_name",
+        "uscc"
     ]
     for _ in range(row_cnt):
         each_gender = random.choice(["male", "female"])
@@ -53,6 +67,7 @@ def chn_personal_test_df():
         each_job = fake.job()
         each_corp = fake.company()
         each_postcode = fake.postcode()
+        each_uscc = generate_uniform_credit_code()
 
         each_x = [
             each_sfz,
@@ -66,6 +81,7 @@ def chn_personal_test_df():
             each_postcode,
             each_job,
             each_corp,
+            each_uscc
         ]
 
         X.append(each_x)
@@ -151,6 +167,26 @@ def test_chn_postcode_inspector_generated_data(chn_personal_test_df: pd.DataFram
     )
     assert inspector_PostCode.inspect_level == 20
     assert inspector_PostCode.pii is False
+
+# 统一社会信用代码
+def test_chn_uscc_inspector_demo_data(raw_data):
+    inspector_USCC = ChinaMainlandUnifiedSocialCreditCode()
+    inspector_USCC.fit(raw_data)
+    assert not inspector_USCC.regex_columns
+    assert sorted(inspector_USCC.inspect()["unified_social_credit_code_columns"]) == sorted([])
+    assert inspector_USCC.inspect_level == 30
+    assert inspector_USCC.pii is True
+
+
+def test_chn_uscc_inspector_generated_data(chn_personal_test_df: pd.DataFrame):
+    inspector_USCC = ChinaMainlandUnifiedSocialCreditCode()
+    inspector_USCC.fit(chn_personal_test_df)
+    assert inspector_USCC.regex_columns
+    assert sorted(inspector_USCC.inspect()["unified_social_credit_code_columns"]) == sorted(
+        ["uscc"]
+    )
+    assert inspector_USCC.inspect_level == 30
+    assert inspector_USCC.pii is True
 
 
 if __name__ == "__main__":
