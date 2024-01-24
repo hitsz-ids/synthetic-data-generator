@@ -95,6 +95,9 @@ class RegexInspector(Inspector):
 
         self.ready = True
 
+    def domain_verification(self, each_sample):
+        return True
+
     def _fit_column(self, column_data: pd.Series):
         """
         Regular expression matching for a single column, returning the matching ratio.
@@ -103,7 +106,8 @@ class RegexInspector(Inspector):
         match_cnt = 0
         for i in column_data:
             m = re.match(self.p, str(i))
-            if m:
+            d = self.domain_verification(str(i))
+            if m and d:
                 match_cnt += 1
         return match_cnt / length
 
