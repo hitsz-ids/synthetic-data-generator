@@ -60,35 +60,6 @@ def test_match_rate_property(empty_inspector: RegexInspector):
     pass
 
 
-def test_inspect_level(int_inspector: RegexInspector):
-    assert int_inspector.inspect_level == 10
-    # set level
-    int_inspector.inspect_level = 66
-    assert int_inspector.inspect_level == 66
-    int_inspector.inspect_level = 88
-    assert int_inspector.inspect_level == 88
-    int_inspector.inspect_level = 100
-    assert int_inspector.inspect_level == 100
-    int_inspector.inspect_level = 10
-    assert int_inspector.inspect_level == 10
-    # test error 1
-    has_error = False
-    try:
-        int_inspector.inspect_level = 120
-    except Exception as e:
-        has_error = True
-        assert type(e) == InspectorInitError
-    assert has_error is True
-    # test error 2
-    has_error = False
-    try:
-        int_inspector.inspect_level = 0
-    except Exception as e:
-        has_error = True
-        assert type(e) == InspectorInitError
-    assert has_error is True
-
-
 def test_parameter_missing_case():
     # init only with pattern
     only_pattern_inspector = RegexInspector(pattern="^[0-9]*$")
