@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from sdgx.data_models.metadata import Metadata
 
 from sdgx.data_models.relationship import Relationship
-from sdgx.exceptions import DataModelError
+from sdgx.exceptions import InspectorInitError
 
 
 class Inspector:
@@ -28,7 +28,7 @@ class Inspector:
 
     _inspect_level: int = 10
     """
-    Inspected level is a concept newly introduced in version 0.1.5. Since a single column in the table may be marked by different inspectors at the same time (for example: the email column may be recognized as email, but it may also be recognized as the id column, and it may also be recognized by different inspectors at the same time identified as a discrete column, which will cause confusion in subsequent processing), the inspect_leve is used when determining the specific type of a column.
+    Inspected level is a concept newly introduced in version 0.1.6. Since a single column in the table may be marked by different inspectors at the same time (for example: the email column may be recognized as email, but it may also be recognized as the id column, and it may also be recognized by different inspectors at the same time identified as a discrete column, which will cause confusion in subsequent processing), the inspect_leve is used when determining the specific type of a column.
 
     We will preset different inspector levels for different inspectors, usually more specific inspectors will get higher levels, and general inspectors (like discrete) will have inspect_level.
 
@@ -44,7 +44,7 @@ class Inspector:
         if value > 0 and value <= 100:
             self._inspect_level = value
         else:
-            raise DataModelError("The inspect_level should be set in [1, 100].")
+            raise InspectorInitError("The inspect_level should be set in [1, 100].")
 
     def __init__(self, inspect_level=None, *args, **kwargs):
         self.ready: bool = False
