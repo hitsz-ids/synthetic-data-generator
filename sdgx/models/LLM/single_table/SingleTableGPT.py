@@ -5,6 +5,7 @@ import pandas as pd
 import openai
 import os
 import random
+import re 
 
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.metadata import Metadata
@@ -22,12 +23,15 @@ class SingleTableGPTModel(SynthesizerModel):
     With this synthetic data generation model, one can easily generate diverse and realistic tabular datasets, mimicking the characteristics and patterns found in real data. 
     """
 
+    fit_medatada = False
+    fit_raw_data = False
+
     openai_API_key = ""
     """
     The API key required to access the OpenAI GPT model. Please provide your own API key for authentication.
     """
 
-    openai_API_url = ""
+    openai_API_url = "https://api.openai.com/v1/"
     """
     The URL endpoint for the OpenAI GPT API. Please specify the appropriate URL for accessing the API.
     """
@@ -46,7 +50,7 @@ class SingleTableGPTModel(SynthesizerModel):
     The maximum time (in seconds) to wait for a response from the OpenAI GPT API. If the response is not received within this time, the request will be timed out.
     """
 
-    gpt_model = "gpt-3.5-turbo"
+    gpt_model = "Gpt-3.5-turbo-0613"
     """
     The specific GPT model to be used for generating text. The default model is "gpt-3.5-turbo", which is known for its high performance and versatility.
     """
@@ -78,7 +82,7 @@ class SingleTableGPTModel(SynthesizerModel):
     
     prompts = {
         "message_prefix" : '''Suppose you are the best data generating model in this world, we have some data entries with the following information:\n''',
-        "message_suffix" :"""Generate synthetic data samples based on the above information, the count of the generated data samples is""",
+        "message_suffix" :"""\nGenerate synthetic data samples based on the above information, the count of the generated data samples is""",
         "system_role_content":"You are a powerful synthetic data generation model."
     }
     """
@@ -87,17 +91,28 @@ class SingleTableGPTModel(SynthesizerModel):
 
     _sample_lines = []
 
+    _responses = []
+
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
     def check(self):
 
         self._check_access_type()
-        self._check_LLM_setting()
-        
-        pass
+        self._check_openAI_setting()
+        self._set_openAI_key()
+
+    def set_openAI_settings(self, API_url, API_key):
+        self.openai_API_url = API_url
+        self.openai_API_key = API_key
+
+        self._set_openAI_key()
+
+    def _set_openAI_key(self):
+        openai.api_key = self.openai_API_key
+        openai.api_base = self.openai_API_url
     
-    def _check_LLM_setting(self):
+    def _check_openAI_setting(self):
         if not self.openai_API_url:
             raise InitializationError('openai_API_url NOT found.')
         if not self.openai_API_key:
@@ -110,64 +125,148 @@ class SingleTableGPTModel(SynthesizerModel):
         if os.getenv("OPENAI_URL"):
             self.openai_API_url = os.getenv("OPENAI_URL")
 
-    def _count_tokens(self, question):
-        
-        response = openai.ChatCompletion.create(
-            model=self.gpt_model,
+    def ask_gpt(self, question, model="gpt-3.5-turbo"):
+        api_key = self.openai_API_key
+        if model:
+            model = model
+        else:
+            model = self.gpt_model
+        openai.api_key = api_key
+        client = openai.OpenAI(api_key=api_key)
+        response = client.chat.completions.create(
+            model=model,
             messages=[
-                {"role": "system", "content": self.prompts['system_role_content']},
-                {"role": "user", "content": question}
+                {
+                    "role": "user",
+                    "content": question,
+                },
             ],
-            max_tokens=self.max_tokens,
-            temperature=self.temperature,
+            temperature= self.temperature, 
+            max_tokens= self.max_tokens,
             timeout=self.timeout
         )
-
-        return response['usage']['total_tokens']
-
-    def ask_gpt(self, question):
-        # 设置聊天的起始对话
-        start_chat = 'User: ' + question + '\nAI:'
-
-        # 调用 OpenAI 的 ChatCompletion API
-        response = openai.ChatCompletion.create(
-             model=self.gpt_model,
-            messages=[
-                {"role": "system", "content": self.prompts['system_role_content']},
-                {"role": "user", "content": start_chat}
-            ],
-            max_tokens=self.max_tokens, 
-            temperature=self.temperature,
-            timeout=self.timeout
-        )
-
+        # store response 
+        self._responses.append(response)
+        # return response
         return response.choices[0].message.content
 
-    def fit(self, train_data: pd.DataFrame | DataLoader ):
+    def fit(self, train_data: pd.DataFrame | DataLoader = None, metadata: Metadata = None, *args, **kwargs):
+
+        if train_data:
+            self._fit_with_data(train_data)
+        elif metadata:
+            self._fit_with_metadata(metadata)
+        else:
+            raise InitializationError('Please pass at least one valid parameter, train_data or metadata')
+    
+    def _fit_with_metadata(self, metadata):
+        self._metadata = metadata
+        self.columns  = metadata.column_list
+        pass
+    
+    def _fit_with_data(self, train_data):
         if type(train_data) is DataLoader:
             train_data = train_data.load_all()
-        
         sample_lines = []
         col_list = list(train_data.columns)
-        # 遍历每一行数据
+        self.columns = col_list
+        
         for index, row in train_data.iterrows():
-            # 遍历每一列数据
             each_line = ''
             random.shuffle(col_list)
             for column in col_list:
-                # 将列名和当前行的数值拼接为字符串
                 value = str(row[column])
                 each_line += f"{column} is {value}, "
             
-            # 移除最后一个逗号和空格
             each_line = each_line[:-2]
-            # 添加换行符
             each_line += "\n"
             sample_lines.append(each_line)
         self._sample_lines = sample_lines
+    
+    @staticmethod
+    def _select_random_elements(input_list, cnt):
+        if cnt > len(input_list):
+            raise ValueError("cnt should not be greater than the length of the list")
+        return random.sample(input_list, cnt)
+    
+    def _split_data_entries(data):
+        lines = data.split("sample")
+        lines = [line.strip() for line in lines if line.strip()]
+        # remove the first line 
+        return lines[1:] 
 
-    def sample(self, count):
+    def _extract_features(self, sample_string):
+        original_columns = self.columns
+        features = []
+        # Maybe it can be optimized here
+        pattern = r'(\w+)\sis\s(\w+|\?)'
+        matches = re.findall(pattern, sample_string)
+        for column in original_columns:
+            for match in matches:
+                if match[0] == column:
+                    features.append(match[1])
+                    break
+            else:
+                features.append(None)
+        return features
+
+    def _form_message(self, sample_list, current_cnt):
+        # form sample string 
+        sample_str = ""
+        for i in range(current_cnt):
+            each_sample = sample_list[i]
+            each_str = f"sample {i}: " + each_sample + "\n"
+            sample_str += each_str
+        # form the message sent to GPT 
+        message = self.prompts['message_prefix'] + sample_str + f'\nPlease note that the table has a total of {len(self.columns)} columns of data, which should not be missing when generating the data.  '+ self.prompts["message_suffix"] + str(current_cnt) + '.'
+
+        return message
+    
+    def _get_result_from_response(self, response: str):
+        result = []
+        response_list = self._split_data_entries(response)
+        for each_response in response_list:
+            each_data = self._extract_features(each_response)
+            result.append(each_data)
+        return result
+
+
+    def sample(self, count = 50, *args, **kwargs):
+
+        if self._fit_with_data:
+            res = self._sample_with_data(count,  *args, **kwargs)
+            
+        elif self._fit_with_metadata:
+            res = self._sample_with_metadata(count, *args, **kwargs)
+        return res 
+    
+    def _sample_with_medadata(self, count, *args, **kwargs):
+        # not implemented
 
         pass
+    
+    def _sample_with_data(self, count, *args, **kwargs):
+        result = []
+        remaining_cnt = count
+        while remaining_cnt > 0:
+            # get the current count 
+            if remaining_cnt - self.query_batch >=0:
+                current_cnt = self.query_batch
+            else:
+                current_cnt = remaining_cnt
+            # select data / form message
+            sample_list = self._select_random_elements(self._sample_lines, current_cnt)
+            message = self._form_message(sample_list, current_cnt)
+            # ask_gpt
+            response = self.ask_gpt(message)
+            # get result from response 
+            generated_batch = self._get_result_from_response(response)
+            # update result 
+            result += generated_batch
+            # update remaining_cnt 
+            remaining_cnt = remaining_cnt - current_cnt
+        
+        # return pd DataFrame 
+        return pd.DataFrame(result, columns = self.columns, index = False)
 
 
