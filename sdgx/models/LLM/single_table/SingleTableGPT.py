@@ -23,9 +23,6 @@ class SingleTableGPTModel(SynthesizerModel):
     With this synthetic data generation model, one can easily generate diverse and realistic tabular datasets, mimicking the characteristics and patterns found in real data. 
     """
 
-    fit_medatada = False
-    fit_raw_data = False
-
     openai_API_key = ""
     """
     The API key required to access the OpenAI GPT model. Please provide your own API key for authentication.
@@ -64,6 +61,8 @@ class SingleTableGPTModel(SynthesizerModel):
     Due to the characteristics of the OpenAI GPT service, we do not recommend running this model with large data tables, which will consume your tokens excessively.
     '''
 
+    use_metadata = False
+
     query_batch = 20
     '''
     This parameter is the number of samples submitted to GPT each time and the number of returned samples. 
@@ -81,8 +80,8 @@ class SingleTableGPTModel(SynthesizerModel):
     '''
     
     prompts = {
-        "message_prefix" : '''Suppose you are the best data generating model in this world, we have some data entries with the following information:\n''',
-        "message_suffix" :"""\nGenerate synthetic data samples based on the above information, the count of the generated data samples is""",
+        "message_prefix" : '''Suppose you are the best data generating model in this world, we have some data entries with the following information:\n\n''',
+        "message_suffix" :"""\nGenerate synthetic data samples based on the above information, the count of the generated data samples is """,
         "system_role_content":"You are a powerful synthetic data generation model."
     }
     """
@@ -92,6 +91,10 @@ class SingleTableGPTModel(SynthesizerModel):
     _sample_lines = []
 
     _responses = []
+
+    _result_list = []
+
+    _message_list = []
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
@@ -160,15 +163,20 @@ class SingleTableGPTModel(SynthesizerModel):
             raise InitializationError('Please pass at least one valid parameter, train_data or metadata')
     
     def _fit_with_metadata(self, metadata):
+        self.use_metadata = True
         self._metadata = metadata
         self.columns  = metadata.column_list
         pass
     
     def _fit_with_data(self, train_data):
+        self.use_raw_data = True
+        self.use_dataloader = False
         if type(train_data) is DataLoader:
             train_data = train_data.load_all()
+            
         sample_lines = []
         col_list = list(train_data.columns)
+        # BUG it seems that the order of the columns is not right
         self.columns = col_list
         
         for index, row in train_data.iterrows():
@@ -189,7 +197,7 @@ class SingleTableGPTModel(SynthesizerModel):
             raise ValueError("cnt should not be greater than the length of the list")
         return random.sample(input_list, cnt)
     
-    def _split_data_entries(data):
+    def _split_data_entries(self, data):
         lines = data.split("sample")
         lines = [line.strip() for line in lines if line.strip()]
         # remove the first line 
@@ -199,7 +207,8 @@ class SingleTableGPTModel(SynthesizerModel):
         original_columns = self.columns
         features = []
         # Maybe it can be optimized here
-        pattern = r'(\w+)\sis\s(\w+|\?)'
+        # pattern = r'(\w+)\sis\s(\w+|\?)'
+        pattern = r'(\w+)(?:\s|=|:|-)+(\w+|\?)'
         matches = re.findall(pattern, sample_string)
         for column in original_columns:
             for match in matches:
@@ -218,11 +227,13 @@ class SingleTableGPTModel(SynthesizerModel):
             each_str = f"sample {i}: " + each_sample + "\n"
             sample_str += each_str
         # form the message sent to GPT 
-        message = self.prompts['message_prefix'] + sample_str + f'\nPlease note that the table has a total of {len(self.columns)} columns of data, which should not be missing when generating the data.  '+ self.prompts["message_suffix"] + str(current_cnt) + '.'
-
+        message = self.prompts['message_prefix'] + sample_str + f'Please note that the table has a total of {len(self.columns)} columns of data, which should not be missing when generating the data.  '+ self.prompts["message_suffix"] + str(current_cnt) + '.'
+        
+        self._message_list.append(message)
+        
         return message
     
-    def _get_result_from_response(self, response: str):
+    def _extract_from_response(self, response: str):
         result = []
         response_list = self._split_data_entries(response)
         for each_response in response_list:
@@ -233,17 +244,17 @@ class SingleTableGPTModel(SynthesizerModel):
 
     def sample(self, count = 50, *args, **kwargs):
 
-        if self._fit_with_data:
+        if self.use_raw_data:
             res = self._sample_with_data(count,  *args, **kwargs)
             
-        elif self._fit_with_metadata:
+        elif self.use_metadata:
             res = self._sample_with_metadata(count, *args, **kwargs)
         return res 
     
-    def _sample_with_medadata(self, count, *args, **kwargs):
-        # not implemented
+    def _sample_with_metadata(self, count, *args, **kwargs):
+        # TODO not implemented 
 
-        pass
+        return count
     
     def _sample_with_data(self, count, *args, **kwargs):
         result = []
@@ -260,13 +271,15 @@ class SingleTableGPTModel(SynthesizerModel):
             # ask_gpt
             response = self.ask_gpt(message)
             # get result from response 
-            generated_batch = self._get_result_from_response(response)
+            generated_batch = self._extract_from_response(response)
             # update result 
             result += generated_batch
             # update remaining_cnt 
             remaining_cnt = remaining_cnt - current_cnt
         
-        # return pd DataFrame 
-        return pd.DataFrame(result, columns = self.columns, index = False)
+        self._result_list.append(result)
+
+        return result
+        # return pd.DataFrame(result, columns = self.columns, index = False)
 
 
