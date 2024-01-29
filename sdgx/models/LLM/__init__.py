@@ -1,1 +1,1 @@
-from . import multi_tables, single_table
+from . import single_table
