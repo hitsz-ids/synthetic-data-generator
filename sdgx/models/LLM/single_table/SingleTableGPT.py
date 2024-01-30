@@ -56,12 +56,24 @@ class SingleTableGPTModel(SynthesizerModel):
     ''' 
     By default, we use raw_data for data access. 
 
-    When using the data loader, due to the randomization operation involved, we currently use the `.load_all()` operation to take out the original data in pd.DataFrame format for subsequent processing.
+    When using the data loader, due to the need of randomization operation, we currently use the `.load_all()` to transform the original data to pd.DataFrame format for subsequent processing.
 
     Due to the characteristics of the OpenAI GPT service, we do not recommend running this model with large data tables, which will consume your tokens excessively.
     '''
 
     use_metadata = False
+    '''
+    In this model, we accept a data generation paradigm that only provides metadata.
+
+    When only metadata is provided, sdgx will format the metadata of the data set into a message and transmit it to GPT, and GPT will generate similar data based on what it knows.
+
+    This is a potential way to generate data that cannot be made public and contains sensitive information.
+    '''
+
+    _metadata = None
+    """
+    the metadata.
+    """
 
     query_batch = 20
     '''
@@ -103,17 +115,16 @@ class SingleTableGPTModel(SynthesizerModel):
 
         self._check_access_type()
         self._check_openAI_setting()
-        self._set_openAI_key()
+        self._set_openAI()
 
-    def set_openAI_settings(self, API_url, API_key):
+    def set_openAI_settings(self, API_url = "https://api.openai.com/v1/", API_key= ""):
         self.openai_API_url = API_url
         self.openai_API_key = API_key
+        self._set_openAI()
 
-        self._set_openAI_key()
-
-    def _set_openAI_key(self):
+    def _set_openAI(self):
         openai.api_key = self.openai_API_key
-        openai.api_base = self.openai_API_url
+        openai.base_url = self.openai_API_url
     
     def _check_openAI_setting(self):
         if not self.openai_API_url:
@@ -156,6 +167,7 @@ class SingleTableGPTModel(SynthesizerModel):
     def fit(self, train_data: pd.DataFrame | DataLoader = None, metadata: Metadata = None, *args, **kwargs):
 
         if train_data:
+            if metadata: self._metadata = metadata
             self._fit_with_data(train_data)
         elif metadata:
             self._fit_with_metadata(metadata)
@@ -173,7 +185,10 @@ class SingleTableGPTModel(SynthesizerModel):
         self.use_dataloader = False
         if type(train_data) is DataLoader:
             train_data = train_data.load_all()
-            
+        # get metadata if no metadata 
+        if not self._metadata:
+            self._metadata = Metadata.from_dataframe(train_data)
+        # here we got both raw_data and metadata 
         sample_lines = []
         col_list = list(train_data.columns)
         # BUG it seems that the order of the columns is not right
@@ -219,7 +234,8 @@ class SingleTableGPTModel(SynthesizerModel):
                 features.append(None)
         return features
 
-    def _form_message(self, sample_list, current_cnt):
+
+    def _form_message_with_data(self, sample_list, current_cnt):
         # form sample string 
         sample_str = ""
         for i in range(current_cnt):
@@ -227,10 +243,16 @@ class SingleTableGPTModel(SynthesizerModel):
             each_str = f"sample {i}: " + each_sample + "\n"
             sample_str += each_str
         # form the message sent to GPT 
-        message = self.prompts['message_prefix'] + sample_str + f'Please note that the table has a total of {len(self.columns)} columns of data, which should not be missing when generating the data.  '+ self.prompts["message_suffix"] + str(current_cnt) + '.'
-        
+        message = self.prompts['message_prefix'] + sample_str + f'Please note that the table has a total of {len(self.columns)} columns of data, which should not be missing when generating the data.'
+
+        # if there are more off-table columns
+        if self.off_table_feature_inference:
+            message = message + f"Also, you should try to infer another {len(self.off_table_feature_inference)} columns based on your knowledge, the name of these columns are : {self.off_table_feature_inference}, then attach these columns behind the original table. "
+
+        # add the suffix of the message 
+        message = message + self.prompts["message_suffix"] + str(current_cnt) + '.'
+        # Maybe it can be optimized here
         self._message_list.append(message)
-        
         return message
     
     def _extract_from_response(self, response: str):
@@ -251,6 +273,10 @@ class SingleTableGPTModel(SynthesizerModel):
             res = self._sample_with_metadata(count, *args, **kwargs)
         return res 
     
+    def _form_message_with_metadata(self, current):
+        # form message 
+
+        pass    
     def _sample_with_metadata(self, count, *args, **kwargs):
         # TODO not implemented 
 
@@ -267,7 +293,7 @@ class SingleTableGPTModel(SynthesizerModel):
                 current_cnt = remaining_cnt
             # select data / form message
             sample_list = self._select_random_elements(self._sample_lines, current_cnt)
-            message = self._form_message(sample_list, current_cnt)
+            message = self._form_message_with_data(sample_list, current_cnt)
             # ask_gpt
             response = self.ask_gpt(message)
             # get result from response 
