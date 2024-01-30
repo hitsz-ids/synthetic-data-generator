@@ -161,7 +161,7 @@ class SingleTableGPTModel(SynthesizerModel):
         )
         # store response 
         self._responses.append(response)
-        # return response
+        # return the content of the gpt response 
         return response.choices[0].message.content
 
     def fit(self, train_data: pd.DataFrame | DataLoader = None, metadata: Metadata = None, *args, **kwargs):
