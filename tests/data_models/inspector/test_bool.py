@@ -3,6 +3,7 @@ import pandas as pd
 import pytest
 
 from sdgx.data_models.inspectors.bool import BoolInspector
+from sdgx.exceptions import InspectorInitError
 
 
 @pytest.fixture
@@ -37,6 +38,7 @@ def test_inspector_demo_data(inspector: BoolInspector, raw_data):
     # should be empty set
     assert not inspector.bool_columns
     assert sorted(inspector.inspect()["bool_columns"]) == sorted([])
+    assert inspector.inspect_level == 10
 
 
 def test_inspector_generated_data(inspector: BoolInspector, bool_test_df: pd.DataFrame):

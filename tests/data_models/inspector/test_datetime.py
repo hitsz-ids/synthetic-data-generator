@@ -74,6 +74,7 @@ def test_inspector_demo_data(inspector: DatetimeInspector, raw_data):
     # should be empty set
     assert not inspector.datetime_columns
     assert sorted(inspector.inspect()["datetime_columns"]) == sorted([])
+    assert inspector.inspect_level == 20
 
 
 def test_inspector_generated_data(inspector: DatetimeInspector, datetime_test_df: pd.DataFrame):
@@ -83,6 +84,7 @@ def test_inspector_generated_data(inspector: DatetimeInspector, datetime_test_df
     assert sorted(inspector.inspect()["datetime_columns"]) == sorted(
         ["simple_datetime", "simple_datetime_2", "date_with_time"]
     )
+    assert inspector.inspect_level == 20
 
 
 if __name__ == "__main__":

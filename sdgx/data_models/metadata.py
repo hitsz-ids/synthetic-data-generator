@@ -44,6 +44,16 @@ class Metadata(BaseModel):
     column_list is used to store all columns' name
     """
 
+    column_inspect_level: Dict[str, int] = defaultdict(lambda: 10)
+    """
+    column_inspect_level is used to store every inspector's level, to specify the true type of each column.
+    """
+
+    pii_columns: Set[set] = set()
+    """
+    pii_columns is used to store all PII columns' name
+    """
+
     # other columns lists are used to store column information
     # here are 5 basic data types
     id_columns: Set[str] = set()
@@ -254,7 +264,17 @@ class Metadata(BaseModel):
 
         metadata = Metadata(primary_keys=primary_keys, column_list=set(dataloader.columns()))
         for inspector in inspectors:
-            metadata.update(inspector.inspect())
+            inspect_res = inspector.inspect()
+            # update column type
+            metadata.update(inspect_res)
+            # update pii column
+            if inspector.pii:
+                for each_key in inspect_res:
+                    metadata.update({"pii_columns": inspect_res[each_key]})
+            # update inspect level
+            for each_key in inspect_res:
+                metadata.column_inspect_level[each_key] = inspector.inspect_level
+
         if not primary_keys:
             metadata.update_primary_key(metadata.id_columns)
 
@@ -296,7 +316,17 @@ class Metadata(BaseModel):
 
         metadata = Metadata(primary_keys=[df.columns[0]], column_list=set(df.columns))
         for inspector in inspectors:
-            metadata.update(inspector.inspect())
+            inspect_res = inspector.inspect()
+            # update column type
+            metadata.update(inspect_res)
+            # update pii column
+            if inspector.pii:
+                for each_key in inspect_res:
+                    metadata.update({"pii_columns": inspect_res[each_key]})
+            # update inspect level
+            for each_key in inspect_res:
+                metadata.column_inspect_level[each_key] = inspector.inspect_level
+
         if check:
             metadata.check()
         return metadata
@@ -341,8 +371,6 @@ class Metadata(BaseModel):
 
         if input_key not in self.column_list:
             raise MetadataInvalidError(f"Primary Key {input_key} not Exist in columns.")
-        if input_key not in self.id_columns:
-            raise MetadataInvalidError(f"Primary Key {input_key} should has ID DataType.")
 
     def get_all_data_type_columns(self):
         """Get all column names from `self.xxx_columns`.
@@ -360,7 +388,6 @@ class Metadata(BaseModel):
             if each_key.endswith("_columns"):
                 column_names = self.get(each_key)
                 all_dtype_cols = all_dtype_cols.union(set(column_names))
-
         return all_dtype_cols
 
     def check(self):
@@ -371,9 +398,15 @@ class Metadata(BaseModel):
             -Is there any missing definition of each column in table.
             -Are there any unknown columns that have been incorrectly updated.
         """
-        # check primary key in column_list and has ID data type
+        # check primary key in column_list
         for each_key in self.primary_keys:
             self.check_single_primary_key(each_key)
+
+        # for single primary key, it should has ID type
+        if len(self.primary_keys) == 1 and list(self.primary_keys)[0] not in self.id_columns:
+            raise MetadataInvalidError(
+                f"Primary Key {self.primary_keys[0]} should has ID DataType."
+            )
 
         all_dtype_columns = self.get_all_data_type_columns()
 
@@ -410,3 +443,53 @@ class Metadata(BaseModel):
         self.primary_keys = primary_keys
 
         logger.info(f"Primary Key updated: {primary_keys}.")
+
+    def dump(self):
+        """Dump model dict, can be used in downstream process, like processor.
+
+        Returns:
+            dict: dumped dict.
+        """
+        model_dict = self.model_dump()
+        model_dict["column_data_type"] = {}
+        for each_col in self.column_list:
+            model_dict["column_data_type"][each_col] = self.get_column_data_type(each_col)
+        return model_dict
+
+    def get_column_data_type(self, column_name: str):
+        """Get the exact type of specific column.
+        Args:
+            column_name(str): The query colmun name.
+        Returns:
+            str: The data type query result.
+        """
+        if column_name not in self.column_list:
+            raise MetadataInvalidError(f"Column {column_name}not exists in metadata.")
+        current_type = None
+        current_level = 0
+        # find the dtype who has most high inspector level
+        for each_key in list(self.model_fields.keys()) + list(self._extend.keys()):
+            if (
+                each_key != "pii_columns"
+                and each_key.endswith("_columns")
+                and column_name in self.get(each_key)
+                and current_level < self.column_inspect_level[each_key]
+            ):
+                current_level = self.column_inspect_level[each_key]
+                current_type = each_key
+        if not current_type:
+            raise MetadataInvalidError(f"Column {column_name} has no data type.")
+        return current_type.split("_columns")[0]
+
+    def get_column_pii(self, column_name: str):
+        """Return if a column is a PII column.
+        Args:
+            column_name(str): The query colmun name.
+        Returns:
+            bool: The PII query result.
+        """
+        if column_name not in self.column_list:
+            raise MetadataInvalidError(f"Column {column_name}not exists in metadata.")
+        if column_name in self.pii_columns:
+            return True
+        return False
