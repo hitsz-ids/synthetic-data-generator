@@ -26,6 +26,7 @@ dependencies = [
     "pydantic>=2",
     "cloudpickle",
     "importlib_metadata",
+    "openai",
 ]
 dynamic = ["version"]
 classifiers = [
