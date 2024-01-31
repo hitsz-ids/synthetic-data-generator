@@ -375,4 +375,4 @@ class SingleTableGPTModel(SynthesizerModel):
 
         # return result
         final_columns = self.columns + self.off_table_features
-        return pd.DataFrame(result, columns=final_columns, index=False)
+        return pd.DataFrame(self._result_list, columns=final_columns)
