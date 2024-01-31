@@ -111,13 +111,23 @@ class SingleTableGPTModel(SynthesizerModel):
 
     columns = []
 
+    dataset_description = ""
+
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
     def check(self):
-        self._check_access_type()
         self._check_openAI_setting()
         self._set_openAI()
+        self._check_access_type()
+    
+    def _check_access_type(self):
+        if self.use_dataloader == self.use_raw_data == self.use_metadata == False:
+            raise SynthesizerInitError(
+                "Data access type not specified, please use `use_raw_data: bool` or `use_dataloader: bool` to specify data access type."
+            )
+        if self.use_dataloader == self.use_raw_data == True:
+            raise SynthesizerInitError("Duplicate data access type found.")
 
     def set_openAI_settings(self, API_url="https://api.openai.com/v1/", API_key=""):
         self.openai_API_url = API_url
@@ -142,6 +152,7 @@ class SingleTableGPTModel(SynthesizerModel):
             self.openai_API_url = os.getenv("OPENAI_URL")
 
     def ask_gpt(self, question, model=None):
+        self.check()
         api_key = self.openai_API_key
         if model:
             model = model
@@ -169,28 +180,35 @@ class SingleTableGPTModel(SynthesizerModel):
     def fit(
         self, raw_data: pd.DataFrame | DataLoader = None, metadata: Metadata = None, *args, **kwargs
     ):
-        if raw_data is not None:
+        if raw_data is not None and type(raw_data) in [pd.DataFrame , DataLoader]:
             if metadata:
                 self._metadata = metadata
             self._fit_with_data(raw_data)
-        elif metadata:
+            return 
+        
+        if type(raw_data) is Metadata:
+            self._fit_with_metadata(raw_data)
+            return 
+        
+        if metadata is not None and type(metadata) is Metadata:
             self._fit_with_metadata(metadata)
-        else:
-            raise InitializationError(
+            return 
+        
+        raise InitializationError(
                 "Please pass at least one valid parameter, train_data or metadata"
             )
 
     def _fit_with_metadata(self, metadata):
         self.use_metadata = True
         self._metadata = metadata
-        self.columns = metadata.column_list
+        self.columns = list(metadata.column_list)
         pass
 
     def _fit_with_data(self, train_data):
         self.use_raw_data = True
         self.use_dataloader = False
         if type(train_data) is DataLoader:
-            self.columns = train_data.columns()
+            self.columns = list(train_data.columns())
             train_data = train_data.load_all()
         if not self.columns:
             self.columns = list(train_data.columns)
@@ -234,6 +252,8 @@ class SingleTableGPTModel(SynthesizerModel):
             sample_str += each_str
         # form the message sent to GPT
         message = self.prompts["message_prefix"] + sample_str
+        # add dataset desp 
+        message = message + self._form_dataset_description()
 
         # then offtable features
         message = message + self._form_message_with_offtable_features()
@@ -270,29 +290,40 @@ class SingleTableGPTModel(SynthesizerModel):
                 features.append(dict_to_list(feature, header))
         return features
 
-    def sample(self, count=50, *args, **kwargs):
+    def sample(self, count=50, dataset_desp = "", *args, **kwargs):
+        self.dataset_description = dataset_desp
         if self.use_raw_data:
             res = self._sample_with_data(count, *args, **kwargs)
 
         elif self.use_metadata:
             res = self._sample_with_metadata(count, *args, **kwargs)
         return res
+    
+    def _form_columns_description(self):
+
+        pass
+
+    def _form_dataset_description(self):
+        if self.dataset_description:
+            return "\nThe desctiption of the generated table is " + self.dataset_description + '\n'
+        else:
+            return ""
+
 
     def _form_message_with_metadata(self, current_cnt):
         # form message
         message = ""
         message = message + self.prompts["message_prefix"]
+        message = message + self._form_dataset_description()
         message = (
             message
             + "This table data generation task will only have metadata and no data samples. The header (columns infomation) of the tabular data is: "
         )
-        message = message + str(self.columns)
+        message = message + str(self.columns) + '. \n'
         # can add more info here
         message = message + self._form_message_with_offtable_features()
-        message = (
-            message
-            + +f"Please note that the generated table has total {len(self.columns) + len(self.off_table_features)} columns of the generated data, the column names are {self.columns + self.off_table_features}, every column should not be missed when generating the data. \n"
-        )
+        message = message +f"Please note that the generated table has total {len(self.columns) + len(self.off_table_features)} columns of the generated data, the column names are {self.columns + self.off_table_features}, every column should not be missed when generating the data. \n"
+        
         # add the suffix of the message
         message = message + self.prompts["message_suffix"] + str(current_cnt) + "."
         self._message_list.append(message)
@@ -343,4 +374,5 @@ class SingleTableGPTModel(SynthesizerModel):
         self._result_list.append(result)
 
         # return result
-        return pd.DataFrame(result, columns=self.columns, index=False)
+        final_columns = self.columns + self.off_table_features
+        return pd.DataFrame(result, columns=final_columns, index=False)
