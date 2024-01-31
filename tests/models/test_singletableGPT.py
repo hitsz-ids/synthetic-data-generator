@@ -3,13 +3,18 @@ import pytest
 from pathlib import Path
 import pandas as pd
 import pytest
+from sdgx.models.LLM.single_table.SingleTableGPT import SingleTableGPTModel
 
 @pytest.fixture
 def raw_data(demo_single_table_path):
-    yield pd.read_csv(demo_single_table_path)
+    yield pd.read_csv(demo_single_table_path).head(100)
+
+@pytest.fixture
+def single_table_gpt_model():
+    yield SingleTableGPTModel()
 
 # When reading the code, please collapse this list
-gpt_response = ["""
+gpt_response_list = ["""
 Here are 20 similar data entries generated based on the provided information:
 
 sample 21: relationship is Husband, fnlwgt is 145441, educational-num is 9, education is HS-grad, occupation is Exec-managerial, gender is Male, race is White, workclass is Private, capital-gain is 0, native-country is United-States, marital-status is Married-civ-spouse, income is >50K, age is 40, capital-loss is 1485, hours-per-week is 40
@@ -32,183 +37,7 @@ sample 37: workclass is Private, educational-num is 7, education is 11th, income
 sample 38: hours-per-week is 40, capital-gain is 0, gender is Male, marital-status is Never-married, age is 25, capital-loss is 0, native-country is ?, fnlwgt is 310864, income is <=50K, educational-num is 13, race is Black, workclass is Private, education is Bachelors, relationship is Not-in-family, occupation is Tech-support
 sample 39: capital-gain is 0, hours-per-week is 55, capital-loss is 0, age is 30, income is <=50K, education is Bachelors, relationship is Not-in-family, marital-status is Never-married, occupation is Exec-managerial, native-country is United-States, gender is Female, race is White, educational-num is 13, workclass is Private, fnlwgt is 128016
 sample 40: hours-per-week is 40, fnlwgt is 174515, capital-loss is 0, marital-status is Widowed, native-country is United-States, capital-gain is 0, age is 40, education is HS-grad, occupation is Machine-op-inspct, educational-num is 9, relationship is Unmarried, race is White, gender is Female, workclass is Private, income is <=50K
-""", '''
-Here are 5 synthetic data samples generated based on the provided information:
-
-Sample 0: 
-- Race: Amer-Indian-Eskimo
-- Occupation: Other-service
-- Income: <=50K
-- Capital-gain: 0.0
-- Relationship: Not-in-family
-- Hours-per-week: 40.0
-- Native-country: United-States
-- Education: Masters
-- Educational-num: 14.0
-- Capital-loss: 0.0
-- Workclass: Private
-- Gender: Male
-- Fnlwgt: 198751
-- Marital-status: Never-married
-- Age: 34
-
-Sample 1: 
-- Race: White
-- Occupation: Machine-op-inspct
-- Income: <=50K
-- Capital-gain: 0.0
-- Relationship: Husband
-- Hours-per-week: 50.0
-- Native-country: United-States
-- Education: Some-college
-- Educational-num: 10.0
-- Capital-loss: 0.0
-- Workclass: Self-emp-inc
-- Gender: Male
-- Fnlwgt: 67001
-- Marital-status: Married-civ-spouse
-- Age: 45
-
-Sample 2: 
-- Race: Black
-- Occupation: Handlers-cleaners
-- Income: <=50K
-- Capital-gain: 0.0
-- Relationship: Unmarried
-- Hours-per-week: 40.0
-- Native-country: United-States
-- Education: Some-college
-- Educational-num: 10.0
-- Capital-loss: 625.0
-- Workclass: Private
-- Gender: Female
-- Fnlwgt: 113732
-- Marital-status: Never-married
-- Age: 42
-
-Sample 3: 
-- Race: Black
-- Occupation: Tech-support
-- Income: <=50K
-- Capital-gain: 4650.0
-- Relationship: Not-in-family
-- Hours-per-week: 40.0
-- Native-country: United-States
-- Education: Some-college
-- Educational-num: 10.0
-- Capital-loss: 0.0
-- Workclass: Federal-gov
-- Gender: Male
-- Fnlwgt: 57629
-- Marital-status: Divorced
-- Age: 62
-
-Sample 4: 
-- Race: White
-- Occupation: Exec-managerial
-- Income: <=50K
-- Capital-gain: 0.0
-- Relationship: Not-in-family
-- Hours-per-week: 55.0
-- Native-country: United-States
-- Education: Bachelors
-- Educational-num: 13.0
-- Capital-loss: 0.0
-- Workclass: Private
-- Gender: Female
-- Fnlwgt: 203079
-- Marital-status: Widowed
-- Age: 37
-'''
-,'''
-Based on the given information, here are 5 synthetic data samples generated:
-
-Sample 0: 
-- capital-loss: 0.0
-- income: <=50K
-- fnlwgt: 299831
-- occupation: ?
-- workclass: ?
-- educational-num: 9.0
-- capital-gain: 0.0
-- race: White
-- gender: Male
-- native-country: United-States
-- marital-status: Married-civ-spouse
-- relationship: Husband
-- education: HS-grad
-- age: 58
-- hours-per-week: 35.0
-
-Sample 1: 
-- capital-loss: 0.0
-- income: <=50K
-- fnlwgt: 325596
-- occupation: Machine-op-inspct
-- workclass: Private
-- educational-num: 11.0
-- capital-gain: 0.0
-- race: White
-- gender: Male
-- native-country: United-States
-- marital-status: Married-civ-spouse
-- relationship: Husband
-- education: Assoc-voc
-- age: 24
-- hours-per-week: 45.0
-
-Sample 2: 
-- capital-loss: 0.0
-- income: <=50K
-- fnlwgt: 142249
-- occupation: Sales
-- workclass: Private
-- educational-num: 13.0
-- capital-gain: 0.0
-- race: White
-- gender: Male
-- native-country: United-States
-- marital-status: Never-married
-- relationship: Own-child
-- education: Bachelors
-- age: 29
-- hours-per-week: 40.0
-
-Sample 3: 
-- capital-loss: 0.0
-- income: <=50K
-- fnlwgt: 315476
-- occupation: Craft-repair
-- workclass: Private
-- educational-num: 7.0
-- capital-gain: 0.0
-- race: White
-- gender: Male
-- native-country: United-States
-- marital-status: Never-married
-- relationship: Unmarried
-- education: 11th
-- age: 22
-- hours-per-week: 40.0
-
-Sample 4: 
-- capital-loss: 0.0
-- income: <=50K
-- fnlwgt: 299197
-- occupation: Transport-moving
-- workclass: Private
-- educational-num: 10.0
-- capital-gain: 0.0
-- race: White
-- gender: Male
-- native-country: United-States
-- marital-status: Never-married
-- relationship: Not-in-family
-- education: Some-college
-- age: 44
-- hours-per-week: 45.0
-'''
-,'''Based on the provided information, here are 15 synthetic data samples generated:
+""",'''Based on the provided information, here are 15 synthetic data samples generated:
 
 Sample 0: income is <=50K, race is White, marital-status is Married-civ-spouse, gender is Male, age is 36, workclass is Self-emp-inc, education is HS-grad, relationship is Husband, native-country is United-States, educational-num is 9.0, occupation is Farming-fishing, capital-loss is 0.0, capital-gain is 0.0, hours-per-week is 80.0, fnlwgt is 48063
 
@@ -243,6 +72,43 @@ Sample 14: income is >50K, race is White, marital-status is Married-civ-spouse, 
 '''
 ]
 
-def test_sample_extraction(gpt_response):
+gpt_response_sample_count = [20, 15]
 
-    assert True is True
+def test_singletable_gpt_model( single_table_gpt_model: SingleTableGPTModel, raw_data: pd.DataFrame):
+    single_table_gpt_model.fit(raw_data)
+    assert single_table_gpt_model.columns  == ['age',
+        'workclass',
+        'fnlwgt',
+        'education',
+        'educational-num',
+        'marital-status',
+        'occupation',
+        'relationship',
+        'race',
+        'gender',
+        'capital-gain',
+        'capital-loss',
+        'hours-per-week',
+        'native-country',
+        'income']
+    assert single_table_gpt_model.openai_API_url == "https://api.openai.com/v1/"
+    # the key is not set
+    assert not single_table_gpt_model.openai_API_key 
+    assert single_table_gpt_model.max_tokens == 3000
+    assert single_table_gpt_model.temperature == 0.1
+    assert single_table_gpt_model.timeout == 90 
+    assert "gpt-3.5" in single_table_gpt_model.gpt_model.lower()
+    assert single_table_gpt_model.use_raw_data is True
+    assert single_table_gpt_model.use_dataloader is False
+    assert single_table_gpt_model.use_metadata is False
+    assert single_table_gpt_model.query_batch == 30 
+    assert not single_table_gpt_model.off_table_feature_inference 
+    assert not single_table_gpt_model.columns
+
+@pytest.mark.parametrize('response_index', range(len(gpt_response_list)))
+def test_feature_extraction(response_index: int, single_table_gpt_model: SingleTableGPTModel, raw_data: pd.DataFrame):
+    single_table_gpt_model.fit(raw_data)
+    response_content = gpt_response_list[response_index]
+    res = single_table_gpt_model.extract_features_from_response(response_content)
+    assert type(res) is list 
+    assert len(res) == gpt_response_sample_count[response_index]
