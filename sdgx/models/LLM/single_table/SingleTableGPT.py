@@ -120,7 +120,7 @@ class SingleTableGPTModel(SynthesizerModel):
         self._check_openAI_setting()
         self._set_openAI()
         self._check_access_type()
-    
+
     def _check_access_type(self):
         if self.use_dataloader == self.use_raw_data == self.use_metadata == False:
             raise SynthesizerInitError(
@@ -180,23 +180,23 @@ class SingleTableGPTModel(SynthesizerModel):
     def fit(
         self, raw_data: pd.DataFrame | DataLoader = None, metadata: Metadata = None, *args, **kwargs
     ):
-        if raw_data is not None and type(raw_data) in [pd.DataFrame , DataLoader]:
+        if raw_data is not None and type(raw_data) in [pd.DataFrame, DataLoader]:
             if metadata:
                 self._metadata = metadata
             self._fit_with_data(raw_data)
-            return 
-        
+            return
+
         if type(raw_data) is Metadata:
             self._fit_with_metadata(raw_data)
-            return 
-        
+            return
+
         if metadata is not None and type(metadata) is Metadata:
             self._fit_with_metadata(metadata)
-            return 
-        
+            return
+
         raise InitializationError(
-                "Please pass at least one valid parameter, train_data or metadata"
-            )
+            "Please pass at least one valid parameter, train_data or metadata"
+        )
 
     def _fit_with_metadata(self, metadata):
         self.use_metadata = True
@@ -252,7 +252,7 @@ class SingleTableGPTModel(SynthesizerModel):
             sample_str += each_str
         # form the message sent to GPT
         message = self.prompts["message_prefix"] + sample_str
-        # add dataset desp 
+        # add dataset desp
         message = message + self._form_dataset_description()
 
         # then offtable features
@@ -290,7 +290,7 @@ class SingleTableGPTModel(SynthesizerModel):
                 features.append(dict_to_list(feature, header))
         return features
 
-    def sample(self, count=50, dataset_desp = "", *args, **kwargs):
+    def sample(self, count=50, dataset_desp="", *args, **kwargs):
         self.dataset_description = dataset_desp
         if self.use_raw_data:
             res = self._sample_with_data(count, *args, **kwargs)
@@ -298,17 +298,16 @@ class SingleTableGPTModel(SynthesizerModel):
         elif self.use_metadata:
             res = self._sample_with_metadata(count, *args, **kwargs)
         return res
-    
+
     def _form_columns_description(self):
 
         pass
 
     def _form_dataset_description(self):
         if self.dataset_description:
-            return "\nThe desctiption of the generated table is " + self.dataset_description + '\n'
+            return "\nThe desctiption of the generated table is " + self.dataset_description + "\n"
         else:
             return ""
-
 
     def _form_message_with_metadata(self, current_cnt):
         # form message
@@ -319,11 +318,14 @@ class SingleTableGPTModel(SynthesizerModel):
             message
             + "This table data generation task will only have metadata and no data samples. The header (columns infomation) of the tabular data is: "
         )
-        message = message + str(self.columns) + '. \n'
+        message = message + str(self.columns) + ". \n"
         # can add more info here
         message = message + self._form_message_with_offtable_features()
-        message = message +f"Please note that the generated table has total {len(self.columns) + len(self.off_table_features)} columns of the generated data, the column names are {self.columns + self.off_table_features}, every column should not be missed when generating the data. \n"
-        
+        message = (
+            message
+            + f"Please note that the generated table has total {len(self.columns) + len(self.off_table_features)} columns of the generated data, the column names are {self.columns + self.off_table_features}, every column should not be missed when generating the data. \n"
+        )
+
         # add the suffix of the message
         message = message + self.prompts["message_suffix"] + str(current_cnt) + "."
         self._message_list.append(message)
