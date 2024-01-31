@@ -110,8 +110,8 @@ def test_singletable_gpt_model(single_table_gpt_model: SingleTableGPTModel, raw_
     assert single_table_gpt_model.use_dataloader is False
     assert single_table_gpt_model.use_metadata is False
     assert single_table_gpt_model.query_batch == 30
-    assert not single_table_gpt_model.off_table_feature_inference
-    assert not single_table_gpt_model.columns
+    assert not single_table_gpt_model.off_table_features
+    assert len(single_table_gpt_model.columns) > 0
 
 
 @pytest.mark.parametrize("response_index", range(len(gpt_response_list)))
@@ -122,4 +122,6 @@ def test_feature_extraction(
     response_content = gpt_response_list[response_index]
     res = single_table_gpt_model.extract_features_from_response(response_content)
     assert type(res) is list
+    # assert shape of extracted features
     assert len(res) == gpt_response_sample_count[response_index]
+    assert len(res[0]) == len(single_table_gpt_model.columns)
