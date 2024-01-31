@@ -6,6 +6,7 @@ import openai
 import os
 import random
 import re 
+from copy import copy
 
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.metadata import Metadata
@@ -33,7 +34,7 @@ class SingleTableGPTModel(SynthesizerModel):
     The URL endpoint for the OpenAI GPT API. Please specify the appropriate URL for accessing the API.
     """
 
-    max_tokens=2000
+    max_tokens=3000
     """
     The maximum number of tokens allowed in the generated response. This parameter helps in limiting the length of the output text.
     """
@@ -42,7 +43,7 @@ class SingleTableGPTModel(SynthesizerModel):
     """A parameter that controls the randomness of the generated text. Lower values like 0.1 make the output more focused and deterministic, while higher values like 1.0 introduce more randomness.
     """
 
-    timeout=60
+    timeout=90
     """
     The maximum time (in seconds) to wait for a response from the OpenAI GPT API. If the response is not received within this time, the request will be timed out.
     """
@@ -75,7 +76,7 @@ class SingleTableGPTModel(SynthesizerModel):
     the metadata.
     """
 
-    query_batch = 20
+    query_batch = 30
     '''
     This parameter is the number of samples submitted to GPT each time and the number of returned samples. 
     
@@ -93,7 +94,7 @@ class SingleTableGPTModel(SynthesizerModel):
     
     prompts = {
         "message_prefix" : '''Suppose you are the best data generating model in this world, we have some data entries with the following information:\n\n''',
-        "message_suffix" :"""\nGenerate synthetic data samples based on the above information, the count of the generated data samples is """,
+        "message_suffix" :"""\nGenerate synthetic data samples based on the above information, each sample should be output on one line (do not output in multiple lines), the output format of the sample is the same as the example in this message, such as "column_name_1 is value_1", the count of the generated data samples is """,
         "system_role_content":"You are a powerful synthetic data generation model."
     }
     """
@@ -107,6 +108,8 @@ class SingleTableGPTModel(SynthesizerModel):
     _result_list = []
 
     _message_list = []
+
+    columns = []
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
@@ -139,7 +142,7 @@ class SingleTableGPTModel(SynthesizerModel):
         if os.getenv("OPENAI_URL"):
             self.openai_API_url = os.getenv("OPENAI_URL")
 
-    def ask_gpt(self, question, model="gpt-3.5-turbo"):
+    def ask_gpt(self, question, model=None):
         api_key = self.openai_API_key
         if model:
             model = model
@@ -164,11 +167,11 @@ class SingleTableGPTModel(SynthesizerModel):
         # return the content of the gpt response 
         return response.choices[0].message.content
 
-    def fit(self, train_data: pd.DataFrame | DataLoader = None, metadata: Metadata = None, *args, **kwargs):
+    def fit(self, raw_data: pd.DataFrame | DataLoader = None, metadata: Metadata = None, *args, **kwargs):
 
-        if train_data:
+        if raw_data is not None:
             if metadata: self._metadata = metadata
-            self._fit_with_data(train_data)
+            self._fit_with_data(raw_data)
         elif metadata:
             self._fit_with_metadata(metadata)
         else:
@@ -184,20 +187,20 @@ class SingleTableGPTModel(SynthesizerModel):
         self.use_raw_data = True
         self.use_dataloader = False
         if type(train_data) is DataLoader:
+            self.columns = train_data.columns()
             train_data = train_data.load_all()
+        if not self.columns:
+            self.columns = list(train_data.columns)
         # get metadata if no metadata 
         if not self._metadata:
             self._metadata = Metadata.from_dataframe(train_data)
         # here we got both raw_data and metadata 
         sample_lines = []
-        col_list = list(train_data.columns)
-        # BUG it seems that the order of the columns is not right
-        self.columns = col_list
-        
-        for index, row in train_data.iterrows():
+        for _, row in train_data.iterrows():
             each_line = ''
-            random.shuffle(col_list)
-            for column in col_list:
+            shuffled_columns = copy(self.columns)
+            random.shuffle(shuffled_columns)
+            for column in shuffled_columns:
                 value = str(row[column])
                 each_line += f"{column} is {value}, "
             
@@ -211,29 +214,6 @@ class SingleTableGPTModel(SynthesizerModel):
         if cnt > len(input_list):
             raise ValueError("cnt should not be greater than the length of the list")
         return random.sample(input_list, cnt)
-    
-    def _split_data_entries(self, data):
-        lines = data.split("sample")
-        lines = [line.strip() for line in lines if line.strip()]
-        # remove the first line 
-        return lines[1:] 
-
-    def _extract_features(self, sample_string):
-        original_columns = self.columns
-        features = []
-        # Maybe it can be optimized here
-        # pattern = r'(\w+)\sis\s(\w+|\?)'
-        pattern = r'(\w+)(?:\s|=|:|-)+(\w+|\?)'
-        matches = re.findall(pattern, sample_string)
-        for column in original_columns:
-            for match in matches:
-                if match[0] == column:
-                    features.append(match[1])
-                    break
-            else:
-                features.append(None)
-        return features
-
 
     def _form_message_with_data(self, sample_list, current_cnt):
         # form sample string 
@@ -255,13 +235,26 @@ class SingleTableGPTModel(SynthesizerModel):
         self._message_list.append(message)
         return message
     
-    def _extract_from_response(self, response: str):
-        result = []
-        response_list = self._split_data_entries(response)
-        for each_response in response_list:
-            each_data = self._extract_features(each_response)
-            result.append(each_data)
-        return result
+    def extract_features_from_response(self, response_content):
+        def dict_to_list(input_dict , header):
+            res = []
+            for each_col in header:
+                each_value = input_dict.get(each_col, None)
+                res.append(each_value)
+            return res 
+
+        header = self.columns
+        features = []
+        for line in response_content.split('\n'):
+            feature = {}
+            for field in header:
+                pattern = r'\b' + field + r'\s*(?:is|=)\s*([^,\n]+)'
+                match = re.search(pattern, line)
+                if match:
+                    feature[field] = match.group(1).strip()
+            if feature:
+                features.append(dict_to_list(feature, header))
+        return features
 
 
     def sample(self, count = 50, *args, **kwargs):
@@ -297,15 +290,15 @@ class SingleTableGPTModel(SynthesizerModel):
             # ask_gpt
             response = self.ask_gpt(message)
             # get result from response 
-            generated_batch = self._extract_from_response(response)
+            generated_batch = self.extract_features_from_response(response)
             # update result 
             result += generated_batch
             # update remaining_cnt 
             remaining_cnt = remaining_cnt - current_cnt
         
         self._result_list.append(result)
-
-        return result
-        # return pd.DataFrame(result, columns = self.columns, index = False)
+        
+        # return result
+        return pd.DataFrame(result, columns = self.columns, index = False)
 
 
