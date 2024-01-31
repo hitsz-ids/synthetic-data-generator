@@ -258,10 +258,7 @@ class SingleTableGPTModel(SynthesizerModel):
         # then offtable features
         message = message + self._form_message_with_offtable_features()
 
-        message = (
-            message
-            + +f"Please note that the generated table has total {len(self.columns) + len(self.off_table_features)} columns of the generated data, the column names are {self.columns + self.off_table_features}, every column should not be missed when generating the data. \n"
-        )
+        message = message + f"Please note that the generated table has total {len(self.columns) + len(self.off_table_features)} columns of the generated data, the column names are {self.columns + self.off_table_features}, every column should not be missed when generating the data. \n"
 
         # add the suffix of the message
         message = message + self.prompts["message_suffix"] + str(current_cnt) + "."
