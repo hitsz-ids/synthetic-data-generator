@@ -103,10 +103,17 @@ marital-status is Married-civ-spouse, relationship is Wife, income is >50K, age 
 marital-status is Never-married, capital-gain is 0, occupation is Adm-clerical, education is HS-grad, fnlwgt is 183934, age is 28, relationship is Not-in-family, hours-per-week is 35, income is <=50K, native-country is United-States, gender is Female, capital-loss is 0, race is White, educational-num is 9, workclass is Private, has_car is False
 marital-status is Divorced, capital-gain is 0, occupation is Handlers-cleaners, education is 11th, fnlwgt is 234721, age is 42, relationship is Unmarried, hours-per-week is 45, income is <=50K, native-country is United-States, gender is Male, capital-loss is 0, race is Black, educational-num is 7, workclass is Private, has_car is True
 marital-status is Married-civ-spouse, capital-gain is 0, occupation is Prof-specialty, education is Masters, fnlwgt is 216129, age is 41, relationship is Husband, hours-per-week is 50, income is >50K, native-country is United-States, gender is Male, capital-loss is 0, race is White, educational-num is 14, workclass is Self-emp-inc, has_car is True
-marital-status is Married-civ-spouse, capital-gain is 0, occupation is Craft-repair, education is Some-college, fnlwgt is 112497, age is 52, relationship is Husband, hours-per-week is 60, income is >50K, native-country is United-States, gender is Male, capital-loss is 0, race is White, educational-num is 10, workclass is Private, has_car is True'''
+marital-status is Married-civ-spouse, capital-gain is 0, occupation is Craft-repair, education is Some-college, fnlwgt is 112497, age is 52, relationship is Husband, hours-per-week is 60, income is >50K, native-country is United-States, gender is Male, capital-loss is 0, race is White, educational-num is 10, workclass is Private, has_car is True''',
+"""
+marital-status = Married-civ-spouse, capital-gain = 0, occupation = Exec-managerial, education = Bachelors, fnlwgt = 189778, age = 35, relationship = Husband, hours-per-week = 40, income = <=50K, native-country = United-States, gender = Male, capital-loss = 0, race = White, educational-num = 13, workclass = Private, has_car = True
+marital-status = Never-married, capital-gain = 0, occupation = Adm-clerical, education = HS-grad, fnlwgt = 183934, age = 28, relationship = Not-in-family, hours-per-week = 35, income = <=50K, native-country = United-States, gender = Female, capital-loss = 0, race = White, educational-num = 9, workclass = Private, has_car = False
+marital-status = Divorced, capital-gain = 0, occupation = Handlers-cleaners, education = 11th, fnlwgt = 234721, age = 42, relationship = Unmarried, hours-per-week = 45, income = <=50K, native-country = United-States, gender = Male, capital-loss = 0, race = Black, educational-num = 7, workclass = Private, has_car = True
+marital-status = Married-civ-spouse, capital-gain = 0, occupation = Prof-specialty, education = Masters, fnlwgt = 216129, age = 41, relationship = Husband, hours-per-week = 50, income = >50K, native-country = United-States, gender = Male, capital-loss = 0, race = White, educational-num = 14, workclass = Self-emp-inc, has_car = True
+marital-status = Married-civ-spouse, capital-gain = 0, occupation = Craft-repair, education = Some-college, fnlwgt = 112497, age = 52, relationship = Husband, hours-per-week = 60, income = >50K, native-country = United-States, gender = Male, capital-loss = 0, race = White, educational-num = 10, workclass = Private, has_car = True
+"""
 ]
 
-gpt_response_sample_count = [20, 15, 20, 5]
+gpt_response_sample_count = [20, 15, 20, 5, 5]
 
 
 def test_singletable_gpt_model(single_table_gpt_model: SingleTableGPTModel, raw_data: pd.DataFrame):
@@ -154,6 +161,8 @@ def test_feature_extraction_data(
     # assert shape of extracted features
     assert len(res) == gpt_response_sample_count[response_index]
     assert len(res[0]) == len(single_table_gpt_model.columns)
+    res_df = pd.DataFrame(res, columns=single_table_gpt_model.columns + single_table_gpt_model.off_table_features)
+    assert res_df.shape == (gpt_response_sample_count[response_index], len(single_table_gpt_model.columns))
 
 @pytest.mark.parametrize("response_index", range(len(gpt_response_list)))
 def test_feature_extraction_metadata(response_index:int, single_table_gpt_model: SingleTableGPTModel,demo_single_table_metadata: Metadata):
@@ -164,3 +173,6 @@ def test_feature_extraction_metadata(response_index:int, single_table_gpt_model:
     res = single_table_gpt_model.extract_features_from_response(response_content)
     assert len(res) == gpt_response_sample_count[response_index]
     assert len(res[0]) == len(single_table_gpt_model.columns) + len(single_table_gpt_model.off_table_features)
+    res_df = pd.DataFrame(res, columns=single_table_gpt_model.columns + single_table_gpt_model.off_table_features)
+    assert res_df.shape == (gpt_response_sample_count[response_index], len(single_table_gpt_model.columns) + len(single_table_gpt_model.off_table_features))
+
