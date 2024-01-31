@@ -137,3 +137,7 @@ class MetadataCombinerInvalidError(MetadataCombinerError):
 
 class MetadataCombinerInitError(MetadataCombinerError):
     ERROR_CODE = 9006
+
+
+class InspectorInitError(DataModelError):
+    ERROR_CODE = 9007
