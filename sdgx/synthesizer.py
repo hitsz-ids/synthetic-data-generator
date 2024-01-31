@@ -103,10 +103,12 @@ class Synthesizer:
             data_processors = []
         self.data_processors_manager = DataProcessorManager()
         self.data_processors = [
-            d
-            if isinstance(d, DataProcessor)
-            else self.data_processors_manager.init_data_processor(
-                d, **(data_processors_kwargs or {})
+            (
+                d
+                if isinstance(d, DataProcessor)
+                else self.data_processors_manager.init_data_processor(
+                    d, **(data_processors_kwargs or {})
+                )
             )
             for d in data_processors
         ]
