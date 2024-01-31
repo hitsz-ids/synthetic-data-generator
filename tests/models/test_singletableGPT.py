@@ -1,20 +1,24 @@
-
-import pytest
 from pathlib import Path
+
 import pandas as pd
 import pytest
+
 from sdgx.models.LLM.single_table.SingleTableGPT import SingleTableGPTModel
+
 
 @pytest.fixture
 def raw_data(demo_single_table_path):
     yield pd.read_csv(demo_single_table_path).head(100)
 
+
 @pytest.fixture
 def single_table_gpt_model():
     yield SingleTableGPTModel()
 
+
 # When reading the code, please collapse this list
-gpt_response_list = ["""
+gpt_response_list = [
+    """
 Here are 20 similar data entries generated based on the provided information:
 
 sample 21: relationship is Husband, fnlwgt is 145441, educational-num is 9, education is HS-grad, occupation is Exec-managerial, gender is Male, race is White, workclass is Private, capital-gain is 0, native-country is United-States, marital-status is Married-civ-spouse, income is >50K, age is 40, capital-loss is 1485, hours-per-week is 40
@@ -37,7 +41,8 @@ sample 37: workclass is Private, educational-num is 7, education is 11th, income
 sample 38: hours-per-week is 40, capital-gain is 0, gender is Male, marital-status is Never-married, age is 25, capital-loss is 0, native-country is ?, fnlwgt is 310864, income is <=50K, educational-num is 13, race is Black, workclass is Private, education is Bachelors, relationship is Not-in-family, occupation is Tech-support
 sample 39: capital-gain is 0, hours-per-week is 55, capital-loss is 0, age is 30, income is <=50K, education is Bachelors, relationship is Not-in-family, marital-status is Never-married, occupation is Exec-managerial, native-country is United-States, gender is Female, race is White, educational-num is 13, workclass is Private, fnlwgt is 128016
 sample 40: hours-per-week is 40, fnlwgt is 174515, capital-loss is 0, marital-status is Widowed, native-country is United-States, capital-gain is 0, age is 40, education is HS-grad, occupation is Machine-op-inspct, educational-num is 9, relationship is Unmarried, race is White, gender is Female, workclass is Private, income is <=50K
-""",'''Based on the provided information, here are 15 synthetic data samples generated:
+""",
+    """Based on the provided information, here are 15 synthetic data samples generated:
 
 Sample 0: income is <=50K, race is White, marital-status is Married-civ-spouse, gender is Male, age is 36, workclass is Self-emp-inc, education is HS-grad, relationship is Husband, native-country is United-States, educational-num is 9.0, occupation is Farming-fishing, capital-loss is 0.0, capital-gain is 0.0, hours-per-week is 80.0, fnlwgt is 48063
 
@@ -69,46 +74,52 @@ Sample 13: income is <=50K, race is White, marital-status is Married-civ-spouse,
 
 Sample 14: income is >50K, race is White, marital-status is Married-civ-spouse, gender is Male, age is 36, workclass is Local-gov, education is Bachelors, relationship is Husband, native-country is United-States, educational-num is 13.0, occupation is Prof-specialty, capital-loss is 0.0, capital-gain is 0.0, hours-per-week is 40.0, fnlwgt is 403681
 
-'''
+""",
 ]
 
 gpt_response_sample_count = [20, 15]
 
-def test_singletable_gpt_model( single_table_gpt_model: SingleTableGPTModel, raw_data: pd.DataFrame):
+
+def test_singletable_gpt_model(single_table_gpt_model: SingleTableGPTModel, raw_data: pd.DataFrame):
     single_table_gpt_model.fit(raw_data)
-    assert single_table_gpt_model.columns  == ['age',
-        'workclass',
-        'fnlwgt',
-        'education',
-        'educational-num',
-        'marital-status',
-        'occupation',
-        'relationship',
-        'race',
-        'gender',
-        'capital-gain',
-        'capital-loss',
-        'hours-per-week',
-        'native-country',
-        'income']
+    assert single_table_gpt_model.columns == [
+        "age",
+        "workclass",
+        "fnlwgt",
+        "education",
+        "educational-num",
+        "marital-status",
+        "occupation",
+        "relationship",
+        "race",
+        "gender",
+        "capital-gain",
+        "capital-loss",
+        "hours-per-week",
+        "native-country",
+        "income",
+    ]
     assert single_table_gpt_model.openai_API_url == "https://api.openai.com/v1/"
     # the key is not set
-    assert not single_table_gpt_model.openai_API_key 
+    assert not single_table_gpt_model.openai_API_key
     assert single_table_gpt_model.max_tokens == 3000
     assert single_table_gpt_model.temperature == 0.1
-    assert single_table_gpt_model.timeout == 90 
+    assert single_table_gpt_model.timeout == 90
     assert "gpt-3.5" in single_table_gpt_model.gpt_model.lower()
     assert single_table_gpt_model.use_raw_data is True
     assert single_table_gpt_model.use_dataloader is False
     assert single_table_gpt_model.use_metadata is False
-    assert single_table_gpt_model.query_batch == 30 
-    assert not single_table_gpt_model.off_table_feature_inference 
+    assert single_table_gpt_model.query_batch == 30
+    assert not single_table_gpt_model.off_table_feature_inference
     assert not single_table_gpt_model.columns
 
-@pytest.mark.parametrize('response_index', range(len(gpt_response_list)))
-def test_feature_extraction(response_index: int, single_table_gpt_model: SingleTableGPTModel, raw_data: pd.DataFrame):
+
+@pytest.mark.parametrize("response_index", range(len(gpt_response_list)))
+def test_feature_extraction(
+    response_index: int, single_table_gpt_model: SingleTableGPTModel, raw_data: pd.DataFrame
+):
     single_table_gpt_model.fit(raw_data)
     response_content = gpt_response_list[response_index]
     res = single_table_gpt_model.extract_features_from_response(response_content)
-    assert type(res) is list 
+    assert type(res) is list
     assert len(res) == gpt_response_sample_count[response_index]
