@@ -20,6 +20,10 @@
 
 # 🚀 合成数据生成器 -- 快速生成高质量合成数据！
 
+  <p style="font-size: small;">切换语言: 
+    <a href="https://github.com/hitsz-ids/synthetic-data-generator/blob/main/README.md" target="_blank">English</a>
+  </p>
+
 </p>
 </div>
 
