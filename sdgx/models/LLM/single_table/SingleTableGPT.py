@@ -85,7 +85,7 @@ class SingleTableGPTModel(SynthesizerModel):
     We do not recommend setting too large a value, as this may cause potential problems or errors.
     """
 
-    off_table_feature_inference = []
+    off_table_features = []
     """
     * Experimental Feature
 
@@ -93,8 +93,8 @@ class SingleTableGPTModel(SynthesizerModel):
     """
 
     prompts = {
-        "message_prefix": """Suppose you are the best data generating model in this world, we have some data entries with the following information:\n\n""",
-        "message_suffix": """\nGenerate synthetic data samples based on the above information, each sample should be output on one line (do not output in multiple lines), the output format of the sample is the same as the example in this message, such as "column_name_1 is value_1", the count of the generated data samples is """,
+        "message_prefix": """Suppose you are the best data generating model in this world, we have some data samples with the following information:\n\n""",
+        "message_suffix": """\nGenerate synthetic data samples based on the above information and your knowledge, each sample should be output on one line (do not output in multiple lines), the output format of the sample is the same as the example in this message, such as "column_name_1 is value_1", the count of the generated data samples is """,
         "system_role_content": "You are a powerful synthetic data generation model.",
     }
     """
@@ -218,6 +218,13 @@ class SingleTableGPTModel(SynthesizerModel):
             raise ValueError("cnt should not be greater than the length of the list")
         return random.sample(input_list, cnt)
 
+    def _form_message_with_offtable_features(self):
+        # if there are more off-table columns
+        if self.off_table_features:
+            return f"Also, you should try to infer another {len(self.off_table_features)} columns based on your knowledge, the name of these columns are : {self.off_table_features}, attach these columns after the original table. \n"
+        else:
+            return ""
+
     def _form_message_with_data(self, sample_list, current_cnt):
         # form sample string
         sample_str = ""
@@ -226,18 +233,15 @@ class SingleTableGPTModel(SynthesizerModel):
             each_str = f"sample {i}: " + each_sample + "\n"
             sample_str += each_str
         # form the message sent to GPT
-        message = (
-            self.prompts["message_prefix"]
-            + sample_str
-            + f"Please note that the table has a total of {len(self.columns)} columns of data, which should not be missing when generating the data."
-        )
+        message = self.prompts["message_prefix"] + sample_str
 
-        # if there are more off-table columns
-        if self.off_table_feature_inference:
-            message = (
-                message
-                + f"Also, you should try to infer another {len(self.off_table_feature_inference)} columns based on your knowledge, the name of these columns are : {self.off_table_feature_inference}, then attach these columns behind the original table. "
-            )
+        # then offtable features
+        message = message + self._form_message_with_offtable_features()
+
+        message = (
+            message
+            + +f"Please note that the generated table has total {len(self.columns) + len(self.off_table_features)} columns of the generated data, the column names are {self.columns + self.off_table_features}, every column should not be missed when generating the data. \n"
+        )
 
         # add the suffix of the message
         message = message + self.prompts["message_suffix"] + str(current_cnt) + "."
@@ -253,7 +257,7 @@ class SingleTableGPTModel(SynthesizerModel):
                 res.append(each_value)
             return res
 
-        header = self.columns
+        header = self.columns + self.off_table_features
         features = []
         for line in response_content.split("\n"):
             feature = {}
@@ -274,13 +278,44 @@ class SingleTableGPTModel(SynthesizerModel):
             res = self._sample_with_metadata(count, *args, **kwargs)
         return res
 
-    def _form_message_with_metadata(self, current):
+    def _form_message_with_metadata(self, current_cnt):
         # form message
-
-        pass
+        message = ""
+        message = message + self.prompts["message_prefix"]
+        message = (
+            message
+            + "This table data generation task will only have metadata and no data samples. The header (columns infomation) of the tabular data is: "
+        )
+        message = message + str(self.columns)
+        # can add more info here
+        message = message + self._form_message_with_offtable_features()
+        message = (
+            message
+            + +f"Please note that the generated table has total {len(self.columns) + len(self.off_table_features)} columns of the generated data, the column names are {self.columns + self.off_table_features}, every column should not be missed when generating the data. \n"
+        )
+        # add the suffix of the message
+        message = message + self.prompts["message_suffix"] + str(current_cnt) + "."
+        self._message_list.append(message)
+        return message
 
     def _sample_with_metadata(self, count, *args, **kwargs):
-        # TODO not implemented
+        result = []
+        remaining_cnt = count
+        while remaining_cnt > 0:
+            # get the current count
+            if remaining_cnt - self.query_batch >= 0:
+                current_cnt = self.query_batch
+            else:
+                current_cnt = remaining_cnt
+            message = self._form_message_with_metadata(current_cnt)
+            # ask_gpt
+            response = self.ask_gpt(message)
+            # get result from response
+            generated_batch = self.extract_features_from_response(response)
+            # update result
+            result += generated_batch
+            # update remaining_cnt
+            remaining_cnt = remaining_cnt - current_cnt
 
         return count
 
