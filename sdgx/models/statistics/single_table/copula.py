@@ -12,8 +12,6 @@ import scipy
 import sdgx.models.components.sdv_copulas as copulas
 from sdgx.exceptions import NonParametricError
 from sdgx.models.components.sdv_copulas import multivariate
-
-
 from sdgx.models.components.sdv_ctgan.data_transformer import DataTransformer
 from sdgx.models.components.sdv_rdt.transformers import OneHotEncoder
 from sdgx.models.components.utils import (
@@ -23,6 +21,7 @@ from sdgx.models.components.utils import (
     validate_numerical_distributions,
 )
 from sdgx.models.statistics.single_table.base import SynthesizerModel
+from sdgx.data_models.metadata import Metadata
 
 LOGGER = logging.getLogger(__name__)
 
@@ -31,8 +30,8 @@ class GaussianCopulaSynthesizer(SynthesizerModel):
     """Model wrapping ``copulas.multivariate.GaussianMultivariate`` copula.
 
     Args:
-        metadata (sdv.metadata.SingleTableMetadata):
-            Single table metadata representing the data that this synthesizer will be used for.
+        metadata (from sdgx.data_models.metadata.Metadata):
+            Single table metadata.
         enforce_min_max_values (bool):
             Specify whether or not to clip the data returned by ``reverse_transform`` of
             the numerical transformer, ``FloatFormatter``, to the min and max values seen
@@ -106,12 +105,12 @@ class GaussianCopulaSynthesizer(SynthesizerModel):
     
     def __init__(
         self,
-        metadata,
-        enforce_min_max_values=True,
-        enforce_rounding=True,
-        locales=None,
-        numerical_distributions=None,
-        default_distribution=None,
+        metadata: Metadata,
+        enforce_min_max_values: bool =True,
+        enforce_rounding: bool =True,
+        locales: list =None,
+        numerical_distributions: dict =None,
+        default_distribution: str =None,
     ):
         """ Initialize the GaussianCopulaSynthesizer class.
         Args:
@@ -192,8 +191,9 @@ class GaussianCopulaSynthesizer(SynthesizerModel):
                 Dict mapping column names to transformers to be used for that column.
         """
         for column, transformer in column_name_to_transformer.items():
-            sdtype = self.metadata.columns[column]["sdtype"]
-            if sdtype == "categorical" and isinstance(transformer, OneHotEncoder):
+            # sdtype = self.metadata.columns[column]["sdtype"]
+            discrete_columns = self.metadata.discrete_columns
+            if column in discrete_columns and isinstance(transformer, OneHotEncoder):
                 warnings.warn(
                     f"Using a OneHotEncoder transformer for column '{column}' "
                     "may slow down the preprocessing and modeling times."
@@ -231,7 +231,7 @@ class GaussianCopulaSynthesizer(SynthesizerModel):
         # Iterate through each column in the input list
         for column in columns:
             # Iterate through each valid column in the metadata
-            for valid_column in self.metadata.columns:
+            for valid_column in self.metadata.column_list:
                 # Check if the column starts with the valid column
                 if column.startswith(valid_column):
                     # If it does, add it to the list of valid columns and break the loop
