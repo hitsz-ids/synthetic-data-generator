@@ -250,11 +250,10 @@ class SingleTableGPTModel(SynthesizerModel):
         return response.choices[0].message.content
 
     def fit(
-        self, raw_data: pd.DataFrame | DataLoader = None,
-        metadata: Metadata = None, *args, **kwargs
+        self, raw_data: pd.DataFrame | DataLoader = None, metadata: Metadata = None, *args, **kwargs
     ):
         """
-        Fits this model to the provided data. 
+        Fits this model to the provided data.
         Please note that no actual algorithmic training is excuted here.
 
         Args:
@@ -340,14 +339,14 @@ class SingleTableGPTModel(SynthesizerModel):
     def _select_random_elements(input_list, cnt):
         """
         This function selects a random sample of elements from the input list.
-        
+
         Args:
             input_list (list): The list from which elements will be selected.
             cnt (int): The number of elements to be selected.
-        
+
         Returns:
             list: A list of randomly selected elements from the input list.
-        
+
         Raises:
             ValueError: If cnt is greater than the length of the input list.
         """
@@ -358,7 +357,7 @@ class SingleTableGPTModel(SynthesizerModel):
     def _form_message_with_offtable_features(self):
         """
         This function forms a message with off-table features.
-        
+
         If there are more off-table columns, additional processing is excuted here.
         """
         if self.off_table_features:
@@ -414,6 +413,7 @@ class SingleTableGPTModel(SynthesizerModel):
         Returns:
             list: A list of extracted features.
         """
+
         def dict_to_list(input_dict, header):
             """
             Converts a dictionary to a list based on the given header.
@@ -447,18 +447,18 @@ class SingleTableGPTModel(SynthesizerModel):
     def sample(self, count=50, dataset_desp="", *args, **kwargs):
         """
         This function samples data from either raw data or metadata based on the given parameters.
-        
+
         Args:
             count (int): The number of samples to be generated. Default is 50.
             dataset_desp (str): The description of the dataset. Default is an empty string.
             *args: Additional positional arguments.
             **kwargs: Additional keyword arguments.
-        
+
         Returns:
             res: The sampled data.
         """
         self.dataset_description = dataset_desp
-        
+
         if self.use_raw_data:
             # If the use_raw_data flag is True, sample data using the _sample_with_data method.
             res = self._sample_with_data(count, *args, **kwargs)
@@ -466,7 +466,7 @@ class SingleTableGPTModel(SynthesizerModel):
         elif self.use_metadata:
             # If the use_metadata flag is True, sample data using the _sample_with_metadata method.
             res = self._sample_with_metadata(count, *args, **kwargs)
-        
+
         return res
 
     def _form_columns_description(self):
@@ -502,22 +502,24 @@ class SingleTableGPTModel(SynthesizerModel):
         message = (
             message
             + "This table data generation task will only have metadata and no data samples. The header (columns infomation) of the tabular data is: "
-        )  
+        )
         # Add information about the table data generation task
         message = message + str(self.columns) + ". \n"  # Add the column information
-        message = message + self._form_message_with_offtable_features()  # Add off-table features information
+        message = (
+            message + self._form_message_with_offtable_features()
+        )  # Add off-table features information
         message = (
             message
             + f"Please note that the generated table has total {len(self.columns) + len(self.off_table_features)} columns of the generated data, the column names are {self.columns + self.off_table_features}, every column should not be missed when generating the data. \n"
         )  # Add information about the generated table columns
 
         # Add the message suffix and current count
-        message = message + self.prompts["message_suffix"] + str(current_cnt) + "."  
+        message = message + self.prompts["message_suffix"] + str(current_cnt) + "."
         # Append the message to the message list
-        self._message_list.append(message)  
+        self._message_list.append(message)
         # Return the formed message with metadata
-        return message  
-    
+        return message
+
     def _sample_with_metadata(self, count, *args, **kwargs):
         """
         This method samples data with metadata.
@@ -532,28 +534,28 @@ class SingleTableGPTModel(SynthesizerModel):
 
         """
         # Initialize an empty list to store the generated samples
-        result = []  
+        result = []
         # Set the remaining count to the input count
-        remaining_cnt = count  
-        
+        remaining_cnt = count
+
         # Set the remaining count to the input count
-        while remaining_cnt > 0:  
+        while remaining_cnt > 0:
             if remaining_cnt - self.query_batch >= 0:
                 # Set the current count to the query batch size if >= 0
-                current_cnt = self.query_batch  
+                current_cnt = self.query_batch
             else:
                 # else, set the current count to the remaining count
-                current_cnt = remaining_cnt  
+                current_cnt = remaining_cnt
             # Generate a message with metadata
-            message = self._form_message_with_metadata(current_cnt)  
+            message = self._form_message_with_metadata(current_cnt)
             # Send the message to GPT and get the response
-            response = self.ask_gpt(message)  
+            response = self.ask_gpt(message)
             # Extract features from the response
-            generated_batch = self.extract_features_from_response(response)  
+            generated_batch = self.extract_features_from_response(response)
             # Add the generated batch to the result list
-            result += generated_batch  
+            result += generated_batch
             # Update the remaining count
-            remaining_cnt = remaining_cnt - current_cnt  
+            remaining_cnt = remaining_cnt - current_cnt
 
         return count  # Return the input count
 
