@@ -3,10 +3,10 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 
-from sdgx.data_models.metadata import Metadata
-from sdgx.models.LLM.single_table.SingleTableGPT import SingleTableGPTModel
-from sdgx.exceptions import InitializationError
 from sdgx.data_loader import DataLoader
+from sdgx.data_models.metadata import Metadata
+from sdgx.exceptions import InitializationError
+from sdgx.models.LLM.single_table.SingleTableGPT import SingleTableGPTModel
 
 
 @pytest.fixture
@@ -119,7 +119,11 @@ marital-status = Married-civ-spouse, capital-gain = 0, occupation = Craft-repair
 gpt_response_sample_count = [20, 15, 20, 5, 5]
 
 
-def test_singletable_gpt_model(single_table_gpt_model: SingleTableGPTModel, raw_data: pd.DataFrame, demo_single_table_data_loader: DataLoader):
+def test_singletable_gpt_model(
+    single_table_gpt_model: SingleTableGPTModel,
+    raw_data: pd.DataFrame,
+    demo_single_table_data_loader: DataLoader,
+):
     single_table_gpt_model.fit(raw_data)
     assert single_table_gpt_model.columns == [
         "age",
@@ -151,7 +155,7 @@ def test_singletable_gpt_model(single_table_gpt_model: SingleTableGPTModel, raw_
     assert single_table_gpt_model.query_batch == 30
     assert not single_table_gpt_model.off_table_features
     assert len(single_table_gpt_model.columns) > 0
-    # train with dataloader 
+    # train with dataloader
     single_table_gpt_model.fit(demo_single_table_data_loader)
 
 
@@ -184,16 +188,14 @@ def test_feature_extraction_data(
     occur_error = False
     try:
         single_table_gpt_model.check()
-        occur_error  = False
+        occur_error = False
     except Exception as e:
         occur_error = True
-        assert type(e) is  InitializationError
+        assert type(e) is InitializationError
     assert occur_error is True
-    # set and check again 
+    # set and check again
     single_table_gpt_model.set_openAI_settings("https://api.openai.com/v1/", fake_openAI_KEY)
     single_table_gpt_model.check()
-    
-    
 
 
 @pytest.mark.parametrize("response_index", range(len(gpt_response_list)))
@@ -221,5 +223,5 @@ def test_feature_extraction_metadata(
     for each_col in demo_single_table_metadata.column_list:
         assert each_col in message
     assert type(message) is str
-    # train with metadata with another way 
-    single_table_gpt_model.fit(metadata = demo_single_table_metadata)
+    # train with metadata with another way
+    single_table_gpt_model.fit(metadata=demo_single_table_metadata)
