@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import logging
@@ -10,6 +9,7 @@ import pandas as pd
 import scipy
 
 import sdgx.models.components.sdv_copulas as copulas
+from sdgx.data_models.metadata import Metadata
 from sdgx.exceptions import NonParametricError
 from sdgx.models.components.sdv_copulas import multivariate
 from sdgx.models.components.sdv_ctgan.data_transformer import DataTransformer
@@ -21,7 +21,6 @@ from sdgx.models.components.utils import (
     validate_numerical_distributions,
 )
 from sdgx.models.statistics.single_table.base import SynthesizerModel
-from sdgx.data_models.metadata import Metadata
 
 LOGGER = logging.getLogger(__name__)
 
@@ -102,17 +101,16 @@ class GaussianCopulaSynthesizer(SynthesizerModel):
 
         return cls._DISTRIBUTIONS[distribution]
 
-    
     def __init__(
         self,
         metadata: Metadata,
-        enforce_min_max_values: bool =True,
-        enforce_rounding: bool =True,
-        locales: list =None,
-        numerical_distributions: dict =None,
-        default_distribution: str =None,
+        enforce_min_max_values: bool = True,
+        enforce_rounding: bool = True,
+        locales: list = None,
+        numerical_distributions: dict = None,
+        default_distribution: str = None,
     ):
-        """ Initialize the GaussianCopulaSynthesizer class.
+        """Initialize the GaussianCopulaSynthesizer class.
         Args:
             metadata (dict): The metadata for the dataset.
             enforce_min_max_values (bool, optional): Whether to enforce minimum and maximum values for generated data. Defaults to True.
@@ -121,16 +119,15 @@ class GaussianCopulaSynthesizer(SynthesizerModel):
             numerical_distributions (dict, optional): The numerical distributions to use for each field. Defaults to None.
             default_distribution (str, optional): The default distribution to use for numerical fields. Defaults to "beta".
         """
-        self.metadata = (metadata,)  
-        self.enforce_min_max_values = (enforce_min_max_values,)  
-        self.enforce_rounding = (enforce_rounding,)  
-        self.locales = (locales,)  
+        self.metadata = (metadata,)
+        self.enforce_min_max_values = (enforce_min_max_values,)
+        self.enforce_rounding = (enforce_rounding,)
+        self.locales = (locales,)
 
         validate_numerical_distributions(numerical_distributions, self.metadata)
 
         self.numerical_distributions = numerical_distributions or {}
         self.default_distribution = default_distribution or "beta"
-
 
         self._default_distribution = self.get_distribution_class(self.default_distribution)
         self._numerical_distributions = {
@@ -139,7 +136,6 @@ class GaussianCopulaSynthesizer(SynthesizerModel):
         }
 
         self._num_rows = None
-
 
     def fit(self, processed_data):
         """
@@ -182,7 +178,6 @@ class GaussianCopulaSynthesizer(SynthesizerModel):
             warnings.filterwarnings("ignore", module="scipy")
             self._model.fit(processed_data)
 
-
     def _warn_for_update_transformers(self, column_name_to_transformer):
         """Raise warnings for update_transformers.
 
@@ -219,12 +214,12 @@ class GaussianCopulaSynthesizer(SynthesizerModel):
         )
 
     def _get_valid_columns_from_metadata(self, columns):
-        """ 
+        """
         This function takes a list of columns as input and returns a list of valid columns based on the metadata.
-        
-        Args: 
+
+        Args:
             columns (list): A list of columns to be checked.
-        Returns: 
+        Returns:
             list: A list of valid columns.
         """
         valid_columns = []
