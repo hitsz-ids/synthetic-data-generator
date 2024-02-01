@@ -18,6 +18,7 @@ def single_table_gpt_model():
 
 
 # When reading the code, please collapse this list
+# COLLAPSE ME
 gpt_response_list = [
     """
 Here are 20 similar data entries generated based on the provided information:
@@ -153,7 +154,7 @@ def test_singletable_gpt_model(single_table_gpt_model: SingleTableGPTModel, raw_
 @pytest.mark.parametrize("response_index", range(len(gpt_response_list)))
 def test_feature_extraction_data(
     response_index: int, single_table_gpt_model: SingleTableGPTModel, raw_data: pd.DataFrame
-):
+):  
     single_table_gpt_model.fit(raw_data)
     response_content = gpt_response_list[response_index]
     res = single_table_gpt_model.extract_features_from_response(response_content)
@@ -168,6 +169,13 @@ def test_feature_extraction_data(
         gpt_response_sample_count[response_index],
         len(single_table_gpt_model.columns),
     )
+    sample_list = single_table_gpt_model._sample_lines
+    message = single_table_gpt_model._form_message_with_data(sample_list, 20) 
+    assert type(message) is str
+    for each_col in raw_data.columns:
+        assert each_col in message
+    assert type(sample_list) is list 
+    assert len(sample_list) == len(raw_data)
 
 
 @pytest.mark.parametrize("response_index", range(len(gpt_response_list)))
@@ -191,3 +199,7 @@ def test_feature_extraction_metadata(
         gpt_response_sample_count[response_index],
         len(single_table_gpt_model.columns) + len(single_table_gpt_model.off_table_features),
     )
+    message = single_table_gpt_model._form_message_with_metadata(20) 
+    for each_col in demo_single_table_metadata.column_list:
+        assert each_col in message
+    assert type(message) is str
