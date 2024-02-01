@@ -17,11 +17,11 @@ from sdgx.models.base import SynthesizerModel
 
 class SingleTableGPTModel(SynthesizerModel):
     """
-    This is a synthetic data generation model powered by openAI GPT - a state-of-the-art language model. This model is based on the groundbreaking research presented in the ICLR paper titled "Language Models are Realistic Tabular Data Generators".
+    This is a synthetic data generation model powered by OpenAI GPT, a state-of-the-art language model. This model is based on groundbreaking research presented in the ICLR paper titled "Language Models are Realistic Tabular Data Generators".
 
-    Our model leverages the power of GPT to generate synthetic tabular data that closely resembles real-world datasets. By utilizing the advanced capabilities of GPT, we aim to provide a reliable and efficient solution for generating simulated data that can be used for various purposes, such as testing, training, and analysis.
+    Our model harnesses the power of GPT to generate synthetic tabular data that closely resembles real-world datasets. By utilizing the advanced capabilities of GPT, we aim to provide a reliable and efficient solution for generating simulated data that can be used for various purposes, such as testing, training, and analysis.
 
-    With this synthetic data generation model, one can easily generate diverse and realistic tabular datasets, mimicking the characteristics and patterns found in real data.
+    With this synthetic data generation model, users can easily generate diverse and realistic tabular datasets, mimicking the characteristics and patterns found in real data.
     """
 
     openai_API_key = ""
@@ -40,7 +40,8 @@ class SingleTableGPTModel(SynthesizerModel):
     """
 
     temperature = 0.1
-    """A parameter that controls the randomness of the generated text. Lower values like 0.1 make the output more focused and deterministic, while higher values like 1.0 introduce more randomness.
+    """
+    A parameter that controls the randomness of the generated text. Lower values like 0.1 make the output more focused and deterministic, while higher values like 1.0 introduce more randomness.
     """
 
     timeout = 90
@@ -102,26 +103,65 @@ class SingleTableGPTModel(SynthesizerModel):
     """
 
     _sample_lines = []
+    """
+    A list to store the sample lines of generated data.
+    """
 
     _responses = []
+    """
+    A list to store the responses received from the OpenAI GPT API.
+    """
 
     _result_list = []
+    """
+    A list to store the generated data samples.
+    """
 
     _message_list = []
+    """
+    A list to store the messages used for generating data.
+    """
 
     columns = []
+    """
+    The columns of the data set.
+    """
+
+    dataset_description = ""
+    """
+    The description of the data set.
+    """
 
     dataset_description = ""
 
     def __init__(self, *args, **kwargs) -> None:
+        """
+        Initializes the class instance.
+
+        Args:
+            *args: Variable length argument list.
+            **kwargs: Arbitrary keyword arguments.
+        """
         super().__init__(*args, **kwargs)
 
     def check(self):
+        """
+        Performs various checks.
+
+        Raises:
+            SynthesizerInitError: If data access type is not specified or if duplicate data access type is found.
+        """
         self._check_openAI_setting()
         self._set_openAI()
         self._check_access_type()
 
     def _check_access_type(self):
+        """
+        Checks the data access type.
+
+        Raises:
+            SynthesizerInitError: If data access type is not specified or if duplicate data access type is found.
+        """
         if self.use_dataloader == self.use_raw_data == self.use_metadata == False:
             raise SynthesizerInitError(
                 "Data access type not specified, please use `use_raw_data: bool` or `use_dataloader: bool` to specify data access type."
@@ -130,15 +170,31 @@ class SingleTableGPTModel(SynthesizerModel):
             raise SynthesizerInitError("Duplicate data access type found.")
 
     def set_openAI_settings(self, API_url="https://api.openai.com/v1/", API_key=""):
+        """
+        Sets the OpenAI settings.
+
+        Args:
+            API_url (str): The OpenAI API URL. Defaults to "https://api.openai.com/v1/".
+            API_key (str): The OpenAI API key. Defaults to an empty string.
+        """
         self.openai_API_url = API_url
         self.openai_API_key = API_key
         self._set_openAI()
 
     def _set_openAI(self):
+        """
+        Sets the OpenAI API key and base URL.
+        """
         openai.api_key = self.openai_API_key
         openai.base_url = self.openai_API_url
 
     def _check_openAI_setting(self):
+        """
+        Checks if the OpenAI settings are properly initialized.
+
+        Raises:
+            InitializationError: If openai_API_url or openai_API_key is not found.
+        """
         if not self.openai_API_url:
             raise InitializationError("openai_API_url NOT found.")
         if not self.openai_API_key:
@@ -146,12 +202,28 @@ class SingleTableGPTModel(SynthesizerModel):
         pass
 
     def _get_openai_setting_from_env(self):
+        """
+        Retrieves OpenAI settings from environment variables.
+        """
         if os.getenv("OPENAI_KEY"):
             self.openai_API_key = os.getenv("OPENAI_KEY")
         if os.getenv("OPENAI_URL"):
             self.openai_API_url = os.getenv("OPENAI_URL")
 
     def ask_gpt(self, question, model=None):
+        """
+        Sends a question to the GPT model.
+
+        Args:
+            question (str): The question to ask.
+            model (str): The GPT model to use. Defaults to None.
+
+        Returns:
+            str: The response from the GPT model.
+
+        Raises:
+            SynthesizerInitError: If the check method fails.
+        """
         self.check()
         api_key = self.openai_API_key
         if model:
@@ -178,8 +250,24 @@ class SingleTableGPTModel(SynthesizerModel):
         return response.choices[0].message.content
 
     def fit(
-        self, raw_data: pd.DataFrame | DataLoader = None, metadata: Metadata = None, *args, **kwargs
+        self, raw_data: pd.DataFrame | DataLoader = None,
+        metadata: Metadata = None, *args, **kwargs
     ):
+        """
+        Fits this model to the provided data. 
+        Please note that no actual algorithmic training is excuted here.
+
+        Args:
+            raw_data (pd.DataFrame | DataLoader): The raw data to fit the model to. It can be either a pandas DataFrame or a DataLoader object.
+            metadata (Metadata): The metadata associated with the raw data.
+
+        Returns:
+            None
+
+        Raises:
+            InitializationError: If neither raw_data nor metadata is provided.
+        """
+
         if raw_data is not None and type(raw_data) in [pd.DataFrame, DataLoader]:
             if metadata:
                 self._metadata = metadata
@@ -199,12 +287,30 @@ class SingleTableGPTModel(SynthesizerModel):
         )
 
     def _fit_with_metadata(self, metadata):
+        """
+        Fit the model using metadata.
+
+        Args:
+            metadata: Metadata object.
+
+        Returns:
+            None
+        """
         self.use_metadata = True
         self._metadata = metadata
         self.columns = list(metadata.column_list)
         pass
 
     def _fit_with_data(self, train_data):
+        """
+        Fit the model using data.
+
+        Args:
+            train_data: Training data.
+
+        Returns:
+            None
+        """
         self.use_raw_data = True
         self.use_dataloader = False
         if type(train_data) is DataLoader:
@@ -232,30 +338,59 @@ class SingleTableGPTModel(SynthesizerModel):
 
     @staticmethod
     def _select_random_elements(input_list, cnt):
+        """
+        This function selects a random sample of elements from the input list.
+        
+        Args:
+            input_list (list): The list from which elements will be selected.
+            cnt (int): The number of elements to be selected.
+        
+        Returns:
+            list: A list of randomly selected elements from the input list.
+        
+        Raises:
+            ValueError: If cnt is greater than the length of the input list.
+        """
         if cnt > len(input_list):
             raise ValueError("cnt should not be greater than the length of the list")
         return random.sample(input_list, cnt)
 
     def _form_message_with_offtable_features(self):
-        # if there are more off-table columns
+        """
+        This function forms a message with off-table features.
+        
+        If there are more off-table columns, additional processing is excuted here.
+        """
         if self.off_table_features:
             return f"Also, you should try to infer another {len(self.off_table_features)} columns based on your knowledge, the name of these columns are : {self.off_table_features}, attach these columns after the original table. \n"
         else:
             return ""
 
     def _form_message_with_data(self, sample_list, current_cnt):
+        """
+        This function forms a message with data.
+
+        Args:
+            sample_list (list): A list of samples.
+            current_cnt (int): The current count of samples.
+
+        Returns:
+            str: The formed message with data.
+        """
         # form sample string
         sample_str = ""
         for i in range(current_cnt):
             each_sample = sample_list[i]
             each_str = f"sample {i}: " + each_sample + "\n"
             sample_str += each_str
+
         # form the message sent to GPT
         message = self.prompts["message_prefix"] + sample_str
-        # add dataset desp
+
+        # add dataset description
         message = message + self._form_dataset_description()
 
-        # then offtable features
+        # add off-table features
         message = message + self._form_message_with_offtable_features()
 
         message = (
@@ -270,7 +405,26 @@ class SingleTableGPTModel(SynthesizerModel):
         return message
 
     def extract_features_from_response(self, response_content):
+        """
+        Extracts features from the response content.
+
+        Args:
+            response_content (dict): The response content as a dictionary.
+
+        Returns:
+            list: A list of extracted features.
+        """
         def dict_to_list(input_dict, header):
+            """
+            Converts a dictionary to a list based on the given header.
+
+            Args:
+                input_dict (dict): The input dictionary.
+                header (list): The list of keys to extract from the dictionary.
+
+            Returns:
+                list: A list of values extracted from the dictionary based on the header.
+            """
             res = []
             for each_col in header:
                 each_value = input_dict.get(each_col, None)
@@ -291,12 +445,28 @@ class SingleTableGPTModel(SynthesizerModel):
         return features
 
     def sample(self, count=50, dataset_desp="", *args, **kwargs):
+        """
+        This function samples data from either raw data or metadata based on the given parameters.
+        
+        Args:
+            count (int): The number of samples to be generated. Default is 50.
+            dataset_desp (str): The description of the dataset. Default is an empty string.
+            *args: Additional positional arguments.
+            **kwargs: Additional keyword arguments.
+        
+        Returns:
+            res: The sampled data.
+        """
         self.dataset_description = dataset_desp
+        
         if self.use_raw_data:
+            # If the use_raw_data flag is True, sample data using the _sample_with_data method.
             res = self._sample_with_data(count, *args, **kwargs)
 
         elif self.use_metadata:
+            # If the use_metadata flag is True, sample data using the _sample_with_metadata method.
             res = self._sample_with_metadata(count, *args, **kwargs)
+        
         return res
 
     def _form_columns_description(self):
@@ -304,55 +474,102 @@ class SingleTableGPTModel(SynthesizerModel):
         pass
 
     def _form_dataset_description(self):
+        """
+        This function is used to form the dataset description.
+
+        Returns:
+            str: The description of the generated table.
+        """
         if self.dataset_description:
-            return "\nThe desctiption of the generated table is " + self.dataset_description + "\n"
+            return "\nThe description of the generated table is " + self.dataset_description + "\n"
         else:
             return ""
 
     def _form_message_with_metadata(self, current_cnt):
+        """
+        This function forms a message with metadata for table data generation task.
+
+        Args:
+            current_cnt (int): The current count of the message.
+
+        Returns:
+            str: The formed message with metadata.
+        """
         # form message
         message = ""
-        message = message + self.prompts["message_prefix"]
-        message = message + self._form_dataset_description()
+        message = message + self.prompts["message_prefix"]  # Add the message prefix
+        message = message + self._form_dataset_description()  # Add the dataset description
         message = (
             message
             + "This table data generation task will only have metadata and no data samples. The header (columns infomation) of the tabular data is: "
-        )
-        message = message + str(self.columns) + ". \n"
-        # can add more info here
-        message = message + self._form_message_with_offtable_features()
+        )  
+        # Add information about the table data generation task
+        message = message + str(self.columns) + ". \n"  # Add the column information
+        message = message + self._form_message_with_offtable_features()  # Add off-table features information
         message = (
             message
             + f"Please note that the generated table has total {len(self.columns) + len(self.off_table_features)} columns of the generated data, the column names are {self.columns + self.off_table_features}, every column should not be missed when generating the data. \n"
-        )
+        )  # Add information about the generated table columns
 
-        # add the suffix of the message
-        message = message + self.prompts["message_suffix"] + str(current_cnt) + "."
-        self._message_list.append(message)
-        return message
-
+        # Add the message suffix and current count
+        message = message + self.prompts["message_suffix"] + str(current_cnt) + "."  
+        # Append the message to the message list
+        self._message_list.append(message)  
+        # Return the formed message with metadata
+        return message  
+    
     def _sample_with_metadata(self, count, *args, **kwargs):
-        result = []
-        remaining_cnt = count
-        while remaining_cnt > 0:
-            # get the current count
-            if remaining_cnt - self.query_batch >= 0:
-                current_cnt = self.query_batch
-            else:
-                current_cnt = remaining_cnt
-            message = self._form_message_with_metadata(current_cnt)
-            # ask_gpt
-            response = self.ask_gpt(message)
-            # get result from response
-            generated_batch = self.extract_features_from_response(response)
-            # update result
-            result += generated_batch
-            # update remaining_cnt
-            remaining_cnt = remaining_cnt - current_cnt
+        """
+        This method samples data with metadata.
 
-        return count
+        Args:
+            count (int): The number of samples to be generated.
+            *args: Additional positional arguments.
+            **kwargs: Additional keyword arguments.
+
+        Returns:
+            int: The input count.
+
+        """
+        # Initialize an empty list to store the generated samples
+        result = []  
+        # Set the remaining count to the input count
+        remaining_cnt = count  
+        
+        # Set the remaining count to the input count
+        while remaining_cnt > 0:  
+            if remaining_cnt - self.query_batch >= 0:
+                # Set the current count to the query batch size if >= 0
+                current_cnt = self.query_batch  
+            else:
+                # else, set the current count to the remaining count
+                current_cnt = remaining_cnt  
+            # Generate a message with metadata
+            message = self._form_message_with_metadata(current_cnt)  
+            # Send the message to GPT and get the response
+            response = self.ask_gpt(message)  
+            # Extract features from the response
+            generated_batch = self.extract_features_from_response(response)  
+            # Add the generated batch to the result list
+            result += generated_batch  
+            # Update the remaining count
+            remaining_cnt = remaining_cnt - current_cnt  
+
+        return count  # Return the input count
 
     def _sample_with_data(self, count, *args, **kwargs):
+        """
+        This function samples data with a given count and returns a DataFrame with the sampled data.
+
+        Args:
+            count (int): The number of data samples to be generated.
+            *args: Variable length argument list.
+            **kwargs: Arbitrary keyword arguments.
+
+        Returns:
+            pd.DataFrame: A DataFrame containing the sampled data.
+
+        """
         result = []
         remaining_cnt = count
         while remaining_cnt > 0:
