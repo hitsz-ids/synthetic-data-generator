@@ -1,7 +1,5 @@
-"""
-    Wrappers around copulas models.
-    需要修改: fit接口以适应性能优化措施
-"""
+
+from __future__ import annotations
 
 import logging
 import warnings
@@ -15,8 +13,7 @@ import sdgx.models.components.sdv_copulas as copulas
 from sdgx.exceptions import NonParametricError
 from sdgx.models.components.sdv_copulas import multivariate
 
-# transformer 以及 sampler 已经拆分，挪到 transform/ 目录中
-# from sdgx.data_process.sampling.sampler import DataSamplerCTGAN
+
 from sdgx.models.components.sdv_ctgan.data_transformer import DataTransformer
 from sdgx.models.components.sdv_rdt.transformers import OneHotEncoder
 from sdgx.models.components.utils import (
@@ -106,7 +103,7 @@ class GaussianCopulaSynthesizer(SynthesizerModel):
 
         return cls._DISTRIBUTIONS[distribution]
 
-    # 初始化方法，参数的类型需要仔细分析一下
+    
     def __init__(
         self,
         metadata,
@@ -116,54 +113,61 @@ class GaussianCopulaSynthesizer(SynthesizerModel):
         numerical_distributions=None,
         default_distribution=None,
     ):
-        self.metadata = (metadata,)  # fit 数据集的元数据
-        self.enforce_min_max_values = (enforce_min_max_values,)  # 限制最大最小value，一般都是true
-        self.enforce_rounding = (enforce_rounding,)  # 保持相同的小数点位数， 一般都是true
-        self.locales = (locales,)  # 和语言设置有关，这个暂时不太清楚
+        """ Initialize the GaussianCopulaSynthesizer class.
+        Args:
+            metadata (dict): The metadata for the dataset.
+            enforce_min_max_values (bool, optional): Whether to enforce minimum and maximum values for generated data. Defaults to True.
+            enforce_rounding (bool, optional): Whether to enforce rounding for generated data. Defaults to True.
+            locales (list, optional): The locales to use for number formatting. Defaults to None.
+            numerical_distributions (dict, optional): The numerical distributions to use for each field. Defaults to None.
+            default_distribution (str, optional): The default distribution to use for numerical fields. Defaults to "beta".
+        """
+        self.metadata = (metadata,)  
+        self.enforce_min_max_values = (enforce_min_max_values,)  
+        self.enforce_rounding = (enforce_rounding,)  
+        self.locales = (locales,)  
 
-        # 验证分布？
-        # 这个时候还没有输入数据的，只有 metadata
-        # 应该是通过 metadata 来验证分布的
         validate_numerical_distributions(numerical_distributions, self.metadata)
-        # 这里的意思是，如果没有指定分布，那么就使用 beta 分布
-        # 下面分别是两个参数，重新赋值
+
         self.numerical_distributions = numerical_distributions or {}
         self.default_distribution = default_distribution or "beta"
 
-        # 以下几行代码是使用 class method 把字符串类型的分布
-        # 转化为 copulas.univariate 的分布实例
+
         self._default_distribution = self.get_distribution_class(self.default_distribution)
         self._numerical_distributions = {
             field: self.get_distribution_class(distribution)
             for field, distribution in self.numerical_distributions.items()
         }
-        # 最后是行数，目前是 none
-        # 目前是没有训练数据的
-        # 这个变量可能和训练数据有关
+
         self._num_rows = None
 
-    # 训练函数，输入的是训练数据
-    # 需要是 data frame 格式
-    # 初步的性能优化方案可以是：
-    # 1. 增加增量学习机制，防止内存消耗过多
-    # 2. 增加
+
     def fit(self, processed_data):
-        # 载入 transformer
+        """
+        Fit the model to the processed data.
+
+        Args:
+            processed_data (pandas.DataFrame): The processed data to fit the model to.
+
+        Returns:
+            None
+        """
+        # Load transformer
         self._transformer = DataTransformer()
         self._transformer.fit(processed_data, self.metadata[0])
 
-        # 使用 transformer 处理数据
+        # Use transformer to process data
         processed_data = pd.DataFrame(self._transformer.transform(processed_data))
 
-        # 这个应该是打 log ，不影响实际训练
+        # Log numerical distributions error (does not affect actual training)
         log_numerical_distributions_error(
             self.numerical_distributions, processed_data.columns, LOGGER
         )
 
-        # 记录学习数据的长度
+        # Record the length of the learning data
         self._num_rows = len(processed_data)
 
-        # 这里是把没有指定分布的列，都设置为默认分布
+        # Set default distribution for columns without specified distribution
         numerical_distributions = deepcopy(self._numerical_distributions)
         for column in processed_data.columns:
             if column not in numerical_distributions:
@@ -171,17 +175,14 @@ class GaussianCopulaSynthesizer(SynthesizerModel):
                     column, self._default_distribution
                 )
 
-        # 然后建立模型
-        # 模型直接调用的 multivariate.GaussianMultivariate
-        # 这个GaussianMultivariate是可以直接 fit 的，只不过不在这里
+        # Build the model
         self._model = multivariate.GaussianMultivariate(distribution=numerical_distributions)
 
-        # 在这里调用 fit 方法
+        # Call the fit method here
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", module="scipy")
             self._model.fit(processed_data)
-        # 注意看，这里只是忽略了警告，但是是直接调用的 data frame 用于 fit
-        # 所以从内存角度而言，多大的数据都是直接载入到内存中的，优化需要从这里下手
+
 
     def _warn_for_update_transformers(self, column_name_to_transformer):
         """Raise warnings for update_transformers.
@@ -197,9 +198,6 @@ class GaussianCopulaSynthesizer(SynthesizerModel):
                     f"Using a OneHotEncoder transformer for column '{column}' "
                     "may slow down the preprocessing and modeling times."
                 )
-
-    # 生成数据函数，这里其实直接调用的 model 的方法
-    # 没有其他了
 
     def sample(self, num_rows, conditions=None):
         """Sample the indicated number of rows from the model.
@@ -221,13 +219,26 @@ class GaussianCopulaSynthesizer(SynthesizerModel):
         )
 
     def _get_valid_columns_from_metadata(self, columns):
+        """ 
+        This function takes a list of columns as input and returns a list of valid columns based on the metadata.
+        
+        Args: 
+            columns (list): A list of columns to be checked.
+        Returns: 
+            list: A list of valid columns.
+        """
         valid_columns = []
+        # Iterate through each column in the input list
         for column in columns:
+            # Iterate through each valid column in the metadata
             for valid_column in self.metadata.columns:
+                # Check if the column starts with the valid column
                 if column.startswith(valid_column):
+                    # If it does, add it to the list of valid columns and break the loop
                     valid_columns.append(column)
                     break
 
+        # Return the list of valid columns
         return valid_columns
 
     def get_learned_distributions(self):
@@ -262,7 +273,7 @@ class GaussianCopulaSynthesizer(SynthesizerModel):
 
         return learned_distributions
 
-    def _get_parameters(self):
+    def get_parameters(self):
         """Get copula model parameters.
 
         Compute model ``correlation`` and ``distribution.std``
@@ -339,7 +350,7 @@ class GaussianCopulaSynthesizer(SynthesizerModel):
         return matrix
 
     @classmethod
-    def _rebuild_correlation_matrix(cls, triangular_correlation):
+    def rebuild_correlation_matrix(cls, triangular_correlation):
         """Rebuild a valid correlation matrix from its lower half triangle.
 
         The input of this function is a list of lists of floats of size 1, 2, 3...n-1:
@@ -379,7 +390,7 @@ class GaussianCopulaSynthesizer(SynthesizerModel):
 
         return cls._get_nearest_correlation_matrix(correlation).tolist()
 
-    def _rebuild_gaussian_copula(self, model_parameters):
+    def rebuild_gaussian_copula(self, model_parameters):
         """Rebuild the model params to recreate a Gaussian Multivariate instance.
 
         Args:
@@ -407,16 +418,16 @@ class GaussianCopulaSynthesizer(SynthesizerModel):
 
         correlation = model_parameters.get("correlation")
         if correlation:
-            model_parameters["correlation"] = self._rebuild_correlation_matrix(correlation)
+            model_parameters["correlation"] = self.rebuild_correlation_matrix(correlation)
         else:
             model_parameters["correlation"] = [[1.0]]
 
         return model_parameters
 
-    def _get_likelihood(self, table_rows):
+    def get_likelihood(self, table_rows):
         return self._model.probability_density(table_rows)
 
-    def _set_parameters(self, parameters):
+    def set_parameters(self, parameters):
         """Set copula model parameters.
 
         Args:
@@ -429,5 +440,5 @@ class GaussianCopulaSynthesizer(SynthesizerModel):
             self._num_rows = 0 if pd.isna(num_rows) else max(0, int(round(num_rows)))
 
         if parameters:
-            parameters = self._rebuild_gaussian_copula(parameters)
+            parameters = self.rebuild_gaussian_copula(parameters)
             self._model = multivariate.GaussianMultivariate.from_dict(parameters)
