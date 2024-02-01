@@ -143,6 +143,7 @@ class SingleTableGPTModel(SynthesizerModel):
             **kwargs: Arbitrary keyword arguments.
         """
         super().__init__(*args, **kwargs)
+        self._get_openai_setting_from_env()
 
     def check(self):
         """
