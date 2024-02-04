@@ -406,7 +406,7 @@ class Metadata(BaseModel):
         # for single primary key, it should has ID type
         if len(self.primary_keys) == 1 and list(self.primary_keys)[0] not in self.id_columns:
             raise MetadataInvalidError(
-                f"Primary Key {self.primary_keys[0]} should has ID DataType."
+                f"Primary Key {self.primary_keys} should has ID DataType."
             )
 
         all_dtype_columns = self.get_all_data_type_columns()
