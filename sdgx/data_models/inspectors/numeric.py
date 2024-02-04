@@ -15,8 +15,22 @@ class NumericInspector(Inspector):
         self.float_columns: set[str] = set()
         self._int_rate = 0.9
 
-    def is_int_column(self, col_series):
-        def is_decimal_part_zero(num):
+    def is_int_column(self, col_series: pd.Series):
+        '''
+        Determine whether a column of pd.DataFrame is of type int
+        In the original pd.DataFrame automatically updated dtype, some int types will be marked as float.
+        In fact, we can make an accurate result by getting the decimal part of the value.
+
+        Args:
+            col_series (pd.Series): One single column of the raw data.
+        '''
+        def is_decimal_part_zero(num: float):
+            '''
+            Is the decimal part == 0.0 ? 
+
+            Args:
+                col_series (float): The number.
+            '''
             try:
                 decimal_part = num - int(num)
             except ValueError:
