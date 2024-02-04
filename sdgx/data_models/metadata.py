@@ -55,9 +55,10 @@ class Metadata(BaseModel):
     """
 
     # other columns lists are used to store column information
-    # here are 5 basic data types
+    # here are 6 basic data types
     id_columns: Set[str] = set()
-    numeric_columns: Set[str] = set()
+    int_columns: Set[str] = set()
+    float_columns: Set[str] = set()
     bool_columns: Set[str] = set()
     discrete_columns: Set[str] = set()
     datetime_columns: Set[str] = set()
