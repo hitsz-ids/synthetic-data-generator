@@ -181,11 +181,22 @@ class Metadata(BaseModel):
                 m.add("id_columns", "ticket_id")
                 # OR
                 m.add("id_columns", ["user_id", "ticket_id"])
+                # OR 
+                # add datetime format 
+                m.add('datetime_format',{"col_1": "%Y-%m-%d %H:%M:%S", "col_2": "%d %b %Y"})
         """
 
         values = (
             values if isinstance(values, Iterable) and not isinstance(values, str) else [values]
         )
+
+        # dict support,  this prevents the value in the key-value pair from being discarded
+        if isinstance(values, dict):
+            if self._extend.get(key, None) is None:
+                self._extend[key] = values
+            else:
+                self._extend[key].update(values)
+            return 
 
         for value in values:
             self.get(key).add(value)
@@ -274,7 +285,8 @@ class Metadata(BaseModel):
                     metadata.update({"pii_columns": inspect_res[each_key]})
             # update inspect level
             for each_key in inspect_res:
-                metadata.column_inspect_level[each_key] = inspector.inspect_level
+                if "columns" in each_key:
+                    metadata.column_inspect_level[each_key] = inspector.inspect_level
 
         if not primary_keys:
             metadata.update_primary_key(metadata.id_columns)
@@ -326,7 +338,8 @@ class Metadata(BaseModel):
                     metadata.update({"pii_columns": inspect_res[each_key]})
             # update inspect level
             for each_key in inspect_res:
-                metadata.column_inspect_level[each_key] = inspector.inspect_level
+                if "columns" in each_key:
+                    metadata.column_inspect_level[each_key] = inspector.inspect_level
 
         if check:
             metadata.check()
