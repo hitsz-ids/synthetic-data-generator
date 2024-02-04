@@ -68,7 +68,9 @@ def test_demo_multi_table_data_metadata_parent(demo_multi_data_parent_matadata):
     assert demo_multi_data_parent_matadata.get_column_data_type("StoreType") == "discrete"
     assert demo_multi_data_parent_matadata.get_column_data_type("Assortment") == "discrete"
     assert demo_multi_data_parent_matadata.get_column_data_type("CompetitionDistance") == "int"
-    assert demo_multi_data_parent_matadata.get_column_data_type("CompetitionOpenSinceMonth") == "int"
+    assert (
+        demo_multi_data_parent_matadata.get_column_data_type("CompetitionOpenSinceMonth") == "int"
+    )
     assert demo_multi_data_parent_matadata.get_column_data_type("Promo2") == "int"
     assert demo_multi_data_parent_matadata.get_column_data_type("Promo2SinceWeek") == "int"
     assert demo_multi_data_parent_matadata.get_column_data_type("Promo2SinceYear") == "int"

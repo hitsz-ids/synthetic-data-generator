@@ -14,7 +14,7 @@ class NumericInspector(Inspector):
         self.int_columns: set[str] = set()
         self.float_columns: set[str] = set()
         self._int_rate = 0.9
-    
+
     def is_int_column(self, col_series):
         def is_decimal_part_zero(num):
             try:
@@ -25,6 +25,7 @@ class NumericInspector(Inspector):
                 return True
             else:
                 return False
+
         int_cnt = 0
         col_length = self.df_length
         for each_val in col_series:
@@ -33,15 +34,15 @@ class NumericInspector(Inspector):
                 int_cnt += 1
                 continue
             if decimal_zer0 is None:
-                col_length -= 1 
+                col_length -= 1
                 continue
-        
+
         int_rate = int_cnt / col_length
-        if int_rate >  self._int_rate:
+        if int_rate > self._int_rate:
             return True
         else:
             return False
-            
+
     def fit(self, raw_data: pd.DataFrame, *args, **kwargs):
         """Fit the inspector.
 
@@ -55,8 +56,8 @@ class NumericInspector(Inspector):
 
         float_candidate = self.float_columns.union(
             set(raw_data.select_dtypes(include=["float64"]).columns)
-        ) 
-        
+        )
+
         for candidate in float_candidate:
             if self.is_int_column(raw_data[candidate]):
                 self.int_columns.add(candidate)
@@ -66,7 +67,7 @@ class NumericInspector(Inspector):
         self.int_columns = self.int_columns.union(
             set(raw_data.select_dtypes(include=["int64"]).columns)
         )
-        
+
         self.ready = True
 
     def inspect(self, *args, **kwargs) -> dict[str, Any]:
@@ -75,7 +76,7 @@ class NumericInspector(Inspector):
         return {
             "int_columns": list(self.int_columns),
             "float_columns": list(self.float_columns),
-            }
+        }
 
 
 @hookimpl
