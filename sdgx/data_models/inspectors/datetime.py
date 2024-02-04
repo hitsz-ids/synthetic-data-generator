@@ -17,7 +17,14 @@ class DatetimeInspector(Inspector):
 
     Often, difficult-to-recognize date or datetime objects are also recognized as descrete types by DatetimeInspector, causing the column to be marked repeatedly.
     """
-    PRESET_FORMAT_STRINGS = ["%Y/%m/%d", "%Y-%m-%d", "%d %b %Y"]
+
+    _format_match_rate = 0.9
+    """
+    When specifically check the datatime format, problems caused by missing values and incorrect values will inevitably occur.
+    To fix this, we discard the .any()  method and use the `match_rate` to increase the robustness of this inspector.
+    """
+
+    PRESET_FORMAT_STRINGS = ["%Y/%m/%d", "%Y-%m-%d", "%d %b %Y", "%b-%Y"]
 
     def __init__(self, user_formats: list[str] = None, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -64,6 +71,7 @@ class DatetimeInspector(Inspector):
 
         # Process for detecting format strings
         for col_name in self.datetime_columns:
+            print(self.datetime_columns)
             each_col = raw_data[col_name]
             datetime_format = self.detect_datetime_format(each_col)
             if datetime_format:
@@ -87,16 +95,17 @@ class DatetimeInspector(Inspector):
         """
         for fmt in self.user_defined_formats + self.PRESET_FORMAT_STRINGS:
             try:
+                print(series[:4])
+                print(fmt)
                 # Check if all dates in the series can be parsed with this format
                 parsed_series = series.apply(
                     lambda x: pd.to_datetime(x, format=fmt, errors="coerce")
                 )
+                print(parsed_series.isnull().any())
                 if not parsed_series.isnull().any():
                     return fmt
             except ValueError:
                 continue
-
-        self.ready = True
 
     def inspect(self, *args, **kwargs) -> dict[str, Any]:
         """Inspect raw data and generate metadata."""
