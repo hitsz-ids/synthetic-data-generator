@@ -1,12 +1,12 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
+from itertools import chain
 from pathlib import Path
 from typing import Dict, List
 
 import pandas as pd
 from pydantic import BaseModel
-from itertools import chain
-from collections.abc import Iterable
 
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.inspectors.base import Inspector
@@ -270,17 +270,16 @@ class MetadataCombiner(BaseModel):
         return chain(
             (k for k in self.model_fields if k.endswith("_columns")),
         )
-    
+
     def __eq__(self, other):
         if not isinstance(other, MetadataCombiner):
             return super().__eq__(other)
-        
-        # if self and other has the same 
+
+        # if self and other has the same
         return (
             self.version == other.version
             and all(
-                self.get(key) == other.get(key)
-                for key in set(chain(self.fields, other.fields))
+                self.get(key) == other.get(key) for key in set(chain(self.fields, other.fields))
             )
             and set(self.fields) == set(other.fields)
         )
