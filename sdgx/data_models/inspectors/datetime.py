@@ -76,7 +76,6 @@ class DatetimeInspector(Inspector):
 
         # Process for detecting format strings
         for col_name in self.datetime_columns:
-            print(self.datetime_columns)
             each_col = raw_data[col_name]
             datetime_format = self.detect_datetime_format(each_col)
             if datetime_format:
