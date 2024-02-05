@@ -347,7 +347,7 @@ class Metadata(BaseModel):
         return metadata
 
     def _dump_json(self):
-        return self.model_dump_json(indent = 4)
+        return self.model_dump_json(indent=4)
 
     def save(self, path: str | Path):
         """
