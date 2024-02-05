@@ -165,7 +165,7 @@ class Metadata(BaseModel):
             raise MetadataInitError("Cannot set _extend directly")
 
         old_value = self.get(key)
-        if key in self.model_fields and key not in self.tag_fields:
+        if key in self.model_fields and key not in self.tag_fields and key not in self.format_fields:
             raise MetadataInitError(
                 f"Set {key} not in tag_fields, try set it directly as m.{key} = value"
             )
@@ -208,6 +208,11 @@ class Metadata(BaseModel):
 
         # dict support,  this prevents the value in the key-value pair from being discarded
         if isinstance(values, dict):
+            # already in fields that contains dict 
+            if key in list(self.format_fields):
+                self.get(key).update(values)
+            
+            # in extend 
             if self._extend.get(key, None) is None:
                 self._extend[key] = values
             else:
