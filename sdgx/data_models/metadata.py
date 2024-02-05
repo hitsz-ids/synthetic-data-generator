@@ -181,8 +181,8 @@ class Metadata(BaseModel):
                 m.add("id_columns", "ticket_id")
                 # OR
                 m.add("id_columns", ["user_id", "ticket_id"])
-                # OR 
-                # add datetime format 
+                # OR
+                # add datetime format
                 m.add('datetime_format',{"col_1": "%Y-%m-%d %H:%M:%S", "col_2": "%d %b %Y"})
         """
 
@@ -196,7 +196,7 @@ class Metadata(BaseModel):
                 self._extend[key] = values
             else:
                 self._extend[key].update(values)
-            return 
+            return
 
         for value in values:
             self.get(key).add(value)
