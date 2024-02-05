@@ -62,6 +62,7 @@ class Metadata(BaseModel):
     bool_columns: Set[str] = set()
     discrete_columns: Set[str] = set()
     datetime_columns: Set[str] = set()
+    datetime_format: Dict = defaultdict(str)
 
     # version info
     version: str = "1.0"
@@ -346,7 +347,7 @@ class Metadata(BaseModel):
         return metadata
 
     def _dump_json(self):
-        return self.model_dump_json()
+        return self.model_dump_json(indent = 4)
 
     def save(self, path: str | Path):
         """
