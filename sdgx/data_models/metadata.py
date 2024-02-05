@@ -81,7 +81,7 @@ class Metadata(BaseModel):
             (k for k in self.model_fields if k.endswith("_columns")),
             (k for k in self._extend.keys() if k.endswith("_columns")),
         )
-    
+
     @property
     def format_fields(self) -> Iterable[str]:
         """
