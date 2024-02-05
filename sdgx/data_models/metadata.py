@@ -79,7 +79,18 @@ class Metadata(BaseModel):
 
         return chain(
             (k for k in self.model_fields if k.endswith("_columns")),
-            self._extend.keys(),
+            (k for k in self._extend.keys() if k.endswith("_columns")),
+        )
+    
+    @property
+    def format_fields(self) -> Iterable[str]:
+        """
+        Return all tag fields in this metadata.
+        """
+
+        return chain(
+            (k for k in self.model_fields if k.endswith("_format")),
+            (k for k in self._extend.keys() if k.endswith("_format")),
         )
 
     def __eq__(self, other):
@@ -90,6 +101,10 @@ class Metadata(BaseModel):
             and all(
                 self.get(key) == other.get(key)
                 for key in set(chain(self.tag_fields, other.tag_fields))
+            )
+            and all(
+                self.get(key) == other.get(key)
+                for key in set(chain(self.format_fields, other.format_fields))
             )
             and self.version == other.version
         )
@@ -346,7 +361,7 @@ class Metadata(BaseModel):
             metadata.check()
         return metadata
 
-    def _dump_json(self):
+    def _dump_json(self) -> str:
         return self.model_dump_json(indent=4)
 
     def save(self, path: str | Path):
