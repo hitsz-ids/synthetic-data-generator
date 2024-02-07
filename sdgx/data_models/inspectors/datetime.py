@@ -102,9 +102,7 @@ class DatetimeInspector(Inspector):
             length = len(parsed_series)
             false_num = len(list(i for i in parsed_series if i is False))
             false_rate = false_num / length
-            if false_rate >= match_rate:
-                return True
-            return False
+            return false_rate >= match_rate
 
         for fmt in self.user_defined_formats + self.PRESET_FORMAT_STRINGS:
             try:
