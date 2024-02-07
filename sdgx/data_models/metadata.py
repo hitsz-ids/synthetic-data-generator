@@ -62,6 +62,7 @@ class Metadata(BaseModel):
     bool_columns: Set[str] = set()
     discrete_columns: Set[str] = set()
     datetime_columns: Set[str] = set()
+    datetime_format: Dict = defaultdict(str)
 
     # version info
     version: str = "1.0"
@@ -78,7 +79,18 @@ class Metadata(BaseModel):
 
         return chain(
             (k for k in self.model_fields if k.endswith("_columns")),
-            self._extend.keys(),
+            (k for k in self._extend.keys() if k.endswith("_columns")),
+        )
+
+    @property
+    def format_fields(self) -> Iterable[str]:
+        """
+        Return all tag fields in this metadata.
+        """
+
+        return chain(
+            (k for k in self.model_fields if k.endswith("_format")),
+            (k for k in self._extend.keys() if k.endswith("_format")),
         )
 
     def __eq__(self, other):
@@ -89,6 +101,10 @@ class Metadata(BaseModel):
             and all(
                 self.get(key) == other.get(key)
                 for key in set(chain(self.tag_fields, other.tag_fields))
+            )
+            and all(
+                self.get(key) == other.get(key)
+                for key in set(chain(self.format_fields, other.format_fields))
             )
             and self.version == other.version
         )
@@ -149,7 +165,11 @@ class Metadata(BaseModel):
             raise MetadataInitError("Cannot set _extend directly")
 
         old_value = self.get(key)
-        if key in self.model_fields and key not in self.tag_fields:
+        if (
+            key in self.model_fields
+            and key not in self.tag_fields
+            and key not in self.format_fields
+        ):
             raise MetadataInitError(
                 f"Set {key} not in tag_fields, try set it directly as m.{key} = value"
             )
@@ -181,11 +201,27 @@ class Metadata(BaseModel):
                 m.add("id_columns", "ticket_id")
                 # OR
                 m.add("id_columns", ["user_id", "ticket_id"])
+                # OR
+                # add datetime format
+                m.add('datetime_format',{"col_1": "%Y-%m-%d %H:%M:%S", "col_2": "%d %b %Y"})
         """
 
         values = (
             values if isinstance(values, Iterable) and not isinstance(values, str) else [values]
         )
+
+        # dict support,  this prevents the value in the key-value pair from being discarded
+        if isinstance(values, dict):
+            # already in fields that contains dict
+            if key in list(self.format_fields):
+                self.get(key).update(values)
+
+            # in extend
+            if self._extend.get(key, None) is None:
+                self._extend[key] = values
+            else:
+                self._extend[key].update(values)
+            return
 
         for value in values:
             self.get(key).add(value)
@@ -274,7 +310,8 @@ class Metadata(BaseModel):
                     metadata.update({"pii_columns": inspect_res[each_key]})
             # update inspect level
             for each_key in inspect_res:
-                metadata.column_inspect_level[each_key] = inspector.inspect_level
+                if "columns" in each_key:
+                    metadata.column_inspect_level[each_key] = inspector.inspect_level
 
         if not primary_keys:
             metadata.update_primary_key(metadata.id_columns)
@@ -326,14 +363,15 @@ class Metadata(BaseModel):
                     metadata.update({"pii_columns": inspect_res[each_key]})
             # update inspect level
             for each_key in inspect_res:
-                metadata.column_inspect_level[each_key] = inspector.inspect_level
+                if "columns" in each_key:
+                    metadata.column_inspect_level[each_key] = inspector.inspect_level
 
         if check:
             metadata.check()
         return metadata
 
-    def _dump_json(self):
-        return self.model_dump_json()
+    def _dump_json(self) -> str:
+        return self.model_dump_json(indent=4)
 
     def save(self, path: str | Path):
         """
