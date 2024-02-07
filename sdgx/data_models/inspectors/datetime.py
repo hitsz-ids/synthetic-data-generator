@@ -100,11 +100,8 @@ class DatetimeInspector(Inspector):
 
         def _is_series_fit_format(parsed_series, match_rate):
             length = len(parsed_series)
-            cnt = 0
-            for i in parsed_series:
-                if i is False:
-                    cnt += 1
-            false_rate = cnt / length
+            false_num = len((for i in parsed_series if i is False))
+            false_rate = false_mum / length
             if false_rate >= match_rate:
                 return True
             return False
