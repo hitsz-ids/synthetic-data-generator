@@ -17,7 +17,19 @@ class DatetimeInspector(Inspector):
 
     Often, difficult-to-recognize date or datetime objects are also recognized as descrete types by DatetimeInspector, causing the column to be marked repeatedly.
     """
-    PRESET_FORMAT_STRINGS = ["%Y/%m/%d", "%Y-%m-%d", "%d %b %Y"]
+
+    _format_match_rate = 0.9
+    """
+    When specifically check the datatime format, problems caused by missing values and incorrect values will inevitably occur.
+    To fix this, we discard the .any()  method and use the `match_rate` to increase the robustness of this inspector.
+    """
+
+    PRESET_FORMAT_STRINGS = [
+        "%Y-%m-%d",
+        "%d %b %Y",
+        "%b-%Y",
+        "%Y/%m/%d",
+    ]
 
     def __init__(self, user_formats: list[str] = None, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -85,18 +97,24 @@ class DatetimeInspector(Inspector):
         Returns:
                str: The datetime format that can parse all dates in the series, or None if no such format is found.
         """
+
+        def _is_series_fit_format(parsed_series, match_rate):
+            length = len(parsed_series)
+            false_num = len(list(i for i in parsed_series if i is False))
+            false_rate = false_num / length
+            return false_rate >= match_rate
+
         for fmt in self.user_defined_formats + self.PRESET_FORMAT_STRINGS:
             try:
                 # Check if all dates in the series can be parsed with this format
                 parsed_series = series.apply(
                     lambda x: pd.to_datetime(x, format=fmt, errors="coerce")
                 )
-                if not parsed_series.isnull().any():
+                # if fit return format, return
+                if _is_series_fit_format(parsed_series.isnull(), self._format_match_rate):
                     return fmt
             except ValueError:
                 continue
-
-        self.ready = True
 
     def inspect(self, *args, **kwargs) -> dict[str, Any]:
         """Inspect raw data and generate metadata."""

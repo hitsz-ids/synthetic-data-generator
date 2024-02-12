@@ -19,6 +19,10 @@
 
 # 🚀 Synthetic Data Generator
 
+<p style="font-size: small;">Switch Language:
+    <a href="https://github.com/hitsz-ids/synthetic-data-generator/blob/main/README_ZH_CN.md" target="_blank">简体中文</a>
+  </p>
+
 </p>
 </div>
 
@@ -149,34 +153,6 @@ The SDG project was initiated by **Institute of Data Security, Harbin Institute 
 
 - Read [CONTRIBUTING](./CONTRIBUTING.md) before draft a pull request.
 - Submit an issue by viewing [View First Good Issue](https://github.com/hitsz-ids/synthetic-data-generator/issues/new) or submit a Pull Request.
-
-### Contributors
-
-<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-
-<!-- prettier-ignore-start -->
-
-<!-- markdownlint-disable -->
-
-<table>
-  <tbody>
-    <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://wh1isper.github.io/"><img src="https://avatars.githubusercontent.com/u/43375501?v=4?s=100" width="100px;" alt="Zhongsheng Ji"/><br /><sub><b>Zhongsheng Ji</b></sub></a><br /><a href="#code-Wh1isper" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/MooooCat"><img src="https://avatars.githubusercontent.com/u/141886018?v=4?s=100" width="100px;" alt="MoooCat"/><br /><sub><b>MoooCat</b></sub></a><br /><a href="#code-MooooCat" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/joeyscave"><img src="https://avatars.githubusercontent.com/u/72662648?v=4?s=100" width="100px;" alt="YUAN KAIWEN"/><br /><sub><b>YUAN KAIWEN</b></sub></a><br /><a href="#code-joeyscave" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/sjh120"><img src="https://avatars.githubusercontent.com/u/86507761?v=4?s=100" width="100px;" alt="sjh120"/><br /><sub><b>sjh120</b></sub></a><br /><a href="#code-sjh120" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Z712023"><img src="https://avatars.githubusercontent.com/u/132286135?v=4?s=100" width="100px;" alt="Z712023"/><br /><sub><b>Z712023</b></sub></a><br /><a href="#code-Z712023" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="http://femilawal.com"><img src="https://avatars.githubusercontent.com/u/33192240?v=4?s=100" width="100px;" alt="Oluwafemi Lawal"/><br /><sub><b>Oluwafemi Lawal</b></sub></a><br /><a href="#code-Femi-lawal" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/iokk3732"><img src="https://avatars.githubusercontent.com/u/141700052?v=4?s=100" width="100px;" alt="iokk3732"/><br /><sub><b>iokk3732</b></sub></a><br /><a href="#code-iokk3732" title="Code">💻</a></td>
-    </tr>
-  </tbody>
-</table>
-
-<!-- markdownlint-restore -->
-
-<!-- prettier-ignore-end -->
-
-<!-- ALL-CONTRIBUTORS-LIST:END -->
 
 ## 👩‍🎓 Related Work
 
