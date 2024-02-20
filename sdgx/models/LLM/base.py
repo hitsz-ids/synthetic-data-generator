@@ -1,16 +1,17 @@
+from sdgx.exceptions import SynthesizerInitError
 from sdgx.models.base import SynthesizerModel
 from sdgx.utils import logger
-from sdgx.exceptions import SynthesizerInitError
+
 
 class LLMBaseModel(SynthesizerModel):
-    '''
+    """
     This is a base class for generating synthetic data using LLM (Large Language Model).
 
     Note:
     - When using the data loader, the original data is transformed to pd.DataFrame format for subsequent processing.
     - It is not recommended to use this model with large data tables due to excessive token consumption in some expensive LLM service.
     - Generating data based on metadata is a potential way to generate data that cannot be made public and contains sensitive information.
-    '''
+    """
 
     use_raw_data = False
     """
@@ -84,16 +85,15 @@ class LLMBaseModel(SynthesizerModel):
             )
         if self.use_dataloader == self.use_raw_data == True:
             raise SynthesizerInitError("Duplicate data access type found.")
-    
+
     def _form_columns_description(self):
-        '''
+        """
         We believe that giving information about a column helps improve data quality.
-        
+
         Currently, we leave this function to Good First Issue until March 2024, if unclaimed we will implement it quickly.
-        '''
+        """
 
         raise NotImplementedError
-    
 
     def _form_message_with_offtable_features(self):
         """
@@ -107,7 +107,6 @@ class LLMBaseModel(SynthesizerModel):
         else:
             logger.info("No off_table_feature needed in current model.")
             return ""
-    
 
     def _form_dataset_description(self):
         """
@@ -122,4 +121,3 @@ class LLMBaseModel(SynthesizerModel):
         else:
             logger.info("No dataset_description given in current model.")
             return ""
-

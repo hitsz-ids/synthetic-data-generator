@@ -73,7 +73,6 @@ class SingleTableGPTModel(LLMBaseModel):
     A list to store the generated data samples.
     """
 
-
     def __init__(self, *args, **kwargs) -> None:
         """
         Initializes the class instance.
