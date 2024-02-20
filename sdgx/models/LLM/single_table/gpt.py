@@ -4,6 +4,7 @@ import os
 import random
 import re
 from copy import copy
+
 import openai
 import pandas as pd
 
@@ -12,6 +13,7 @@ from sdgx.data_models.metadata import Metadata
 from sdgx.exceptions import InitializationError, SynthesizerInitError
 from sdgx.models.base import SynthesizerModel
 from sdgx.utils import logger
+
 
 class SingleTableGPTModel(SynthesizerModel):
     """
@@ -439,6 +441,7 @@ class SingleTableGPTModel(SynthesizerModel):
                 each_value = input_dict.get(each_col, None)
                 res.append(each_value)
             return res
+
         logger.info("Extracting samples from response ...")
         header = self.columns + self.off_table_features
         features = []
