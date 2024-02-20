@@ -27,13 +27,11 @@
 </p>
 </div>
 
-
 合成数据生成器（Synthetic Data Generator，SDG）是一个专注于快速生成高质量的结构化表格数据的数据组件。SDG支持单表和多表数据合成算法，并集成了基于大语言模型（LLM）的合成数据生成模型。
 
 合成数据（Synthetic Data）是由计算机使用真实数据、元数据和算法生成的合成数据不包含任何敏感信息，但它保留了原始数据的基本特性。合成数据和真实数据之间没有直接的关联，使其免于GDPR和ADPPA等隐私法规的约束，消除实际应用中的隐私泄露风险。
 
 高质量的合成数据可以安全、多样化地在各种领域中使用，包括数据共享、模型训练和调试、系统开发和测试等应用。阅读 [最新API文档](https://synthetic-data-generator.readthedocs.io/en/latest/) 获取更多细节。
-
 
 ## 🔧 主要特性
 
@@ -65,12 +63,9 @@
 
 根据表中已有的数据以及LLM掌握的知识推断表外特征，即新的列数据。
 
-
-
 <video id="video" controls="" preload="none" >
       <source id="mp4" src="assets/LLM_Case_2.mp4" type="video/mp4">
 </video>
-
 
 ## 🔛 快速开始
 
@@ -98,8 +93,6 @@ pip install .
 # 或者直接从git安装
 pip install git+https://github.com/hitsz-ids/synthetic-data-generator.git
 ```
-
-
 
 ### 单表数据快速合成示例
 
