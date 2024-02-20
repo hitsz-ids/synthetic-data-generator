@@ -165,7 +165,7 @@ def test_feature_extraction_data(
 ):
     single_table_gpt_model.fit(raw_data)
     response_content = gpt_response_list[response_index]
-    res = single_table_gpt_model.extract_features_from_response(response_content)
+    res = single_table_gpt_model.extract_samples_from_response(response_content)
     assert type(res) is list
     # assert shape of extracted features
     assert len(res) == gpt_response_sample_count[response_index]
@@ -207,7 +207,7 @@ def test_feature_extraction_metadata(
     single_table_gpt_model.fit(demo_single_table_metadata)
     single_table_gpt_model.off_table_features = ["has_car"]
     response_content = gpt_response_list[response_index]
-    res = single_table_gpt_model.extract_features_from_response(response_content)
+    res = single_table_gpt_model.extract_samples_from_response(response_content)
     assert len(res) == gpt_response_sample_count[response_index]
     assert len(res[0]) == len(single_table_gpt_model.columns) + len(
         single_table_gpt_model.off_table_features

@@ -4,8 +4,6 @@ import os
 import random
 import re
 from copy import copy
-from pathlib import Path
-
 import openai
 import pandas as pd
 
@@ -13,7 +11,7 @@ from sdgx.data_loader import DataLoader
 from sdgx.data_models.metadata import Metadata
 from sdgx.exceptions import InitializationError, SynthesizerInitError
 from sdgx.models.base import SynthesizerModel
-
+from sdgx.utils import logger
 
 class SingleTableGPTModel(SynthesizerModel):
     """
@@ -200,7 +198,7 @@ class SingleTableGPTModel(SynthesizerModel):
             raise InitializationError("openai_API_url NOT found.")
         if not self.openai_API_key:
             raise InitializationError("openai_API_key NOT found.")
-        pass
+        logger.debug("OpenAI setting check passed.")
 
     def _get_openai_setting_from_env(self):
         """
@@ -208,8 +206,10 @@ class SingleTableGPTModel(SynthesizerModel):
         """
         if os.getenv("OPENAI_KEY"):
             self.openai_API_key = os.getenv("OPENAI_KEY")
+            logger.debug("Get OPENAI_KEY from ENV.")
         if os.getenv("OPENAI_URL"):
             self.openai_API_url = os.getenv("OPENAI_URL")
+            logger.debug("Get OPENAI_URL from ENV.")
 
     def ask_gpt(self, question, model=None):
         """
@@ -233,6 +233,7 @@ class SingleTableGPTModel(SynthesizerModel):
             model = self.gpt_model
         openai.api_key = api_key
         client = openai.OpenAI(api_key=api_key)
+        logger.info(f"Ask GPT with temperature = {self.temperature}.")
         response = client.chat.completions.create(
             model=model,
             messages=[
@@ -245,6 +246,7 @@ class SingleTableGPTModel(SynthesizerModel):
             max_tokens=self.max_tokens,
             timeout=self.timeout,
         )
+        logger.info("Ask GPT Finished.")
         # store response
         self._responses.append(response)
         # return the content of the gpt response
@@ -283,7 +285,7 @@ class SingleTableGPTModel(SynthesizerModel):
             return
 
         raise InitializationError(
-            "Please pass at least one valid parameter, train_data or metadata"
+            "Ple1ase pass at least one valid parameter, train_data or metadata"
         )
 
     def _fit_with_metadata(self, metadata):
@@ -296,10 +298,11 @@ class SingleTableGPTModel(SynthesizerModel):
         Returns:
             None
         """
+        logger.info("Fitting model with metadata...")
         self.use_metadata = True
         self._metadata = metadata
         self.columns = list(metadata.column_list)
-        pass
+        logger.info("Fitting model with metadata... Finished.")
 
     def _fit_with_data(self, train_data):
         """
@@ -311,6 +314,7 @@ class SingleTableGPTModel(SynthesizerModel):
         Returns:
             None
         """
+        logger.info("Fitting model with raw data...")
         self.use_raw_data = True
         self.use_dataloader = False
         if type(train_data) is DataLoader:
@@ -335,6 +339,7 @@ class SingleTableGPTModel(SynthesizerModel):
             each_line += "\n"
             sample_lines.append(each_line)
         self._sample_lines = sample_lines
+        logger.info("Fitting model with raw data... Finished.")
 
     @staticmethod
     def _select_random_elements(input_list, cnt):
@@ -362,8 +367,10 @@ class SingleTableGPTModel(SynthesizerModel):
         If there are more off-table columns, additional processing is excuted here.
         """
         if self.off_table_features:
+            logger.info(f"Use off_table_feature = {self.off_table_features}.")
             return f"Also, you should try to infer another {len(self.off_table_features)} columns based on your knowledge, the name of these columns are : {self.off_table_features}, attach these columns after the original table. \n"
         else:
+            logger.info("No off_table_feature needed in current model.")
             return ""
 
     def _form_message_with_data(self, sample_list, current_cnt):
@@ -402,17 +409,18 @@ class SingleTableGPTModel(SynthesizerModel):
         message = message + self.prompts["message_suffix"] + str(current_cnt) + "."
         # Maybe it can be optimized here
         self._message_list.append(message)
+        logger.debug("Message Generated.")
         return message
 
-    def extract_features_from_response(self, response_content):
+    def extract_samples_from_response(self, response_content):
         """
-        Extracts features from the response content.
+        Extracts samples from the response content.
 
         Args:
             response_content (dict): The response content as a dictionary.
 
         Returns:
-            list: A list of extracted features.
+            list: A list of extracted samples.
         """
 
         def dict_to_list(input_dict, header):
@@ -431,7 +439,7 @@ class SingleTableGPTModel(SynthesizerModel):
                 each_value = input_dict.get(each_col, None)
                 res.append(each_value)
             return res
-
+        logger.info("Extracting samples from response ...")
         header = self.columns + self.off_table_features
         features = []
         for line in response_content.split("\n"):
@@ -443,6 +451,7 @@ class SingleTableGPTModel(SynthesizerModel):
                     feature[field] = match.group(1).strip()
             if feature:
                 features.append(dict_to_list(feature, header))
+        logger.info(f"Extracting samples from response ... Finished, {len(features)} extracted.")
         return features
 
     def sample(self, count=50, dataset_desp="", *args, **kwargs):
@@ -458,6 +467,7 @@ class SingleTableGPTModel(SynthesizerModel):
         Returns:
             res: The sampled data.
         """
+        logger.info("Sampling use GPT model ...")
         self.dataset_description = dataset_desp
 
         if self.use_raw_data:
@@ -467,12 +477,12 @@ class SingleTableGPTModel(SynthesizerModel):
         elif self.use_metadata:
             # If the use_metadata flag is True, sample data using the _sample_with_metadata method.
             res = self._sample_with_metadata(count, *args, **kwargs)
-
+        logger.info("Sampling use GPT model ... Finished.")
         return res
 
     def _form_columns_description(self):
 
-        pass
+        raise NotImplementedError
 
     def _form_dataset_description(self):
         """
@@ -482,8 +492,10 @@ class SingleTableGPTModel(SynthesizerModel):
             str: The description of the generated table.
         """
         if self.dataset_description:
+            logger.info(f"Use dataset_description = {self.dataset_description}.")
             return "\nThe description of the generated table is " + self.dataset_description + "\n"
         else:
+            logger.info("No dataset_description given in current model.")
             return ""
 
     def _form_message_with_metadata(self, current_cnt):
@@ -511,7 +523,7 @@ class SingleTableGPTModel(SynthesizerModel):
         )  # Add off-table features information
         message = (
             message
-            + f"Please note that the generated table has total {len(self.columns) + len(self.off_table_features)} columns of the generated data, the column names are {self.columns + self.off_table_features}, every column should not be missed when generating the data. \n"
+            + f"Note that the generated table has total {len(self.columns) + len(self.off_table_features)} columns, the column names are {self.columns + self.off_table_features}, every column should NOT be missed in generated data.\n"
         )  # Add information about the generated table columns
 
         # Add the message suffix and current count
@@ -534,6 +546,7 @@ class SingleTableGPTModel(SynthesizerModel):
             int: The input count.
 
         """
+        logger.info("Sampling with metadata.")
         # Initialize an empty list to store the generated samples
         result = []
         # Set the remaining count to the input count
@@ -552,7 +565,7 @@ class SingleTableGPTModel(SynthesizerModel):
             # Send the message to GPT and get the response
             response = self.ask_gpt(message)
             # Extract features from the response
-            generated_batch = self.extract_features_from_response(response)
+            generated_batch = self.extract_samples_from_response(response)
             # Add the generated batch to the result list
             result += generated_batch
             # Update the remaining count
@@ -573,6 +586,7 @@ class SingleTableGPTModel(SynthesizerModel):
             pd.DataFrame: A DataFrame containing the sampled data.
 
         """
+        logger.info("Sampling with raw_data.")
         result = []
         remaining_cnt = count
         while remaining_cnt > 0:
@@ -587,7 +601,7 @@ class SingleTableGPTModel(SynthesizerModel):
             # ask_gpt
             response = self.ask_gpt(message)
             # get result from response
-            generated_batch = self.extract_features_from_response(response)
+            generated_batch = self.extract_samples_from_response(response)
             # update result
             result += generated_batch
             # update remaining_cnt
