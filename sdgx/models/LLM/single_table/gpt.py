@@ -10,12 +10,12 @@ import pandas as pd
 
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.metadata import Metadata
-from sdgx.exceptions import InitializationError, SynthesizerInitError
-from sdgx.models.base import SynthesizerModel
+from sdgx.exceptions import InitializationError
+from sdgx.models.LLM.base import LLMBaseModel
 from sdgx.utils import logger
 
 
-class SingleTableGPTModel(SynthesizerModel):
+class SingleTableGPTModel(LLMBaseModel):
     """
     This is a synthetic data generation model powered by OpenAI GPT, a state-of-the-art language model. This model is based on groundbreaking research presented in the ICLR paper titled "Language Models are Realistic Tabular Data Generators".
 
@@ -34,7 +34,7 @@ class SingleTableGPTModel(SynthesizerModel):
     The URL endpoint for the OpenAI GPT API. Please specify the appropriate URL for accessing the API.
     """
 
-    max_tokens = 3000
+    max_tokens = 4000
     """
     The maximum number of tokens allowed in the generated response. This parameter helps in limiting the length of the output text.
     """
@@ -54,29 +54,6 @@ class SingleTableGPTModel(SynthesizerModel):
     The specific GPT model to be used for generating text. The default model is "gpt-3.5-turbo", which is known for its high performance and versatility.
     """
 
-    use_raw_data = False
-    """
-    By default, we use raw_data for data access.
-
-    When using the data loader, due to the need of randomization operation, we currently use the `.load_all()` to transform the original data to pd.DataFrame format for subsequent processing.
-
-    Due to the characteristics of the OpenAI GPT service, we do not recommend running this model with large data tables, which will consume your tokens excessively.
-    """
-
-    use_metadata = False
-    """
-    In this model, we accept a data generation paradigm that only provides metadata.
-
-    When only metadata is provided, sdgx will format the metadata of the data set into a message and transmit it to GPT, and GPT will generate similar data based on what it knows.
-
-    This is a potential way to generate data that cannot be made public and contains sensitive information.
-    """
-
-    _metadata = None
-    """
-    the metadata.
-    """
-
     query_batch = 30
     """
     This parameter is the number of samples submitted to GPT each time and the number of returned samples.
@@ -86,30 +63,9 @@ class SingleTableGPTModel(SynthesizerModel):
     We do not recommend setting too large a value, as this may cause potential problems or errors.
     """
 
-    off_table_features = []
-    """
-    * Experimental Feature
-
-    Whether infer data columns that do not exist in the real data table, the effect may not be very good.
-    """
-
-    prompts = {
-        "message_prefix": """Suppose you are the best data generating model in this world, we have some data samples with the following information:\n\n""",
-        "message_suffix": """\nGenerate synthetic data samples based on the above information and your knowledge, each sample should be output on one line (do not output in multiple lines), the output format of the sample is the same as the example in this message, such as "column_name_1 is value_1", the count of the generated data samples is """,
-        "system_role_content": "You are a powerful synthetic data generation model.",
-    }
-    """
-    Prompt words for generating data (preliminary version, improvements welcome).
-    """
-
     _sample_lines = []
     """
     A list to store the sample lines of generated data.
-    """
-
-    _responses = []
-    """
-    A list to store the responses received from the OpenAI GPT API.
     """
 
     _result_list = []
@@ -117,22 +73,6 @@ class SingleTableGPTModel(SynthesizerModel):
     A list to store the generated data samples.
     """
 
-    _message_list = []
-    """
-    A list to store the messages used for generating data.
-    """
-
-    columns = []
-    """
-    The columns of the data set.
-    """
-
-    dataset_description = ""
-    """
-    The description of the data set.
-    """
-
-    dataset_description = ""
 
     def __init__(self, *args, **kwargs) -> None:
         """
@@ -155,20 +95,6 @@ class SingleTableGPTModel(SynthesizerModel):
         self._check_openAI_setting()
         self._set_openAI()
         self._check_access_type()
-
-    def _check_access_type(self):
-        """
-        Checks the data access type.
-
-        Raises:
-            SynthesizerInitError: If data access type is not specified or if duplicate data access type is found.
-        """
-        if self.use_dataloader == self.use_raw_data == self.use_metadata == False:
-            raise SynthesizerInitError(
-                "Data access type not specified, please use `use_raw_data: bool` or `use_dataloader: bool` to specify data access type."
-            )
-        if self.use_dataloader == self.use_raw_data == True:
-            raise SynthesizerInitError("Duplicate data access type found.")
 
     def set_openAI_settings(self, API_url="https://api.openai.com/v1/", API_key=""):
         """
@@ -362,19 +288,6 @@ class SingleTableGPTModel(SynthesizerModel):
             raise ValueError("cnt should not be greater than the length of the list")
         return random.sample(input_list, cnt)
 
-    def _form_message_with_offtable_features(self):
-        """
-        This function forms a message with off-table features.
-
-        If there are more off-table columns, additional processing is excuted here.
-        """
-        if self.off_table_features:
-            logger.info(f"Use off_table_feature = {self.off_table_features}.")
-            return f"Also, you should try to infer another {len(self.off_table_features)} columns based on your knowledge, the name of these columns are : {self.off_table_features}, attach these columns after the original table. \n"
-        else:
-            logger.info("No off_table_feature needed in current model.")
-            return ""
-
     def _form_message_with_data(self, sample_list, current_cnt):
         """
         This function forms a message with data.
@@ -482,24 +395,6 @@ class SingleTableGPTModel(SynthesizerModel):
             res = self._sample_with_metadata(count, *args, **kwargs)
         logger.info("Sampling use GPT model ... Finished.")
         return res
-
-    def _form_columns_description(self):
-
-        raise NotImplementedError
-
-    def _form_dataset_description(self):
-        """
-        This function is used to form the dataset description.
-
-        Returns:
-            str: The description of the generated table.
-        """
-        if self.dataset_description:
-            logger.info(f"Use dataset_description = {self.dataset_description}.")
-            return "\nThe description of the generated table is " + self.dataset_description + "\n"
-        else:
-            logger.info("No dataset_description given in current model.")
-            return ""
 
     def _form_message_with_metadata(self, current_cnt):
         """
