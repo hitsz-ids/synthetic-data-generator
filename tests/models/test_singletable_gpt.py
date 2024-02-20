@@ -6,7 +6,7 @@ import pytest
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.metadata import Metadata
 from sdgx.exceptions import InitializationError
-from sdgx.models.LLM.single_table.SingleTableGPT import SingleTableGPTModel
+from sdgx.models.LLM.single_table.gpt import SingleTableGPTModel
 
 
 @pytest.fixture
