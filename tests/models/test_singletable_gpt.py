@@ -145,7 +145,7 @@ def test_singletable_gpt_model(
     assert single_table_gpt_model.openai_API_url == "https://api.openai.com/v1/"
     # the key is not set
     assert not single_table_gpt_model.openai_API_key
-    assert single_table_gpt_model.max_tokens == 3000
+    assert single_table_gpt_model.max_tokens == 4000
     assert single_table_gpt_model.temperature == 0.1
     assert single_table_gpt_model.timeout == 90
     assert "gpt-3.5" in single_table_gpt_model.gpt_model.lower()
