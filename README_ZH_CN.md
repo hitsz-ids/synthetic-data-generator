@@ -55,15 +55,13 @@
 
 无需原始训练数据，可以根据元数据生成合成数据。
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/gVUiiLr74nk?si=kNGEiKR_GQGXa45L" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+![Synthetic data generation without Data](assets/LLM_Case_1.gif)
 
 #### 表外特征推断功能
 
 根据表中已有的数据以及LLM掌握的知识推断表外特征，即新的列数据。
 
-<video id="video" controls="" preload="none" >
-      <source id="mp4" src="assets/LLM_Case_2.mp4" type="video/mp4">
-</video>
+![Off-Table feature inference](assets/LLM_Case_2.gif)
 
 ## 🔛 快速开始
 
