@@ -175,17 +175,11 @@ SDG开源项目由**哈尔滨工业大学（深圳）数据安全研究院**发�
 ### 论文
 
 - CTGAN：[Modeling Tabular Data using Conditional GAN](https://proceedings.neurips.cc/paper/2019/hash/254ed7d2de3b23ab10936522dd547b78-Abstract.html)
+- C3-TGAN: [C3-TGAN- Controllable Tabular Data Synthesis with Explicit Correlations and Property Constraints](https://www.researchgate.net/publication/374652636_C3-TGAN-_Controllable_Tabular_Data_Synthesis_with_Explicit_Correlations_and_Property_Constraints)
 - TVAE：[Modeling Tabular Data using Conditional GAN](https://proceedings.neurips.cc/paper/2019/hash/254ed7d2de3b23ab10936522dd547b78-Abstract.html)
 - table-GAN：[Data Synthesis based on Generative Adversarial Networks](https://arxiv.org/pdf/1806.03384.pdf)
 - CTAB-GAN:[CTAB-GAN: Effective Table Data Synthesizing](https://proceedings.mlr.press/v157/zhao21a/zhao21a.pdf)
 - OCT-GAN: [OCT-GAN: Neural ODE-based Conditional Tabular GANs](https://arxiv.org/pdf/2105.14969.pdf)
-
-### 数据集
-
-- [Adult数据集](http://archive.ics.uci.edu/ml/datasets/adult)
-- [Satellite数据集](http://archive.ics.uci.edu/dataset/146/statlog+landsat+satellite)
-- [Rossmann数据集](https://www.kaggle.com/competitions/rossmann-store-sales/data)
-- [Telstra数据集](https://www.kaggle.com/competitions/telstra-recruiting-network/data)
 
 ## 📄 许可证
 
