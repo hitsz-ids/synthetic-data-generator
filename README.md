@@ -43,7 +43,7 @@ High-quality synthetic data can be safely utilized across various domains includ
 - Easy to extend
   - Supports expansion of models, data processing, data connectors, etc. in the form of plug-in packages
 
-### LLM-integrated synthetic data generation
+### 🎉 LLM-integrated synthetic data generation
 
 For a long time, LLM has been used to understand and generate various types of data. In fact, LLM also has certain capabilities in tabular data generation. Also, it has some abilities that cannot be achieved by traditional (based on GAN methods or statistical methods) .
 
