@@ -53,9 +53,7 @@ Our `sdgx.models.LLM.single_table.gpt.SingleTableGPTModel` implements two new fe
 
 No training data is required, synthetic data can be generated based on metadata data.
 
-<video id="video" controls="" preload="none" >
-      <source id="mp4" src="assets/LLM_Case_1.mp4" type="video/mp4">
-</video>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/gVUiiLr74nk?si=kNGEiKR_GQGXa45L" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
 #### Off-Table feature inference
 

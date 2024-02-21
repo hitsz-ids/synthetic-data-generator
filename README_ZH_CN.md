@@ -55,9 +55,7 @@
 
 无需原始训练数据，可以根据元数据生成合成数据。
 
-<video id="video" controls="" preload="none" >
-      <source id="mp4" src="assets/LLM_Case_1.mp4" type="video/mp4">
-</video>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/gVUiiLr74nk?si=kNGEiKR_GQGXa45L" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
 #### 表外特征推断功能
 
