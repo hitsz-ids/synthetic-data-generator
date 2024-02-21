@@ -41,7 +41,7 @@ You can install our python package with pip,
 .. code-block:: bash
 
     pip install sdgx
-   
+
 
 Or use pre-built images to quickly experience the latest features.
 
