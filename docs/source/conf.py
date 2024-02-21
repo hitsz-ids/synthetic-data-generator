@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.abspath(".."))
 # -- Project information -----------------------------------------------------
 
 project = "Synthetic Data Generator"
-copyright = "2023, hitsz-ids"
+copyright = "2024, hitsz-ids"
 author = "hitsz-ids"
 
 # The full version, including alpha/beta/rc tags
