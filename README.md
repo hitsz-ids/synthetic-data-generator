@@ -59,7 +59,6 @@ No training data is required, synthetic data can be generated based on metadata 
 
 Infer new column data based on the existing data in the table and the knowledge mastered by LLM.
 
-
 ![Off-Table feature inference](assets/LLM_Case_2.gif)
 
 ## 🔛 Quick Start
