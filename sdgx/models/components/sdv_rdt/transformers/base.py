@@ -1,4 +1,5 @@
 """BaseTransformer module."""
+
 import abc
 import inspect
 

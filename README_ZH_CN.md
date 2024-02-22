@@ -20,27 +20,48 @@
 
 # 🚀 合成数据生成器 -- 快速生成高质量合成数据！
 
+<p style="font-size: small;">切换语言:
+    <a href="https://github.com/hitsz-ids/synthetic-data-generator/blob/main/README.md" target="_blank">English</a>
+  </p>
+
 </p>
 </div>
 
-合成数据生成器（Synthetic Data Generator，SDG）是一个专注于快速生成高质量结构化表格数据的组件。支持多种单表、多表数据合成算法，实现最高120倍性能提升，支持差分隐私等方法，加强合成数据安全性。
+合成数据生成器（Synthetic Data Generator，SDG）是一个专注于快速生成高质量的结构化表格数据的数据组件。SDG支持单表和多表数据合成算法，并集成了基于大语言模型（LLM）的合成数据生成模型。
 
-合成数据是由机器根据真实数据与算法生成的，合成数据不含敏感信息，但能保留真实数据中的行为特征。合成数据与真实数据不存在任何对应关系，不受 GDPR 、ADPPA等隐私法规的约束，在实际应用中不需要担心隐私泄漏风险。高质量的合成数据可用于数据安全开放、模型训练调试、系统开发测试等众多领域。
+合成数据（Synthetic Data）是由计算机使用真实数据、元数据和算法生成的合成数据不包含任何敏感信息，但它保留了原始数据的基本特性。合成数据和真实数据之间没有直接的关联，使其免于GDPR和ADPPA等隐私法规的约束，消除实际应用中的隐私泄露风险。
 
-## 🎉 主要特性
+高质量的合成数据可以安全、多样化地在各种领域中使用，包括数据共享、模型训练和调试、系统开发和测试等应用。阅读 [最新API文档](https://synthetic-data-generator.readthedocs.io/en/latest/) 获取更多细节。
 
-- 高性能
-  - 支持多种统计学数据合成算法，实现最高120倍性能提升，不需要GPU设备；
+## 🔧 主要特性
+
+- 无限进步：
+  - 支持多种统计学数据合成算法，支持基于LLM的仿真数据生成方法；
   - 为大数据场景优化，有效减少内存消耗；
   - 持续跟踪学术界和工业界的最新进展，及时引入支持优秀算法和模型。
-  - 为深度学习模型提供torch等框架的分布式训练支持
-- 隐私增强
+- 隐私增强：
   - 提供中文敏感数据自动识别能力，包括姓名、身份证号、人名等17种常见敏感字段；
   - 支持差分隐私、匿名化等方法，加强合成数据安全性。
-- 易扩展
-  - 支持以插件包的形式拓展模型、数据处理、数据连接器等功能
+- 易扩展：
+  - 支持以插件包的形式拓展模型、数据处理、数据连接器等功能。
 
-阅读 [最新的文档](https://synthetic-data-generator.readthedocs.io/en/latest/) 获取更多细节.
+### 🎉 借助LLM进行合成数据生成
+
+长期以来，LLM一直被用来理解和生成各种类型的数据。 事实上，LLM在表格数据生成方面也有较强的性能。 且LLM还具有一些传统（基于GAN方法或统计方法）无法实现的能力。
+
+我们的 `sdgx.models.LLM.single_table.gpt.SingleTableGPTModel` 实现了两个新功能：
+
+#### 无原始记录的数据合成功能
+
+无需原始训练数据，可以根据元数据生成合成数据。
+
+![Synthetic data generation without Data](assets/LLM_Case_1.gif)
+
+#### 表外特征推断功能
+
+根据表中已有的数据以及LLM掌握的知识推断表外特征，即新的列数据。
+
+![Off-Table feature inference](assets/LLM_Case_2.gif)
 
 ## 🔛 快速开始
 
@@ -52,21 +73,21 @@
 docker pull idsteam/sdgx:latest
 ```
 
-### 从本地安装（目前推荐）
+### 从Pypi安装
 
-目前本项目的代码更新速度快，我们推荐您通过源码进行安装的方式使用SDG。
+```bash
+pip install sdgx
+```
+
+### 从本地安装
+
+您可以通过源码进行安装的方式使用SDG。
 
 ```bash
 git clone git@github.com:hitsz-ids/synthetic-data-generator.git
 pip install .
 # 或者直接从git安装
 pip install git+https://github.com/hitsz-ids/synthetic-data-generator.git
-```
-
-### 从Pypi安装
-
-```bash
-pip install sdgx
 ```
 
 ### 单表数据快速合成示例
@@ -149,53 +170,17 @@ SDG开源项目由**哈尔滨工业大学（深圳）数据安全研究院**发�
 - 非常欢迎你的加入！[提一个 Issue](https://github.com/hitsz-ids/synthetic-data-generator/issues/new) 或者提交一个 Pull Request。
 - 开发环境配置请参考[开发者文档](./CONTRIBUTING.md)
 
-### Contributors
-
-<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-
-<!-- prettier-ignore-start -->
-
-<!-- markdownlint-disable -->
-
-<table>
-  <tbody>
-    <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://wh1isper.github.io/"><img src="https://avatars.githubusercontent.com/u/43375501?v=4?s=100" width="100px;" alt="Zhongsheng Ji"/><br /><sub><b>Zhongsheng Ji</b></sub></a><br /><a href="#code-Wh1isper" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/MooooCat"><img src="https://avatars.githubusercontent.com/u/141886018?v=4?s=100" width="100px;" alt="MoooCat"/><br /><sub><b>MoooCat</b></sub></a><br /><a href="#code-MooooCat" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/joeyscave"><img src="https://avatars.githubusercontent.com/u/72662648?v=4?s=100" width="100px;" alt="YUAN KAIWEN"/><br /><sub><b>YUAN KAIWEN</b></sub></a><br /><a href="#code-joeyscave" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/sjh120"><img src="https://avatars.githubusercontent.com/u/86507761?v=4?s=100" width="100px;" alt="sjh120"/><br /><sub><b>sjh120</b></sub></a><br /><a href="#code-sjh120" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Z712023"><img src="https://avatars.githubusercontent.com/u/132286135?v=4?s=100" width="100px;" alt="Z712023"/><br /><sub><b>Z712023</b></sub></a><br /><a href="#code-Z712023" title="Code">💻</a></td>
-    </tr>
-  </tbody>
-</table>
-
-<!-- markdownlint-restore -->
-
-<!-- prettier-ignore-end -->
-
-<!-- ALL-CONTRIBUTORS-LIST:END -->
-
 ## 👩‍🎓 相关工作
 
 ### 论文
 
 - CTGAN：[Modeling Tabular Data using Conditional GAN](https://proceedings.neurips.cc/paper/2019/hash/254ed7d2de3b23ab10936522dd547b78-Abstract.html)
+- C3-TGAN: [C3-TGAN- Controllable Tabular Data Synthesis with Explicit Correlations and Property Constraints](https://www.researchgate.net/publication/374652636_C3-TGAN-_Controllable_Tabular_Data_Synthesis_with_Explicit_Correlations_and_Property_Constraints)
 - TVAE：[Modeling Tabular Data using Conditional GAN](https://proceedings.neurips.cc/paper/2019/hash/254ed7d2de3b23ab10936522dd547b78-Abstract.html)
 - table-GAN：[Data Synthesis based on Generative Adversarial Networks](https://arxiv.org/pdf/1806.03384.pdf)
 - CTAB-GAN:[CTAB-GAN: Effective Table Data Synthesizing](https://proceedings.mlr.press/v157/zhao21a/zhao21a.pdf)
 - OCT-GAN: [OCT-GAN: Neural ODE-based Conditional Tabular GANs](https://arxiv.org/pdf/2105.14969.pdf)
 
-### 数据集
-
-- [Adult数据集](http://archive.ics.uci.edu/ml/datasets/adult)
-- [Satellite数据集](http://archive.ics.uci.edu/dataset/146/statlog+landsat+satellite)
-- [Rossmann数据集](https://www.kaggle.com/competitions/rossmann-store-sales/data)
-- [Telstra数据集](https://www.kaggle.com/competitions/telstra-recruiting-network/data)
-
 ## 📄 许可证
 
 SDG开源项目使用 Apache-2.0 license，有关协议请参考[LICENSE](https://github.com/hitsz-ids/synthetic-data-generator/blob/main/LICENSE)。
-
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=hitsz-ids/synthetic-data-generator&type=Date)](https://star-history.com/#hitsz-ids/synthetic-data-generator&Date)

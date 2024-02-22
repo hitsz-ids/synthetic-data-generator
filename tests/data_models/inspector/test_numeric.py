@@ -17,10 +17,11 @@ def raw_data(demo_single_table_path):
 def test_inspector(inspector: NumericInspector, raw_data):
     inspector.fit(raw_data)
     assert inspector.ready
-    assert inspector.numeric_columns
-    assert sorted(inspector.inspect()["numeric_columns"]) == sorted(
+    assert inspector.int_columns
+    assert sorted(inspector.inspect()["int_columns"]) == sorted(
         ["educational-num", "fnlwgt", "hours-per-week", "age", "capital-gain", "capital-loss"]
     )
+    assert not inspector.float_columns
     assert inspector.inspect_level == 10
 
 

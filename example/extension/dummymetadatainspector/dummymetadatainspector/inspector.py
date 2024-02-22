@@ -4,8 +4,7 @@ from sdgx.data_models.inspectors.base import Inspector
 from sdgx.data_models.inspectors.extension import hookimpl
 
 
-class MyOwnInspector(Inspector):
-    ...
+class MyOwnInspector(Inspector): ...
 
 
 @hookimpl
