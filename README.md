@@ -27,6 +27,8 @@
 <p style="font-size: small;">
     View Colab Examples:
     <a href="https://colab.research.google.com/drive/1cMB336jN3kb-m_pr1aJjshnNep_6bhsf?usp=sharing" target="value">CTGAN</a>
+    &nbsp;| &nbsp;
+    <a href="https://colab.research.google.com/drive/1VFnP59q3eoVtMJ1PvcYjmuXtx9N8C7o0?usp=sharing" target="value"> LLM Data Synthesis</a>
 </p>
 
 </p>
