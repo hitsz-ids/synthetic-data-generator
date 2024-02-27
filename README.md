@@ -21,7 +21,7 @@
 
 <p style="font-size: small;">Switch Language:
     <a href="https://github.com/hitsz-ids/synthetic-data-generator/blob/main/README_ZH_CN.md" target="_blank">简体中文</a> &nbsp;| &nbsp;Latest  
-    <a href="https://synthetic-data-generator.readthedocs.io/en/latest/" target="value">API Docs</a>&nbsp;| &nbsp; Join <a href="https://synthetic-data-generator.readthedocs.io/en/latest/" target="value">Wechat Group</a>
+    <a href="https://synthetic-data-generator.readthedocs.io/en/latest/" target="value">API Docs</a>&nbsp;| &nbsp; Join <a href="assets/wechat_QR_code.JPG" target="value">Wechat Group</a>
 </p>
 
 <p style="font-size: small;">
@@ -172,13 +172,6 @@ Synthetic data are as follows：
 [1000 rows x 15 columns]
 ```
 
-## 🤝 Join Community
-
-The SDG project was initiated by **Institute of Data Security, Harbin Institute of Technology**. If you are interested in out project, welcome to join our community. We welcome organizations, teams, and individuals who share our commitment to data protection and security through open source:
-
-- Read [CONTRIBUTING](./CONTRIBUTING.md) before draft a pull request.
-- Submit an issue by viewing [View First Good Issue](https://github.com/hitsz-ids/synthetic-data-generator/issues/new) or submit a Pull Request.
-
 ## 👩‍🎓 Related Work
 
 - CTGAN：[Modeling Tabular Data using Conditional GAN](https://proceedings.neurips.cc/paper/2019/hash/254ed7d2de3b23ab10936522dd547b78-Abstract.html)
@@ -187,6 +180,16 @@ The SDG project was initiated by **Institute of Data Security, Harbin Institute 
 - table-GAN：[Data Synthesis based on Generative Adversarial Networks](https://arxiv.org/pdf/1806.03384.pdf)
 - CTAB-GAN:[CTAB-GAN: Effective Table Data Synthesizing](https://proceedings.mlr.press/v157/zhao21a/zhao21a.pdf)
 - OCT-GAN: [OCT-GAN: Neural ODE-based Conditional Tabular GANs](https://arxiv.org/pdf/2105.14969.pdf)
+
+## 🤝 Join Community
+
+The SDG project was initiated by **Institute of Data Security, Harbin Institute of Technology**. If you are interested in out project, welcome to join our community. We welcome organizations, teams, and individuals who share our commitment to data protection and security through open source:
+
+- Read [CONTRIBUTING](./CONTRIBUTING.md) before draft a pull request.
+- Submit an issue by viewing [View First Good Issue](https://github.com/hitsz-ids/synthetic-data-generator/issues/new) or submit a Pull Request.
+- Join our Wechat Group through QR code.
+
+![Wechat QR Code](assets/wechat_QR_code.JPG)
 
 ## 📄 License
 
