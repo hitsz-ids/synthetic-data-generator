@@ -21,7 +21,7 @@
 # 🚀 合成数据生成器 -- 快速生成高质量合成数据！
 
 <p style="font-size: small;">切换语言:
-    <a href="https://github.com/hitsz-ids/synthetic-data-generator/blob/main/README.md" target="_blank">English</a> &nbsp;| &nbsp;最新  
+    <a href="https://github.com/hitsz-ids/synthetic-data-generator/blob/main/README.md" target="_blank">English</a> &nbsp;| &nbsp;最新
     <a href="https://synthetic-data-generator.readthedocs.io/en/latest/" target="value">API文档</a>&nbsp;| &nbsp; 加入 <a href="assets/wechat_QR_code.JPG" target="value">Wechat群组</a>
   </p>
 
@@ -70,7 +70,6 @@
 #### 表外特征推断功能
 
 根据表中已有的数据以及LLM掌握的知识推断表外特征，即新的列数据，查看 <a href="https://colab.research.google.com/drive/1_chuTVZECpj5fklj-RAp7ZVrew8weLW_?usp=sharing" target="value"> Colab 例子</a>。
-
 
 ![Off-Table feature inference](assets/LLM_Case_2.gif)
 
@@ -196,7 +195,6 @@ SDG开源项目由**哈尔滨工业大学（深圳）数据安全研究院**发�
 <div align="left">
   <img src="assets/wechat_QR_code.JPG" width="400" >
 </div>
-
 
 ## 📄 许可证
 
