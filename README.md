@@ -28,7 +28,9 @@
     View Colab Examples:
     <a href="https://colab.research.google.com/drive/1cMB336jN3kb-m_pr1aJjshnNep_6bhsf?usp=sharing" target="value">CTGAN</a>
     &nbsp;| &nbsp;
-    <a href="https://colab.research.google.com/drive/1VFnP59q3eoVtMJ1PvcYjmuXtx9N8C7o0?usp=sharing" target="value"> LLM Data Synthesis</a>
+    <a href="https://colab.research.google.com/drive/1VFnP59q3eoVtMJ1PvcYjmuXtx9N8C7o0?usp=sharing" target="value"> LLM: Data Synthesis</a>
+    &nbsp;| &nbsp;
+    <a href="https://colab.research.google.com/drive/1_chuTVZECpj5fklj-RAp7ZVrew8weLW_?usp=sharing" target="value"> LLM: Off-table Feature Inference</a>
 </p>
 
 </p>
@@ -59,13 +61,13 @@ Our `sdgx.models.LLM.single_table.gpt.SingleTableGPTModel` implements two new fe
 
 #### Synthetic data generation without Data
 
-No training data is required, synthetic data can be generated based on metadata data.
+No training data is required, synthetic data can be generated based on metadata data, view in our <a href="https://colab.research.google.com/drive/1VFnP59q3eoVtMJ1PvcYjmuXtx9N8C7o0?usp=sharing" target="value"> colab example</a>.
 
 ![Synthetic data generation without Data](assets/LLM_Case_1.gif)
 
 #### Off-Table feature inference
 
-Infer new column data based on the existing data in the table and the knowledge mastered by LLM.
+Infer new column data based on the existing data in the table and the knowledge mastered by LLM, view in our <a href="https://colab.research.google.com/drive/1_chuTVZECpj5fklj-RAp7ZVrew8weLW_?usp=sharing" target="value"> colab example</a>.
 
 ![Off-Table feature inference](assets/LLM_Case_2.gif)
 
