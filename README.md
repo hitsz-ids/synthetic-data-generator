@@ -31,7 +31,6 @@
     <a href="https://colab.research.google.com/drive/1_chuTVZECpj5fklj-RAp7ZVrew8weLW_?usp=sharing" target="value"> LLM: Off-table Feature Inference</a>
     &nbsp;| &nbsp;
     <a href="https://colab.research.google.com/drive/1cMB336jN3kb-m_pr1aJjshnNep_6bhsf?usp=sharing" target="value">CTGAN</a>
-    
 </p>
 
 </p>

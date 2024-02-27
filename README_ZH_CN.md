@@ -21,8 +21,18 @@
 # 🚀 合成数据生成器 -- 快速生成高质量合成数据！
 
 <p style="font-size: small;">切换语言:
-    <a href="https://github.com/hitsz-ids/synthetic-data-generator/blob/main/README.md" target="_blank">English</a>
+    <a href="https://github.com/hitsz-ids/synthetic-data-generator/blob/main/README.md" target="_blank">English</a> &nbsp;| &nbsp;最新  
+    <a href="https://synthetic-data-generator.readthedocs.io/en/latest/" target="value">API文档</a>&nbsp;| &nbsp; 加入 <a href="assets/wechat_QR_code.JPG" target="value">Wechat群组</a>
   </p>
+
+<p style="font-size: small;">
+    查看 Colab 例子:&nbsp;
+    <a href="https://colab.research.google.com/drive/1VFnP59q3eoVtMJ1PvcYjmuXtx9N8C7o0?usp=sharing" target="value"> 使用LLM仿真数据</a>
+    &nbsp;| &nbsp;
+    <a href="https://colab.research.google.com/drive/1_chuTVZECpj5fklj-RAp7ZVrew8weLW_?usp=sharing" target="value"> 借助LLM进行表外特征推断</a>
+    &nbsp;| &nbsp;
+    <a href="https://colab.research.google.com/drive/1cMB336jN3kb-m_pr1aJjshnNep_6bhsf?usp=sharing" target="value">CTGAN模型</a>
+</p>
 
 </p>
 </div>
@@ -31,7 +41,7 @@
 
 合成数据（Synthetic Data）是由计算机使用真实数据、元数据和算法生成的合成数据不包含任何敏感信息，但它保留了原始数据的基本特性。合成数据和真实数据之间没有直接的关联，使其免于GDPR和ADPPA等隐私法规的约束，消除实际应用中的隐私泄露风险。
 
-高质量的合成数据可以安全、多样化地在各种领域中使用，包括数据共享、模型训练和调试、系统开发和测试等应用。阅读 [最新API文档](https://synthetic-data-generator.readthedocs.io/en/latest/) 获取更多细节。
+高质量的合成数据可以安全、多样化地在各种领域中使用，包括数据共享、模型训练和调试、系统开发和测试等应用。阅读 [**最新API文档**](https://synthetic-data-generator.readthedocs.io/en/latest/) 获取更多细节。
 
 ## 🔧 主要特性
 
@@ -53,13 +63,14 @@
 
 #### 无原始记录的数据合成功能
 
-无需原始训练数据，可以根据元数据生成合成数据。
+无需原始训练数据，可以根据元数据生成合成数据，查看 <a href="https://colab.research.google.com/drive/1VFnP59q3eoVtMJ1PvcYjmuXtx9N8C7o0?usp=sharing" target="value"> Colab 例子</a>。
 
 ![Synthetic data generation without Data](assets/LLM_Case_1.gif)
 
 #### 表外特征推断功能
 
-根据表中已有的数据以及LLM掌握的知识推断表外特征，即新的列数据。
+根据表中已有的数据以及LLM掌握的知识推断表外特征，即新的列数据，查看 <a href="https://colab.research.google.com/drive/1_chuTVZECpj5fklj-RAp7ZVrew8weLW_?usp=sharing" target="value"> Colab 例子</a>。
+
 
 ![Off-Table feature inference](assets/LLM_Case_2.gif)
 
@@ -163,13 +174,6 @@ print(sampled_data)
 [1000 rows x 15 columns]
 ```
 
-## 🤝  如何贡献
-
-SDG开源项目由**哈尔滨工业大学（深圳）数据安全研究院**发起，若您对SDG项目感兴趣并愿意一起完善它，欢迎加入我们的开源社区：
-
-- 非常欢迎你的加入！[提一个 Issue](https://github.com/hitsz-ids/synthetic-data-generator/issues/new) 或者提交一个 Pull Request。
-- 开发环境配置请参考[开发者文档](./CONTRIBUTING.md)
-
 ## 👩‍🎓 相关工作
 
 ### 论文
@@ -180,6 +184,19 @@ SDG开源项目由**哈尔滨工业大学（深圳）数据安全研究院**发�
 - table-GAN：[Data Synthesis based on Generative Adversarial Networks](https://arxiv.org/pdf/1806.03384.pdf)
 - CTAB-GAN:[CTAB-GAN: Effective Table Data Synthesizing](https://proceedings.mlr.press/v157/zhao21a/zhao21a.pdf)
 - OCT-GAN: [OCT-GAN: Neural ODE-based Conditional Tabular GANs](https://arxiv.org/pdf/2105.14969.pdf)
+
+## 🤝  如何贡献
+
+SDG开源项目由**哈尔滨工业大学（深圳）数据安全研究院**发起，若您对SDG项目感兴趣并愿意一起完善它，欢迎加入我们的开源社区：
+
+- 非常欢迎你的加入！[提一个 Issue](https://github.com/hitsz-ids/synthetic-data-generator/issues/new) 或者提交一个 Pull Request。
+- 开发环境配置请参考[开发者文档](./CONTRIBUTING.md)
+- 加入微信群：
+
+<div align="left">
+  <img src="assets/wechat_QR_code.JPG" width="400" >
+</div>
+
 
 ## 📄 许可证
 
