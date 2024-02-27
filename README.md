@@ -189,7 +189,10 @@ The SDG project was initiated by **Institute of Data Security, Harbin Institute 
 - Submit an issue by viewing [View First Good Issue](https://github.com/hitsz-ids/synthetic-data-generator/issues/new) or submit a Pull Request.
 - Join our Wechat Group through QR code.
 
-![Wechat QR Code](assets/wechat_QR_code.JPG)
+<div align="left">
+  <img src="assets/wechat_QR_code.JPG" width="400" >
+</div>
+
 
 ## 📄 License
 
