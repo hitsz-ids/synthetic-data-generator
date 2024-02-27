@@ -20,8 +20,9 @@
 # 🚀 Synthetic Data Generator
 
 <p style="font-size: small;">Switch Language:
-    <a href="https://github.com/hitsz-ids/synthetic-data-generator/blob/main/README_ZH_CN.md" target="_blank">简体中文</a>
-  </p>
+    <a href="https://github.com/hitsz-ids/synthetic-data-generator/blob/main/README_ZH_CN.md" target="_blank">简体中文</a> &nbsp;| &nbsp;View Colab Examples:
+    <a href="https://colab.research.google.com/drive/1cMB336jN3kb-m_pr1aJjshnNep_6bhsf?usp=sharing" target="_blank">CTGAN</a>
+</p>
 
 </p>
 </div>
