@@ -49,7 +49,7 @@ class SingleTableGPTModel(LLMBaseModel):
     The maximum time (in seconds) to wait for a response from the OpenAI GPT API. If the response is not received within this time, the request will be timed out.
     """
 
-    gpt_model = "Gpt-3.5-turbo-0613"
+    gpt_model = "gpt-3.5-turbo"
     """
     The specific GPT model to be used for generating text. The default model is "gpt-3.5-turbo", which is known for its high performance and versatility.
     """
