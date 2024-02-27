@@ -468,7 +468,11 @@ class SingleTableGPTModel(LLMBaseModel):
             # Update the remaining count
             remaining_cnt = remaining_cnt - current_cnt
 
-        return count  # Return the input count
+        self._result_list.append(result)
+
+        # return result in pd.DataFrame
+        final_columns = self.columns + self.off_table_features
+        return pd.DataFrame(self._result_list, columns=final_columns)
 
     def _sample_with_data(self, count, *args, **kwargs):
         """
