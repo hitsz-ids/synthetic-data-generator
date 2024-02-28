@@ -49,7 +49,7 @@ class SingleTableGPTModel(LLMBaseModel):
     The maximum time (in seconds) to wait for a response from the OpenAI GPT API. If the response is not received within this time, the request will be timed out.
     """
 
-    gpt_model = "Gpt-3.5-turbo-0613"
+    gpt_model = "gpt-3.5-turbo"
     """
     The specific GPT model to be used for generating text. The default model is "gpt-3.5-turbo", which is known for its high performance and versatility.
     """
@@ -468,7 +468,11 @@ class SingleTableGPTModel(LLMBaseModel):
             # Update the remaining count
             remaining_cnt = remaining_cnt - current_cnt
 
-        return count  # Return the input count
+        self._result_list.append(result)
+
+        # return result in pd.DataFrame
+        final_columns = self.columns + self.off_table_features
+        return pd.DataFrame(result, columns=final_columns)
 
     def _sample_with_data(self, count, *args, **kwargs):
         """
@@ -508,4 +512,4 @@ class SingleTableGPTModel(LLMBaseModel):
 
         # return result
         final_columns = self.columns + self.off_table_features
-        return pd.DataFrame(self._result_list, columns=final_columns)
+        return pd.DataFrame(self.result, columns=final_columns)
