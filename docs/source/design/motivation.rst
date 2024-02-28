@@ -32,7 +32,7 @@ SDV: SOTA, and not perfact
 In this case, we found `SDV <https://github.com/sdv-dev/SDV>`_,
 a Python library designed to be your one-stop shop for creating tabular synthetic data.
 `In this research <https://dai.lids.mit.edu/wp-content/uploads/2018/03/SDV.pdf>`_,
-they propose techniques for data simulation against associative relationships in relational databases and open source it as SDV.
+they propose techniques for data synthesis against associative relationships in relational databases and open source it as SDV.
 
 However, while SDV is a powerful tool for generating synthetic data, it is not without its limitations.
 One of the main challenges we encountered during our usage was related to performance.
@@ -42,7 +42,7 @@ This can lead to longer processing times and increased demand on system resource
 which might not be feasible for all use cases or environments.
 
 Second, the architecture of SDV presents certain limitations when it comes to extending its capabilities.
-While SDV is designed to support a variety of data simulation techniques for relational databases,
+While SDV is designed to support few data synthesis techniques for relational databases,
 its architecture makes it difficult to incorporate additional algorithms or support different modalities of data.
 This restricts our ability to expand upon its functionality and adapt it to a wider range of use cases.
 
