@@ -36,11 +36,11 @@
 </p>
 </div>
 
-The Synthetic Data Generator (SDG) is a specialized framework designed to generate high-quality structured tabular data. 
+The Synthetic Data Generator (SDG) is a specialized framework designed to generate high-quality structured tabular data.
 
-Synthetic data does not contain any sensitive information, yet it retains the essential characteristics of the original data, making it exempt from privacy regulations such as GDPR and ADPPA. 
+Synthetic data does not contain any sensitive information, yet it retains the essential characteristics of the original data, making it exempt from privacy regulations such as GDPR and ADPPA.
 
-High-quality synthetic data can be safely utilized across various domains including data sharing, model training and debugging, system development and testing, etc. 
+High-quality synthetic data can be safely utilized across various domains including data sharing, model training and debugging, system development and testing, etc.
 
 ## 💥News
 
