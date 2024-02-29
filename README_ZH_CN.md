@@ -37,13 +37,42 @@
 </p>
 </div>
 
-合成数据生成器（Synthetic Data Generator，SDG）是一个专注于快速生成高质量的结构化表格数据的数据组件。SDG支持单表和多表数据合成算法，并集成了基于大语言模型（LLM）的合成数据生成模型。
+合成数据生成器（Synthetic Data Generator，SDG）是一个专注于快速生成高质量的结构化表格数据的数据组件。
 
-合成数据（Synthetic Data）是由计算机使用真实数据、元数据和算法生成的合成数据不包含任何敏感信息，但它保留了原始数据的基本特性。合成数据和真实数据之间没有直接的关联，使其免于GDPR和ADPPA等隐私法规的约束，消除实际应用中的隐私泄露风险。
+合成数据（Synthetic Data）不包含任何敏感信息，但它保留了原始数据的基本特性，使其免于GDPR和ADPPA等隐私法规的约束，消除实际应用中的隐私泄露风险。
 
-高质量的合成数据可以安全、多样化地在各种领域中使用，包括数据共享、模型训练和调试、系统开发和测试等应用。阅读 [**最新API文档**](https://synthetic-data-generator.readthedocs.io/en/latest/) 获取更多细节。
+高质量的合成数据可以安全、多样化地在各种领域中使用，包括数据共享、模型训练和调试、系统开发和测试等应用。
 
-## 🔧 主要特性
+## 💥 相关信息
+
+我们的里程碑和时间节点如下所示：
+
+🔥 2024年2月20日：基于LLM的单表数据合成模型已包含，查看colab示例：<a href="https://colab.research.google.com/drive/1VFnP59q3eoVtMJ1PvcYjmuXtx9N8C7o0?usp=sharing" target="value">LLM：数据合成</a> 和 <a href="https://colab.research.google.com/drive/1_chuTVZECpj5fklj-RAp7ZVrew8weLW_?usp=sharing" target="value">LLM：表外特征推断</a>。
+
+🔶 2023年12月20日：v0.1.0版本发布，包含支持数十亿数据处理能力的CTGAN模型，查看colab示例：<a href="https://colab.research.google.com/drive/1cMB336jN3kb-m_pr1aJjshnNep_6bhsf?usp=sharing" target="value">支持数十亿数据的CTGAN</a>。
+
+🔆 2023年8月10日：第一行SDG代码提交。
+
+## 🎉 借助LLM进行合成数据生成
+
+长期以来，LLM一直被用来理解和生成各种类型的数据。 事实上，LLM在表格数据生成方面也有较强的性能。 且LLM还具有一些传统（基于GAN方法或统计方法）无法实现的能力。
+
+我们的 `sdgx.models.LLM.single_table.gpt.SingleTableGPTModel` 实现了两个新功能：
+
+### 无原始记录的数据合成功能
+
+无需原始训练数据，可以根据元数据生成合成数据，查看 <a href="https://colab.research.google.com/drive/1VFnP59q3eoVtMJ1PvcYjmuXtx9N8C7o0?usp=sharing" target="value"> Colab 例子</a>。
+
+![Synthetic data generation without Data](assets/LLM_Case_1.gif)
+
+### 表外特征推断功能
+
+根据表中已有的数据以及LLM掌握的知识推断表外特征，即新的列数据，查看 <a href="https://colab.research.google.com/drive/1_chuTVZECpj5fklj-RAp7ZVrew8weLW_?usp=sharing" target="value"> Colab 例子</a>。
+
+![Off-Table feature inference](assets/LLM_Case_2.gif)
+
+
+##  💫 Why SDG ?
 
 - 无限进步：
   - 支持多种统计学数据合成算法，支持基于LLM的仿真数据生成方法；
@@ -55,25 +84,7 @@
 - 易扩展：
   - 支持以插件包的形式拓展模型、数据处理、数据连接器等功能。
 
-### 🎉 借助LLM进行合成数据生成
-
-长期以来，LLM一直被用来理解和生成各种类型的数据。 事实上，LLM在表格数据生成方面也有较强的性能。 且LLM还具有一些传统（基于GAN方法或统计方法）无法实现的能力。
-
-我们的 `sdgx.models.LLM.single_table.gpt.SingleTableGPTModel` 实现了两个新功能：
-
-#### 无原始记录的数据合成功能
-
-无需原始训练数据，可以根据元数据生成合成数据，查看 <a href="https://colab.research.google.com/drive/1VFnP59q3eoVtMJ1PvcYjmuXtx9N8C7o0?usp=sharing" target="value"> Colab 例子</a>。
-
-![Synthetic data generation without Data](assets/LLM_Case_1.gif)
-
-#### 表外特征推断功能
-
-根据表中已有的数据以及LLM掌握的知识推断表外特征，即新的列数据，查看 <a href="https://colab.research.google.com/drive/1_chuTVZECpj5fklj-RAp7ZVrew8weLW_?usp=sharing" target="value"> Colab 例子</a>。
-
-![Off-Table feature inference](assets/LLM_Case_2.gif)
-
-## 🔛 快速开始
+## 🌀 快速开始
 
 ### 预构建镜像
 
