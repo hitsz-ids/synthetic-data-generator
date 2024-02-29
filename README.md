@@ -25,10 +25,10 @@
 </p>
 
 <p style="font-size: small;">
-    View Colab Examples:&nbsp;
+    Colab Examples:&nbsp;
     <a href="https://colab.research.google.com/drive/1VFnP59q3eoVtMJ1PvcYjmuXtx9N8C7o0?usp=sharing" target="value"> LLM: Data Synthesis</a>
     &nbsp;| &nbsp;
-    <a href="https://colab.research.google.com/drive/1_chuTVZECpj5fklj-RAp7ZVrew8weLW_?usp=sharing" target="value"> LLM: Off-table Feature Inference</a>
+    <a href="https://colab.research.google.com/drive/1_chuTVZECpj5fklj-RAp7ZVrew8weLW_?usp=sharing" target="value"> LLM: Off-Table Inference</a>
     &nbsp;| &nbsp;
     <a href="https://colab.research.google.com/drive/1cMB336jN3kb-m_pr1aJjshnNep_6bhsf?usp=sharing" target="value"> Billion-Level-Data supported CTGAN</a>
 </p>
