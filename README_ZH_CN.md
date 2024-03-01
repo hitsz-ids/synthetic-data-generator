@@ -31,7 +31,7 @@
     &nbsp;| &nbsp;
     <a href="https://colab.research.google.com/drive/1_chuTVZECpj5fklj-RAp7ZVrew8weLW_?usp=sharing" target="value"> 借助LLM进行表外特征推断</a>
     &nbsp;| &nbsp;
-    <a href="https://colab.research.google.com/drive/1cMB336jN3kb-m_pr1aJjshnNep_6bhsf?usp=sharing" target="value">CTGAN模型</a>
+    <a href="https://colab.research.google.com/drive/1cMB336jN3kb-m_pr1aJjshnNep_6bhsf?usp=sharing" target="value">支持十亿级数据的CTGAN</a>
 </p>
 
 </p>
@@ -49,7 +49,7 @@
 
 🔥 2024年2月20日：基于LLM的单表数据合成模型已包含，查看colab示例：<a href="https://colab.research.google.com/drive/1VFnP59q3eoVtMJ1PvcYjmuXtx9N8C7o0?usp=sharing" target="value">LLM：数据合成</a> 和 <a href="https://colab.research.google.com/drive/1_chuTVZECpj5fklj-RAp7ZVrew8weLW_?usp=sharing" target="value">LLM：表外特征推断</a>。
 
-🔶 2023年12月20日：v0.1.0版本发布，包含支持数十亿数据处理能力的CTGAN模型，查看colab示例：<a href="https://colab.research.google.com/drive/1cMB336jN3kb-m_pr1aJjshnNep_6bhsf?usp=sharing" target="value">支持数十亿数据的CTGAN</a>。
+🔶 2023年12月20日：v0.1.0发布，包含支持数十亿数据处理能力的CTGAN模型，查看我们的<a href="https://github.com/hitsz-ids/synthetic-data-generator/tree/ main/benchmarks#results" target="value"> 针对 SDV 的基准</a>，SDG 实现了更少的内存消耗并避免了训练期间的崩溃（Out of Memory），具体使用请查看我们的colab示例：<a href="https://colab.research.google.com/drive/1cMB336jN3kb-m_pr1aJjshnNep_6bhsf?usp=sharing" target="value">支持十亿级数据的CTGAN</a>。
 
 🔆 2023年8月10日：第一行SDG代码提交。
 
