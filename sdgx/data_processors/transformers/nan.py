@@ -13,6 +13,8 @@ class NonValueTransformer(Transformer):
     This Transformer is mainly used as a reference for Transformer to facilitate developers to quickly understand the role of Transformer.
     '''
 
+    fill_na_value = 0 
+
     def fit(self, metadata: Metadata | None = None):
         '''
         Fit method for the transformer. 
@@ -29,7 +31,7 @@ class NonValueTransformer(Transformer):
         '''
         logger.info("Converting data using NonValueTransformer")
 
-        return raw_data.fillna()  
+        return raw_data.fillna(value= self.fill_na_value)  
     
     def reverse_convert(self, processed_data: DataFrame) -> DataFrame:
         '''
