@@ -21,7 +21,7 @@ class NonValueTransformer(Transformer):
         
         Does not require any action.
         '''
-        logger.info("Fitting NonValueTransformer")
+        logger.info("NonValueTransformer Fitted.")
 
         return 
 
@@ -29,9 +29,14 @@ class NonValueTransformer(Transformer):
         '''
         Convert method to handle missing values in the input data.
         '''
-        logger.info("Converting data using NonValueTransformer")
 
-        return raw_data.fillna(value= self.fill_na_value)  
+        logger.info("Converting data using NonValueTransformer...")
+
+        res = raw_data.fillna(value= self.fill_na_value)  
+        
+        logger.info("Converting data using NonValueTransformer... Finished.")
+
+        return res
     
     def reverse_convert(self, processed_data: DataFrame) -> DataFrame:
         '''
@@ -39,6 +44,8 @@ class NonValueTransformer(Transformer):
         
         Does not require any action.
         '''
+        logger.info("Data reverse-converted by NonValueTransformer (No Action).")
+
         return processed_data
 
     pass
