@@ -99,9 +99,9 @@ class Synthesizer:
             self.dataloader = None
 
         # Init data processors
-        if not data_processors:
-            data_processors = []
         self.data_processors_manager = DataProcessorManager()
+        if not data_processors:
+            data_processors = self.data_processors_manager.registed_default_processor_list
         self.data_processors = [
             (
                 d
