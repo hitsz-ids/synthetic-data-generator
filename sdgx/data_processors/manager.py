@@ -33,7 +33,7 @@ class DataProcessorManager(Manager):
     
     hookspecs_model = extension
 
-    preset_defalut_processors = [ p.lower() for p in ["NonValueTransformer"]]
+    preset_defalut_processors = [ p.lower() for p in ["NonValueTransformer",'IntValueFormatter']]
     
     @property
     def registed_data_processors(self):
