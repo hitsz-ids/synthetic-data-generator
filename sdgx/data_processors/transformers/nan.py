@@ -14,6 +14,8 @@ class NonValueTransformer(Transformer):
     '''
 
     fill_na_value = 0 
+    
+    drop_na = False
 
     def fit(self, metadata: Metadata | None = None):
         '''
@@ -32,7 +34,10 @@ class NonValueTransformer(Transformer):
 
         logger.info("Converting data using NonValueTransformer...")
 
-        res = raw_data.fillna(value= self.fill_na_value)  
+        if self.drop:
+            res = raw_data.dropna()
+        else:
+            res = raw_data.fillna(value= self.fill_na_value)  
         
         logger.info("Converting data using NonValueTransformer... Finished.")
 
