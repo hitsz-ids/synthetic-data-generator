@@ -1,10 +1,14 @@
 from __future__ import annotations
 
-from pandas import DataFrame  
+import pandas as pd 
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder
+
 from sdgx.data_models.metadata import Metadata  
 from sdgx.data_processors.transformers.base import Transformer 
 from sdgx.data_processors.extension import hookimpl
 from sdgx.utils import logger
+from sdgx.data_loader import DataLoader
+from sdgx.models.components.optimize.ndarray_loader import NDArrayLoader
 
 class DiscreteTransformer(Transformer):
     '''
@@ -13,38 +17,82 @@ class DiscreteTransformer(Transformer):
     By default, DiscreteTransformer will perform one-hot encoding of discrete columns, and issue a warning message when dimensionality explosion occurs.
     '''
 
-    discrete_columns = None
+    discrete_columns: list = None
     '''
     Record which columns are of discrete type.
     '''
 
-    def fit(self, metadata: Metadata | None = None):
+    encoders: dict = {}
+
+    onehot_encoder_handle_unknown='ignore'
+
+    def fit(self, metadata: Metadata, tabular_data: DataLoader | pd.DataFrame):
         '''
         Fit method for the transformer. 
         '''
 
+        logger.info("Fitting using DiscreteTransformer...")
+
         self.discrete_columns = metadata.get('discrete_columns')
+        
+        # no discrete columns 
+        if len(self.discrete_columns) == 0 :
+            logger.info("Fitting using DiscreteTransformer... Finished (No Columns).")
+            return 
 
-        logger.info("DiscreteTransformer Fitted.")
+        # then, there are >= 1 discrete colums
+        for each_col in self.discrete_columns:
+            # fit each column 
+            self._fit_column(tabular_data[[each_col]])
+
+        logger.info("Fitting using DiscreteTransformer... Finished.")
+        
         return 
+    
+    def _fit_column(self, column_name: str, column_data: pd.DataFrame):
+        '''
+        Fit every discrete columns in `_fit_column`.
 
-    def convert(self, raw_data: DataFrame) -> DataFrame:
+        Args:
+            - column_data (pd.DataFrame): A dataframe containing a column.
+            - column_name: str: column name.
+
+        '''
+
+        self.encoders[column_name] = OneHotEncoder(handle_unknown= self.onehot_encoder_handle_unknown)
+        # fit the column data
+        self.encoders[column_name].fit(column_data)
+        
+        logger.info(f"Discrete column {column_name} fitted.")
+        
+
+    def convert(self, raw_data: pd.DataFrame) -> pd.DataFrame:
         '''
         Convert method to handle discrete values in the input data.
         '''
 
         logger.info("Converting data using DiscreteTransformer...")
 
-        if self.drop:
-            res = raw_data.dropna()
-        else:
-            res = raw_data.fillna(value= self.fill_na_value)  
+        # TODO 
+        # transform every discrete column into 
         
         logger.info("Converting data using DiscreteTransformer... Finished.")
-
-        return res
+        
+        # return the result
+        return 
     
-    def reverse_convert(self, processed_data: DataFrame) -> DataFrame:
+    def _transform_column(self, column_name: str, column_data: pd.DataFrame | pd.Series):
+        '''
+        Transform every single discrete columns in `_transform_column`.
+
+        Args:
+            - column_data (pd.DataFrame): A dataframe containing a column.
+            - column_name: str: column name.
+
+        '''
+        pass
+    
+    def reverse_convert(self, processed_data: pd.DataFrame) -> pd.DataFrame:
         '''
         Reverse_convert method for the transformer. 
         
