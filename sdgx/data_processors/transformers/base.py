@@ -1,4 +1,8 @@
+import pandas as pd 
 from sdgx.data_processors.base import DataProcessor
+from sdgx.data_models.metadata import Metadata
+from sdgx.data_loader import DataLoader
+from sdgx.models.components.optimize.ndarray_loader import NDArrayLoader
 
 
 class Transformer(DataProcessor):
@@ -10,3 +14,13 @@ class Transformer(DataProcessor):
 
     To achieve that, Transformer can use :ref:`Formatter` and :ref:`Inspector` to help.
     """
+
+    def fit(self, metadata: Metadata | None = None, tabular_data: DataLoader | pd.DataFrame = None):
+        '''
+        Fit method for the transformer. 
+        
+        由于 ，Transformer 可能需要更多参数。
+        '''
+        
+
+        return  

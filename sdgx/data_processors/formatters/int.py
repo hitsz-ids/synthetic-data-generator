@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import pandas as pd 
+from typing import Any
+
 from sdgx.data_models.metadata import Metadata  
 from sdgx.data_processors.formatters.base import Formatter
 from sdgx.data_processors.extension import hookimpl
@@ -13,7 +15,7 @@ class IntValueFormatter(Formatter):
 
     int_columns = None
 
-    def fit(self, metadata: Metadata | None = None):
+    def fit(self, metadata: Metadata | None = None, **kwargs: dict[str, Any]):
         '''
         Fit method for the formatter. 
         
