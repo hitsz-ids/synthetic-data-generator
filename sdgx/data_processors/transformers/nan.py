@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from pandas import DataFrame  
+from typing import Any 
+
 from sdgx.data_models.metadata import Metadata  
 from sdgx.data_processors.transformers.base import Transformer 
 from sdgx.data_processors.extension import hookimpl
@@ -17,7 +19,7 @@ class NonValueTransformer(Transformer):
     
     drop_na = False
 
-    def fit(self, metadata: Metadata | None = None):
+    def fit(self, metadata: Metadata | None = None,  **kwargs: dict[str, Any]):
         '''
         Fit method for the transformer. 
         
