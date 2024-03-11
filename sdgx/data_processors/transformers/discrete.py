@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import pandas as pd 
-from sklearn.preprocessing import LabelEncoder, OneHotEncoder
+from sklearn.preprocessing import OneHotEncoder
 
 from sdgx.data_models.metadata import Metadata  
 from sdgx.data_processors.transformers.base import Transformer 
@@ -28,7 +28,7 @@ class DiscreteTransformer(Transformer):
 
     def fit(self, metadata: Metadata, tabular_data: DataLoader | pd.DataFrame):
         '''
-        Fit method for the transformer. 
+        Fit method for the DiscreteTransformer. 
         '''
 
         logger.info("Fitting using DiscreteTransformer...")
@@ -43,7 +43,7 @@ class DiscreteTransformer(Transformer):
         # then, there are >= 1 discrete colums
         for each_col in self.discrete_columns:
             # fit each column 
-            self._fit_column(tabular_data[[each_col]])
+            self._fit_column(each_col, tabular_data[[each_col]])
 
         logger.info("Fitting using DiscreteTransformer... Finished.")
         
@@ -56,7 +56,6 @@ class DiscreteTransformer(Transformer):
         Args:
             - column_data (pd.DataFrame): A dataframe containing a column.
             - column_name: str: column name.
-
         '''
 
         self.encoders[column_name] = OneHotEncoder(handle_unknown= self.onehot_encoder_handle_unknown)
@@ -75,6 +74,15 @@ class DiscreteTransformer(Transformer):
 
         # TODO 
         # transform every discrete column into 
+        if len(self.discrete_columns) == 0:
+            logger.info("Converting data using DiscreteTransformer... Finished (No column).")
+            return 
+        
+        for each_col in self.discrete_columns:
+            new_onehot_column_set = self.encoders[each_col].transform(raw_data[[each_col]])
+            # TODO 1- add new_onehot_column_set into the original dataframe
+            # TODO 2- delete the original column 
+            logger.info(f"Column {each_col} converted.")
         
         logger.info("Converting data using DiscreteTransformer... Finished.")
         
@@ -102,8 +110,5 @@ class DiscreteTransformer(Transformer):
         logger.info("Data reverse-converted by DiscreteTransformer.")
 
         return processed_data
-
-
-
 
     pass
