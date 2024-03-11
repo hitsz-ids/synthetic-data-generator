@@ -18,9 +18,17 @@ class Transformer(DataProcessor):
     def fit(self, metadata: Metadata | None = None, tabular_data: DataLoader | pd.DataFrame = None):
         '''
         Fit method for the transformer. 
-        
-        由于 ，Transformer 可能需要更多参数。
         '''
         
 
         return  
+
+    @staticmethod
+    def delete_column(tabular_data,  column_name):
+
+        pass
+
+    @staticmethod
+    def attach_columns(tabular_data, new_columns):
+
+        pass
