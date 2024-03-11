@@ -87,12 +87,14 @@ class ChinaMainlandAddressInspector(RegexInspector):
 
     _inspect_level = 30
 
+    address_min_length = 8 
+
+    address_max_length = 30 
+
     def domain_verification(self, each_sample):
         # CHN address should be between 8 - 30 characters
-        if len(each_sample) < 8:
-            return False
-        if len(each_sample) > 30:
-            return False
+        if len(each_sample) < self.address_min_length: return False
+        if len(each_sample) > self.address_max_length: return False
         # notice to distinguishing from the company name
         if each_sample.endswith("公司"):
             return False
