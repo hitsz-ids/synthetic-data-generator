@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-import pandas as pd 
+import pandas as pd
+
 from sdgx.data_processors.base import DataProcessor
 
 
@@ -30,17 +31,16 @@ class Formatter(DataProcessor):
             pd.DataFrame: Raw data
         """
         return self.post_processing(processed_data)
-    
-     
+
     def post_processing(self, processed_data: pd.DataFrame) -> pd.DataFrame:
-        '''
+        """
         For formatter, please rewrite this method.
-        
+
         Args:
             processed_data (pd.DataFrame): Processed data
 
         Returns:
             pd.DataFrame: Raw data
-        '''
+        """
 
         return processed_data

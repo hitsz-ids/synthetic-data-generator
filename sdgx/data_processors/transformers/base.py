@@ -1,7 +1,8 @@
-import pandas as pd 
-from sdgx.data_processors.base import DataProcessor
-from sdgx.data_models.metadata import Metadata
+import pandas as pd
+
 from sdgx.data_loader import DataLoader
+from sdgx.data_models.metadata import Metadata
+from sdgx.data_processors.base import DataProcessor
 from sdgx.models.components.optimize.ndarray_loader import NDArrayLoader
 
 
@@ -16,15 +17,14 @@ class Transformer(DataProcessor):
     """
 
     def fit(self, metadata: Metadata | None = None, tabular_data: DataLoader | pd.DataFrame = None):
-        '''
-        Fit method for the transformer. 
-        '''
-        
+        """
+        Fit method for the transformer.
+        """
 
-        return  
+        return
 
     @staticmethod
-    def delete_column(tabular_data,  column_name):
+    def delete_column(tabular_data, column_name):
 
         pass
 

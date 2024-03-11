@@ -1,19 +1,20 @@
-import pytest
 import datetime
 import random
 import string
-import pandas as pd
 
+import pandas as pd
+import pytest
 from faker import Faker
+
 fake = Faker(locale="zh_CN")
 
 from sdgx.data_models.inspectors.personal import (
-    EmailInspector,
+    ChinaMainlandAddressInspector,
     ChinaMainlandIDInspector,
     ChinaMainlandMobilePhoneInspector,
     ChinaMainlandPostCode,
     ChinaMainlandUnifiedSocialCreditCode,
-    ChinaMainlandAddressInspector
+    EmailInspector,
 )
 
 
@@ -193,6 +194,7 @@ def test_chn_uscc_inspector_generated_data(chn_personal_test_df: pd.DataFrame):
     assert inspector_USCC.inspect_level == 30
     assert inspector_USCC.pii is True
 
+
 # CHN address
 def test_chn_address_inspector_demo_data(raw_data):
     inspector_CHN_Address = ChinaMainlandAddressInspector()
@@ -212,6 +214,7 @@ def test_chn_address_inspector_generated_data(chn_personal_test_df: pd.DataFrame
     )
     assert inspector_CHN_Address.inspect_level == 30
     assert inspector_CHN_Address.pii is True
+
 
 if __name__ == "__main__":
     pytest.main(["-vv", "-s", __file__])

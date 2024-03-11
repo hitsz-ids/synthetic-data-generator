@@ -291,7 +291,9 @@ class Synthesizer:
         start_time = time.time()
         for d in self.data_processors:
             d.fit(metadata)
-        logger.info(f"Fitted {len(self.data_processors)} data processors in  {time.time() - start_time}s.")
+        logger.info(
+            f"Fitted {len(self.data_processors)} data processors in  {time.time() - start_time}s."
+        )
 
         def chunk_generator() -> Generator[pd.DataFrame, None, None]:
             for chunk in self.dataloader.iter():
