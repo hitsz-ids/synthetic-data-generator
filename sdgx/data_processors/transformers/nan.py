@@ -36,7 +36,7 @@ class NonValueTransformer(Transformer):
 
         logger.info("Converting data using NonValueTransformer...")
 
-        if self.drop:
+        if self.drop_na:
             res = raw_data.dropna()
         else:
             res = raw_data.fillna(value= self.fill_na_value)  
