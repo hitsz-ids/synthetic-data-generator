@@ -32,11 +32,11 @@ class Inspector:
     """
 
     ready: bool = False
-    '''
-    Indicates whether the inspector has completed its inference. 
-    
+    """
+    Indicates whether the inspector has completed its inference.
+
     When completed, ready == True.
-    '''
+    """
 
     @property
     def inspect_level(self):
@@ -45,8 +45,8 @@ class Inspector:
 
         We will preset different inspector levels for different inspectors, usually more specific inspectors will get higher levels, and general inspectors (like discrete) will have inspect_level.
 
-        The value of the variable inspect_level is limited to 1-100. In baseclass and bool, discrete and numeric types, the inspect_level is set to 10. For datetime and id types, the inspect_level is set to 20. 
-        
+        The value of the variable inspect_level is limited to 1-100. In baseclass and bool, discrete and numeric types, the inspect_level is set to 10. For datetime and id types, the inspect_level is set to 20.
+
         Current inspect_level value will make it easier for developers to insert a custom inspector from the middle.
         """
         return self._inspect_level

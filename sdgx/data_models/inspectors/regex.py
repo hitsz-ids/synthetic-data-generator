@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import re
 from typing import Any
+
 import pandas as pd
 
 from sdgx.data_models.inspectors.base import Inspector
 from sdgx.exceptions import InspectorInitError
+
 
 class RegexInspector(Inspector):
     """RegexInspector
@@ -25,9 +27,9 @@ class RegexInspector(Inspector):
     """
 
     _match_percentage: float = 0.8
-    '''
+    """
     Private variable used to store property match_percentage's value.
-    '''
+    """
 
     @property
     def match_percentage(self):
