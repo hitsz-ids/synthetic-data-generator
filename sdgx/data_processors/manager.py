@@ -1,5 +1,4 @@
 from __future__ import annotations
-
 from typing import Any
 
 from sdgx import data_processors
@@ -28,12 +27,25 @@ class DataProcessorManager(Manager):
 
     """
     register_type = DataProcessor
+    '''
+    Specifies the type of data processors to register.'''
     
     project_name = PROJECT_NAME
+    '''
+    Stores the project name from the extension module.
+    '''
     
     hookspecs_model = extension
+    '''
+    The hook specifications model from the extension module.
+    '''
 
-    preset_defalut_processors = [ p.lower() for p in ["NonValueTransformer",'IntValueFormatter']]
+    preset_defalut_processors = [ p.lower() for p in ["NonValueTransformer",'IntValueFormatter']] + ['ColumnOrderTransformer'.lower()]
+    '''
+    preset_defalut_processors list stores the lowercase names of the transformers loaded by default. When using the synthesizer, they will be loaded by default to facilitate user operations.
+
+    Keep ColumnOrderTransformer always at the last one.
+    '''
     
     @property
     def registed_data_processors(self):
