@@ -31,7 +31,7 @@ class IntValueFormatter(Formatter):
 
     def convert(self, raw_data: pd.DataFrame) -> pd.DataFrame:
         '''
-        Convert method to handle missing values in the input data.
+        No action for convert.
         '''
         
         logger.info("Converting data using IntValueFormatter... Finished  (No Action).")
@@ -41,8 +41,8 @@ class IntValueFormatter(Formatter):
     def post_processing(self, processed_data: pd.DataFrame) -> pd.DataFrame:
         '''
         post_processing method for the formatter. 
-        
-        Does not require any action.
+
+        Do format conversion for int columns.
         '''
 
         for col in self.int_columns:
