@@ -1,4 +1,4 @@
-DatetimeInspector
+Datetime
 ============================
 
 .. autoclass:: sdgx.data_models.inspectors.datetime.DatetimeInspector

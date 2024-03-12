@@ -1,7 +1,7 @@
-Bool
+China Mainland Post Code
 ============================
 
-.. autoclass:: sdgx.data_models.inspectors.bool.BoolInspector
+.. autoclass:: sdgx.data_models.inspectors.personal.ChinaMainlandPostCode
     :members:
     :undoc-members:
     :inherited-members:
