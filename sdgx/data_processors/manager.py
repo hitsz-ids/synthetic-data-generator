@@ -40,7 +40,7 @@ class DataProcessorManager(Manager):
     The hook specifications model from the extension module.
     '''
 
-    preset_defalut_processors = [ p.lower() for p in ["NonValueTransformer",'IntValueFormatter']] + ['ColumnOrderTransformer'.lower()]
+    preset_defalut_processors = [ p.lower() for p in ["NonValueTransformer",'IntValueFormatter', 'DatetimeFormatter']] + ['ColumnOrderTransformer'.lower()]
     '''
     preset_defalut_processors list stores the lowercase names of the transformers loaded by default. When using the synthesizer, they will be loaded by default to facilitate user operations.
 
