@@ -17,7 +17,13 @@ Built-in Inspector
     BoolInspector <bool>
     DatetimeInspector <datetime>
     IDInspector <i_id>
-
+    RegexInspector<regex>
+    EmailInspector<email>
+    ChinaMainlandIDInspector<ChinaMainlandID>
+    ChinaMainlandMobilePhoneInspector<ChinaMainlandMobilePhone>
+    ChinaMainlandPostCode<ChinaMainlandPostCode>
+    ChinaMainlandUnifiedSocialCreditCode<ChinaMainlandUnifiedSocialCreditCode>
+    ChinaMainlandAddressInspector<ChinaMainlandAddress>
 
 Custom Inspectors Relevant
 -----------------------------

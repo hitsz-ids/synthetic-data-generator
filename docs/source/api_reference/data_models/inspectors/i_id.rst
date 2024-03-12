@@ -1,4 +1,4 @@
-IDInspector
+ID
 ============================
 
 .. autoclass:: sdgx.data_models.inspectors.i_id.IDInspector

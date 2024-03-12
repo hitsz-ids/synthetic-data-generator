@@ -1,4 +1,4 @@
-DiscreteInspector
+Discrete
 ============================
 
 .. autoclass:: sdgx.data_models.inspectors.discrete.DiscreteInspector
