@@ -39,7 +39,7 @@ class Metadata(BaseModel):
     primary_keys is used to store single primary key or composite primary key
     """
 
-    column_list: Set[str] = set()
+    column_list: list[str] = []
     """"
     column_list is used to store all columns' name
     """
@@ -299,7 +299,7 @@ class Metadata(BaseModel):
         if primary_keys is None:
             primary_keys = set()
 
-        metadata = Metadata(primary_keys=primary_keys, column_list=set(dataloader.columns()))
+        metadata = Metadata(primary_keys=primary_keys, column_list=dataloader.columns())
         for inspector in inspectors:
             inspect_res = inspector.inspect()
             # update column type
@@ -352,7 +352,7 @@ class Metadata(BaseModel):
         for inspector in inspectors:
             inspector.fit(df)
 
-        metadata = Metadata(primary_keys=[df.columns[0]], column_list=set(df.columns))
+        metadata = Metadata(primary_keys=[df.columns[0]], column_list=df.columns)
         for inspector in inspectors:
             inspect_res = inspector.inspect()
             # update column type
@@ -474,7 +474,7 @@ class Metadata(BaseModel):
             raise MetadataInvalidError("Primary key should be Iterable or str.")
         primary_keys = set(primary_keys if isinstance(primary_keys, Iterable) else [primary_keys])
 
-        if not primary_keys.issubset(self.column_list):
+        if not primary_keys.issubset(set(self.column_list)):
             raise MetadataInvalidError("Primary key not exist in table columns.")
 
         self.primary_keys = primary_keys
