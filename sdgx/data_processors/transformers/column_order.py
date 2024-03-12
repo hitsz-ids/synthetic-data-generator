@@ -45,10 +45,31 @@ class ColumnOrderTransformer(Transformer):
         Reverse_convert method for the transformer. 
         '''
 
-
+        res = self.rearrange_columns(self.column_list, processed_data)
         logger.info("Data reverse-converted by ColumnOrderTransformer.")
 
-        return processed_data
+        return res
+    
+    @staticmethod
+    def rearrange_columns(column_list, processed_data):
+        """
+        This method rearranges the columns of a given DataFrame according to the provided column list.
+        
+        Any columns in the DataFrame that are not in the column list are dropped.
+
+        Args:
+            - column_list (list): A list of column names in the order they should appear in the output DataFrame.
+            - processed_data (pd.DataFrame): The DataFrame to be rearranged.
+
+        Returns:
+            - result_data (pd.DataFrame): The rearranged DataFrame.
+        """
+        # Use the `reindex` function to rearrange the columns according to `column_list`.
+        # The `columns` parameter specifies the order of the columns.
+        # The `drop` parameter is set to True to drop any columns not in `column_list`.
+        result_data = processed_data.reindex(columns=column_list)
+        
+        return result_data
 
     pass
 
