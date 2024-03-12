@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pandas as pd 
 from sdgx.data_processors.base import DataProcessor
 from sdgx.data_models.metadata import Metadata
