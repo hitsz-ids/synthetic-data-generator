@@ -1,7 +1,7 @@
-Bool
+Regex
 ============================
 
-.. autoclass:: sdgx.data_models.inspectors.bool.BoolInspector
+.. autoclass:: sdgx.data_models.inspectors.regex.RegexInspector
     :members:
     :undoc-members:
     :inherited-members:

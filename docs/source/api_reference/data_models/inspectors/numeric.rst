@@ -1,4 +1,4 @@
-NumericInspector
+Numeric
 ============================
 
 .. autoclass:: sdgx.data_models.inspectors.numeric.NumericInspector

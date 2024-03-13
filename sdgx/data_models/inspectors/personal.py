@@ -74,6 +74,35 @@ class ChinaMainlandUnifiedSocialCreditCode(RegexInspector):
         return True
 
 
+class ChinaMainlandAddressInspector(RegexInspector):
+
+    # This regular expression does not take effect and is only for reference by developers.
+    # pattern = r"^[\u4e00-\u9fa5]{2,}(省|自治区|特别行政区|市)|[\u4e00-\u9fa5]{2,}(市|区|县|自治州|自治县|县级市|地区|盟|林区)?|[\u4e00-\u9fa5]{0,}(街道|镇|乡)?|[\u4e00-\u9fa5]{0,}(路|街|巷|弄)?|[\u4e00-\u9fa5]{0,}(号|弄)?$"
+
+    pattern = r"^[\u4e00-\u9fa5]{2,}(省|自治区|特别行政区|市|县|村|弄|乡|路|街)"
+
+    pii = True
+
+    data_type_name = "china_mainland_address"
+
+    _inspect_level = 30
+
+    address_min_length = 8
+
+    address_max_length = 30
+
+    def domain_verification(self, each_sample):
+        # CHN address should be between 8 - 30 characters
+        if len(each_sample) < self.address_min_length:
+            return False
+        if len(each_sample) > self.address_max_length:
+            return False
+        # notice to distinguishing from the company name
+        if each_sample.endswith("公司"):
+            return False
+        return True
+
+
 @hookimpl
 def register(manager):
     manager.register("EmailInspector", EmailInspector)
@@ -85,3 +114,5 @@ def register(manager):
     manager.register("ChinaMainlandPostCode", ChinaMainlandPostCode)
 
     manager.register("ChinaMainlandUnifiedSocialCreditCode", ChinaMainlandUnifiedSocialCreditCode)
+
+    manager.register("ChinaMainlandAddressInspector", ChinaMainlandAddressInspector)

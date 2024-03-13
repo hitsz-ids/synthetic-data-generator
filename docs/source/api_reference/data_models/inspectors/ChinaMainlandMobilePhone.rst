@@ -1,7 +1,7 @@
-Bool
+China Mainland Mobile Phone
 ============================
 
-.. autoclass:: sdgx.data_models.inspectors.bool.BoolInspector
+.. autoclass:: sdgx.data_models.inspectors.personal.ChinaMainlandMobilePhoneInspector
     :members:
     :undoc-members:
     :inherited-members:
