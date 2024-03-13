@@ -27,6 +27,7 @@ dependencies = [
     "cloudpickle",
     "importlib_metadata",
     "openai>=1.10.0",
+    "python-dotenv",
 ]
 dynamic = ["version"]
 classifiers = [

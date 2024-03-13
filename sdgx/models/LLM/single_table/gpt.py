@@ -7,6 +7,9 @@ from copy import copy
 
 import openai
 import pandas as pd
+from dotenv import load_dotenv
+
+load_dotenv()
 
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.metadata import Metadata
