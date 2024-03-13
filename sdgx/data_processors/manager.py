@@ -61,10 +61,16 @@ class DataProcessorManager(Manager):
         '''
         registed_processor_list = self.registed_data_processors.keys()
         
-        # calculate intersection 
-        target_processors = list(set(registed_processor_list).intersection(self.preset_defalut_processors))
+        # we donot use the code next line to calculate processor intersection, to ensure the oder of processors not changed.
+        # target_processors = list(set(registed_processor_list).intersection(self.preset_defalut_processors))
+
+        # calculate the target_processors
+        default_processors = []
+        for each_processor in self.preset_defalut_processors:
+            if each_processor in registed_processor_list:
+                default_processors.append(each_processor)
         
-        return target_processors
+        return default_processors
 
     def load_all_local_model(self):
         '''

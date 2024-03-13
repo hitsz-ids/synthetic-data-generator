@@ -45,7 +45,7 @@ class DatetimeFormatter(Formatter):
         '''
         if len(self.datetime_columns) == 0:
             logger.info("Converting data using DatetimeFormatter... Finished (No datetime columns).")
-            return 
+            return raw_data
         
         logger.info("Converting data using DatetimeFormatter...")
 
@@ -87,7 +87,7 @@ class DatetimeFormatter(Formatter):
         '''
         if len(self.datetime_columns) == 0:
             logger.info("Data reverse-converted by DatetimeFormatter (No datetime columns).")
-            return
+            return processed_data
 
         result_data = self.convert_timestamp_to_datetime(self.datetime_columns, self.datetime_formats, processed_data, self.default_datetime_format)
 
