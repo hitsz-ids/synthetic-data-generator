@@ -289,9 +289,14 @@ class Synthesizer:
         self.metadata = metadata  # Ensure update metadata
 
         logger.info("Fitting data processors...")
+        if not self.dataloader:
+            logger.info('Fitting without dataloader.')
         start_time = time.time()
         for d in self.data_processors:
-            d.fit(metadata)
+            if self.dataloader:
+                d.fit(metadata = metadata, dataloader = self.dataloader)
+            else:
+                d.fit(metadata = metadata)
         logger.info(f"Fitted {len(self.data_processors)} data processors in  {time.time() - start_time}s.")
 
         def chunk_generator() -> Generator[pd.DataFrame, None, None]:
