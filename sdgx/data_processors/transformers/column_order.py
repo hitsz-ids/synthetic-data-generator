@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from pandas import DataFrame  
+import pandas as pd
+from typing import Any
+
 from sdgx.data_models.metadata import Metadata  
 from sdgx.data_processors.transformers.base import Transformer 
 from sdgx.data_processors.extension import hookimpl
@@ -18,7 +20,7 @@ class ColumnOrderTransformer(Transformer):
     The list of tabular data's columns.
     '''
 
-    def fit(self, metadata: Metadata | None = None):
+    def fit(self, metadata: Metadata | None = None, **kwargs: dict[str, Any]):
         '''
         Fit method for the transformer. 
         
@@ -31,7 +33,7 @@ class ColumnOrderTransformer(Transformer):
 
         return 
 
-    def convert(self, raw_data: DataFrame) -> DataFrame:
+    def convert(self, raw_data: pd.DataFrame) -> pd.DataFrame:
         '''
         Convert method to handle missing values in the input data.
         '''
@@ -40,7 +42,7 @@ class ColumnOrderTransformer(Transformer):
 
         return raw_data
     
-    def reverse_convert(self, processed_data: DataFrame) -> DataFrame:
+    def reverse_convert(self, processed_data: pd.DataFrame) -> pd.DataFrame:
         '''
         Reverse_convert method for the transformer. 
         '''

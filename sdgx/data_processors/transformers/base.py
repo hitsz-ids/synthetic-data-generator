@@ -24,13 +24,3 @@ class Transformer(DataProcessor):
         
 
         return  
-
-    @staticmethod
-    def delete_column(tabular_data,  column_name):
-
-        pass
-
-    @staticmethod
-    def attach_columns(tabular_data, new_columns):
-
-        pass
