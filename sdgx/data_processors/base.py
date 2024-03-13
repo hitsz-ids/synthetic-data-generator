@@ -41,3 +41,49 @@ class DataProcessor:
             pd.DataFrame: Raw data
         """
         return processed_data
+
+    @staticmethod
+    def remove_columns(tabular_data: pd.DataFrame, column_name_to_remove: list) -> pd.DataFrame:
+        """
+        Remove specified columns from the input tabular data.
+        
+        Args:
+            - tabular_data (pd.DataFrame): Processed tabular data
+            - column_name_to_remove (list): List of column names to be removed
+        
+        Returns:
+            - result_data (pd.DataFrame): Tabular data with specified columns removed
+        """
+        
+        # Make a copy of the input data to avoid modifying the original data
+        result_data = tabular_data.copy()
+        
+        # Remove specified columns
+        result_data = result_data.drop(columns=column_name_to_remove)
+        
+        return result_data
+
+    @staticmethod
+    def attach_columns(tabular_data: pd.DataFrame, new_columns: pd.DataFrame) -> pd.DataFrame:
+        """
+        Attach additional columns to an existing DataFrame.
+
+        Args:
+            - tabular_data (pd.DataFrame): The original DataFrame.
+            - new_columns (pd.DataFrame): The DataFrame containing additional columns to be attached.
+
+        Returns:
+            - result_data (pd.DataFrame): The DataFrame with new_columns attached.
+
+        Raises:
+            - ValueError: If the number of rows in tabular_data and new_columns are not the same.
+        """
+
+        # Check if the number of rows in tabular_data and new_columns are the same
+        if tabular_data.shape[0] != new_columns.shape[0]:
+            raise ValueError("Number of rows in tabular_data and new_columns must be the same.")
+
+        # Concatenate tabular_data and new_columns along axis 1 (columns)
+        result_data = pd.concat([tabular_data, new_columns], axis=1)
+
+        return result_data
