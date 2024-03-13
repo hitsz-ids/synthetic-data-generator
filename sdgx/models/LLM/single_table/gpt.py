@@ -3,9 +3,10 @@ from __future__ import annotations
 import os
 import random
 import re
+from copy import copy
+
 import openai
 import pandas as pd
-from copy import copy
 from dotenv import load_dotenv
 
 load_dotenv()
