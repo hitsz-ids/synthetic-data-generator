@@ -31,6 +31,8 @@ class ColumnOrderTransformer(Transformer):
 
         logger.info("ColumnOrderTransformer Fitted.")
 
+        self.fitted = True
+
         return 
 
     def convert(self, raw_data: pd.DataFrame) -> pd.DataFrame:
