@@ -26,7 +26,7 @@ Built-in Inspector
     ChinaMainlandPostCode<ChinaMainlandPostCode>
     ChinaMainlandUnifiedSocialCreditCode<ChinaMainlandUnifiedSocialCreditCode>
     ChinaMainlandAddressInspector<ChinaMainlandAddress>
-    
+
 
 Custom Inspectors Relevant
 -----------------------------
