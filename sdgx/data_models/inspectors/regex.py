@@ -121,12 +121,17 @@ class RegexInspector(Inspector):
              column_data (pd.Series): the column data.
         """
         length = len(column_data)
+        unmatch_cnt = 0
         match_cnt = 0
         for i in column_data:
             m = re.match(self.p, str(i))
             d = self.domain_verification(str(i))
             if m and d:
                 match_cnt += 1
+            else:
+                unmatch_cnt += 1
+            if unmatch_cnt > length * (1 - self.match_percentage):
+                break
         return match_cnt / length
 
     def inspect(self, *args, **kwargs) -> dict[str, Any]:
