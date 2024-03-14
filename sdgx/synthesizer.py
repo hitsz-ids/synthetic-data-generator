@@ -342,9 +342,12 @@ class Synthesizer:
         logger.info("Sampling...")
         metadata = metadata or self.metadata
         self.metadata = metadata  # Ensure update metadata
-        if metadata:
-            for d in self.data_processors:
-                d.fit(metadata)
+
+        # data_processors do not need to be fit again in the sampling stage
+        # if metadata:
+        #     for d in self.data_processors:
+        #         d.fit(metadata)
+        
         if not model_sample_args:
             model_sample_args = {}
 
