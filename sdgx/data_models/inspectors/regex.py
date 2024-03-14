@@ -130,8 +130,8 @@ class RegexInspector(Inspector):
                 match_cnt += 1
             else:
                 unmatch_cnt += 1
-            if unmatch_cnt > length * (1 - self.match_percentage):
-                break
+                if unmatch_cnt > length * (1 - self.match_percentage) + 1:
+                    break
         return match_cnt / length
 
     def inspect(self, *args, **kwargs) -> dict[str, Any]:
