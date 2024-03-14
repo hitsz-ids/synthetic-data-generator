@@ -7,7 +7,7 @@ import pytest
 from faker import Faker
 
 fake = Faker(locale="zh_CN")
-fake_en = Faker(['en_US'])
+fake_en = Faker(["en_US"])
 
 from sdgx.data_models.inspectors.personal import (
     ChinaMainlandAddressInspector,
@@ -15,7 +15,9 @@ from sdgx.data_models.inspectors.personal import (
     ChinaMainlandMobilePhoneInspector,
     ChinaMainlandPostCode,
     ChinaMainlandUnifiedSocialCreditCode,
-    EmailInspector,ChineseNameInspector,EnglishNameInspector
+    ChineseNameInspector,
+    EmailInspector,
+    EnglishNameInspector,
 )
 
 
@@ -115,6 +117,7 @@ def test_email_inspector_generated_data(chn_personal_test_df: pd.DataFrame):
     assert sorted(inspector_Email.inspect()["email_columns"]) == sorted(["email"])
     assert inspector_Email.inspect_level == 30
     assert inspector_Email.pii is True
+
 
 # Phone No
 def test_chn_phone_inspector_demo_data(raw_data):
@@ -218,6 +221,7 @@ def test_chn_address_inspector_generated_data(chn_personal_test_df: pd.DataFrame
     assert inspector_CHN_Address.inspect_level == 30
     assert inspector_CHN_Address.pii is True
 
+
 # CHN name
 def test_chn_name_inspector_demo_data(raw_data):
     inspector_CHN_name = ChineseNameInspector()
@@ -227,15 +231,15 @@ def test_chn_name_inspector_demo_data(raw_data):
     assert inspector_CHN_name.inspect_level == 40
     assert inspector_CHN_name.pii is True
 
+
 def test_chn_name_inspector_generated_data(chn_personal_test_df: pd.DataFrame):
     inspector_CHN_name = ChineseNameInspector()
     inspector_CHN_name.fit(chn_personal_test_df)
     assert inspector_CHN_name.regex_columns
-    assert sorted(inspector_CHN_name.inspect()["chinese_name_columns"]) == sorted(
-        ["chn_name"]
-    )
+    assert sorted(inspector_CHN_name.inspect()["chinese_name_columns"]) == sorted(["chn_name"])
     assert inspector_CHN_name.inspect_level == 40
     assert inspector_CHN_name.pii is True
+
 
 # English name
 def test_eng_name_inspector_demo_data(raw_data):
@@ -246,15 +250,15 @@ def test_eng_name_inspector_demo_data(raw_data):
     assert inspector_ENG_name.inspect_level == 40
     assert inspector_ENG_name.pii is True
 
+
 def test_eng_name_inspector_generated_data(chn_personal_test_df: pd.DataFrame):
     inspector_ENG_name = EnglishNameInspector()
     inspector_ENG_name.fit(chn_personal_test_df)
     assert inspector_ENG_name.regex_columns
-    assert sorted(inspector_ENG_name.inspect()["english_name_columns"]) == sorted(
-        ["eng_name"]
-    )
+    assert sorted(inspector_ENG_name.inspect()["english_name_columns"]) == sorted(["eng_name"])
     assert inspector_ENG_name.inspect_level == 40
     assert inspector_ENG_name.pii is True
+
 
 if __name__ == "__main__":
     pytest.main(["-vv", "-s", __file__])
