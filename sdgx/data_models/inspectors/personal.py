@@ -112,6 +112,46 @@ class ChineseNameInspector(RegexInspector):
 
     pii = True
 
+# English Name
+class EnglishNameInspector(RegexInspector):
+    pattern = r"^([a-zA-Z]{2,}\s[a-zA-Z]{1,}'?-?[a-zA-Z]{2,}\s?([a-zA-Z]{1,})?)"
+
+    data_type_name = "english_name"
+
+    _inspect_level = 40
+
+    pii = True
+
+    name_min_length = 5 
+    '''
+    The min length of the name. 
+
+    GPT-4: The shortest full name in English could be something like "Ed Li" or "Al Lu", with just four characters including a space.
+    '''
+
+    name_max_length = 70 
+    '''
+    The max length of the name. 
+
+    UK Government Data Standards Catalogue suggests 35 characters for each of Given Name and Family Name, or 70 characters for a single field to hold the Full Name.
+    '''
+
+    def domain_verification(self, each_sample):
+        def has_number(s):
+            for char in s:
+                if char.isdigit():
+                    return True
+            return False
+        # English name should be between 5 - 70 characters
+        if len(each_sample) > self.name_max_length:
+            return False
+        if len(each_sample) < self.name_min_length:
+            return False
+        # usually a name should not contains number 
+        if has_number(each_sample):
+            return False
+        return True
+
 @hookimpl
 def register(manager):
     manager.register("EmailInspector", EmailInspector)
