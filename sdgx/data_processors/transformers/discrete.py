@@ -46,6 +46,7 @@ class DiscreteTransformer(Transformer):
             self._fit_column(each_col, tabular_data[[each_col]])
 
         logger.info("Fitting using DiscreteTransformer... Finished.")
+        self.fitted = True
         
         return 
     

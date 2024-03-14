@@ -26,6 +26,8 @@ class NonValueTransformer(Transformer):
         Does not require any action.
         '''
         logger.info("NonValueTransformer Fitted.")
+        
+        self.fitted = True
 
         return 
 

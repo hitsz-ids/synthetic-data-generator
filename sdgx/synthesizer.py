@@ -347,6 +347,10 @@ class Synthesizer:
         # if metadata:
         #     for d in self.data_processors:
         #         d.fit(metadata)
+
+        # check data processor fit status before sampling 
+        for d in self.data_processors:
+            d.check_fitted()
         
         if not model_sample_args:
             model_sample_args = {}

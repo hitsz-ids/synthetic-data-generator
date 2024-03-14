@@ -3,12 +3,20 @@ from __future__ import annotations
 import pandas as pd
 
 from sdgx.data_models.metadata import Metadata
+from sdgx.exceptions import SynthesizerProcessorError
 
 
 class DataProcessor:
     """
     Base class for data processors.
     """
+
+    fitted = False
+
+    def check_fitted(self):
+        if not self.fitted:
+            raise SynthesizerProcessorError("Processor NOT fitted.")
+
 
     def fit(self, metadata: Metadata | None = None):
         """Fit the data processor.

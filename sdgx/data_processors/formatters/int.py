@@ -26,6 +26,7 @@ class IntValueFormatter(Formatter):
         self.int_columns = metadata.get("int_columns")
         
         logger.info("IntValueFormatter Fitted.")
+        self.fitted = True
 
         return 
 

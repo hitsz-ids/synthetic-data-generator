@@ -57,6 +57,7 @@ class DatetimeFormatter(Formatter):
         self.dead_columns = dead_columns
         
         logger.info("DatetimeFormatter Fitted.")
+        self.fitted = True
         return 
 
     def convert(self, raw_data: pd.DataFrame) -> pd.DataFrame:
