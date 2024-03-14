@@ -165,3 +165,7 @@ def register(manager):
     manager.register("ChinaMainlandUnifiedSocialCreditCode", ChinaMainlandUnifiedSocialCreditCode)
 
     manager.register("ChinaMainlandAddressInspector", ChinaMainlandAddressInspector)
+
+    manager.register("ChineseNameInspector", ChineseNameInspector)
+
+    manager.register("EnglishNameInspector", EnglishNameInspector)
