@@ -205,11 +205,17 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
         self._ndarry_loader = None
 
     def fit(self, metadata: Metadata, dataloader: DataLoader, epochs=None, *args, **kwargs):
-        discrete_columns = list(metadata.get("discrete_columns"))
+        # from version 0.2.1, sdgx use `sdgx.data_processor.transformers.discrete` to handle discrete_columns
+        # the original sdv transformer will be removed in version 0.3.0 
+        # disable ctgan's sdv transformer in version 0.2.1
+        discrete_columns = list(metadata.get("discrete_columns")) # this line is commented
+        # discrete_columns = []
         if epochs is not None:
             self._epochs = epochs
         self._pre_fit(dataloader, discrete_columns)
+        logger.info("CTGAN prefit finished, start CTGAN training.")
         self._fit(len(self._ndarry_loader))
+        logger.info("CTGAN training finished.")
 
     def _pre_fit(self, dataloader: DataLoader, discrete_columns: list[str] = None) -> NDArrayLoader:
         if not discrete_columns:
@@ -223,16 +229,18 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
         logger.info("Transforming data...")
         self._ndarry_loader = self._transformer.transform(dataloader)
 
+        logger.info("Sampling data.")
         self._data_sampler = DataSampler(
             self._ndarry_loader, self._transformer.output_info_list, self._log_frequency
         )
 
+        logger.info('Initialize Generator.')
         # Initialize Generator
-        data_dim = self._transformer.output_dimensions
+        self.data_dim = self._transformer.output_dimensions
         self._generator = Generator(
             self._embedding_dim + self._data_sampler.dim_cond_vec(),
             self._generator_dim,
-            data_dim,
+            self.data_dim,
         ).to(self._device)
 
     @random_state
@@ -243,10 +251,11 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
             dataloader: :ref:`DataLoader` for the training data processed by :ref:`DataProcessor`.
 
         """
+        logger.info(f'Fit using data_size:{data_size}, data_dim: {self.data_dim}.')
         epochs = self._epochs
-        data_dim = self._transformer.output_dimensions
+        # data_dim = self._transformer.output_dimensions
         discriminator = Discriminator(
-            data_dim + self._data_sampler.dim_cond_vec(),
+            self.data_dim + self._data_sampler.dim_cond_vec(),
             self._discriminator_dim,
             pac=self.pac,
         ).to(self._device)
@@ -268,7 +277,7 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
         mean = torch.zeros(self._batch_size, self._embedding_dim, device=self._device)
         std = mean + 1
 
-        logger.info("Starting training, epochs: {}".format(epochs))
+        logger.info("Starting model training, epochs: {}".format(epochs))
         steps_per_epoch = max(data_size // self._batch_size, 1)
         for i in range(epochs):
             start_time = time.time()
@@ -348,10 +357,10 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
                 loss_g.backward()
                 optimizerG.step()
 
-            logger.debug(
+            logger.info(
                 f"Epoch {i+1}, Loss G: {loss_g.detach().cpu(): .4f},"  # noqa: T001
-                f"Loss D: {loss_d.detach().cpu(): .4f},"
-                f"Time: {time.time() - start_time: .4f}",
+                f" Loss D: {loss_d.detach().cpu(): .4f},"
+                f" Time: {time.time() - start_time: .4f}",
             )
 
     def sample(self, count: int, *args, **kwargs) -> pd.DataFrame:
