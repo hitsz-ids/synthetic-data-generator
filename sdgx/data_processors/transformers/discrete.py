@@ -22,7 +22,11 @@ class DiscreteTransformer(Transformer):
     Record which columns are of discrete type.
     '''
 
-    encoders: dict = {}
+    one_hot_warning_cnt = 512
+
+    one_hot_encoders: dict = {}
+
+    one_hot_column_names: dict = {}
 
     onehot_encoder_handle_unknown='ignore'
 
@@ -34,6 +38,14 @@ class DiscreteTransformer(Transformer):
         logger.info("Fitting using DiscreteTransformer...")
 
         self.discrete_columns = metadata.get('discrete_columns')
+
+        # remove datetime columns from discrete columns 
+        # because datetime columns are converted into timestamps 
+        datetime_columns = metadata.get('datetime_columns')
+        for each_datgetime_col in datetime_columns:
+            if each_datgetime_col in self.discrete_columns:
+                self.discrete_columns.remove(each_datgetime_col)
+                logger.info(f"Datetime column {each_datgetime_col} removed from discrete column.")
         
         # no discrete columns 
         if len(self.discrete_columns) == 0 :
@@ -59,11 +71,11 @@ class DiscreteTransformer(Transformer):
             - column_name: str: column name.
         '''
 
-        self.encoders[column_name] = OneHotEncoder(handle_unknown= self.onehot_encoder_handle_unknown)
+        self.one_hot_encoders[column_name] = OneHotEncoder(handle_unknown= self.onehot_encoder_handle_unknown, sparse_output=False)
         # fit the column data
-        self.encoders[column_name].fit(column_data)
+        self.one_hot_encoders[column_name].fit(column_data)
         
-        logger.info(f"Discrete column {column_name} fitted.")
+        logger.debug(f"Discrete column {column_name} fitted.")
         
 
     def convert(self, raw_data: pd.DataFrame) -> pd.DataFrame:
@@ -73,43 +85,66 @@ class DiscreteTransformer(Transformer):
 
         logger.info("Converting data using DiscreteTransformer...")
 
-        # TODO 
-        # transform every discrete column into 
+        processed_data = raw_data.copy()
+
+        # transform every discrete column into one-hot encoded columns 
         if len(self.discrete_columns) == 0:
             logger.info("Converting data using DiscreteTransformer... Finished (No column).")
             return 
         
         for each_col in self.discrete_columns:
-            new_onehot_column_set = self.encoders[each_col].transform(raw_data[[each_col]])
-            # TODO 1- add new_onehot_column_set into the original dataframe
-            # TODO 2- delete the original column 
-            logger.info(f"Column {each_col} converted.")
+            # 1- transform each column
+            new_onehot_columns = self.one_hot_encoders[each_col].transform(raw_data[[each_col]]) 
+            new_onehot_column_names = self.one_hot_encoders[each_col].get_feature_names_out()
+            self.one_hot_column_names[each_col] = new_onehot_column_names
+
+            # logger warning if too many columns 
+            if len(new_onehot_column_names) > self.one_hot_warning_cnt:
+                logger.warning(f"Column {each_col} has too many discrete values ({len(new_onehot_column_names)} values), may consider as a continous column?")
+            
+            # 2- add new_onehot_column_set into the original dataframe, record the column name ?             
+            processed_data = self.attach_columns(processed_data, pd.DataFrame(new_onehot_columns, columns = new_onehot_column_names))
+
+            logger.debug(f"Column {each_col} converted.")
         
+        logger.info(f"Processed data shape: {processed_data.shape}.")
+
         logger.info("Converting data using DiscreteTransformer... Finished.")
         
-        # return the result
-        return 
-    
-    def _transform_column(self, column_name: str, column_data: pd.DataFrame | pd.Series):
-        '''
-        Transform every single discrete columns in `_transform_column`.
-
-        Args:
-            - column_data (pd.DataFrame): A dataframe containing a column.
-            - column_name: str: column name.
-
-        '''
-        pass
+        processed_data = self.remove_columns(processed_data, self.discrete_columns)
+        
+        return processed_data
     
     def reverse_convert(self, processed_data: pd.DataFrame) -> pd.DataFrame:
         '''
         Reverse_convert method for the transformer. 
         
+        Args:
+            - processed_data (pd.DataFrame): A dataframe containing onehot encoded columns.
         
+        Returns:
+            - pd.DataFrame: inverse transformed processed data.
         '''
 
-        logger.info("Data reverse-converted by DiscreteTransformer.")
+        reversed_data = processed_data.copy()
 
-        return processed_data
+        # for each discrete col 
+        for each_col in self.discrete_columns:
+            # 1- get one-hot column sets from processed data 
+            one_hot_column_set = processed_data[self.one_hot_column_names[each_col]]
+            # 2- inverse convert using ohe 
+            res_column_data = self.one_hot_encoders[each_col].inverse_transform(pd.DataFrame(one_hot_column_set, columns = self.one_hot_column_names[each_col]))
+            # 3- put original column back to reversed_data
+            reversed_data = self.attach_columns(reversed_data, pd.DataFrame(res_column_data, columns = [each_col]))
+            reversed_data = self.remove_columns(reversed_data, self.one_hot_column_names[each_col])
+
+        logger.info("Data inverse-converted by DiscreteTransformer.")
+
+        return reversed_data
 
     pass
+
+@hookimpl
+def register(manager):
+    manager.register("DiscreteTransformer", DiscreteTransformer)
+
