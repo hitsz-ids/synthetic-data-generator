@@ -294,7 +294,7 @@ class Synthesizer:
         start_time = time.time()
         for d in self.data_processors:
             if self.dataloader:
-                d.fit(metadata = metadata, dataloader = self.dataloader)
+                d.fit(metadata = metadata, tabular_data = self.dataloader)
             else:
                 d.fit(metadata = metadata)
         logger.info(f"Fitted {len(self.data_processors)} data processors in  {time.time() - start_time}s.")
@@ -314,8 +314,9 @@ class Synthesizer:
         )
         logger.info(f"Initialized processed data loader in {time.time() - start_time}s")
         try:
-            logger.info("Starting model fit...")
+            logger.info("Model fit Started...")
             self.model.fit(metadata, processed_dataloader, **(model_fit_kwargs or {}))
+            logger.info("Model fit... Finished")
         finally:
             processed_dataloader.finalize(clear_cache=True)
 
