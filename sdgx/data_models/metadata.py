@@ -1,14 +1,16 @@
 from __future__ import annotations
 
 import json
+import warnings
 from collections import defaultdict
 from collections.abc import Iterable
+from copy import deepcopy
 from itertools import chain
 from pathlib import Path
-from typing import Any, Dict, Set
+from typing import Any, Dict, Set, List
 
 import pandas as pd
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.inspectors.base import RelationshipInspector
@@ -33,6 +35,24 @@ class Metadata(BaseModel):
 
         column_list(list[str]): list of the comlumn name in the table, other columns lists are used to store column information.
     """
+    _SDTYPE_KWARGS = {
+        'numerical': frozenset(['computer_representation']),
+        'datetime': frozenset(['datetime_format']),
+        'categorical': frozenset(['order', 'order_by']),
+        'boolean': frozenset([]),
+        'id': frozenset(['regex_format']),
+        'unknown': frozenset(['pii']),
+    }
+
+    _KEYS = frozenset([
+        'columns',
+        'primary_key',
+        'alternate_keys',
+        'sequence_key',
+        'sequence_index',
+        'column_relationships',
+        'METADATA_SPEC_VERSION'
+    ])
 
     primary_keys: Set[str] = set()
     """
@@ -70,7 +90,159 @@ class Metadata(BaseModel):
     """
     For extend information, use ``get`` and ``set``
     """
+    columns: Dict = defaultdict(str)
+    primary_key: str = None
+    alternate_keys: List[str] = Field(default_factory=list, optional=True)
 
+    def __init__(self, **data: Any):
+        super().__init__(**data)
+        self.columns = {}
+        self.primary_key = None
+        self.alternate_keys = []
+
+    # ----------------------------------------------------------------------
+    def add_column(self, column_name, **kwargs):
+        """Add a column to the ``SingleTableMetadata``.
+
+        Args:
+            column_name (str):
+                The column name to be added.
+            kwargs (type):
+                Any additional key word arguments for the column, where ``sdtype`` is required.
+
+        Raises:
+            - ``InvalidMetadataError`` if the column already exists.
+            - ``InvalidMetadataError`` if the ``kwargs`` do not contain ``sdtype``.
+            - ``InvalidMetadataError`` if the column has unexpected values or ``kwargs`` for the
+              given ``sdtype``.
+            - ``InvalidMetadataError`` if the ``pii`` value is not ``True`` or ``False`` when
+               present.
+        """
+        if column_name in self.columns:
+            raise Exception(
+                f"Column name '{column_name}' already exists. Use 'update_column' "
+                'to update an existing column.'
+            )
+
+        sdtype = kwargs.get('sdtype')
+        if sdtype is None:
+            raise Exception(f"Please provide a 'sdtype' for column '{column_name}'.")
+
+        column_kwargs = deepcopy(kwargs)
+        if sdtype not in self._SDTYPE_KWARGS:
+            pii = column_kwargs.get('pii', True)
+            column_kwargs['pii'] = pii
+
+        self.columns[column_name] = column_kwargs
+
+    def update_column(self, column_name, **kwargs):
+        """Update an existing column in the ``SingleTableMetadata``.
+
+        Args:
+            column_name (str):
+                The column name to be updated.
+            **kwargs (type):
+                Any key word arguments that describe metadata for the column.
+
+        Raises:
+            - ``InvalidMetadataError`` if the column doesn't already exist in the
+              ``SingleTableMetadata``.
+            - ``InvalidMetadataError`` if the column has unexpected values or ``kwargs`` for the
+              current
+              ``sdtype``.
+            - ``InvalidMetadataError`` if the ``pii`` value is not ``True`` or ``False`` when
+               present.
+        """
+        _kwargs = deepcopy(kwargs)
+        if 'sdtype' in kwargs:
+            sdtype = kwargs.pop('sdtype')
+        else:
+            sdtype = self.columns[column_name]['sdtype']
+            _kwargs['sdtype'] = sdtype
+
+        self.columns[column_name] = _kwargs
+
+    def set_primary_key(self, column_name):
+        """Set the metadata primary key.
+
+        Args:
+            column_name (str):
+                Name of the primary key column(s).
+        """
+        if column_name in self.alternate_keys:
+            warnings.warn(
+                f"'{column_name}' is currently set as an alternate key and will be removed from "
+                'that list.'
+            )
+            self.alternate_keys.remove(column_name)
+
+        if self.primary_key is not None:
+            warnings.warn(
+                f"There is an existing primary key '{self.primary_key}'."
+                ' This key will be removed.'
+            )
+
+        self.primary_key = column_name
+
+    def remove_primary_key(self):
+        """Remove the metadata primary key."""
+        if self.primary_key is None:
+            warnings.warn('No primary key exists to remove.')
+
+        self.primary_key = None
+
+    def add_column_relationship(self, relationship_type, column_names):
+        """Add a column relationship to the metadata.
+
+        Args:
+            relationship_type (str):
+                Type of column relationship.
+            column_names (list[str]):
+                List of column names in the relationship.
+        """
+        relationship = {'type': relationship_type, 'column_names': column_names}
+        to_check = [relationship] + self.column_relationships
+        self.column_relationships.append(relationship)
+
+    def _get_primary_and_alternate_keys(self):
+        """Get set of primary and alternate keys.
+
+        Returns:
+            set:
+                Set of keys.
+        """
+        keys = set(self.alternate_keys)
+        if self.primary_key:
+            keys.update({self.primary_key})
+
+        return keys
+
+    @staticmethod
+    def _get_invalid_column_values(column, validation_function):
+        valid = column.apply(validation_function).astype(bool)
+
+        return set(column[~valid])
+
+    @classmethod
+    def load_from_dict(cls, metadata_dict):
+        """Create a ``SingleTableMetadata`` instance from a python ``dict``.
+
+        Args:
+            metadata_dict (dict):
+                Python dictionary representing a ``SingleTableMetadata`` object.
+
+        Returns:
+            Instance of ``SingleTableMetadata``.
+        """
+        instance = cls()
+        for key in instance._KEYS:
+            value = deepcopy(metadata_dict.get(key))
+            if value:
+                setattr(instance, f'{key}', value)
+
+        return instance
+
+    # ----------------------------------------------------------------------
     @property
     def tag_fields(self) -> Iterable[str]:
         """
@@ -97,16 +269,16 @@ class Metadata(BaseModel):
         if not isinstance(other, Metadata):
             return super().__eq__(other)
         return (
-            set(self.tag_fields) == set(other.tag_fields)
-            and all(
-                self.get(key) == other.get(key)
-                for key in set(chain(self.tag_fields, other.tag_fields))
-            )
-            and all(
-                self.get(key) == other.get(key)
-                for key in set(chain(self.format_fields, other.format_fields))
-            )
-            and self.version == other.version
+                set(self.tag_fields) == set(other.tag_fields)
+                and all(
+            self.get(key) == other.get(key)
+            for key in set(chain(self.tag_fields, other.tag_fields))
+        )
+                and all(
+            self.get(key) == other.get(key)
+            for key in set(chain(self.format_fields, other.format_fields))
+        )
+                and self.version == other.version
         )
 
     def query(self, field: str) -> Iterable[str]:
@@ -166,9 +338,9 @@ class Metadata(BaseModel):
 
         old_value = self.get(key)
         if (
-            key in self.model_fields
-            and key not in self.tag_fields
-            and key not in self.format_fields
+                key in self.model_fields
+                and key not in self.tag_fields
+                and key not in self.format_fields
         ):
             raise MetadataInitError(
                 f"Set {key} not in tag_fields, try set it directly as m.{key} = value"
@@ -258,14 +430,14 @@ class Metadata(BaseModel):
 
     @classmethod
     def from_dataloader(
-        cls,
-        dataloader: DataLoader,
-        max_chunk: int = 10,
-        primary_keys: set[str] = None,
-        include_inspectors: Iterable[str] | None = None,
-        exclude_inspectors: Iterable[str] | None = None,
-        inspector_init_kwargs: dict[str, Any] | None = None,
-        check: bool = False,
+            cls,
+            dataloader: DataLoader,
+            max_chunk: int = 10,
+            primary_keys: set[str] = None,
+            include_inspectors: Iterable[str] | None = None,
+            exclude_inspectors: Iterable[str] | None = None,
+            inspector_init_kwargs: dict[str, Any] | None = None,
+            check: bool = False,
     ) -> "Metadata":
         """Initialize a metadata from DataLoader and Inspectors
 
@@ -322,12 +494,12 @@ class Metadata(BaseModel):
 
     @classmethod
     def from_dataframe(
-        cls,
-        df: pd.DataFrame,
-        include_inspectors: list[str] | None = None,
-        exclude_inspectors: list[str] | None = None,
-        inspector_init_kwargs: dict[str, Any] | None = None,
-        check: bool = False,
+            cls,
+            df: pd.DataFrame,
+            include_inspectors: list[str] | None = None,
+            exclude_inspectors: list[str] | None = None,
+            inspector_init_kwargs: dict[str, Any] | None = None,
+            check: bool = False,
     ) -> "Metadata":
         """Initialize a metadata from DataFrame and Inspectors
 
@@ -507,10 +679,10 @@ class Metadata(BaseModel):
         # find the dtype who has most high inspector level
         for each_key in list(self.model_fields.keys()) + list(self._extend.keys()):
             if (
-                each_key != "pii_columns"
-                and each_key.endswith("_columns")
-                and column_name in self.get(each_key)
-                and current_level < self.column_inspect_level[each_key]
+                    each_key != "pii_columns"
+                    and each_key.endswith("_columns")
+                    and column_name in self.get(each_key)
+                    and current_level < self.column_inspect_level[each_key]
             ):
                 current_level = self.column_inspect_level[each_key]
                 current_type = each_key

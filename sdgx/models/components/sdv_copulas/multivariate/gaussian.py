@@ -286,7 +286,7 @@ class GaussianMultivariate(Multivariate):
         warnings.warn("`covariance` will be renamed to `correlation` in v0.4.0", DeprecationWarning)
 
         return {
-            "covariance": self.covariance.to_numpy().tolist(),
+            "correlation": self.covariance.to_numpy().tolist(),
             "univariates": univariates,
             "columns": self.columns,
             "type": get_qualified_name(self),

@@ -109,3 +109,4 @@ class SynthesizerModel:
                 f"`random_state` {random_state} expected to be an int or a tuple of "
                 "(`np.random.RandomState`, `torch.Generator`)"
             )
+

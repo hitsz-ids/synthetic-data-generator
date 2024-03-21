@@ -431,3 +431,7 @@ class GaussianCopulaSynthesizer(SynthesizerModel):
         if parameters:
             parameters = self._rebuild_gaussian_copula(parameters)
             self._model = multivariate.GaussianMultivariate.from_dict(parameters)
+
+    def get_metadata(self):
+        """Return the ``SingleTableMetadata`` for this synthesizer."""
+        return self.metadata

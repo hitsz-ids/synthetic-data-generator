@@ -35,6 +35,7 @@ class MetadataCombiner(BaseModel):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.relationships = []
 
     def check(self):
         """Do necessary checks:
@@ -62,19 +63,19 @@ class MetadataCombiner(BaseModel):
         # each table in metadata must in a relationship
         if not (relationship_parents | relationship_children).issuperset(table_names):
             raise MetadataCombinerInvalidError(
-                f"Table {table_names - (relationship_parents+relationship_children)} is missing in relationships."
+                f"Table {table_names - (relationship_parents + relationship_children)} is missing in relationships."
             )
 
         logger.info("MultiTableCombiner check finished.")
 
     @classmethod
     def from_dataloader(
-        cls,
-        dataloaders: list[DataLoader],
-        metadata_from_dataloader_kwargs: None | dict = None,
-        relationshipe_inspector: None | str | type[Inspector] = "SubsetRelationshipInspector",
-        relationships_inspector_kwargs: None | dict = None,
-        relationships: None | list[Relationship] = None,
+            cls,
+            dataloaders: list[DataLoader],
+            metadata_from_dataloader_kwargs: None | dict = None,
+            relationshipe_inspector: None | str | type[Inspector] = "SubsetRelationshipInspector",
+            relationships_inspector_kwargs: None | dict = None,
+            relationships: None | list[Relationship] = None,
     ):
         """
         Combine multiple dataloaders with relationship.
@@ -116,13 +117,13 @@ class MetadataCombiner(BaseModel):
 
     @classmethod
     def from_dataframe(
-        cls,
-        dataframes: list[pd.DataFrame],
-        names: list[str],
-        metadata_from_dataloader_kwargs: None | dict = None,
-        relationshipe_inspector: None | str | type[Inspector] = "SubsetRelationshipInspector",
-        relationships_inspector_kwargs: None | dict = None,
-        relationships: None | list[Relationship] = None,
+            cls,
+            dataframes: list[pd.DataFrame],
+            names: list[str],
+            metadata_from_dataloader_kwargs: None | dict = None,
+            relationshipe_inspector: None | str | type[Inspector] = "SubsetRelationshipInspector",
+            relationships_inspector_kwargs: None | dict = None,
+            relationships: None | list[Relationship] = None,
     ) -> "MetadataCombiner":
         """
         Combine multiple dataframes with relationship.
@@ -171,10 +172,10 @@ class MetadataCombiner(BaseModel):
         return self.model_dump_json()
 
     def save(
-        self,
-        save_dir: str | Path,
-        metadata_subdir: str = "metadata",
-        relationship_subdir: str = "relationship",
+            self,
+            save_dir: str | Path,
+            metadata_subdir: str = "metadata",
+            relationship_subdir: str = "relationship",
     ):
         """
         Save metadata to json file.
@@ -207,11 +208,11 @@ class MetadataCombiner(BaseModel):
 
     @classmethod
     def load(
-        cls,
-        save_dir: str | Path,
-        metadata_subdir: str = "metadata",
-        relationship_subdir: str = "relationship",
-        version: None | str = None,
+            cls,
+            save_dir: str | Path,
+            metadata_subdir: str = "metadata",
+            relationship_subdir: str = "relationship",
+            version: None | str = None,
     ) -> "MetadataCombiner":
         """
         Load metadata from json file.
@@ -247,10 +248,10 @@ class MetadataCombiner(BaseModel):
 
     @classmethod
     def upgrade(
-        cls,
-        old_version: str,
-        named_metadata: dict[str, Metadata],
-        relationships: list[Relationship],
+            cls,
+            old_version: str,
+            named_metadata: dict[str, Metadata],
+            relationships: list[Relationship],
     ) -> None:
         """
         Upgrade metadata from old version to new version
@@ -277,9 +278,10 @@ class MetadataCombiner(BaseModel):
 
         # if self and other has the same
         return (
-            self.version == other.version
-            and all(
-                self.get(key) == other.get(key) for key in set(chain(self.fields, other.fields))
-            )
-            and set(self.fields) == set(other.fields)
+                self.version == other.version
+                and all(
+            self.get(key) == other.get(key) for key in set(chain(self.fields, other.fields))
         )
+                and set(self.fields) == set(other.fields)
+        )
+

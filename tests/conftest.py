@@ -179,9 +179,9 @@ def demo_multi_data_relationship():
 
 @pytest.fixture
 def demo_multi_table_data_metadata_combiner(
-    demo_multi_data_parent_matadata: Metadata,
-    demo_multi_data_child_matadata: Metadata,
-    demo_multi_data_relationship: Relationship,
+        demo_multi_data_parent_matadata: Metadata,
+        demo_multi_data_child_matadata: Metadata,
+        demo_multi_data_relationship: Relationship,
 ):
     # 1. get metadata
     metadata_dict = {}
@@ -192,3 +192,80 @@ def demo_multi_table_data_metadata_combiner(
     m = MetadataCombiner(named_metadata=metadata_dict, relationships=[demo_multi_data_relationship])
 
     yield m
+
+
+@pytest.fixture
+def get_multi_table_metadata():
+    """Return a ``MultiTableMetadata`` object to be used with tests."""
+    dict_metadata = {
+        'tables': {
+            'nesreca': {
+                'primary_key': 'id_nesreca',
+                'columns': {
+                    'upravna_enota': {'sdtype': 'id'},
+                    'id_nesreca': {'sdtype': 'id'},
+                    'nesreca_val': {'sdtype': 'numerical'}
+                }
+            },
+            'oseba': {
+                'columns': {
+                    'upravna_enota': {'sdtype': 'id'},
+                    'id_nesreca': {'sdtype': 'id'},
+                    'oseba_val': {'sdtype': 'numerical'}
+                }
+            },
+            'upravna_enota': {
+                'primary_key': 'id_upravna_enota',
+                'columns': {
+                    'id_upravna_enota': {'sdtype': 'id'},
+                    'upravna_val': {'sdtype': 'numerical'}
+                }
+            }
+        },
+        'relationships': [
+            {
+                'parent_table_name': 'upravna_enota',
+                'parent_primary_key': 'id_upravna_enota',
+                'child_table_name': 'nesreca',
+                'child_foreign_key': 'upravna_enota'
+            },
+            {
+                'parent_table_name': 'upravna_enota',
+                'parent_primary_key': 'id_upravna_enota',
+                'child_table_name': 'oseba',
+                'child_foreign_key': 'upravna_enota'
+            },
+            {
+                'parent_table_name': 'nesreca',
+                'parent_primary_key': 'id_nesreca',
+                'child_table_name': 'oseba',
+                'child_foreign_key': 'id_nesreca'
+            }
+        ],
+        'METADATA_SPEC_VERSION': 'MULTI_TABLE_V1'
+    }
+
+    return MetadataCombiner.load_from_dict(dict_metadata)
+
+
+@pytest.fixture
+def get_multi_table_data():
+    """Return a dictionary containing some data for multi table."""
+    data = {
+        'nesreca': pd.DataFrame({
+            'id_nesreca': list(range(4)),
+            'upravna_enota': list(range(4)),
+            'nesreca_val': list(range(4))
+        }),
+        'oseba': pd.DataFrame({
+            'upravna_enota': list(range(4)),
+            'id_nesreca': list(range(4)),
+            'oseba_val': list(range(4))
+        }),
+        'upravna_enota': pd.DataFrame({
+            'id_upravna_enota': list(range(4)),
+            'upravna_val': list(range(4))
+        }),
+    }
+
+    return data
