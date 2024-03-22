@@ -1,7 +1,7 @@
-Bool
+Chinese Name
 ============================
 
-.. autoclass:: sdgx.data_models.inspectors.bool.BoolInspector
+.. autoclass:: sdgx.data_models.inspectors.personal.ChineseNameInspector
     :members:
     :undoc-members:
     :inherited-members:

@@ -27,6 +27,7 @@ dependencies = [
     "cloudpickle",
     "importlib_metadata",
     "openai>=1.10.0",
+    "python-dotenv",
 ]
 dynamic = ["version"]
 classifiers = [
@@ -35,6 +36,7 @@ classifiers = [
     'Programming Language :: Python :: 3.9',
     'Programming Language :: Python :: 3.10',
     'Programming Language :: Python :: 3.11',
+    'Programming Language :: Python :: 3.12',
 ]
 
 [project.optional-dependencies]

@@ -8,13 +8,12 @@ import pandas as pd
 from sdgx.data_models.inspectors.base import Inspector
 from sdgx.exceptions import InspectorInitError
 
-# By default, we will not directly register the RegexInspector to the Inspector Manager
-# Instead, use it as a baseclass or user-defined regex, then put it into the Inspector Manager or use it alone
-
 
 class RegexInspector(Inspector):
     """RegexInspector
     RegexInspector is a sdgx inspector that uses regular expression rules to detect column data types. It can be initialized with a custom expression, or it can be inherited and applied to specific data types,such as email, US address, HKID etc.
+
+    By default, we will not directly register the RegexInspector to the Inspector Manager. Instead, use it as a baseclass or user-defined regex, then put it into the Inspector Manager or use it alone
     """
 
     pattern: str = None
@@ -29,13 +28,16 @@ class RegexInspector(Inspector):
 
     _match_percentage: float = 0.8
     """
-    match_percentage shoud > 0.5 and < 1.
-
-    Due to the existence of empty data, wrong data, etc., the match_percentage is the proportion of the current regular expression compound. When the number of compound regular expressions is higher than this ratio, the column can be considered fit the current data type.
+    Private variable used to store property match_percentage's value.
     """
 
     @property
     def match_percentage(self):
+        """
+        The match_percentage shoud > 0.5 and < 1.
+
+        Due to the existence of empty data, wrong data, etc., the match_percentage is the proportion of the current regular expression compound. When the number of compound regular expressions is higher than this ratio, the column can be considered fit the current data type.
+        """
         return self._match_percentage
 
     @match_percentage.setter
@@ -83,7 +85,7 @@ class RegexInspector(Inspector):
     def fit(self, raw_data: pd.DataFrame, *args, **kwargs):
         """Fit the inspector.
 
-        Finds the list of regex columns from the raw data.
+        Finds the list of regex columns from the tabular data (in pd.DataFrame).
 
         Args:
             raw_data (pd.DataFrame): Raw data
@@ -95,20 +97,41 @@ class RegexInspector(Inspector):
 
         self.ready = True
 
-    def domain_verification(self, each_sample):
+    def domain_verification(self, each_sample: str):
+        """
+        The function domain_verification is used to add custom domain verification logic. When a sample matches a regular expression, the domain_verification function is executed for further verification.
+
+        Additional logic checks can be performed beyond regular expressions, making it more flexible. For example, in a company name, there may be address information. When determining the type of address, if the sample ends with "Company", domain_verification can return False to avoid misclassification, thus improving the accuracy of the inspector.
+
+        This function has the power to veto. When the function outputs False, the sample will be classified as not matching the corresponding data type of the inspector.
+
+        If this function is not overwritten, domain_verification will default to return True.
+
+        Args:
+            each_sample (str): string of each sample.
+        """
+
         return True
 
     def _fit_column(self, column_data: pd.Series):
         """
         Regular expression matching for a single column, returning the matching ratio.
+
+        Args:
+             column_data (pd.Series): the column data.
         """
         length = len(column_data)
+        unmatch_cnt = 0
         match_cnt = 0
         for i in column_data:
             m = re.match(self.p, str(i))
             d = self.domain_verification(str(i))
             if m and d:
                 match_cnt += 1
+            else:
+                unmatch_cnt += 1
+                if unmatch_cnt > length * (1 - self.match_percentage) + 1:
+                    break
         return match_cnt / length
 
     def inspect(self, *args, **kwargs) -> dict[str, Any]:

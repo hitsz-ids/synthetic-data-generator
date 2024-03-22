@@ -6,15 +6,19 @@ import pandas as pd
 import pytest
 from faker import Faker
 
+fake = Faker(locale="zh_CN")
+fake_en = Faker(["en_US"])
+
 from sdgx.data_models.inspectors.personal import (
+    ChinaMainlandAddressInspector,
     ChinaMainlandIDInspector,
     ChinaMainlandMobilePhoneInspector,
     ChinaMainlandPostCode,
     ChinaMainlandUnifiedSocialCreditCode,
+    ChineseNameInspector,
     EmailInspector,
+    EnglishNameInspector,
 )
-
-fake = Faker(locale="zh_CN")
 
 
 def generate_uniform_credit_code():
@@ -45,6 +49,7 @@ def chn_personal_test_df():
     header = [
         "ssn_sfz",
         "chn_name",
+        "eng_name",
         "gender",
         "birth_date",
         "age",
@@ -62,6 +67,7 @@ def chn_personal_test_df():
             each_name = fake.last_name() + fake.name_male()
         else:
             each_name = fake.last_name() + fake.name_female()
+        each_eng_name = fake_en.name()
         each_birth_date = fake.date()
         each_age = today.year - int(each_birth_date[:4])
         each_email = fake.email()
@@ -76,6 +82,7 @@ def chn_personal_test_df():
         each_x = [
             each_sfz,
             each_name,
+            each_eng_name,
             each_gender,
             each_birth_date,
             each_age,
@@ -192,6 +199,65 @@ def test_chn_uscc_inspector_generated_data(chn_personal_test_df: pd.DataFrame):
     )
     assert inspector_USCC.inspect_level == 30
     assert inspector_USCC.pii is True
+
+
+# CHN address
+def test_chn_address_inspector_demo_data(raw_data):
+    inspector_CHN_Address = ChinaMainlandAddressInspector()
+    inspector_CHN_Address.fit(raw_data)
+    assert not inspector_CHN_Address.regex_columns
+    assert sorted(inspector_CHN_Address.inspect()["china_mainland_address_columns"]) == sorted([])
+    assert inspector_CHN_Address.inspect_level == 30
+    assert inspector_CHN_Address.pii is True
+
+
+def test_chn_address_inspector_generated_data(chn_personal_test_df: pd.DataFrame):
+    inspector_CHN_Address = ChinaMainlandAddressInspector()
+    inspector_CHN_Address.fit(chn_personal_test_df)
+    assert inspector_CHN_Address.regex_columns
+    assert sorted(inspector_CHN_Address.inspect()["china_mainland_address_columns"]) == sorted(
+        ["chn_address"]
+    )
+    assert inspector_CHN_Address.inspect_level == 30
+    assert inspector_CHN_Address.pii is True
+
+
+# CHN name
+def test_chn_name_inspector_demo_data(raw_data):
+    inspector_CHN_name = ChineseNameInspector()
+    inspector_CHN_name.fit(raw_data)
+    assert not inspector_CHN_name.regex_columns
+    assert sorted(inspector_CHN_name.inspect()["chinese_name_columns"]) == sorted([])
+    assert inspector_CHN_name.inspect_level == 40
+    assert inspector_CHN_name.pii is True
+
+
+def test_chn_name_inspector_generated_data(chn_personal_test_df: pd.DataFrame):
+    inspector_CHN_name = ChineseNameInspector()
+    inspector_CHN_name.fit(chn_personal_test_df)
+    assert inspector_CHN_name.regex_columns
+    assert sorted(inspector_CHN_name.inspect()["chinese_name_columns"]) == sorted(["chn_name"])
+    assert inspector_CHN_name.inspect_level == 40
+    assert inspector_CHN_name.pii is True
+
+
+# English name
+def test_eng_name_inspector_demo_data(raw_data):
+    inspector_ENG_name = EnglishNameInspector()
+    inspector_ENG_name.fit(raw_data)
+    assert not inspector_ENG_name.regex_columns
+    assert sorted(inspector_ENG_name.inspect()["english_name_columns"]) == sorted([])
+    assert inspector_ENG_name.inspect_level == 40
+    assert inspector_ENG_name.pii is True
+
+
+def test_eng_name_inspector_generated_data(chn_personal_test_df: pd.DataFrame):
+    inspector_ENG_name = EnglishNameInspector()
+    inspector_ENG_name.fit(chn_personal_test_df)
+    assert inspector_ENG_name.regex_columns
+    assert sorted(inspector_ENG_name.inspect()["english_name_columns"]) == sorted(["eng_name"])
+    assert inspector_ENG_name.inspect_level == 40
+    assert inspector_ENG_name.pii is True
 
 
 if __name__ == "__main__":
