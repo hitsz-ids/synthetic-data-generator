@@ -35,6 +35,7 @@ class MetadataCombiner(BaseModel):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.relationships = []
 
     def check(self):
         """Do necessary checks:
