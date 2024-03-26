@@ -138,7 +138,7 @@ class DataTransformer(object):
         ohe = column_transform_info.transform
         return ohe.transform(data).to_numpy()
 
-    def _synchronous_transform(self, raw_data, column_transform_info_list) -> NDArrayLoader:
+    def _synchronous_transform(self, raw_data, column_transform_info_list, output_path:str, output_type: str) -> NDArrayLoader:
         """Take a Pandas DataFrame and transform columns synchronous.
 
         Outputs a list with Numpy arrays.
@@ -151,6 +151,10 @@ class DataTransformer(object):
                 loader.store(self._transform_continuous(column_transform_info, data).astype(float))
             else:
                 loader.store(self._transform_discrete(column_transform_info, data).astype(float))
+
+        if output_type == "npz":
+            ages = loader.load(0)
+            np.savez(output_path, loader.get_all())
 
         return loader
 
@@ -187,7 +191,9 @@ class DataTransformer(object):
         # Only use parallelization with larger data sizes.
         # Otherwise, the transformation will be slower.
         if dataloader.shape[0] < 500:
-            loader = self._synchronous_transform(dataloader, self._column_transform_info_list)
+            loader = self._synchronous_transform(dataloader, self._column_transform_info_list,
+                                                 "C:\\Users\\Bobph\\Desktop\\COMP490\\synthetic-data-generator",
+                                                 "npz")
         else:
             loader = self._parallel_transform(dataloader, self._column_transform_info_list)
 
