@@ -7,10 +7,11 @@ from sdgx.synthesizer import Synthesizer
 from sdgx.utils import download_demo_data
 
 # This will download demo data to ./dataset
-dataset_csv = download_demo_data()
+# dataset_csv = download_demo_data()  # Original data set
+trimmed_dataset_csv = "C:\\Users\\Bobph\\Desktop\\COMP490\\synthetic-data-generator\\adult.csv"
 
 # Create data connector for csv file
-data_connector = CsvConnector(path=dataset_csv)
+data_connector = CsvConnector(path=trimmed_dataset_csv)
 
 # Initialize synthesizer, use CTGAN model
 synthesizer = Synthesizer(
