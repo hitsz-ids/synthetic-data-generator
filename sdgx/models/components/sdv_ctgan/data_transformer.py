@@ -150,9 +150,9 @@ class DataTransformer(object):
             else:
                 column_data_list.append(self._transform_discrete(column_transform_info, data))
 
-        output_type = 'npz'
-        if output_type == 'npz':
-            np.savez('output.npz', *column_data_list)
+        output_type = "npz"
+        if output_type == "npz":
+            np.savez("output.npz", *column_data_list)
 
         return column_data_list
 
