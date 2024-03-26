@@ -221,7 +221,7 @@ class DataTransformer(object):
         column_names = []
         for column_transform_info in self._column_transform_info_list:
             dim = column_transform_info.output_dimensions
-            column_data = data[:, st: st + dim]
+            column_data = data[:, st : st + dim]
             if column_transform_info.column_type == "continuous":
                 recovered_column_data = self._inverse_transform_continuous(
                     column_transform_info, column_data, sigmas, st
