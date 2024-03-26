@@ -136,7 +136,7 @@ class DataTransformer(object):
         ohe = column_transform_info.transform
         return ohe.transform(data).to_numpy()
 
-    def _synchronous_transform(self, raw_data, column_transform_info_list):
+    def _synchronous_transform(self, raw_data, column_transform_info_list, output_type):
         """Take a Pandas DataFrame and transform columns synchronous.
 
         Outputs a list with Numpy arrays.
@@ -150,7 +150,6 @@ class DataTransformer(object):
             else:
                 column_data_list.append(self._transform_discrete(column_transform_info, data))
 
-        output_type = "npz"
         if output_type == "npz":
             np.savez("output.npz", *column_data_list)
 
@@ -184,7 +183,7 @@ class DataTransformer(object):
         # Otherwise, the transformation will be slower.
         if raw_data.shape[0] < 500:
             column_data_list = self._synchronous_transform(
-                raw_data, self._column_transform_info_list
+                raw_data, self._column_transform_info_list, output_type="npz"
             )
         else:
             column_data_list = self._parallel_transform(raw_data, self._column_transform_info_list)
