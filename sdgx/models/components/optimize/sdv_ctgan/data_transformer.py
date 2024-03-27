@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections import namedtuple
 
+import os
 import numpy as np
 import pandas as pd
 from joblib import Parallel, delayed
@@ -152,9 +153,10 @@ class DataTransformer(object):
             else:
                 loader.store(self._transform_discrete(column_transform_info, data).astype(float))
 
+        # Saving transformed data into an npz file
         if output_type == "npz":
-            ages = loader.load(0)
-            np.savez(output_path, loader.get_all())
+            all_transformed_data = loader.get_all()
+            np.savez(os.path.join(output_path, "all_transformed_data.npz"), all_transformed_data)
 
         return loader
 
