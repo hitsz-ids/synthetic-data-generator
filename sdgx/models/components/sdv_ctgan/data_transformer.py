@@ -150,10 +150,15 @@ class DataTransformer(object):
             else:
                 column_data_list.append(self._transform_discrete(column_transform_info, data))
 
-        if output_type == "npz":
-            np.savez("output.npz", *column_data_list)
+        self._output_column_data(column_data_list=column_data_list, output_type=output_type)
 
         return column_data_list
+
+    def _output_column_data(self, column_data_list, output_type):
+        if output_type == "npz":
+            np.savez("output.npz", *column_data_list)
+        else:
+            print("output type is not properly selected")
 
     def _parallel_transform(self, raw_data, column_transform_info_list):
         """Take a Pandas DataFrame and transform columns in parallel.
