@@ -2,7 +2,9 @@ import os
 import tempfile
 import unittest
 from unittest.mock import patch
+
 import numpy as np
+
 from sdgx.models.components.sdv_ctgan.data_transformer import DataTransformer
 
 
