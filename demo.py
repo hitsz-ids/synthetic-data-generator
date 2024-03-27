@@ -1,5 +1,6 @@
 import pandas as pd
 
+import numpy as np
 from sdgx.data_connectors.csv_connector import CsvConnector
 from sdgx.models.components.sdv_ctgan.data_transformer import DataTransformer
 from sdgx.models.ml.single_table.ctgan import CTGANSynthesizerModel
@@ -24,7 +25,17 @@ synthesizer.fit()
 
 # Sample
 sampled_data = synthesizer.sample(1000)
+print("Synthesized Data")
 print(sampled_data)
+
+
+print("\n\n\nTransformed Data the Sample Data Was Trained On")
+zipped_transformed_data = np.load("C:\\Users\\Bobph\\Desktop\\COMP490\\synthetic-data-generator\\all_transformed_data.npz")
+data_list = zipped_transformed_data.files
+transformed_data = np.asmatrix(zipped_transformed_data['arr_0'])
+print(transformed_data)
+
+
 
 # Issue 33
 # transformer = DataTransformer()
