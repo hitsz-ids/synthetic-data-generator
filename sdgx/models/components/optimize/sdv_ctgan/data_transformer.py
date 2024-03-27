@@ -143,6 +143,7 @@ class DataTransformer(object):
 
         Outputs a list with Numpy arrays.
         """
+        print("inside synchronous transform function")
         loader = NDArrayLoader()
         for column_transform_info in column_transform_info_list:
             column_name = column_transform_info.column_name
@@ -152,7 +153,36 @@ class DataTransformer(object):
             else:
                 loader.store(self._transform_discrete(column_transform_info, data).astype(float))
 
+        # issue 33
+        self._output_column_data(loader, "npz")
+
         return loader
+
+    def _output_column_data(self, loader, output_type):
+        filename = "output.npz"
+        if output_type == "npz":
+            try:
+                print(f"saving output file {filename}")
+                all_data = loader.get_all()
+                np.savez(filename, *all_data)
+                print("output file saved successfully")
+            except Exception as e:
+                print(f"error saving file {e}")
+        else:
+            print("output type is not properly selected")
+
+        self._demonstrate_issue_33(filename)
+
+    def _demonstrate_issue_33(self, filename):
+        npz_data = np.load(filename)
+        print(f"demonstrating npz file save:\n")
+        count = 0
+        for key in npz_data.keys():
+            count += 1
+            print(f"key: {key}\ndata: {npz_data[key]}")
+            if count == 100:
+                break
+
 
     def _parallel_transform(self, raw_data, column_transform_info_list) -> NDArrayLoader:
         """Take a Pandas DataFrame and transform columns in parallel.
@@ -179,6 +209,10 @@ class DataTransformer(object):
         loader = NDArrayLoader()
         for ndarray in p(processes):
             loader.store(ndarray.astype(float))
+
+        # issue 33
+        self._output_column_data(loader, "npz")
+
         return loader
 
     def transform(self, dataloader: DataLoader) -> NDArrayLoader:
@@ -186,6 +220,7 @@ class DataTransformer(object):
 
         # Only use parallelization with larger data sizes.
         # Otherwise, the transformation will be slower.
+        print("inside transform function")
         if dataloader.shape[0] < 500:
             loader = self._synchronous_transform(dataloader, self._column_transform_info_list)
         else:
