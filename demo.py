@@ -22,20 +22,11 @@ synthesizer = Synthesizer(
 )
 
 # Fit the model
-print("fitting the synthesizer")
+print("fitting the synthesizer, this is where transform is called")
 synthesizer.fit()
 
 # Sample
-print("creating sampled data")
-sampled_data = synthesizer.sample(1000)
-print(sampled_data)
+# print("creating sampled data")
+# sampled_data = synthesizer.sample(1000)
+# print(sampled_data)
 
-# Issue 33
-print("loading data from csv")
-raw_data = CsvConnector(path=dataset_csv).read()
-print("creating transformer")
-transformer = DataTransformer()
-# print("fitting transformer")
-# transformer.fit(raw_data)
-# print("transforming data")
-# transformed_data = transformer.transform(raw_data)
