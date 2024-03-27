@@ -28,7 +28,7 @@ class DiscreteTransformer(Transformer):
 
     one_hot_column_names: dict = {}
 
-    onehot_encoder_handle_unknown='ignore'
+    onehot_encoder_handle_unknown: str ='ignore'
 
     def fit(self, metadata: Metadata, tabular_data: DataLoader | pd.DataFrame):
         '''
@@ -42,16 +42,18 @@ class DiscreteTransformer(Transformer):
         # remove datetime columns from discrete columns 
         # because datetime columns are converted into timestamps 
         datetime_columns = metadata.get('datetime_columns')
+
+        # no discrete columns 
+        if len(self.discrete_columns) == 0 :
+            logger.info("Fitting using DiscreteTransformer... Finished (No Columns).")
+            return 
+        
+        # fit each columns 
         for each_datgetime_col in datetime_columns:
             if each_datgetime_col in self.discrete_columns:
                 self.discrete_columns.remove(each_datgetime_col)
                 logger.info(f"Datetime column {each_datgetime_col} removed from discrete column.")
         
-        # no discrete columns 
-        if len(self.discrete_columns) == 0 :
-            logger.info("Fitting using DiscreteTransformer... Finished (No Columns).")
-            return 
-
         # then, there are >= 1 discrete colums
         for each_col in self.discrete_columns:
             # fit each column 
@@ -64,7 +66,7 @@ class DiscreteTransformer(Transformer):
     
     def _fit_column(self, column_name: str, column_data: pd.DataFrame):
         '''
-        Fit every discrete columns in `_fit_column`.
+        Fit every discrete column in `_fit_column`.
 
         Args:
             - column_data (pd.DataFrame): A dataframe containing a column.
@@ -85,12 +87,12 @@ class DiscreteTransformer(Transformer):
 
         logger.info("Converting data using DiscreteTransformer...")
 
-        processed_data = raw_data.copy()
-
         # transform every discrete column into one-hot encoded columns 
         if len(self.discrete_columns) == 0:
             logger.info("Converting data using DiscreteTransformer... Finished (No column).")
             return 
+        
+        processed_data = raw_data.copy()
         
         for each_col in self.discrete_columns:
             # 1- transform each column
