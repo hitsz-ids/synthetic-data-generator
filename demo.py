@@ -9,10 +9,9 @@ from sdgx.utils import download_demo_data
 
 # This will download demo data to ./dataset
 # dataset_csv = download_demo_data()  # Original data set
-trimmed_dataset_csv = "C:\\Users\\Bobph\\Desktop\\COMP490\\synthetic-data-generator\\adult.csv"
 
 # Create data connector for csv file
-data_connector = CsvConnector(path=trimmed_dataset_csv)
+data_connector = CsvConnector(path="adult.csv")
 
 # Initialize synthesizer, use CTGAN model
 synthesizer = Synthesizer(
@@ -28,12 +27,11 @@ sampled_data = synthesizer.sample(1000)
 print("Synthesized Data")
 print(sampled_data)
 
-
-print("\n\n\nTransformed Data the Sample Data Was Trained On")
-zipped_transformed_data = np.load("C:\\Users\\Bobph\\Desktop\\COMP490\\synthetic-data-generator\\all_transformed_data.npz")
-data_list = zipped_transformed_data.files
-transformed_data = np.asmatrix(zipped_transformed_data['arr_0'])
-print(transformed_data)
+print("Creating csv file...")
+zipped_transformed_data = np.load("all_transformed_data.npz")
+transformed_data_frame = pd.DataFrame(zipped_transformed_data['arr_0'])
+transformed_data_frame.to_csv("all_transformed_data.csv", index=False, header=False)
+print("Done!")
 
 
 
