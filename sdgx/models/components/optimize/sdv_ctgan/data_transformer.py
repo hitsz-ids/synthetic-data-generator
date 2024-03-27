@@ -155,6 +155,7 @@ class DataTransformer(object):
 
         # Saving transformed data into an npz file
         if output_type == "npz":
+            print(f"Saving zipped transformed data to {output_path}\\all_transformed_data.npz")
             all_transformed_data = loader.get_all()
             np.savez(os.path.join(output_path, "all_transformed_data.npz"), all_transformed_data)
 
@@ -192,10 +193,13 @@ class DataTransformer(object):
 
         # Only use parallelization with larger data sizes.
         # Otherwise, the transformation will be slower.
+
         if dataloader.shape[0] < 500:
+            output_path = input("Please provide a path to save the transformed data: (eg. C\\Users\\User\\Dekstop) ")
             loader = self._synchronous_transform(dataloader, self._column_transform_info_list,
-                                                 "C:\\Users\\Bobph\\Desktop\\COMP490\\synthetic-data-generator",
+                                                 output_path,
                                                  "npz")
+
         else:
             loader = self._parallel_transform(dataloader, self._column_transform_info_list)
 
