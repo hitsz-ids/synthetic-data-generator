@@ -183,7 +183,6 @@ class DataTransformer(object):
             if count == 100:
                 break
 
-
     def _parallel_transform(self, raw_data, column_transform_info_list) -> NDArrayLoader:
         """Take a Pandas DataFrame and transform columns in parallel.
 
