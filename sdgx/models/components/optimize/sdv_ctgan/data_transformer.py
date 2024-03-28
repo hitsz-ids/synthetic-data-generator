@@ -154,27 +154,26 @@ class DataTransformer(object):
                 loader.store(self._transform_discrete(column_transform_info, data).astype(float))
 
         # issue 33
-        self._output_column_data(loader, "npz")
+        self._output_column_data(loader, "output.npz", "npz")
 
         return loader
 
-    def _output_column_data(self, loader, output_type):
-        filename = "output.npz"
+    def _output_column_data(self, loader, output_path, output_type):
         if output_type == "npz":
             try:
-                print(f"saving output file {filename}")
+                print(f"saving output file {output_path}")
                 all_data = loader.get_all()
-                np.savez(filename, *all_data)
+                np.savez(output_path, *all_data)
                 print("output file saved successfully")
             except Exception as e:
                 print(f"error saving file {e}")
         else:
             print("output type is not properly selected")
 
-        self._demonstrate_issue_33(filename)
+        self._demonstrate_issue_33(output_path)
 
-    def _demonstrate_issue_33(self, filename):
-        npz_data = np.load(filename)
+    def _demonstrate_issue_33(self, output_path):
+        npz_data = np.load(output_path)
         print(f"demonstrating npz file save:\n")
         count = 0
         for key in npz_data.keys():
@@ -210,7 +209,7 @@ class DataTransformer(object):
             loader.store(ndarray.astype(float))
 
         # issue 33
-        self._output_column_data(loader, "npz")
+        self._output_column_data(loader, "output.npz", "npz")
 
         return loader
 
