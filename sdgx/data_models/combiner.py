@@ -35,7 +35,10 @@ class MetadataCombiner(BaseModel):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.relationships = []
+        if kwargs['relationships']:
+            self.relationships = kwargs['relationships']
+        else:
+            self.relationships = []
 
     def check(self):
         """Do necessary checks:
