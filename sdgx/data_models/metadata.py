@@ -92,13 +92,13 @@ class Metadata(BaseModel):
     For extend information, use ``get`` and ``set``
     """
     columns: Dict = defaultdict(str)
-    primary_key: str = None
+    primary_key: str = 'default'
     alternate_keys: List[str] = Field(default_factory=list, optional=True)
 
     def __init__(self, **data: Any):
         super().__init__(**data)
         self.columns = {}
-        self.primary_key = None
+        self.primary_key = 'default'
         self.alternate_keys = []
 
     # ----------------------------------------------------------------------
