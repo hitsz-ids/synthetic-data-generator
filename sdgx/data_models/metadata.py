@@ -7,7 +7,7 @@ from collections.abc import Iterable
 from copy import deepcopy
 from itertools import chain
 from pathlib import Path
-from typing import Any, Dict, Set, List
+from typing import Any, Dict, List, Set
 
 import pandas as pd
 from pydantic import BaseModel, Field
@@ -37,23 +37,25 @@ class Metadata(BaseModel):
     """
 
     _SDTYPE_KWARGS = {
-        'numerical': frozenset(['computer_representation']),
-        'datetime': frozenset(['datetime_format']),
-        'categorical': frozenset(['order', 'order_by']),
-        'boolean': frozenset([]),
-        'id': frozenset(['regex_format']),
-        'unknown': frozenset(['pii']),
+        "numerical": frozenset(["computer_representation"]),
+        "datetime": frozenset(["datetime_format"]),
+        "categorical": frozenset(["order", "order_by"]),
+        "boolean": frozenset([]),
+        "id": frozenset(["regex_format"]),
+        "unknown": frozenset(["pii"]),
     }
 
-    _KEYS = frozenset([
-        'columns',
-        'primary_key',
-        'alternate_keys',
-        'sequence_key',
-        'sequence_index',
-        'column_relationships',
-        'METADATA_SPEC_VERSION'
-    ])
+    _KEYS = frozenset(
+        [
+            "columns",
+            "primary_key",
+            "alternate_keys",
+            "sequence_key",
+            "sequence_index",
+            "column_relationships",
+            "METADATA_SPEC_VERSION",
+        ]
+    )
 
     primary_keys: Set[str] = set()
     """
@@ -122,17 +124,17 @@ class Metadata(BaseModel):
         if column_name in self.columns:
             raise Exception(
                 f"Column name '{column_name}' already exists. Use 'update_column' "
-                'to update an existing column.'
+                "to update an existing column."
             )
 
-        sdtype = kwargs.get('sdtype')
+        sdtype = kwargs.get("sdtype")
         if sdtype is None:
             raise Exception(f"Please provide a 'sdtype' for column '{column_name}'.")
 
         column_kwargs = deepcopy(kwargs)
         if sdtype not in self._SDTYPE_KWARGS:
-            pii = column_kwargs.get('pii', True)
-            column_kwargs['pii'] = pii
+            pii = column_kwargs.get("pii", True)
+            column_kwargs["pii"] = pii
 
         self.columns[column_name] = column_kwargs
 
@@ -155,11 +157,11 @@ class Metadata(BaseModel):
                present.
         """
         _kwargs = deepcopy(kwargs)
-        if 'sdtype' in kwargs:
-            sdtype = kwargs.pop('sdtype')
+        if "sdtype" in kwargs:
+            sdtype = kwargs.pop("sdtype")
         else:
-            sdtype = self.columns[column_name]['sdtype']
-            _kwargs['sdtype'] = sdtype
+            sdtype = self.columns[column_name]["sdtype"]
+            _kwargs["sdtype"] = sdtype
 
         self.columns[column_name] = _kwargs
 
@@ -173,14 +175,14 @@ class Metadata(BaseModel):
         if column_name in self.alternate_keys:
             warnings.warn(
                 f"'{column_name}' is currently set as an alternate key and will be removed from "
-                'that list.'
+                "that list."
             )
             self.alternate_keys.remove(column_name)
 
         if self.primary_key is not None:
             warnings.warn(
                 f"There is an existing primary key '{self.primary_key}'."
-                ' This key will be removed.'
+                " This key will be removed."
             )
 
         self.primary_key = column_name
@@ -188,7 +190,7 @@ class Metadata(BaseModel):
     def remove_primary_key(self):
         """Remove the metadata primary key."""
         if self.primary_key is None:
-            warnings.warn('No primary key exists to remove.')
+            warnings.warn("No primary key exists to remove.")
 
         self.primary_key = None
 
@@ -201,7 +203,7 @@ class Metadata(BaseModel):
             column_names (list[str]):
                 List of column names in the relationship.
         """
-        relationship = {'type': relationship_type, 'column_names': column_names}
+        relationship = {"type": relationship_type, "column_names": column_names}
         to_check = [relationship] + self.column_relationships
         self.column_relationships.append(relationship)
 
@@ -239,7 +241,7 @@ class Metadata(BaseModel):
         for key in instance._KEYS:
             value = deepcopy(metadata_dict.get(key))
             if value:
-                setattr(instance, f'{key}', value)
+                setattr(instance, f"{key}", value)
 
         return instance
 
