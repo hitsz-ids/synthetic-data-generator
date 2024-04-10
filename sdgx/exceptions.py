@@ -77,6 +77,7 @@ class SynthesizerSampleError(SynthesizerError):
 class SynthesizerProcessorError(SynthesizerError):
     ERROR_CODE = 4003
 
+
 class CacheError(SdgxError):
     """
     Exception to indicate that exception when using cache.

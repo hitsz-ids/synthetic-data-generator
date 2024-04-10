@@ -102,7 +102,7 @@ class Synthesizer:
         self.data_processors_manager = DataProcessorManager()
         if not data_processors:
             data_processors = self.data_processors_manager.registed_default_processor_list
-        logger.info(f'Using data processors: {data_processors}')
+        logger.info(f"Using data processors: {data_processors}")
         self.data_processors = [
             (
                 d
@@ -290,14 +290,16 @@ class Synthesizer:
 
         logger.info("Fitting data processors...")
         if not self.dataloader:
-            logger.info('Fitting without dataloader.')
+            logger.info("Fitting without dataloader.")
         start_time = time.time()
         for d in self.data_processors:
             if self.dataloader:
-                d.fit(metadata = metadata, tabular_data = self.dataloader)
+                d.fit(metadata=metadata, tabular_data=self.dataloader)
             else:
-                d.fit(metadata = metadata)
-        logger.info(f"Fitted {len(self.data_processors)} data processors in  {time.time() - start_time}s.")
+                d.fit(metadata=metadata)
+        logger.info(
+            f"Fitted {len(self.data_processors)} data processors in  {time.time() - start_time}s."
+        )
 
         def chunk_generator() -> Generator[pd.DataFrame, None, None]:
             for chunk in self.dataloader.iter():
@@ -349,10 +351,10 @@ class Synthesizer:
         #     for d in self.data_processors:
         #         d.fit(metadata)
 
-        # check data processor fit status before sampling 
+        # check data processor fit status before sampling
         for d in self.data_processors:
             d.check_fitted()
-        
+
         if not model_sample_args:
             model_sample_args = {}
 

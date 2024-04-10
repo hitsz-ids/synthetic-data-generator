@@ -17,7 +17,6 @@ class DataProcessor:
         if not self.fitted:
             raise SynthesizerProcessorError("Processor NOT fitted.")
 
-
     def fit(self, metadata: Metadata | None = None):
         """Fit the data processor.
 
@@ -54,21 +53,21 @@ class DataProcessor:
     def remove_columns(tabular_data: pd.DataFrame, column_name_to_remove: list) -> pd.DataFrame:
         """
         Remove specified columns from the input tabular data.
-        
+
         Args:
             - tabular_data (pd.DataFrame): Processed tabular data
             - column_name_to_remove (list): List of column names to be removed
-        
+
         Returns:
             - result_data (pd.DataFrame): Tabular data with specified columns removed
         """
-        
+
         # Make a copy of the input data to avoid modifying the original data
         result_data = tabular_data.copy()
-        
+
         # Remove specified columns
         result_data = result_data.drop(columns=column_name_to_remove)
-        
+
         return result_data
 
     @staticmethod

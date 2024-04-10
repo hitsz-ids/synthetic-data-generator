@@ -206,9 +206,9 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
 
     def fit(self, metadata: Metadata, dataloader: DataLoader, epochs=None, *args, **kwargs):
         # from version 0.2.1, sdgx use `sdgx.data_processor.transformers.discrete` to handle discrete_columns
-        # the original sdv transformer will be removed in version 0.3.0 
+        # the original sdv transformer will be removed in version 0.3.0
         # disable ctgan's sdv transformer in version 0.2.1
-        discrete_columns = list(metadata.get("discrete_columns")) # this line is commented
+        discrete_columns = list(metadata.get("discrete_columns"))  # this line is commented
         # discrete_columns = []
         if epochs is not None:
             self._epochs = epochs
@@ -234,7 +234,7 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
             self._ndarry_loader, self._transformer.output_info_list, self._log_frequency
         )
 
-        logger.info('Initialize Generator.')
+        logger.info("Initialize Generator.")
         # Initialize Generator
         self.data_dim = self._transformer.output_dimensions
         self._generator = Generator(
@@ -251,7 +251,7 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
             dataloader: :ref:`DataLoader` for the training data processed by :ref:`DataProcessor`.
 
         """
-        logger.info(f'Fit using data_size:{data_size}, data_dim: {self.data_dim}.')
+        logger.info(f"Fit using data_size:{data_size}, data_dim: {self.data_dim}.")
         epochs = self._epochs
         # data_dim = self._transformer.output_dimensions
         discriminator = Discriminator(
