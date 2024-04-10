@@ -68,9 +68,6 @@ class ColumnOrderTransformer(Transformer):
         Returns:
             - result_data (pd.DataFrame): The rearranged DataFrame.
         """
-        # Use the `reindex` function to rearrange the columns according to `column_list`.
-        # The `columns` parameter specifies the order of the columns.
-        # The `drop` parameter is set to True to drop any columns not in `column_list`.
         result_data = processed_data.reindex(columns=column_list)
         
         return result_data

@@ -127,6 +127,9 @@ class NumericValueTransformer(Transformer):
         return 
 
     def _reverse_convert_column_scale(self, column_name: str, column_data: pd.DataFrame):
+        '''
+        Reverse convert method for input column using scale method. 
+        '''
 
         reverse_converted_data = self.scalers[column_name].inverse_transform(column_data)
         return reverse_converted_data
