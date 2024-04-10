@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-import pandas as pd
 from typing import Any, Dict
+
+import pandas as pd
 
 from sdgx.data_models.metadata import Metadata
 from sdgx.exceptions import SynthesizerProcessorError
@@ -18,7 +19,7 @@ class DataProcessor:
         if not self.fitted:
             raise SynthesizerProcessorError("Processor NOT fitted.")
 
-    def fit(self, metadata: Metadata | None = None,  **kwargs: Dict[str, Any]):
+    def fit(self, metadata: Metadata | None = None, **kwargs: Dict[str, Any]):
         """Fit the data processor.
 
         Called before ``convert`` and ``reverse_convert``.
