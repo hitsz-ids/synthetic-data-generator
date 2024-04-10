@@ -36,6 +36,7 @@ class MockModel(SynthesizerModel):
 
 
 class MockDataProcessor(DataProcessor):
+    fitted = True
     pass
 
 
