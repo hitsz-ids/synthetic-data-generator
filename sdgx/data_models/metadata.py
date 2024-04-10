@@ -5,7 +5,7 @@ from collections import defaultdict
 from collections.abc import Iterable
 from itertools import chain
 from pathlib import Path
-from typing import Any, Dict, Set
+from typing import Any, Dict, Set, List
 
 import pandas as pd
 from pydantic import BaseModel
@@ -39,7 +39,7 @@ class Metadata(BaseModel):
     primary_keys is used to store single primary key or composite primary key
     """
 
-    column_list: list[str] = []
+    column_list: List[str] = []
     """"
     column_list is used to store all columns' name
     """

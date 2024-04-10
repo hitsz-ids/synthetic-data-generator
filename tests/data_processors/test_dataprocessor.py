@@ -15,7 +15,7 @@ def single_demo_data_df(demo_single_table_path):
 @pytest.fixture
 def attach_demo_data_df(demo_single_table_path):
     df = pd.read_csv(demo_single_table_path)
-    return df[["education", "capitalgain"]]
+    return df[["education", "capital-gain"]]
 
 
 @pytest.fixture
@@ -43,12 +43,12 @@ def test_attach_columns(
     assert "workclass" in single_demo_data_df.columns
     assert "age" in single_demo_data_df.columns
     assert "education" not in single_demo_data_df.columns
-    assert "capitalgain" not in single_demo_data_df.columns
+    assert "capital-gain" not in single_demo_data_df.columns
     assert "education" in attach_demo_data_df.columns
-    assert "capitalgain" in attach_demo_data_df.columns
+    assert "capital-gain" in attach_demo_data_df.columns
     attached_df = base_data_processor.attach_columns(single_demo_data_df, attach_demo_data_df)
     assert "occupation" in attached_df.columns
     assert "workclass" in attached_df.columns
     assert "age" in attached_df.columns
     assert "education" in attached_df.columns
-    assert "capitalgain" in attached_df
+    assert "capital-gain" in attached_df
