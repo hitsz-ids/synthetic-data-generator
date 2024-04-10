@@ -5,7 +5,7 @@ from collections import defaultdict
 from collections.abc import Iterable
 from itertools import chain
 from pathlib import Path
-from typing import Any, Dict, Set, List
+from typing import Any, Dict, List, Set
 
 import pandas as pd
 from pydantic import BaseModel
