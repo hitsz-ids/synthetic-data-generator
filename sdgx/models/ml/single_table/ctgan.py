@@ -203,7 +203,7 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
         self._data_sampler = None
         self._generator = None
         self._ndarry_loader = None
-
+self.data_dim = None
     def fit(self, metadata: Metadata, dataloader: DataLoader, epochs=None, *args, **kwargs):
         # from version 0.2.1, sdgx use `sdgx.data_processor.transformers.discrete` to handle discrete_columns
         # the original sdv transformer will be removed in version 0.3.0

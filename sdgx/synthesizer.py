@@ -347,9 +347,6 @@ class Synthesizer:
         self.metadata = metadata  # Ensure update metadata
 
         # data_processors do not need to be fit again in the sampling stage
-        # if metadata:
-        #     for d in self.data_processors:
-        #         d.fit(metadata)
 
         # check data processor fit status before sampling
         for d in self.data_processors:
