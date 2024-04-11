@@ -22,6 +22,7 @@ class DataProcessor:
     def fit(self, metadata: Metadata | None = None, **kwargs: Dict[str, Any]):
         self._fit(metadata, **kwargs)
         self.fitted = True
+
     def _fit(self, metadata: Metadata | None = None, **kwargs: Dict[str, Any]):
         raise NotImplementedError
         """Fit the data processor.
