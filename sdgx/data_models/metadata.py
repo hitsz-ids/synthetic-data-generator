@@ -43,14 +43,14 @@ class Metadata(BaseModel):
     """"
     column_list is the actual value of self.column_list
     """
-    
-    @validator('column_list')
+
+    @validator("column_list")
     def check_column_list(cls, value) -> Any:
         # check if v has duplicate element
         if len(value) == len(set(value)):
             return value
         raise MetadataInitError("column_list has duplicate element!")
-    
+
     column_inspect_level: Dict[str, int] = defaultdict(lambda: 10)
     """
     column_inspect_level is used to store every inspector's level, to specify the true type of each column.
@@ -77,9 +77,6 @@ class Metadata(BaseModel):
     """
     For extend information, use ``get`` and ``set``
     """
-    
-    
-
 
     @property
     def tag_fields(self) -> Iterable[str]:
