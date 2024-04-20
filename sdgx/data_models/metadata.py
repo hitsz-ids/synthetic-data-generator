@@ -5,7 +5,7 @@ from collections import defaultdict
 from collections.abc import Iterable
 from itertools import chain
 from pathlib import Path
-from typing import Any, Dict, Set
+from typing import Any, Dict, List, Set
 
 import pandas as pd
 from pydantic import BaseModel
@@ -39,9 +39,9 @@ class Metadata(BaseModel):
     primary_keys is used to store single primary key or composite primary key
     """
 
-    column_list: Set[str] = set()
+    _column_list: List[str] = []
     """"
-    column_list is used to store all columns' name
+    _column_list is the actual value of self.column_list
     """
 
     column_inspect_level: Dict[str, int] = defaultdict(lambda: 10)
@@ -70,6 +70,28 @@ class Metadata(BaseModel):
     """
     For extend information, use ``get`` and ``set``
     """
+
+    @property
+    def column_list(self) -> List:
+        '''
+        column_list is used to store all columns' name with order
+        '''
+        return self._column_list
+
+    @column_list.setter
+    def column_list(self, value: List):
+        '''
+        Setter of the property column_list.
+        '''
+        def remove_duplicates(lst):
+            seen = set()
+            result = []
+            for item in lst:
+                if item not in seen:
+                    seen.add(item)
+                    result.append(item)
+            return result
+        self._column_list = remove_duplicates(value)
 
     @property
     def tag_fields(self) -> Iterable[str]:
@@ -299,7 +321,7 @@ class Metadata(BaseModel):
         if primary_keys is None:
             primary_keys = set()
 
-        metadata = Metadata(primary_keys=primary_keys, column_list=set(dataloader.columns()))
+        metadata = Metadata(primary_keys=primary_keys, column_list=dataloader.columns())
         for inspector in inspectors:
             inspect_res = inspector.inspect()
             # update column type
@@ -352,7 +374,7 @@ class Metadata(BaseModel):
         for inspector in inspectors:
             inspector.fit(df)
 
-        metadata = Metadata(primary_keys=[df.columns[0]], column_list=set(df.columns))
+        metadata = Metadata(primary_keys=[df.columns[0]], column_list=df.columns)
         for inspector in inspectors:
             inspect_res = inspector.inspect()
             # update column type
@@ -474,7 +496,7 @@ class Metadata(BaseModel):
             raise MetadataInvalidError("Primary key should be Iterable or str.")
         primary_keys = set(primary_keys if isinstance(primary_keys, Iterable) else [primary_keys])
 
-        if not primary_keys.issubset(self.column_list):
+        if not primary_keys.issubset(set(self.column_list)):
             raise MetadataInvalidError("Primary key not exist in table columns.")
 
         self.primary_keys = primary_keys
