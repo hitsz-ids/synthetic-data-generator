@@ -348,10 +348,6 @@ class Synthesizer:
 
         # data_processors do not need to be fit again in the sampling stage
 
-        # check data processor fit status before sampling
-        for d in self.data_processors:
-            d.check_fitted()
-
         if not model_sample_args:
             model_sample_args = {}
 
