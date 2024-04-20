@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Set
 
 import pandas as pd
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.inspectors.base import RelationshipInspector
@@ -44,7 +44,8 @@ class Metadata(BaseModel):
     column_list is the actual value of self.column_list
     """
 
-    @validator("column_list")
+    @field_validator("column_list")
+    @classmethod
     def check_column_list(cls, value) -> Any:
         # check if v has duplicate element
         if len(value) == len(set(value)):
