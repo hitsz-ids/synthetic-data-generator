@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import shutil
 from pathlib import Path
+from typing import Any, Dict
+
 import pandas as pd
 import pytest
-from typing import Dict, Any
 
 from sdgx.data_connectors.generator_connector import GeneratorConnector
 from sdgx.data_models.metadata import Metadata
@@ -39,7 +40,8 @@ class MockDataProcessor(DataProcessor):
     fitted = True
 
     def _fit(self, metadata: Metadata | None = None, **kwargs: Dict[str, Any]):
-        return 
+        return
+
     pass
 
 
