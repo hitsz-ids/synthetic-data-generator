@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Set
 
 import pandas as pd
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, validator
 
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.inspectors.base import RelationshipInspector
@@ -39,11 +39,18 @@ class Metadata(BaseModel):
     primary_keys is used to store single primary key or composite primary key
     """
 
-    _column_list: List[str] = []
+    column_list: List[str] = Field(default_factory=list, title="The List of Column Names")
     """"
-    _column_list is the actual value of self.column_list
+    column_list is the actual value of self.column_list
     """
-
+    
+    @validator('column_list')
+    def check_column_list(cls, value) -> Any:
+        # check if v has duplicate element
+        if len(value) == len(set(value)):
+            return value
+        raise MetadataInitError("column_list has duplicate element!")
+    
     column_inspect_level: Dict[str, int] = defaultdict(lambda: 10)
     """
     column_inspect_level is used to store every inspector's level, to specify the true type of each column.
@@ -70,30 +77,9 @@ class Metadata(BaseModel):
     """
     For extend information, use ``get`` and ``set``
     """
+    
+    
 
-    @property
-    def column_list(self) -> List:
-        """
-        column_list is used to store all columns' name with order
-        """
-        return self._column_list
-
-    @column_list.setter
-    def column_list(self, value: List):
-        """
-        Setter of the property column_list.
-        """
-
-        def remove_duplicates(lst):
-            seen = set()
-            result = []
-            for item in lst:
-                if item not in seen:
-                    seen.add(item)
-                    result.append(item)
-            return result
-
-        self._column_list = remove_duplicates(value)
 
     @property
     def tag_fields(self) -> Iterable[str]:
