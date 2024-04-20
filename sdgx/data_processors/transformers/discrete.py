@@ -18,7 +18,7 @@ class DiscreteTransformer(Transformer):
     By default, DiscreteTransformer will perform one-hot encoding of discrete columns, and issue a warning message when dimensionality explosion occurs.
     """
 
-    discrete_columns: list = None
+    discrete_columns: list = []
     """
     Record which columns are of discrete type.
     """

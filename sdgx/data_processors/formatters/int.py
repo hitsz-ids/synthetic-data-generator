@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, List
 
 import pandas as pd
 
@@ -15,7 +15,7 @@ class IntValueFormatter(Formatter):
     Formatter class for handling Int values in pd.DataFrame.
     """
 
-    int_columns = None
+    int_columns: List = []
 
     def fit(self, metadata: Metadata | None = None, **kwargs: dict[str, Any]):
         """
