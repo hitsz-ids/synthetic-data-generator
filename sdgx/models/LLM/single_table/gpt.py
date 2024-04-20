@@ -515,4 +515,4 @@ class SingleTableGPTModel(LLMBaseModel):
 
         # return result
         final_columns = self.columns + self.off_table_features
-        return pd.DataFrame(self.result, columns=final_columns)
+        return pd.DataFrame(result, columns=final_columns)
