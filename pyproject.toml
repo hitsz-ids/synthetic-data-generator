@@ -28,6 +28,7 @@ dependencies = [
     "importlib_metadata",
     "openai>=1.10.0",
     "python-dotenv",
+    "joblib>=1.4.0"
 ]
 dynamic = ["version"]
 classifiers = [
