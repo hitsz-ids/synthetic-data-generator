@@ -73,16 +73,17 @@ class Metadata(BaseModel):
 
     @property
     def column_list(self) -> List:
-        '''
+        """
         column_list is used to store all columns' name with order
-        '''
+        """
         return self._column_list
 
     @column_list.setter
     def column_list(self, value: List):
-        '''
+        """
         Setter of the property column_list.
-        '''
+        """
+
         def remove_duplicates(lst):
             seen = set()
             result = []
@@ -91,6 +92,7 @@ class Metadata(BaseModel):
                     seen.add(item)
                     result.append(item)
             return result
+
         self._column_list = remove_duplicates(value)
 
     @property
