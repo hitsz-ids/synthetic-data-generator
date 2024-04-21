@@ -17,7 +17,6 @@ dependencies = [
     'Faker>=10',
     "matplotlib",
     "torch>=2",
-    "torchvision",
     "table-evaluator",
     "click",
     "pluggy",
