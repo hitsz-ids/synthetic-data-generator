@@ -48,6 +48,8 @@ Our current key achievements and timelines are as follows:
 
 🔥 Feb 20, 2024: a single-table data synthesis model based on LLM is included, view colab example: <a href="https://colab.research.google.com/drive/1VFnP59q3eoVtMJ1PvcYjmuXtx9N8C7o0?usp=sharing" target="value"> LLM: Data Synthesis</a> and <a href="https://colab.research.google.com/drive/1_chuTVZECpj5fklj-RAp7ZVrew8weLW_?usp=sharing" target="value"> LLM: Off-table Feature Inference</a>.
 
+🔧 Feb 7, 2024: We improved `sdgx.data_models.metadata` to support metadata information describing for single tables and multiple tables, support multiple data types, support automatic data type inference. view colab example: <a href="https://colab.research.google.com/drive/1b4ZTpgSYjOt7ekp1Wj8CxDknbOHEwA7s?usp=sharing" target="value">SDG Single-Table Metadata</a>。
+
 🔶 Dec 20, 2023: v0.1.0 released, a CTGAN model that supports billions of data processing capabilities is included, view our <a href="https://github.com/hitsz-ids/synthetic-data-generator/tree/main/benchmarks#results" target="value"> benchmark against SDV</a>, where SDG achieved less memory consumption and avoided crashing during training. For specific use, view colab example: <a href="https://colab.research.google.com/drive/1cMB336jN3kb-m_pr1aJjshnNep_6bhsf?usp=sharing" target="value"> Billion-Level-Data supported CTGAN</a>.
 
 🔆 Aug 10, 2023: First line of SDG code committed.

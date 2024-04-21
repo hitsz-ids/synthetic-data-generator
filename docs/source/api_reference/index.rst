@@ -13,7 +13,6 @@ API Reference
     Cacher for DataLoader <cachers/index>
     Data Processor <data_processors/index>
     Models <models/index>
-    Metadata and Inspectors <data_models/index>
     Data Exporter <data_exporters/index>
     Manager <manager>
     Exceptions <exceptions>

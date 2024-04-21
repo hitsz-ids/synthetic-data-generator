@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Set
 
 import pandas as pd
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
 
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.inspectors.base import RelationshipInspector
@@ -39,10 +39,19 @@ class Metadata(BaseModel):
     primary_keys is used to store single primary key or composite primary key
     """
 
-    column_list: List[str] = []
+    column_list: List[str] = Field(default_factory=list, title="The List of Column Names")
+
     """"
-    column_list is used to store all columns' name
+    column_list is the actual value of self.column_list
     """
+
+    @field_validator("column_list")
+    @classmethod
+    def check_column_list(cls, value) -> Any:
+        # check if v has duplicate element
+        if len(value) == len(set(value)):
+            return value
+        raise MetadataInitError("column_list has duplicate element!")
 
     column_inspect_level: Dict[str, int] = defaultdict(lambda: 10)
     """

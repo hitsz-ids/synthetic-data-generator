@@ -7,6 +7,9 @@ from copy import copy
 
 import openai
 import pandas as pd
+from dotenv import load_dotenv
+
+load_dotenv()
 
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.metadata import Metadata
@@ -512,4 +515,4 @@ class SingleTableGPTModel(LLMBaseModel):
 
         # return result
         final_columns = self.columns + self.off_table_features
-        return pd.DataFrame(self.result, columns=final_columns)
+        return pd.DataFrame(result, columns=final_columns)
