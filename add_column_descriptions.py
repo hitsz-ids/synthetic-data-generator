@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-class AddColumnDescriptions():
+class AddColumnDescriptions:
     def __init__(self, sampled_data):
         self.sampled_data = sampled_data
 
@@ -10,7 +10,7 @@ class AddColumnDescriptions():
         print(sampled_data_df.info())
         num_columns = sampled_data_df.shape[1]
 
-        descriptions = [""]*num_columns
+        descriptions = [""] * num_columns
 
         for i, (column_name, column_data) in enumerate(sampled_data_df.items()):
             # print(f"column name: {column_name}, column #{i}")
