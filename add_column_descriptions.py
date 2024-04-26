@@ -15,19 +15,22 @@ class AddColumnDescriptions:
         for i, (column_name, column_data) in enumerate(sampled_data_df.items()):
             data_type = column_data.dtype
 
-            descriptions[i] = f"column #{i}\ncolumn name: {column_name}\ncolumn data type: {data_type}"
+            descriptions[i] = (
+                f"column #{i}\ncolumn name: {column_name}\ncolumn data type: {data_type}"
+            )
 
             if data_type == "int64":
                 min = column_data.min()
                 max = column_data.max()
                 mean = column_data.mean()
                 std_deviation = column_data.std
-                descriptions[i] = descriptions[i]+(f"min value: {min}\nmax value: {max}\nmean value: {mean}\n"
-                                                   f"standard deviation: {std_deviation}")
+                descriptions[i] = descriptions[i] + (
+                    f"min value: {min}\nmax value: {max}\nmean value: {mean}\n"
+                    f"standard deviation: {std_deviation}"
+                )
 
             elif data_type == "datetime64":
                 print("data type is datetime64")
-
 
             # if column_data.dtype == 'object':
             #     unique_values = column_data.unique()
