@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-class AddColumnDescriptions():
+class AddColumnDescriptions:
     def __init__(self, sampled_data):
         self.sampled_data = sampled_data
 
@@ -13,9 +13,21 @@ class AddColumnDescriptions():
         descriptions = [""]*num_columns
 
         for i, (column_name, column_data) in enumerate(sampled_data_df.items()):
-            # print(f"column name: {column_name}, column #{i}")
             data_type = column_data.dtype
-            descriptions[i] = f"column #{i}\ncolumn name: {column_name}\ndata type: {data_type}"
+
+            descriptions[i] = f"column #{i}\ncolumn name: {column_name}\ncolumn data type: {data_type}"
+
+            if data_type == "int64":
+                min = column_data.min()
+                max = column_data.max()
+                mean = column_data.mean()
+                std_deviation = column_data.std
+                descriptions[i] = descriptions[i]+(f"min value: {min}\nmax value: {max}\nmean value: {mean}\n"
+                                                   f"standard deviation: {std_deviation}")
+
+            elif data_type == "datetime64":
+                print("data type is datetime64")
+
 
             # if column_data.dtype == 'object':
             #     unique_values = column_data.unique()
