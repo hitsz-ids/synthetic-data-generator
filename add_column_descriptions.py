@@ -1,13 +1,40 @@
 import pandas as pd
 
 
+def _add_int64_column_descriptions(column_data, description):
+    min_value = column_data.min()
+    max_value = column_data.max()
+    mean_value = column_data.mean()
+    std_deviation = column_data.std()
+    description = description + (
+        f"min value: {min_value}\nmax value: {max_value}\nmean value: {mean_value}\n"
+        f"standard deviation: {std_deviation}\n"
+    )
+    return description
+
+
+def _add_datetime64_column_descriptions(column_data, description):
+    start_date = column_data.min()
+    end_date = column_data.max
+    description = description + f"start date: {start_date}\nend date: {end_date}\n"
+    return description
+
+
+def _add_category_column_descriptions(column_data, description):
+    all_categories = len(column_data.values())
+    unique_categories = len(column_data.unique())
+    description = description + (f"number of all category values: {all_categories}\nnumber of "
+                                 f"unique category values: {unique_categories}\n")
+    return description
+
+
 class AddColumnDescriptions:
     def __init__(self, sampled_data):
         self.sampled_data = sampled_data
 
     def add_column_descriptions(self):
         sampled_data_df = pd.DataFrame(self.sampled_data)
-        print(sampled_data_df.info())
+        # print(sampled_data_df.info())
         num_columns = sampled_data_df.shape[1]
 
         descriptions = [""] * num_columns
@@ -20,29 +47,14 @@ class AddColumnDescriptions:
             )
 
             if data_type == "int64":
-                min = column_data.min()
-                max = column_data.max()
-                mean = column_data.mean()
-                std_deviation = column_data.std()
-                descriptions[i] = descriptions[i] + (
-                    f"min value: {min}\nmax value: {max}\nmean value: {mean}\n"
-                    f"standard deviation: {std_deviation}\n"
-                )
+                descriptions[i] = _add_int64_column_descriptions(column_data, descriptions[i])
 
             elif data_type == "datetime64":
-                print("data type is datetime64")
-                start_date = column_data.min()
-                end_date = column_data.max
+                descriptions[i] = _add_datetime64_column_descriptions(column_data, descriptions[i])
 
-                descriptions[i] = descriptions[i] + f"start date: {start_date}\nend date: {end_date}\n"
+            elif data_type == "category":
+                descriptions[i] = _add_category_column_descriptions(column_data, descriptions[i])
 
-            # if column_data.dtype == 'object':
-            #     unique_values = column_data.unique()
-            #     print(f"object values: {unique_values}")
-            #
-            # elif column_data.dtype == 'int64':
-            #     column_mean = column_data.mean()
-            #     print(f"mean: {column_mean}")
         print("")
         for element in descriptions:
             print(element)
