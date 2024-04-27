@@ -34,7 +34,9 @@ class AddColumnDescriptions:
                 start_date = column_data.min()
                 end_date = column_data.max
 
-                descriptions[i] = descriptions[i] + f"start date: {start_date}\nend date: {end_date}\n"
+                descriptions[i] = (
+                    descriptions[i] + f"start date: {start_date}\nend date: {end_date}\n"
+                )
 
             # if column_data.dtype == 'object':
             #     unique_values = column_data.unique()
