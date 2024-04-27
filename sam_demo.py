@@ -7,15 +7,12 @@ from sdgx.synthesizer import Synthesizer
 from sdgx.utils import download_demo_data, logger
 
 # This will download demo data to ./dataset
-print("downloading demo data")
 dataset_csv = download_demo_data()
 
 # Create data connector for csv file
-print("creating data connector (wrapping csv file into connector)")
 data_connector = CsvConnector(path=dataset_csv)
 
 # Initialize synthesizer, use CTGAN model
-print("initializing synthesizer")
 synthesizer = Synthesizer(
     model=CTGANSynthesizerModel(epochs=1),  # For quick demo
     data_connector=data_connector,
