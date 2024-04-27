@@ -23,8 +23,10 @@ def _add_datetime64_column_descriptions(column_data, description):
 def _add_category_column_descriptions(column_data, description):
     all_categories = len(column_data.values())
     unique_categories = len(column_data.unique())
-    description = description + (f"number of all category values: {all_categories}\nnumber of "
-                                 f"unique category values: {unique_categories}\n")
+    description = description + (
+        f"number of all category values: {all_categories}\nnumber of "
+        f"unique category values: {unique_categories}\n"
+    )
     return description
 
 
