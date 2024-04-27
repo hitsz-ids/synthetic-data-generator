@@ -7,6 +7,7 @@ from typing import Generator
 import pandas as pd
 
 from sdgx.data_connectors.base import DataConnector
+from sdgx.log import logger
 
 
 class CsvConnector(DataConnector):
@@ -31,6 +32,8 @@ class CsvConnector(DataConnector):
 
 
     """
+    # new logger
+    logger.info("new logger-Initializing CSVConnector...")
 
     @cached_property
     def identity(self):
