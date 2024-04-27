@@ -22,10 +22,20 @@ def _add_datetime64_column_descriptions(column_data, description):
 
 def _add_category_column_descriptions(column_data, description):
     all_categories = len(column_data.values())
-    unique_categories = len(column_data.unique())
+    unique_categories = column_data.unique()
     description = description + (
         f"number of all category values: {all_categories}\nnumber of "
         f"unique category values: {unique_categories}\n"
+    )
+    return description
+
+
+def _add_object_column_descriptions(column_data, description):
+    all_objects = len(column_data)
+    unique_objects = len(column_data.unique())
+    description = description + (
+        f"number of all object values: {all_objects}\nnumber of "
+        f"unique object values: {unique_objects}\n"
     )
     return description
 
@@ -56,6 +66,9 @@ class AddColumnDescriptions:
 
             elif data_type == "category":
                 descriptions[i] = _add_category_column_descriptions(column_data, descriptions[i])
+
+            elif data_type == "object":
+                descriptions[i] = _add_object_column_descriptions(column_data, descriptions[i])
 
         print("")
         for element in descriptions:
