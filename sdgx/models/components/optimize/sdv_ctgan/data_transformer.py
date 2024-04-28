@@ -179,7 +179,7 @@ class DataTransformer(object):
         for key in npz_data.keys():
             count += 1
             print(f"key: {key}\ndata: {npz_data[key]}")
-            if count == 100:
+            if count == 3:
                 break
 
     def _parallel_transform(self, raw_data, column_transform_info_list) -> NDArrayLoader:
