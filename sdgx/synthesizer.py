@@ -396,6 +396,9 @@ class Synthesizer:
         It useful when Synthesizer object is no longer needed and may hold large resources like GPUs.
         """
 
+        # new logger
+        logger.info("clearing dataloader cache...")
+
         if self.dataloader:
             self.dataloader.finalize(clear_cache=True)
         # Release resources

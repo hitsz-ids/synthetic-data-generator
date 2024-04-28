@@ -13,7 +13,7 @@ df = pd.read_csv(p)
 m = Metadata.from_dataframe(df)
 
 # I add a k-v pair
-# this will add the the  `.extend`  field
+# this will add the  `.extend`  field
 m.add('a', "something")
 m.add("Eric", [23, "Business"])
 # then save the model
