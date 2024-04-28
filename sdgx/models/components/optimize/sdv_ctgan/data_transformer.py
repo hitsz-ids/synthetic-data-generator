@@ -143,7 +143,10 @@ class DataTransformer(object):
 
         Outputs a list with Numpy arrays.
         """
-        print("inside synchronous transform function")
+
+        # new logger
+        logger.info("Performing a synchronous transform...")
+
         loader = NDArrayLoader()
         for column_transform_info in column_transform_info_list:
             column_name = column_transform_info.column_name
