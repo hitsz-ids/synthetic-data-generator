@@ -1,6 +1,8 @@
 # import packages
-import pandas as pd
 from pathlib import Path
+
+import pandas as pd
+
 from sdgx.data_models.metadata import Metadata
 from sdgx.utils import download_demo_data
 
@@ -14,12 +16,12 @@ m = Metadata.from_dataframe(df)
 
 # I add a k-v pair
 # this will add the  `.extend`  field
-m.add('a', "something")
+m.add("a", "something")
 m.add("Eric", [23, "Business"])
 # then save the model
-m.save(Path('here.json'))
+m.save(Path("here.json"))
 
-print(m.get('a'))
+print(m.get("a"))
 """The output is:
 {'something'}
 """
@@ -28,7 +30,7 @@ print(m.get('a'))
 n = Metadata.load(Path("here.json"))
 print(f"type of n: {type(n)}")
 # the value "something" is missing
-print(n.get('a'))
+print(n.get("a"))
 """The output is:
 set()
 """
@@ -36,6 +38,6 @@ set()
 extended = n._extend
 print(extended)
 print(f"type of extended: {type(extended)}")
-''' The output is :
+""" The output is :
 defaultdict(<class 'set'>, {})
-'''
+"""
