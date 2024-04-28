@@ -145,7 +145,7 @@ class DataTransformer(object):
         """
 
         # new logger
-        logger.info("Performing a synchronous transform...")
+        logger.info("new logger performing a synchronous transform...")
 
         loader = NDArrayLoader()
         for column_transform_info in column_transform_info_list:

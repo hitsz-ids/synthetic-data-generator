@@ -400,7 +400,7 @@ class Synthesizer:
         """
 
         # new logger
-        logger.info("clearing dataloader cache...")
+        logger.info("new logger clearing dataloader cache...")
 
         if self.dataloader:
             self.dataloader.finalize(clear_cache=True)
