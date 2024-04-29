@@ -132,6 +132,9 @@ class Synthesizer:
             self.metadata = metadata
         elif metadata_path:
             self.metadata = Metadata.load(metadata_path)
+            #Added detailed logging for metadata loading to improve configuration tracking
+            logger.info(f"Metadata loaded from path: {metadata_path}")
+
         else:
             self.metadata = None
 
