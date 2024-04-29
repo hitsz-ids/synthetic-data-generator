@@ -92,9 +92,11 @@ class Synthesizer:
             data_connector = DataConnectorManager().init_data_connector(
                 data_connector, **(data_connector_kwargs or {})
             )
-            
-            logger.info(f"Data connector initialized: {data_connector}") # Log the type or identifier of the data connector after its initialization
-            
+
+            logger.info(
+                f"Data connector initialized: {data_connector}"
+            )  # Log the type or identifier of the data connector after its initialization
+
         if data_connector:
             self.dataloader = DataLoader(
                 data_connector,
