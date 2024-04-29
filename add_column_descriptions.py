@@ -52,7 +52,9 @@ class AddColumnDescriptions:
         for i, (column_name, column_data) in enumerate(sampled_data_df.items()):
             data_type = column_data.dtype
 
-            description = f"column #{i}\ncolumn name: {column_name}\ncolumn data type: {data_type}\n"
+            description = (
+                f"column #{i}\ncolumn name: {column_name}\ncolumn data type: {data_type}\n"
+            )
 
             if data_type == "int64":
                 description += _add_int64_column_descriptions(column_data)
