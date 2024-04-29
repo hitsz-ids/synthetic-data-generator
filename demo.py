@@ -39,4 +39,3 @@ print(sampled_data)
 # print("creating sampled data")
 # sampled_data = synthesizer.sample(1000)
 # print(sampled_data)
-
