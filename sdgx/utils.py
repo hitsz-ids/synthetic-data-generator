@@ -59,6 +59,10 @@ def download_demo_data(data_dir: str | Path = "./dataset") -> Path:
     Returns:
         pathlib.Path: demo data path
     """
+
+    # new logger
+    logger.info("new logger-Downloading demo data...")
+
     data_dir = Path(data_dir).expanduser().resolve()
     demo_data_path = data_dir / "adult.csv"
     if not demo_data_path.exists():

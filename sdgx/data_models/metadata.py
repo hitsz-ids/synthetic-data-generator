@@ -205,7 +205,7 @@ class Metadata(BaseModel):
                 # add datetime format
                 m.add('datetime_format',{"col_1": "%Y-%m-%d %H:%M:%S", "col_2": "%d %b %Y"})
         """
-
+        print(f"Attempting to add k, v: {key}, {values}")
         values = (
             values if isinstance(values, Iterable) and not isinstance(values, str) else [values]
         )

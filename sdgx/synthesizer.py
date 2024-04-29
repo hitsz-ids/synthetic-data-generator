@@ -61,6 +61,9 @@ class Synthesizer:
             sampled_data = synthesizer.sample(1000)
     """
 
+    # new logger
+    logger.info("new logger-Initializing Synthesizer...")
+
     METADATA_SAVE_NAME = "metadata.json"
     """
     Default name for metadata file
@@ -89,6 +92,11 @@ class Synthesizer:
             data_connector = DataConnectorManager().init_data_connector(
                 data_connector, **(data_connector_kwargs or {})
             )
+
+            logger.info(
+                f"Data connector initialized: {data_connector}"
+            )  # Log the type or identifier of the data connector after its initialization
+
         if data_connector:
             self.dataloader = DataLoader(
                 data_connector,
@@ -395,6 +403,9 @@ class Synthesizer:
 
         It useful when Synthesizer object is no longer needed and may hold large resources like GPUs.
         """
+
+        # new logger
+        logger.info("new logger clearing dataloader cache...")
 
         if self.dataloader:
             self.dataloader.finalize(clear_cache=True)
