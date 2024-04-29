@@ -145,6 +145,10 @@ class Synthesizer:
         if (isinstance(model, str) or isinstance(model, type)) and model_path:
             # Load model by cls or str
             self.model = self.model_manager.load(model, model_path)
+
+            # Log the path from where the model is being loaded, providing a trace for troubleshooting issues related to model loading
+            logger.info(f"Model loaded from path: {model_path}")
+
             if model_kwargs:
                 logger.warning("model_kwargs will be ignored when loading model from model_path")
         elif isinstance(model, str) or isinstance(model, type):
