@@ -284,6 +284,8 @@ class Synthesizer:
             inspector_init_kwargs (dict[str, Any], optional): The keyword arguments for metadata inspectors. Defaults to None.
             model_fit_kwargs (dict[str, Any], optional): The keyword arguments for model.fit. Defaults to None.
         """
+
+        logger.info("new logger-Fitting the synthesizer with metadata and data processors")
         if self.dataloader is None:
             raise SynthesizerInitError(
                 "Cannot fit without dataloader, check `data_connector` parameter when initializing Synthesizer"
