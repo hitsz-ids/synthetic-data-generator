@@ -26,6 +26,16 @@ print("fitting the synthesizer, this is where transform is called")
 synthesizer.fit()
 
 # Sample
+
+sampled_data = synthesizer.sample(1000)
+print(sampled_data)
+
+# Issue 33
+# transformer = DataTransformer()
+# transformed_data = transformer.transform(sampled_data)
+# print(transformed_data)
+
+
 # print("creating sampled data")
 # sampled_data = synthesizer.sample(1000)
 # print(sampled_data)
