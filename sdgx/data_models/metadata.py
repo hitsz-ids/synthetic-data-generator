@@ -97,16 +97,16 @@ class Metadata(BaseModel):
         if not isinstance(other, Metadata):
             return super().__eq__(other)
         return (
-            set(self.tag_fields) == set(other.tag_fields)
-            and all(
-                self.get(key) == other.get(key)
-                for key in set(chain(self.tag_fields, other.tag_fields))
-            )
-            and all(
-                self.get(key) == other.get(key)
-                for key in set(chain(self.format_fields, other.format_fields))
-            )
-            and self.version == other.version
+                set(self.tag_fields) == set(other.tag_fields)
+                and all(
+            self.get(key) == other.get(key)
+            for key in set(chain(self.tag_fields, other.tag_fields))
+        )
+                and all(
+            self.get(key) == other.get(key)
+            for key in set(chain(self.format_fields, other.format_fields))
+        )
+                and self.version == other.version
         )
 
     def query(self, field: str) -> Iterable[str]:
@@ -166,9 +166,9 @@ class Metadata(BaseModel):
 
         old_value = self.get(key)
         if (
-            key in self.model_fields
-            and key not in self.tag_fields
-            and key not in self.format_fields
+                key in self.model_fields
+                and key not in self.tag_fields
+                and key not in self.format_fields
         ):
             raise MetadataInitError(
                 f"Set {key} not in tag_fields, try set it directly as m.{key} = value"
@@ -205,7 +205,8 @@ class Metadata(BaseModel):
                 # add datetime format
                 m.add('datetime_format',{"col_1": "%Y-%m-%d %H:%M:%S", "col_2": "%d %b %Y"})
         """
-        print(f"Attempting to add k, v: {key}, {values}")
+        # comment out before demoing to class
+        # print(f"Attempting to add k, v: {key}, {values}")
         values = (
             values if isinstance(values, Iterable) and not isinstance(values, str) else [values]
         )
@@ -258,14 +259,14 @@ class Metadata(BaseModel):
 
     @classmethod
     def from_dataloader(
-        cls,
-        dataloader: DataLoader,
-        max_chunk: int = 10,
-        primary_keys: set[str] = None,
-        include_inspectors: Iterable[str] | None = None,
-        exclude_inspectors: Iterable[str] | None = None,
-        inspector_init_kwargs: dict[str, Any] | None = None,
-        check: bool = False,
+            cls,
+            dataloader: DataLoader,
+            max_chunk: int = 10,
+            primary_keys: set[str] = None,
+            include_inspectors: Iterable[str] | None = None,
+            exclude_inspectors: Iterable[str] | None = None,
+            inspector_init_kwargs: dict[str, Any] | None = None,
+            check: bool = False,
     ) -> "Metadata":
         """Initialize a metadata from DataLoader and Inspectors
 
@@ -322,12 +323,12 @@ class Metadata(BaseModel):
 
     @classmethod
     def from_dataframe(
-        cls,
-        df: pd.DataFrame,
-        include_inspectors: list[str] | None = None,
-        exclude_inspectors: list[str] | None = None,
-        inspector_init_kwargs: dict[str, Any] | None = None,
-        check: bool = False,
+            cls,
+            df: pd.DataFrame,
+            include_inspectors: list[str] | None = None,
+            exclude_inspectors: list[str] | None = None,
+            inspector_init_kwargs: dict[str, Any] | None = None,
+            check: bool = False,
     ) -> "Metadata":
         """Initialize a metadata from DataFrame and Inspectors
 
@@ -380,6 +381,27 @@ class Metadata(BaseModel):
 
         with path.open("w") as f:
             f.write(self._dump_json())
+
+    def save_extend(self, path: str | Path):
+        """
+        Save the set objects in _extend to a json file.
+        """
+        json_dict = {}
+
+        keys = list(self._extend.keys())
+        vals = list(self._extend.values())
+
+        # The objects in _extend are sets, which json cannot iterate through,
+        # so converting them to a dictionary is necessary
+        for i in range(len(keys)):
+            if type(vals[i]) is set:
+                json_dict[keys[i]] = list(vals[i])
+            else:
+                json_dict[keys[i]] = vals[i]
+
+        with path.open("w") as f:
+            json.dump(json_dict, f)
+
 
     @classmethod
     def load(cls, path: str | Path) -> "Metadata":
@@ -507,10 +529,10 @@ class Metadata(BaseModel):
         # find the dtype who has most high inspector level
         for each_key in list(self.model_fields.keys()) + list(self._extend.keys()):
             if (
-                each_key != "pii_columns"
-                and each_key.endswith("_columns")
-                and column_name in self.get(each_key)
-                and current_level < self.column_inspect_level[each_key]
+                    each_key != "pii_columns"
+                    and each_key.endswith("_columns")
+                    and column_name in self.get(each_key)
+                    and current_level < self.column_inspect_level[each_key]
             ):
                 current_level = self.column_inspect_level[each_key]
                 current_type = each_key
