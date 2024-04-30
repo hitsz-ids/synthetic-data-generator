@@ -392,16 +392,18 @@ class Metadata(BaseModel):
         vals = list(self._extend.values())
 
         # The objects in _extend are sets, which json cannot iterate through,
-        # so converting them to a dictionary is necessary
+        # so converting them to a list allows them to be saved to a json file
         for i in range(len(keys)):
             if type(vals[i]) is set:
                 json_dict[keys[i]] = list(vals[i])
             else:
                 json_dict[keys[i]] = vals[i]
 
-        with path.open("w") as f:
-            json.dump(json_dict, f)
-
+        try:
+            with path.open("w") as f:
+                json.dump(json_dict, f, indent=4)
+        except TypeError as extend_error:
+            print(f'{extend_error}, one or values in _extend could not be saved to a JSON file')
 
     @classmethod
     def load(cls, path: str | Path) -> "Metadata":
