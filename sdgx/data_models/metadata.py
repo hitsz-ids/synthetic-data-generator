@@ -403,7 +403,7 @@ class Metadata(BaseModel):
             with path.open("w") as f:
                 json.dump(json_dict, f, indent=4)
         except TypeError as extend_error:
-            print(f'{extend_error}, one or values in _extend could not be saved to a JSON file')
+            print(f"{extend_error}, one or values in _extend could not be saved to a JSON file")
 
     @classmethod
     def load(cls, path: str | Path) -> "Metadata":
