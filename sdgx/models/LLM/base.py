@@ -88,7 +88,7 @@ class LLMBaseModel(SynthesizerModel):
         if self.use_dataloader == self.use_raw_data == True:
             raise SynthesizerInitError("Duplicate data access type found.")
 
-    def _form_columns_description(self, sampled_data):
+    def Form_columns_description(self, sampled_data):
         sampled_data_df = pd.DataFrame(sampled_data)
 
         all_descriptions = ""
