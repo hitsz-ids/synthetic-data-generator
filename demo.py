@@ -1,7 +1,5 @@
-import pandas as pd
-
 from sdgx.data_connectors.csv_connector import CsvConnector
-from sdgx.models.components.sdv_ctgan.data_transformer import DataTransformer
+from sdgx.models.LLM.base import LLMBaseModel
 from sdgx.models.ml.single_table.ctgan import CTGANSynthesizerModel
 from sdgx.synthesizer import Synthesizer
 from sdgx.utils import download_demo_data
@@ -26,16 +24,9 @@ print("fitting the synthesizer, this is where transform is called")
 synthesizer.fit()
 
 # Sample
-
 sampled_data = synthesizer.sample(1000)
 print(sampled_data)
 
-# Issue 33
-# transformer = DataTransformer()
-# transformed_data = transformer.transform(sampled_data)
-# print(transformed_data)
-
-
-# print("creating sampled data")
-# sampled_data = synthesizer.sample(1000)
-# print(sampled_data)
+llm_base_model = LLMBaseModel()
+result = llm_base_model.Form_columns_description(sampled_data)
+print("demonstrating sams personal issue 142:\n" + result)
