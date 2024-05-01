@@ -61,6 +61,9 @@ class Synthesizer:
             sampled_data = synthesizer.sample(1000)
     """
 
+    # new logger
+    logger.info("new logger-Initializing Synthesizer...")
+
     METADATA_SAVE_NAME = "metadata.json"
     """
     Default name for metadata file
@@ -89,6 +92,11 @@ class Synthesizer:
             data_connector = DataConnectorManager().init_data_connector(
                 data_connector, **(data_connector_kwargs or {})
             )
+
+            logger.info(
+                f"Data connector initialized: {data_connector}"
+            )  # Log the type or identifier of the data connector after its initialization
+
         if data_connector:
             self.dataloader = DataLoader(
                 data_connector,
@@ -124,6 +132,9 @@ class Synthesizer:
             self.metadata = metadata
         elif metadata_path:
             self.metadata = Metadata.load(metadata_path)
+            # Added detailed logging for metadata loading to improve configuration tracking
+            logger.info(f"Metadata loaded from path: {metadata_path}")
+
         else:
             self.metadata = None
 
@@ -137,6 +148,10 @@ class Synthesizer:
         if (isinstance(model, str) or isinstance(model, type)) and model_path:
             # Load model by cls or str
             self.model = self.model_manager.load(model, model_path)
+
+            # Log the path from where the model is being loaded, providing a trace for troubleshooting issues related to model loading
+            logger.info(f"Model loaded from path: {model_path}")
+
             if model_kwargs:
                 logger.warning("model_kwargs will be ignored when loading model from model_path")
         elif isinstance(model, str) or isinstance(model, type):
@@ -269,6 +284,8 @@ class Synthesizer:
             inspector_init_kwargs (dict[str, Any], optional): The keyword arguments for metadata inspectors. Defaults to None.
             model_fit_kwargs (dict[str, Any], optional): The keyword arguments for model.fit. Defaults to None.
         """
+
+        logger.info("new logger-Fitting the synthesizer with metadata and data processors")
         if self.dataloader is None:
             raise SynthesizerInitError(
                 "Cannot fit without dataloader, check `data_connector` parameter when initializing Synthesizer"
@@ -395,6 +412,9 @@ class Synthesizer:
 
         It useful when Synthesizer object is no longer needed and may hold large resources like GPUs.
         """
+
+        # new logger
+        logger.info("new logger clearing dataloader cache...")
 
         if self.dataloader:
             self.dataloader.finalize(clear_cache=True)

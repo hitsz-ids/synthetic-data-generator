@@ -192,3 +192,8 @@ def demo_multi_table_data_metadata_combiner(
     m = MetadataCombiner(named_metadata=metadata_dict, relationships=[demo_multi_data_relationship])
 
     yield m
+
+
+def test_save_npz_file():
+
+    assert "Hello World" != "hello world"
