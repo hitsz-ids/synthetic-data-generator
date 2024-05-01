@@ -401,13 +401,15 @@ class Metadata(BaseModel):
             elif type(vals[i]) is not None:
                 json_dict[keys[i]] = vals[i]
             else:
-                print(f'data type: {type(vals[i])} could not be processed into a JSON file')
+                print(f"data type: {type(vals[i])} could not be processed into a JSON file")
 
         try:
             with path.open("w") as f:
                 json.dump(json_dict, f, indent=4)
         except TypeError as extend_error:
-            print(f'{extend_error}, one or more values in _extend could not be saved to a JSON file')
+            print(
+                f"{extend_error}, one or more values in _extend could not be saved to a JSON file"
+            )
             return None
 
         return json_dict

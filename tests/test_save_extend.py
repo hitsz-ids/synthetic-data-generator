@@ -1,6 +1,8 @@
-import pytest
 from pathlib import Path
+
 import pandas as pd
+import pytest
+
 from sdgx.data_models.metadata import Metadata
 
 
@@ -8,7 +10,7 @@ def test_clean_data():
     df = pd.read_csv("extendBug.csv")
     m = Metadata.from_dataframe(df)
     m.add("Hello", "World")
-    n = m.save_extend(Path('clean_data.json'))
+    n = m.save_extend(Path("clean_data.json"))
     assert n.get("Hello") == ["World"]
 
 
@@ -16,7 +18,7 @@ def test_int_values():
     df = pd.read_csv("extendBug.csv")
     m = Metadata.from_dataframe(df)
     m.add("Numbers", 55)
-    n = m.save_extend(Path('int_values.json'))
+    n = m.save_extend(Path("int_values.json"))
     assert n.get("Numbers") == [55]
 
 
@@ -24,7 +26,7 @@ def test_dict():
     df = pd.read_csv("extendBug.csv")
     m = Metadata.from_dataframe(df)
     m.add("Dict", {"values"})
-    n = m.save_extend(Path('dict.json'))
+    n = m.save_extend(Path("dict.json"))
     assert n.get("Dict") == ["values"]
 
 
@@ -32,7 +34,7 @@ def test_empty():
     df = pd.read_csv("extendBug.csv")
     m = Metadata.from_dataframe(df)
     m.add("", "")
-    n = m.save_extend(Path('empty.json'))
+    n = m.save_extend(Path("empty.json"))
     assert n.get("") == [""]
 
 
@@ -40,8 +42,8 @@ def test_none():
     df = pd.read_csv("extendBug.csv")
     m = Metadata.from_dataframe(df)
     m.add("none", None)
-    n = m.save_extend(Path('none.json'))
-    assert n.get('none') == [None]
+    n = m.save_extend(Path("none.json"))
+    assert n.get("none") == [None]
 
 
 def test_bad_path():
