@@ -30,4 +30,5 @@ print(sampled_data)
 # model = SingleTableGPTModel()
 
 col_descriptions = AddColumnDescriptions(sampled_data)
-col_descriptions.add_column_descriptions()
+result = col_descriptions.add_column_descriptions()
+print(result)
