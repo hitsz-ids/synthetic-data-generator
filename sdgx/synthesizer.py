@@ -16,6 +16,7 @@ from sdgx.data_processors.manager import DataProcessorManager
 from sdgx.exceptions import SynthesizerInitError, SynthesizerSampleError
 from sdgx.log import logger
 from sdgx.models.base import SynthesizerModel
+from sdgx.models.statistics.single_table.base import StatisitcSynthesizerModel
 from sdgx.models.manager import ModelManager
 
 
@@ -142,7 +143,7 @@ class Synthesizer:
         elif isinstance(model, str) or isinstance(model, type):
             # Init model by cls or str
             self.model = self.model_manager.init_model(model, **(model_kwargs or {}))
-        elif isinstance(model, SynthesizerModel):
+        elif isinstance(model, SynthesizerModel) or isinstance(model, StatisitcSynthesizerModel):
             # Already initialized model
             self.model = model
             if model_kwargs:
@@ -307,7 +308,7 @@ class Synthesizer:
         logger.info(f"Initialized processed data loader in {time.time() - start_time}s")
         try:
             logger.info("Starting model fit...")
-            self.model.fit(metadata, processed_dataloader, **(model_fit_kwargs or {}))
+            self.model.fit(metadata, processed_dataloader)# , **(model_fit_kwargs or {}))
         finally:
             processed_dataloader.finalize(clear_cache=True)
 
