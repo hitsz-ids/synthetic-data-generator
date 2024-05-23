@@ -2,13 +2,14 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from sdgx.data_processors.transformers.numeric import NumericValueTransformer
 from sdgx.data_models.metadata import Metadata
+from sdgx.data_processors.transformers.numeric import NumericValueTransformer
+
 
 @pytest.fixture
 def raw_data():
     row_cnt = 1000
-    header = ["int_id", "str_id", "int_random", "bool_random", 'float_random']
+    header = ["int_id", "str_id", "int_random", "bool_random", "float_random"]
 
     int_id = list(range(row_cnt))
     str_id = list("id_" + str(i) for i in range(row_cnt))
@@ -17,10 +18,14 @@ def raw_data():
     bool_random = int_random < 50
     float_random = np.random.randn(row_cnt)
 
-    X = [[int_id[i], str_id[i], int_random[i], bool_random[i], float_random[i]] for i in range(row_cnt)]
+    X = [
+        [int_id[i], str_id[i], int_random[i], bool_random[i], float_random[i]]
+        for i in range(row_cnt)
+    ]
     # Convert the list of lists to a DataFrame
     df = pd.DataFrame(X, columns=header)
     yield df
+
 
 def calculate_mean_and_variance(df, numeric_df):
     if not isinstance(numeric_df, list):
@@ -32,61 +37,72 @@ def calculate_mean_and_variance(df, numeric_df):
     for col in numeric_df:
         mean = df[col].mean()
         variance = df[col].var()
-        stats[col] = {'mean': mean, 'variance': variance}
+        stats[col] = {"mean": mean, "variance": variance}
     return stats
 
+
 def test_numeric_transformer_fit_test_df(raw_data: pd.DataFrame):
-    """
-    """
-    # get metadata 
+    """ """
+    # get metadata
     metadata_df = Metadata.from_dataframe(raw_data)
 
-    # fit the transformer 
+    # fit the transformer
     transformer = NumericValueTransformer()
     transformer.fit(metadata_df, raw_data)
-    assert transformer.int_columns == {'int_random', 'int_id'}
-    assert transformer.float_columns == {'float_random'}
+    assert transformer.int_columns == {"int_random", "int_id"}
+    assert transformer.float_columns == {"float_random"}
+
 
 def test_numeric_transformer_convert_test_df(raw_data: pd.DataFrame):
-    """
-    """
-    # get metadata 
+    """ """
+    # get metadata
     metadata_df = Metadata.from_dataframe(raw_data)
-    # fit the transformer 
+    # fit the transformer
     transformer = NumericValueTransformer()
     transformer.fit(metadata_df, raw_data)
-    # convert the data 
+    # convert the data
     converted_df = transformer.convert(raw_data)
     numerical_columns = list(transformer.int_columns) + list(transformer.float_columns)
     converted_status = calculate_mean_and_variance(converted_df, numerical_columns)
     assert type(converted_df) == pd.DataFrame
     assert converted_df.shape == raw_data.shape
-    assert np.isclose(converted_status['int_id']['mean'], 0.)
-    assert np.isclose(converted_status['int_random']['mean'], 0.)
-    assert np.isclose(converted_status['float_random']['mean'], 0.)
-    assert np.isclose(converted_status['int_id']['variance'], 1,atol=0.001)
-    assert np.isclose(converted_status['int_random']['variance'], 1,atol=0.001)
-    assert np.isclose(converted_status['float_random']['variance'], 1,atol=0.001)
+    assert np.isclose(converted_status["int_id"]["mean"], 0.0)
+    assert np.isclose(converted_status["int_random"]["mean"], 0.0)
+    assert np.isclose(converted_status["float_random"]["mean"], 0.0)
+    assert np.isclose(converted_status["int_id"]["variance"], 1, atol=0.001)
+    assert np.isclose(converted_status["int_random"]["variance"], 1, atol=0.001)
+    assert np.isclose(converted_status["float_random"]["variance"], 1, atol=0.001)
 
 
 def test_numeric_transformer_reverse_convert_test_df(raw_data: pd.DataFrame):
-    """
-    """
-    # fit the transformer 
+    """ """
+    # fit the transformer
     transformer = NumericValueTransformer()
     transformer.fit(Metadata.from_dataframe(raw_data), raw_data)
     numerical_columns = list(transformer.int_columns) + list(transformer.float_columns)
-    # convert the data 
+    # convert the data
     converted_df = transformer.convert(raw_data)
-    # invert the converted data 
+    # invert the converted data
     reverse_converted_df = transformer.reverse_convert(converted_df)
     reverse_converted_status = calculate_mean_and_variance(reverse_converted_df, numerical_columns)
     original_status = calculate_mean_and_variance(raw_data, numerical_columns)
     assert type(reverse_converted_df) == pd.DataFrame
     assert reverse_converted_df.shape == raw_data.shape
-    assert np.isclose(reverse_converted_status['int_id']['mean'], original_status['int_id']['mean'])
-    assert np.isclose(reverse_converted_status['int_random']['mean'], original_status['int_random']['mean'])
-    assert np.isclose(reverse_converted_status['float_random']['mean'], original_status['float_random']['mean'])
-    assert np.isclose(reverse_converted_status['int_id']['variance'], original_status['int_id']['variance'])
-    assert np.isclose(reverse_converted_status['int_random']['variance'], original_status['int_random']['variance'])
-    assert np.isclose(reverse_converted_status['float_random']['variance'], original_status['float_random']['variance'])
+    assert np.isclose(reverse_converted_status["int_id"]["mean"], original_status["int_id"]["mean"])
+    assert np.isclose(
+        reverse_converted_status["int_random"]["mean"], original_status["int_random"]["mean"]
+    )
+    assert np.isclose(
+        reverse_converted_status["float_random"]["mean"], original_status["float_random"]["mean"]
+    )
+    assert np.isclose(
+        reverse_converted_status["int_id"]["variance"], original_status["int_id"]["variance"]
+    )
+    assert np.isclose(
+        reverse_converted_status["int_random"]["variance"],
+        original_status["int_random"]["variance"],
+    )
+    assert np.isclose(
+        reverse_converted_status["float_random"]["variance"],
+        original_status["float_random"]["variance"],
+    )
