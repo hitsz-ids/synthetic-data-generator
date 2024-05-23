@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, List
+from typing import Any, Set, Dict
 
 import numpy as np
 import pandas as pd
@@ -18,13 +18,13 @@ class NumericValueTransformer(Transformer):
     Transformer class for handling numeric value (int + float) in data.
     """
 
-    standard_scale = True
+    standard_scale: bool = True
 
-    int_columns: List = []
+    int_columns: Set = []
 
-    float_columns: List = []
+    float_columns: Set = []
 
-    scalers: dict = {}
+    scalers: Dict = {}
 
     def fit(
         self,
@@ -38,6 +38,7 @@ class NumericValueTransformer(Transformer):
         Data columns of int and float types need to be recorded here (Get data from metadata).
         """
 
+        # TODO The methods to obtain these data types need to be changed
         self.int_columns = metadata.int_columns
         self.float_columns = metadata.float_columns
 
@@ -45,8 +46,8 @@ class NumericValueTransformer(Transformer):
             logger.info("NumericValueTransformer Fitted (No numeric columns).")
             return
 
-        # fit each column
-        for each_col in self.int_columns + self.float_columns:
+        # fit each columnxf
+        for each_col in list(self.int_columns) + list(self.float_columns):
             self._fit_column(each_col, tabular_data[[each_col]])
 
         self.fitted = True
@@ -84,7 +85,7 @@ class NumericValueTransformer(Transformer):
 
         processed_data = raw_data.copy()
 
-        for each_col in self.int_columns + self.float_columns:
+        for each_col in list(self.int_columns) + list(self.float_columns):
             # convert every column then change the column
             processed_col = self._covert_column(each_col, processed_data[[each_col]])
             processed_data[each_col] = processed_col
@@ -114,7 +115,7 @@ class NumericValueTransformer(Transformer):
         Reverse convert method, convert generated data into processed data.
         """
 
-        for each_col in self.int_columns + self.float_columns:
+        for each_col in list(self.int_columns) + list(self.float_columns):
             # reverse convert every column then change the column
             processed_col = self._reverse_convert_column(each_col, processed_data[[each_col]])
             processed_data[each_col] = processed_col

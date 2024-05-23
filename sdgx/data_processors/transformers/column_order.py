@@ -74,8 +74,6 @@ class ColumnOrderTransformer(Transformer):
 
         return result_data
 
-    pass
-
 
 @hookimpl
 def register(manager):
