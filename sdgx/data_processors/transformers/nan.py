@@ -19,7 +19,7 @@ class NonValueTransformer(Transformer):
 
     fill_na_value = 0
 
-    drop_na = False
+    drop_na = True
 
     def fit(self, metadata: Metadata | None = None, **kwargs: dict[str, Any]):
         """
