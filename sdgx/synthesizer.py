@@ -16,8 +16,8 @@ from sdgx.data_processors.manager import DataProcessorManager
 from sdgx.exceptions import SynthesizerInitError, SynthesizerSampleError
 from sdgx.log import logger
 from sdgx.models.base import SynthesizerModel
-from sdgx.models.statistics.single_table.base import StatisitcSynthesizerModel
 from sdgx.models.manager import ModelManager
+from sdgx.models.statistics.single_table.base import StatisitcSynthesizerModel
 
 
 class Synthesizer:
@@ -308,7 +308,7 @@ class Synthesizer:
         logger.info(f"Initialized processed data loader in {time.time() - start_time}s")
         try:
             logger.info("Starting model fit...")
-            self.model.fit(metadata, processed_dataloader)# , **(model_fit_kwargs or {}))
+            self.model.fit(metadata, processed_dataloader)  # , **(model_fit_kwargs or {}))
         finally:
             processed_dataloader.finalize(clear_cache=True)
 

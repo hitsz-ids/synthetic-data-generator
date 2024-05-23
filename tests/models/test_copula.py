@@ -17,8 +17,7 @@ def discrete_cols(dummy_data):
     yield [col for col in dummy_data.columns if not col.startswith("feature")]
 
 
-def test_gaussian_copula(dummy_single_table_metadata,
-    dummy_single_table_data_loader):
+def test_gaussian_copula(dummy_single_table_metadata, dummy_single_table_data_loader):
     model = GaussianCopulaSynthesizer()
     model.discrete_cols = discrete_cols
     model.fit(dummy_single_table_metadata, dummy_single_table_data_loader)

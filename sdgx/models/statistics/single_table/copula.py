@@ -1,17 +1,16 @@
 import logging
 import warnings
 from copy import deepcopy
+
 import numpy as np
 import pandas as pd
 import scipy
 
 import sdgx.models.components.sdv_copulas as copulas
-from sdgx.exceptions import NonParametricError
-from sdgx.models.components.sdv_copulas import multivariate
-from sdgx.data_models.metadata import Metadata
 from sdgx.data_loader import DataLoader
-from sdgx.exceptions import SynthesizerInitError
-
+from sdgx.data_models.metadata import Metadata
+from sdgx.exceptions import NonParametricError, SynthesizerInitError
+from sdgx.models.components.sdv_copulas import multivariate
 from sdgx.models.components.sdv_ctgan.data_transformer import DataTransformer
 from sdgx.models.components.sdv_rdt.transformers import OneHotEncoder
 from sdgx.models.components.utils import (
@@ -105,9 +104,9 @@ class GaussianCopulaSynthesizer(StatisitcSynthesizerModel):
         default_distribution=None,
     ):
         self.metadata = metadata
-        self.enforce_min_max_values = (enforce_min_max_values,)  
-        self.enforce_rounding = (enforce_rounding,)  
-        self.locales = (locales,) 
+        self.enforce_min_max_values = (enforce_min_max_values,)
+        self.enforce_rounding = (enforce_rounding,)
+        self.locales = (locales,)
 
         if isinstance(self.metadata, Metadata):
             self.discrete_cols = self.metadata.discrete_columns
@@ -119,7 +118,6 @@ class GaussianCopulaSynthesizer(StatisitcSynthesizerModel):
         self.numerical_distributions = numerical_distributions or {}
         self.default_distribution = default_distribution or "beta"
 
-
         self._default_distribution = self.get_distribution_class(self.default_distribution)
         self._numerical_distributions = {
             field: self.get_distribution_class(distribution)
@@ -129,32 +127,29 @@ class GaussianCopulaSynthesizer(StatisitcSynthesizerModel):
         self._num_rows = None
         self._transformer = None
 
-
     def fit(self, metadata: Metadata, dataloader: DataLoader, *args, **kwargs):
-        
+
         # extract pd.DataFrame processed_data from dataloader
         processed_data: pd.DataFrame = dataloader.load_all()
-        
-        # get discrete_cols from metadata 
+
+        # get discrete_cols from metadata
         self.discrete_cols = list(metadata.get("discrete_columns"))
-        
-        
+
         self.metadata = metadata
 
-        # load the original transformer 
+        # load the original transformer
         self._transformer = DataTransformer()
-        
 
         # self._transformer.fit(processed_data, self.metadata[0])
         self._transformer.fit(processed_data, self.discrete_cols)
 
         processed_data = pd.DataFrame(self._transformer.transform(processed_data))
 
-        '''
+        """
         log_numerical_distributions_error(
             self.numerical_distributions, processed_data.columns, LOGGER
         )
-        '''
+        """
 
         self._num_rows = len(processed_data)
 
