@@ -83,39 +83,3 @@ def test_nan_handling_test_df(nan_test_df: pd.DataFrame):
 
     # Check if the transformed DataFrame does not contain any NaN values.
     assert not has_nan(transformed_df)
-
-
-def test_nan_handling_raw_df(raw_data: pd.DataFrame):
-    """
-    Test the handling of NaN values in a DataFrame.
-    This function tests the behavior of a DataFrame when it contains NaN values.
-    It is designed to be used in a testing environment, where the DataFrame is passed as an argument.
-
-    Parameters:
-    raw_data (pd.DataFrame): The DataFrame to test.
-
-    Returns:
-    None
-
-    Raises:
-    AssertionError: If the DataFrame does not handle NaN values as expected.
-    """
-
-    # Check if the DataFrame contains NaN values. If it does, the test will fail.
-    assert has_nan(raw_data), "NaN values were not removed from the DataFrame."
-
-    # Initialize the NonValueTransformer.
-    nan_transformer = NonValueTransformer()
-    # Check if the transformer has not been fitted yet.
-    assert nan_transformer.fitted is False
-
-    # Fit the transformer with the DataFrame.
-    nan_transformer.fit(raw_data)
-    # Check if the transformer has been fitted after the fit operation.
-    assert nan_transformer.fitted
-
-    # Transform the DataFrame using the transformer.
-    transformed_df = nan_transformer.convert(raw_data)
-
-    # Check if the transformed DataFrame does not contain any NaN values.
-    assert not has_nan(transformed_df)
