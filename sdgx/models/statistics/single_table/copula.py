@@ -19,12 +19,12 @@ from sdgx.models.components.utils import (
     unflatten_dict,
     validate_numerical_distributions,
 )
-from sdgx.models.statistics.single_table.base import StatisitcSynthesizerModel
+from sdgx.models.statistics.single_table.base import StatisticSynthesizerModel
 
 LOGGER = logging.getLogger(__name__)
 
 
-class GaussianCopulaSynthesizer(StatisitcSynthesizerModel):
+class GaussianCopulaSynthesizer(StatisticSynthesizerModel):
     """Model wrapping ``copulas.multivariate.GaussianMultivariate`` copula.
 
     Args:

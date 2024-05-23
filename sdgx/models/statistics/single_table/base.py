@@ -9,7 +9,7 @@ import numpy as np
 import torch
 
 
-class StatisitcSynthesizerModel:
+class StatisticSynthesizerModel:
     random_states = None
 
     def __init__(self, transformer=None, sampler=None) -> None:
