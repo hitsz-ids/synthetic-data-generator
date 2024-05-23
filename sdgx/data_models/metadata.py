@@ -103,7 +103,6 @@ class Metadata(BaseModel):
         self.primary_key = "default"
         self.alternate_keys = []
 
-    # ----------------------------------------------------------------------
     def add_column(self, column_name, **kwargs):
         """Add a column to the ``SingleTableMetadata``.
 
@@ -245,7 +244,6 @@ class Metadata(BaseModel):
 
         return instance
 
-    # ----------------------------------------------------------------------
 
     @property
     def tag_fields(self) -> Iterable[str]:
