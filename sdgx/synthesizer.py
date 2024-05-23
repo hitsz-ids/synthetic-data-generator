@@ -308,7 +308,7 @@ class Synthesizer:
         logger.info(f"Initialized processed data loader in {time.time() - start_time}s")
         try:
             logger.info("Starting model fit...")
-            self.model.fit(metadata, processed_dataloader)  # , **(model_fit_kwargs or {}))
+            self.model.fit(metadata, processed_dataloader, **(model_fit_kwargs or {}))
         finally:
             processed_dataloader.finalize(clear_cache=True)
 
