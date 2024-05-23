@@ -17,10 +17,13 @@ def discrete_cols(dummy_data):
     yield [col for col in dummy_data.columns if not col.startswith("feature")]
 
 
-def test_gaussian_copula(dummy_data, discrete_cols):
-    model = GaussianCopulaSynthesizer(discrete_cols)
-    model.fit(dummy_data)
+def test_gaussian_copula(dummy_single_table_metadata,
+    dummy_single_table_data_loader):
+    model = GaussianCopulaSynthesizer()
+    model.discrete_cols = discrete_cols
+    model.fit(dummy_single_table_metadata, dummy_single_table_data_loader)
 
     sampled_data = model.sample(10)
+    original_data = dummy_single_table_data_loader.load_all()
     assert len(sampled_data) == 10
-    assert sampled_data.columns.tolist() == dummy_data.columns.tolist()
+    assert sampled_data.columns.tolist() == original_data.columns.tolist()
