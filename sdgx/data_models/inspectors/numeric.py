@@ -23,7 +23,7 @@ class NumericInspector(Inspector):
         self._int_rate = 0.9
         self.df_length = 0
 
-    def is_int_column(self, col_series: pd.Series):
+    def _is_int_column(self, col_series: pd.Series):
         """
         Determine whether a column of pd.DataFrame is of type int
         In the original pd.DataFrame automatically updated dtype, some int types will be marked as float.
@@ -94,7 +94,7 @@ class NumericInspector(Inspector):
         )
 
         for candidate in float_candidate:
-            if self.is_int_column(raw_data[candidate]):
+            if self._is_int_column(raw_data[candidate]):
                 self.int_columns.add(candidate)
             else:
                 self.float_columns.add(candidate)
