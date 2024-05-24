@@ -17,6 +17,7 @@ from sdgx.exceptions import SynthesizerInitError, SynthesizerSampleError
 from sdgx.log import logger
 from sdgx.models.base import SynthesizerModel
 from sdgx.models.manager import ModelManager
+from sdgx.models.statistics.single_table.base import StatisticSynthesizerModel
 
 
 class Synthesizer:
@@ -142,7 +143,7 @@ class Synthesizer:
         elif isinstance(model, str) or isinstance(model, type):
             # Init model by cls or str
             self.model = self.model_manager.init_model(model, **(model_kwargs or {}))
-        elif isinstance(model, SynthesizerModel):
+        elif isinstance(model, SynthesizerModel) or isinstance(model, StatisticSynthesizerModel):
             # Already initialized model
             self.model = model
             if model_kwargs:
