@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Any
+
 import pandas as pd
 
 from sdgx.data_models.inspectors.base import Inspector
@@ -14,6 +15,7 @@ class NumericInspector(Inspector):
     This class is a subclass of `Inspector` and is designed to provide methods for inspecting
     and analyzing numeric data. It includes methods for detecting int or float data type.
     """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.int_columns: set[str] = set()
@@ -46,6 +48,7 @@ class NumericInspector(Inspector):
                 return True
             else:
                 return False
+
         # Initialize the counter for values with zero decimal part
         int_cnt = 0
         col_length = self.df_length
@@ -62,13 +65,13 @@ class NumericInspector(Inspector):
             if decimal_zer0 is None:
                 col_length -= 1
                 continue
-        
+
         # Calculate the rate of values with zero decimal part
         if col_length <= 0:
             int_rate = 0
         else:
             int_rate = int_cnt / col_length
-        
+
         # Check if the rate is greater than the predefined rate
         if int_rate > self._int_rate:
             return True
@@ -109,6 +112,7 @@ class NumericInspector(Inspector):
             "int_columns": list(self.int_columns),
             "float_columns": list(self.float_columns),
         }
+
 
 @hookimpl
 def register(manager):
