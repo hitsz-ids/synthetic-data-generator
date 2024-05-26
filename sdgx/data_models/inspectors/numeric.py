@@ -9,13 +9,21 @@ from sdgx.data_models.inspectors.extension import hookimpl
 
 
 class NumericInspector(Inspector):
+    """
+    A class for inspecting numeric data.
+
+    This class is a subclass of `Inspector` and is designed to provide methods for inspecting
+    and analyzing numeric data. It includes methods for detecting int or float data type.
+    """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.int_columns: set[str] = set()
         self.float_columns: set[str] = set()
         self._int_rate = 0.9
+        self.df_length = 0
 
-    def is_int_column(self, col_series: pd.Series):
+    def _is_int_column(self, col_series: pd.Series):
         """
         Determine whether a column of pd.DataFrame is of type int
         In the original pd.DataFrame automatically updated dtype, some int types will be marked as float.
@@ -41,18 +49,30 @@ class NumericInspector(Inspector):
             else:
                 return False
 
+        # Initialize the counter for values with zero decimal part
         int_cnt = 0
         col_length = self.df_length
+
+        # Iterate over each value in the series
         for each_val in col_series:
             decimal_zer0 = is_decimal_part_zero(each_val)
+            # If the decimal part is zero, increment the counter and continue to the next value
             if decimal_zer0 is True:
                 int_cnt += 1
                 continue
+            # If the decimal part is not zero or not a decimal number
+            # decrease the length of the series and continue to the next value
             if decimal_zer0 is None:
                 col_length -= 1
                 continue
 
-        int_rate = int_cnt / col_length
+        # Calculate the rate of values with zero decimal part
+        if col_length <= 0:
+            int_rate = 0
+        else:
+            int_rate = int_cnt / col_length
+
+        # Check if the rate is greater than the predefined rate
         if int_rate > self._int_rate:
             return True
         else:
@@ -74,7 +94,7 @@ class NumericInspector(Inspector):
         )
 
         for candidate in float_candidate:
-            if self.is_int_column(raw_data[candidate]):
+            if self._is_int_column(raw_data[candidate]):
                 self.int_columns.add(candidate)
             else:
                 self.float_columns.add(candidate)
