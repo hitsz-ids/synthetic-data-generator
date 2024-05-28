@@ -135,9 +135,9 @@ class DatetimeFormatter(Formatter):
 
         return result_data
 
-    def post_processing(self, processed_data: pd.DataFrame) -> pd.DataFrame:
+    def reverse_convert(self, processed_data: pd.DataFrame) -> pd.DataFrame:
         """
-        post_processing method for datetime formatter.
+        reverse_convert method for datetime formatter.
 
         Does not require any action.
         """

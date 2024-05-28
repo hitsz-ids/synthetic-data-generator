@@ -41,9 +41,9 @@ class IntValueFormatter(Formatter):
 
         return raw_data
 
-    def post_processing(self, processed_data: pd.DataFrame) -> pd.DataFrame:
+    def reverse_convert(self, processed_data: pd.DataFrame) -> pd.DataFrame:
         """
-        post_processing method for the formatter.
+        reverse_convert method for the formatter.
 
         Do format conversion for int columns.
         """
@@ -54,8 +54,6 @@ class IntValueFormatter(Formatter):
         logger.info("Data reverse-converted by IntValueFormatter.")
 
         return processed_data
-
-    pass
 
 
 @hookimpl

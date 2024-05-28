@@ -24,7 +24,6 @@ class DataProcessor:
         self.fitted = True
 
     def _fit(self, metadata: Metadata | None = None, **kwargs: Dict[str, Any]):
-        raise NotImplementedError
         """Fit the data processor.
 
         Called before ``convert`` and ``reverse_convert``.
