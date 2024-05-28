@@ -18,5 +18,3 @@ class Formatter(DataProcessor):
     - Formatter will not add additional columns to the input table.
     - When a whole table is used as input, use :ref:`Transformer`.
     """
-
-
