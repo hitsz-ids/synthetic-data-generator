@@ -1,10 +1,12 @@
+import datetime
+
 import numpy as np
 import pandas as pd
 import pytest
-import datetime
 
 from sdgx.data_models.metadata import Metadata
 from sdgx.data_processors.formatters.datetime import DatetimeFormatter
+
 
 @pytest.fixture
 def datetime_test_df():
@@ -50,12 +52,13 @@ def datetime_test_df():
             not_str_id[i],
             simple_datetime_str[i],
             simple_datetime_2[i],
-            date_with_time[i], 
+            date_with_time[i],
         ]
         for i in range(row_cnt)
     ]
 
-    yield pd.DataFrame(datetime_test_df, columns=header) # 1000 rows, 7 columns
+    yield pd.DataFrame(datetime_test_df, columns=header)  # 1000 rows, 7 columns
+
 
 def is_a_integer_list(lst):
     """
@@ -68,6 +71,7 @@ def is_a_integer_list(lst):
     bool: True if all elements are integers or floats that are also integers, False otherwise.
     """
     return all(isinstance(i, int) or (isinstance(i, float) and i.is_integer()) for i in lst)
+
 
 def is_a_string_list(lst):
     """
@@ -83,33 +87,45 @@ def is_a_string_list(lst):
 
 
 def test_datetime_formatter_test_df_dead_column(datetime_test_df: pd.DataFrame):
-    # about the data 
+    # about the data
     assert datetime_test_df.shape == (1000, 7)
 
-    # get the metadata 
+    # get the metadata
     metadata_df = Metadata.from_dataframe(datetime_test_df)
-    assert metadata_df.datetime_columns == {'simple_datetime_2', 'date_with_time', 'simple_datetime'} 
+    assert metadata_df.datetime_columns == {
+        "simple_datetime_2",
+        "date_with_time",
+        "simple_datetime",
+    }
     metadata_df.datetime_format = {}
-    
+
     # fit the transformer
     transformer = DatetimeFormatter()
-    transformer.fit(metadata= metadata_df)
+    transformer.fit(metadata=metadata_df)
 
-    # no element in datetime_columns 
-    assert transformer.datetime_columns == [] 
-    assert set(transformer.dead_columns) == {'simple_datetime_2', 'date_with_time', 'simple_datetime'}  # all dead
+    # no element in datetime_columns
+    assert transformer.datetime_columns == []
+    assert set(transformer.dead_columns) == {
+        "simple_datetime_2",
+        "date_with_time",
+        "simple_datetime",
+    }  # all dead
 
 
 def test_datetime_formatter_test_df(datetime_test_df: pd.DataFrame):
-    # about the data 
+    # about the data
     assert datetime_test_df.shape == (1000, 7)
 
-    # get the metadata 
+    # get the metadata
     metadata_df = Metadata.from_dataframe(datetime_test_df)
-    assert metadata_df.datetime_columns == {'simple_datetime_2', 'date_with_time', 'simple_datetime'} 
+    assert metadata_df.datetime_columns == {
+        "simple_datetime_2",
+        "date_with_time",
+        "simple_datetime",
+    }
     # set the right format
-    # TODO : it seems that metadata has problems in inspecting defalut format such as "%d %b %Y" 
-    # here we assign the real value, and will fix this issue in another PR 
+    # TODO : it seems that metadata has problems in inspecting defalut format such as "%d %b %Y"
+    # here we assign the real value, and will fix this issue in another PR
     datetime_format = {}
     datetime_format["simple_datetime"] = "%Y-%m-%d"
     datetime_format["simple_datetime_2"] = "%d %b %Y"
@@ -119,27 +135,29 @@ def test_datetime_formatter_test_df(datetime_test_df: pd.DataFrame):
     # fit the transformer
     transformer = DatetimeFormatter()
     assert not transformer.fitted
-    transformer.fit(metadata= metadata_df)
+    transformer.fit(metadata=metadata_df)
     assert transformer.fitted
 
     # no element in dead_columns
-    assert transformer.dead_columns == [] # no columns dead
-    assert set(transformer.datetime_columns) == {'simple_datetime_2', 'date_with_time', 'simple_datetime'}  
+    assert transformer.dead_columns == []  # no columns dead
+    assert set(transformer.datetime_columns) == {
+        "simple_datetime_2",
+        "date_with_time",
+        "simple_datetime",
+    }
 
-    # convert the dataframe, check if datetime columns are int type 
+    # convert the dataframe, check if datetime columns are int type
     converted_df = transformer.convert(datetime_test_df)
-    assert is_a_integer_list(converted_df['date_with_time'].to_list())
-    assert is_a_integer_list(converted_df['simple_datetime_2'].to_list())
-    assert is_a_integer_list(converted_df['simple_datetime'].to_list())
-    
+    assert is_a_integer_list(converted_df["date_with_time"].to_list())
+    assert is_a_integer_list(converted_df["simple_datetime_2"].to_list())
+    assert is_a_integer_list(converted_df["simple_datetime"].to_list())
+
     reverse_converte_df = transformer.reverse_convert(converted_df)
     # assert string type in reverse converted dataframe
-    assert is_a_string_list(reverse_converte_df['simple_datetime'].to_list())
-    assert is_a_string_list(reverse_converte_df['date_with_time'].to_list())
-    assert is_a_string_list(reverse_converte_df['simple_datetime_2'].to_list())
+    assert is_a_string_list(reverse_converte_df["simple_datetime"].to_list())
+    assert is_a_string_list(reverse_converte_df["date_with_time"].to_list())
+    assert is_a_string_list(reverse_converte_df["simple_datetime_2"].to_list())
 
     # check if the dataframe is equal to the original one
     # use the eq method and .all().all() to check the equality of two 2d dataframes
     assert reverse_converte_df.eq(datetime_test_df).all().all()
-
-
