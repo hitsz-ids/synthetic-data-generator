@@ -71,8 +71,21 @@ def df_data_processed():
 
 def test_numeric_transformer_fit_test_df(df_data: pd.DataFrame, df_data_processed: pd.DataFrame):
     """
-    This module contains tests for the order of transformers in a data processing pipeline.
-    Each test case verifies that the order of transformers is maintained correctly during the data processing.
+    Test the functionality of the ColumnOrderTransformer class.
+
+    This function tests the following:
+    1. The correctness of the input dataframes' columns and shapes.
+    2. The correctness of the metadata extraction from the input dataframe.
+    3. The correctness of the fitting of the ColumnOrderTransformer.
+    4. The correctness of the conversion of the input dataframe using the ColumnOrderTransformer.
+    5. The correctness of the reverse conversion of the processed dataframe using the ColumnOrderTransformer.
+
+    Parameters:
+    df_data (pd.DataFrame): The input dataframe to be transformed.
+    df_data_processed (pd.DataFrame): The processed dataframe to be reversely transformed.
+
+    Returns:
+    None
     """
     # about the df_data and df_data_processed
     assert df_data.columns.to_list() == [

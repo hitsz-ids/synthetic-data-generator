@@ -60,7 +60,7 @@ def datetime_test_df():
     yield pd.DataFrame(datetime_test_df, columns=header)  # 1000 rows, 7 columns
 
 
-def is_a_integer_list(lst):
+def is_an_integer_list(lst):
     """
     Check if all elements in the list are integers or floats that are also integers.
 
@@ -87,6 +87,18 @@ def is_a_string_list(lst):
 
 
 def test_datetime_formatter_test_df_dead_column(datetime_test_df: pd.DataFrame):
+    """
+    Test the DatetimeFormatter class with a DataFrame that has datetime columns.
+
+    Parameters:
+    datetime_test_df (pd.DataFrame): The DataFrame to test.
+
+    Returns:
+    None
+
+    Raises:
+    AssertionError: If any of the assertions fail.
+    """
     # about the data
     assert datetime_test_df.shape == (1000, 7)
 
@@ -113,6 +125,22 @@ def test_datetime_formatter_test_df_dead_column(datetime_test_df: pd.DataFrame):
 
 
 def test_datetime_formatter_test_df(datetime_test_df: pd.DataFrame):
+    """
+    Test function for the DatetimeFormatter class.
+
+    This function tests the functionality of the DatetimeFormatter class by creating a test DataFrame,
+    setting the datetime format for the columns, fitting the transformer, converting the DataFrame,
+    reversing the conversion, and checking if the reversed DataFrame is equal to the original one.
+
+    Args:
+        datetime_test_df (pd.DataFrame): The test DataFrame to be used for testing.
+
+    Returns:
+        None
+
+    Raises:
+        AssertionError: If any of the assertions fail.
+    """
     # about the data
     assert datetime_test_df.shape == (1000, 7)
 
@@ -148,9 +176,9 @@ def test_datetime_formatter_test_df(datetime_test_df: pd.DataFrame):
 
     # convert the dataframe, check if datetime columns are int type
     converted_df = transformer.convert(datetime_test_df)
-    assert is_a_integer_list(converted_df["date_with_time"].to_list())
-    assert is_a_integer_list(converted_df["simple_datetime_2"].to_list())
-    assert is_a_integer_list(converted_df["simple_datetime"].to_list())
+    assert is_an_integer_list(converted_df["date_with_time"].to_list())
+    assert is_an_integer_list(converted_df["simple_datetime_2"].to_list())
+    assert is_an_integer_list(converted_df["simple_datetime"].to_list())
 
     reverse_converte_df = transformer.reverse_convert(converted_df)
     # assert string type in reverse converted dataframe
