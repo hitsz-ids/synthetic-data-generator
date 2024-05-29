@@ -23,7 +23,7 @@ def df_data():
     yield df
 
 
-def check_integer_in_list(lst):
+def is_a_integer_list(lst):
     """
     Check if all elements in the list are integers or floats that are also integers.
 
@@ -66,7 +66,7 @@ def test_int_formatter_fit_test_df(df_data: pd.DataFrame):
     formatter.int_columns.add("float_random")
     assert formatter.int_columns == {"int_random", "int_id", "float_random"}
     reverse_df = formatter.reverse_convert(df_data)
-    assert check_integer_in_list(reverse_df["float_random"].tolist())
-    assert check_integer_in_list(reverse_df["int_id"].tolist())
-    assert not check_integer_in_list(reverse_df["str_id"].tolist())
-    assert check_integer_in_list(reverse_df["int_random"].tolist())
+    assert is_a_integer_list(reverse_df["float_random"].tolist())
+    assert is_a_integer_list(reverse_df["int_id"].tolist())
+    assert not is_a_integer_list(reverse_df["str_id"].tolist())
+    assert is_a_integer_list(reverse_df["int_random"].tolist())
