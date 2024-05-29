@@ -1,11 +1,12 @@
+import random
+
 import numpy as np
 import pandas as pd
 import pytest
-import random 
 
 from sdgx.data_models.metadata import Metadata
-from sdgx.data_processors.transformers.discrete import DiscreteTransformer
 from sdgx.data_processors.transformers.column_order import ColumnOrderTransformer
+from sdgx.data_processors.transformers.discrete import DiscreteTransformer
 
 
 @pytest.fixture
@@ -14,7 +15,7 @@ def df_data():
     header = ["int_id", "discrete_val", "int_random", "bool_random", "float_random"]
 
     int_id = list(range(row_cnt))
-    discrete_val = list( random.choice(['a', 'b', 'c']) for _ in range(row_cnt))
+    discrete_val = list(random.choice(["a", "b", "c"]) for _ in range(row_cnt))
 
     int_random = np.random.randint(100, size=row_cnt)
     bool_random = int_random < 50
@@ -28,6 +29,7 @@ def df_data():
     df = pd.DataFrame(X, columns=header)
     yield df
 
+
 def is_a_string_list(lst):
     """
     Check if all items in a list are strings.
@@ -39,6 +41,7 @@ def is_a_string_list(lst):
     bool: True if all items in the list are strings, False otherwise.
     """
     return all(isinstance(item, str) for item in lst)
+
 
 def is_an_integer_list(lst):
     """
@@ -88,7 +91,7 @@ def test_discrete_transformer_fit_test_df(df_data: pd.DataFrame):
     assert isinstance(converted_df, pd.DataFrame)
     assert is_an_integer_list(converted_df["discrete_val_a"].to_list())
     assert is_an_integer_list(converted_df["discrete_val_b"].to_list())
-    assert is_an_integer_list(converted_df["discrete_val_c"].to_list()) 
+    assert is_an_integer_list(converted_df["discrete_val_c"].to_list())
 
     # reverse convert the df back to original
     reverse_converted_df = transformer.reverse_convert(converted_df)
@@ -99,4 +102,3 @@ def test_discrete_transformer_fit_test_df(df_data: pd.DataFrame):
     # check if the dataframe is equal to the original one
     # use the eq method and .all().all() to check the equality of two 2d dataframes
     assert reverse_converted_df.eq(df_data).all().all()
-
