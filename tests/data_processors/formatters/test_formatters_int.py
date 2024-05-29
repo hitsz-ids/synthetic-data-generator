@@ -17,10 +17,7 @@ def df_data():
     int_random = np.random.randint(100, size=row_cnt)
     float_random = np.random.randn(row_cnt)
 
-    X = [
-        [int_id[i], str_id[i], int_random[i], float_random[i]]
-        for i in range(row_cnt)
-    ]
+    X = [[int_id[i], str_id[i], int_random[i], float_random[i]] for i in range(row_cnt)]
     # Convert the list of lists to a DataFrame
     df = pd.DataFrame(X, columns=header)
     yield df
@@ -35,7 +32,7 @@ def check_integer_in_list(lst):
 
     Returns:
     bool: True if all elements are integers or floats that are also integers, False otherwise.
-    """    
+    """
     return all(isinstance(i, int) or (isinstance(i, float) and i.is_integer()) for i in lst)
 
 
@@ -65,7 +62,7 @@ def test_int_formatter_fit_test_df(df_data: pd.DataFrame):
     formatter = IntValueFormatter()
     formatter.fit(metadata_df)
     assert formatter.int_columns == {"int_random", "int_id"}
-    # add float_random column to formatter 
+    # add float_random column to formatter
     formatter.int_columns.add("float_random")
     assert formatter.int_columns == {"int_random", "int_id", "float_random"}
     reverse_df = formatter.reverse_convert(df_data)
@@ -73,5 +70,3 @@ def test_int_formatter_fit_test_df(df_data: pd.DataFrame):
     assert check_integer_in_list(reverse_df["int_id"].tolist())
     assert not check_integer_in_list(reverse_df["str_id"].tolist())
     assert check_integer_in_list(reverse_df["int_random"].tolist())
-
-
