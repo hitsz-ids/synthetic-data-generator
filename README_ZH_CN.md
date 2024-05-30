@@ -47,6 +47,8 @@
 
 我们的里程碑和时间节点如下所示：
 
+🔥 2024年5月30日：Data Processor 模块被正式合并，该模块可以：1）可以帮助 SDG 将部分数据列（如 Datetime 类型的列）在送入模型前进行格式转换，从而避免被当作离散类型处理，对模型生成数据反向转换成原有格式；2）对各种数据类型进行更加定制化的预处理和后处理；3）轻松应对原始数据中的空值等问题；4）支持插件系统。
+
 🔥 2024年2月20日：基于LLM的单表数据合成模型已包含，查看Colab示例：<a href="https://colab.research.google.com/drive/1VFnP59q3eoVtMJ1PvcYjmuXtx9N8C7o0?usp=sharing" target="value">LLM：数据合成</a> 和 <a href="https://colab.research.google.com/drive/1_chuTVZECpj5fklj-RAp7ZVrew8weLW_?usp=sharing" target="value">LLM：表外特征推断</a>。
 
 🔧 2024年2月7日：SDG团队完善了 `sdgx.data_models.metadata`，支持描述单表、多表的元数据信息，支持多种数据类型，支持数据类型的自动推断能力，查看Colab示例：<a href="https://colab.research.google.com/drive/1b4ZTpgSYjOt7ekp1Wj8CxDknbOHEwA7s?usp=sharing" target="value">SDG Single-Table Metadata</a>。
