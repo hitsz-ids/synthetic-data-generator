@@ -100,9 +100,10 @@ class Synthesizer:
             self.dataloader = None
 
         # Init data processors
-        if not data_processors:
-            data_processors = []
         self.data_processors_manager = DataProcessorManager()
+        if not data_processors:
+            data_processors = self.data_processors_manager.registed_default_processor_list
+        logger.info(f"Using data processors: {data_processors}")
         self.data_processors = [
             (
                 d
@@ -289,8 +290,17 @@ class Synthesizer:
         self.metadata = metadata  # Ensure update metadata
 
         logger.info("Fitting data processors...")
+        if not self.dataloader:
+            logger.info("Fitting without dataloader.")
+        start_time = time.time()
         for d in self.data_processors:
-            d.fit(metadata)
+            if self.dataloader:
+                d.fit(metadata=metadata, tabular_data=self.dataloader)
+            else:
+                d.fit(metadata=metadata)
+        logger.info(
+            f"Fitted {len(self.data_processors)} data processors in  {time.time() - start_time}s."
+        )
 
         def chunk_generator() -> Generator[pd.DataFrame, None, None]:
             for chunk in self.dataloader.iter():
@@ -307,8 +317,9 @@ class Synthesizer:
         )
         logger.info(f"Initialized processed data loader in {time.time() - start_time}s")
         try:
-            logger.info("Starting model fit...")
+            logger.info("Model fit Started...")
             self.model.fit(metadata, processed_dataloader, **(model_fit_kwargs or {}))
+            logger.info("Model fit... Finished")
         finally:
             processed_dataloader.finalize(clear_cache=True)
 
@@ -335,9 +346,9 @@ class Synthesizer:
         logger.info("Sampling...")
         metadata = metadata or self.metadata
         self.metadata = metadata  # Ensure update metadata
-        if metadata:
-            for d in self.data_processors:
-                d.fit(metadata)
+
+        # data_processors do not need to be fit again in the sampling stage
+
         if not model_sample_args:
             model_sample_args = {}
 
