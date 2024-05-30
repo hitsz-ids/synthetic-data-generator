@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import shutil
 from pathlib import Path
+from typing import Any, Dict
 
 import pandas as pd
 import pytest
@@ -36,6 +37,11 @@ class MockModel(SynthesizerModel):
 
 
 class MockDataProcessor(DataProcessor):
+    fitted = True
+
+    def _fit(self, metadata: Metadata | None = None, **kwargs: Dict[str, Any]):
+        return
+
     pass
 
 

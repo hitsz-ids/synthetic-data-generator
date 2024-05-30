@@ -40,6 +40,7 @@ class Metadata(BaseModel):
     """
 
     column_list: List[str] = Field(default_factory=list, title="The List of Column Names")
+
     """"
     column_list is the actual value of self.column_list
     """
