@@ -46,6 +46,8 @@ High-quality synthetic data can be safely utilized across various domains includ
 
 Our current key achievements and timelines are as follows:
 
+🔥 May 30, 2024: The Data Processor module was officially merged. This module will: 1) help SDG convert the format of some data columns (such as Datetime columns) before feeded into the model (so as to avoid being treated as discrete types), and reversely convert the model-generated data into the original format; 2) perform more customized pre-processing and post-processing on various data types; 3) easily deal with problems such as null values ​​in the original data; 4) support the plug-in system.
+
 🔥 Feb 20, 2024: a single-table data synthesis model based on LLM is included, view colab example: <a href="https://colab.research.google.com/drive/1VFnP59q3eoVtMJ1PvcYjmuXtx9N8C7o0?usp=sharing" target="value"> LLM: Data Synthesis</a> and <a href="https://colab.research.google.com/drive/1_chuTVZECpj5fklj-RAp7ZVrew8weLW_?usp=sharing" target="value"> LLM: Off-table Feature Inference</a>.
 
 🔧 Feb 7, 2024: We improved `sdgx.data_models.metadata` to support metadata information describing for single tables and multiple tables, support multiple data types, support automatic data type inference. view colab example: <a href="https://colab.research.google.com/drive/1b4ZTpgSYjOt7ekp1Wj8CxDknbOHEwA7s?usp=sharing" target="value">SDG Single-Table Metadata</a>。
