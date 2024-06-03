@@ -202,7 +202,7 @@ print(sampled_data)
 
 SDG开源项目由**哈尔滨工业大学（深圳）数据安全研究院**发起，若您对SDG项目感兴趣并愿意一起完善它，欢迎加入我们的开源社区：
 
-- 非常欢迎你的加入！[查看 First Good Issue](https://github.com/hitsz-ids/synthetic-data-generator/labels/good%20first%20issue) 或者提交一个 Pull Request。
+- 非常欢迎你的加入！[查看 Good First Issue](https://github.com/hitsz-ids/synthetic-data-generator/labels/good%20first%20issue) 或者提交一个 Pull Request。
 - 开发环境配置请参考[开发者文档](./CONTRIBUTING.md)
 - 加入微信群：
 
