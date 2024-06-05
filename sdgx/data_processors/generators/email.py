@@ -1,9 +1,11 @@
-import pandas as pd 
+import pandas as pd
 from faker import Faker
+
 from sdgx.data_models.metadata import Metadata
 from sdgx.data_processors.generators.pii import PIIGenerator
 
 fake = Faker(locale="zh_CN")
+
 
 class EmailGenerator(PIIGenerator):
     """
@@ -28,20 +30,18 @@ class EmailGenerator(PIIGenerator):
 
     def fit(self, metadata: Metadata | None = None):
 
-        self.email_columns_list = list(metadata.get('email_columns'))
+        self.email_columns_list = list(metadata.get("email_columns"))
 
         self.fitted = True
-    
 
     def convert(self, raw_data: pd.DataFrame) -> pd.DataFrame:
         if not self.email_columns_list:
-            return raw_data 
+            return raw_data
         processed_data = raw_data
         # remove every email column from the dataframe
         for each_col in self.email_columns_list:
             processed_data = self.remove_columns(processed_data, each_col)
         return processed_data
-    
 
     def reverse_convert(self, processed_data: pd.DataFrame) -> pd.DataFrame:
         if not self.email_columns_list:
@@ -49,7 +49,7 @@ class EmailGenerator(PIIGenerator):
         df_length = processed_data.shape[0]
         for each_col_name in self.email_columns_list:
             each_email_col = [fake.ascii_company_email() for _ in range(df_length)]
-            each_email_df = pd.DataFrame({each_col_name : each_email_col})
+            each_email_df = pd.DataFrame({each_col_name: each_email_col})
             processed_data = self.attach_columns(processed_data, each_email_df)
 
         return processed_data

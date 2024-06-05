@@ -13,7 +13,7 @@ from sdgx.data_processors.generators.base import Generator
 class PIIGenerator(Generator):
     """
     The PIIGenerator class is a subclass of the Generator class. It is designed to generate PII (Personally Identifiable Information) objects.
-    
+
     This class is responsible for:
         - providing batch generation methods for different types of PII objects (columns).
         - providing randomised generation methods for different types of PII objects.
