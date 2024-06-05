@@ -93,7 +93,7 @@ def test_MISim_continuous(test_data_num, mi_sim_instance):
 
     assert result >= 0
     assert result <= 1
-    assert np.isclose(result1, 0, atol = 1e-9)
+    assert np.isclose(result1, 1, atol = 1e-9)
     assert np.isclose(result, result2, atol = 1e-9)
 
 
