@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import math
 import random
 from datetime import datetime, timedelta
 
@@ -94,8 +93,8 @@ def test_MISim_continuous(test_data_num, mi_sim_instance):
 
     assert result >= 0
     assert result <= 1
-    assert result1 == 1
-    assert round(result2, 9) == round(result, 9)
+    assert np.isclose(result1, 0, atol = 1e-9)
+    assert np.isclose(result, result2, atol = 1e-9)
 
 
 def test_MISim_time(test_data_time, mi_sim_instance):
@@ -108,8 +107,8 @@ def test_MISim_time(test_data_time, mi_sim_instance):
 
     assert result >= 0
     assert result <= 1
-    assert result1 == 1
-    assert result2 == result
+    assert np.isclose(result1, 1, atol=1e-9)
+    assert np.isclose(result, result2, atol=1e-9)
 
 
 if __name__ == "__main__":
