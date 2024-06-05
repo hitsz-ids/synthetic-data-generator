@@ -48,7 +48,7 @@ class EmailGenerator(PIIGenerator):
             return processed_data
         df_length = processed_data.shape[0]
         for each_col_name in self.email_columns_list:
-            each_email_col = [fake.ascii_company_email() for i in range(df_length)]
+            each_email_col = [fake.ascii_company_email() for _ in range(df_length)]
             each_email_df = pd.DataFrame({each_col_name : each_email_col})
             processed_data = self.attach_columns(processed_data, each_email_df)
 

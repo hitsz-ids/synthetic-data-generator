@@ -4,9 +4,11 @@ import datetime
 import random
 import pandas as pd
 import pytest
+import re
 from faker import Faker
 
-from sdgx.data_processors.generators.email import EmailGenerator    
+from sdgx.data_models.metadata import Metadata
+from sdgx.data_processors.generators.email import EmailGenerator
 
 fake = Faker(locale="zh_CN")
 fake_en = Faker(["en_US"])
@@ -66,4 +68,35 @@ def chn_personal_test_df():
 
     yield pd.DataFrame(X, columns=header)
 
+
+def is_email(input_str: str) -> bool:
+    email_regex = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
+    return bool(re.match(email_regex, input_str))
+
+
+def test_email_generator(chn_personal_test_df: pd.DataFrame):
+    
+    assert 'email' in chn_personal_test_df.columns
+    # get metadata 
+    metadata_df = Metadata.from_dataframe(chn_personal_test_df)
+
+    # generator
+    email_generator = EmailGenerator()
+    assert not email_generator.fitted
+    email_generator.fit(metadata_df)
+    assert email_generator.fitted
+    assert email_generator.email_columns_list == ['email']
+
+    converted_df = email_generator.convert(chn_personal_test_df)
+    assert len(converted_df) == len(chn_personal_test_df)
+    assert converted_df.shape[1] != chn_personal_test_df.shape[1]
+    assert converted_df.shape[1] == chn_personal_test_df.shape[1] - len(email_generator.email_columns_list)
+    assert 'email' not in converted_df.columns
+
+    reverse_converted_df = email_generator.reverse_convert(converted_df)
+    assert len(reverse_converted_df) == len(chn_personal_test_df)
+    assert 'email' in reverse_converted_df.columns
+    # each generated value is email 
+    for each_value in chn_personal_test_df['email'].values:
+        assert is_email(each_value)
 
