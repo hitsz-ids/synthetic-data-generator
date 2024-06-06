@@ -56,6 +56,7 @@ class EmailGenerator(PIIGenerator):
 
         return processed_data
 
+
 @hookimpl
 def register(manager):
     manager.register("EmailGenerator", EmailGenerator)
