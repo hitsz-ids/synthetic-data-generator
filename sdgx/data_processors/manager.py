@@ -44,7 +44,7 @@ class DataProcessorManager(Manager):
     """
 
     preset_defalut_processors = [
-        p.lower() for p in ["IntValueFormatter", "DatetimeFormatter", "NonValueTransformer"]
+        p.lower() for p in ["IntValueFormatter", "DatetimeFormatter", "NonValueTransformer", "EmailGenerator"]
     ] + ["ColumnOrderTransformer".lower()]
     """
     preset_defalut_processors list stores the lowercase names of the transformers loaded by default. When using the synthesizer, they will be loaded by default to facilitate user operations.

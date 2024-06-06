@@ -55,3 +55,7 @@ class EmailGenerator(PIIGenerator):
             processed_data = self.attach_columns(processed_data, each_email_df)
 
         return processed_data
+
+@hookimpl
+def register(manager):
+    manager.register("EmailGenerator", EmailGenerator)
