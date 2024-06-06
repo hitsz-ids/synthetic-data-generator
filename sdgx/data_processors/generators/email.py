@@ -3,8 +3,8 @@ from __future__ import annotations
 import pandas as pd
 from faker import Faker
 
-from sdgx.data_processors.extension import hookimpl
 from sdgx.data_models.metadata import Metadata
+from sdgx.data_processors.extension import hookimpl
 from sdgx.data_processors.generators.pii import PIIGenerator
 
 fake = Faker(locale="zh_CN")
