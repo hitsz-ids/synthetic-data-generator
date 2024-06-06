@@ -1,4 +1,4 @@
-Column Order Transformer 
+Column Order Transformer
 ============================
 
 .. autoclass:: sdgx.data_processors.transformers.column_order.ColumnOrderTransformer

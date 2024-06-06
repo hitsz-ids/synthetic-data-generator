@@ -1,4 +1,4 @@
-Datetime Formatter 
+Datetime Formatter
 ============================
 
 .. autoclass:: sdgx.data_processors.formatters.datetime.DatetimeFormatter

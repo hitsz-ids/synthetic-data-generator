@@ -1,4 +1,4 @@
-Int Formatter 
+Int Formatter
 ============================
 
 .. autoclass:: sdgx.data_processors.formatters.int.IntValueFormatter

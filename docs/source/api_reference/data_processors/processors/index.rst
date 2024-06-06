@@ -32,7 +32,3 @@ Generators
     :maxdepth: 1
 
     Email Generator <email>
-
-
-
-

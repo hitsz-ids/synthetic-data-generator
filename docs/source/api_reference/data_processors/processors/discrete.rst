@@ -1,4 +1,4 @@
-Discrete Transformer 
+Discrete Transformer
 ============================
 
 .. autoclass:: sdgx.data_processors.transformers.discrete.DiscreteTransformer

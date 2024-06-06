@@ -1,4 +1,4 @@
-Numeric Transformer 
+Numeric Transformer
 ============================
 
 .. autoclass:: sdgx.data_processors.transformers.numeric.NumericValueTransformer

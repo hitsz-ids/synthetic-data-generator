@@ -1,4 +1,4 @@
-Nan Transformer 
+Nan Transformer
 ============================
 
 .. autoclass:: sdgx.data_processors.transformers.nan.NonValueTransformer

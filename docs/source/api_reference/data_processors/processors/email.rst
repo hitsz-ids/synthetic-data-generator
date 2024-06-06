@@ -1,5 +1,4 @@
-Email Generator 
+Email Generator
 ============================
 
 TBD
-

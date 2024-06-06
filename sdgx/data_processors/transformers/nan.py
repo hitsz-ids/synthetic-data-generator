@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Any
+
 from pandas import DataFrame
 
 from sdgx.data_models.metadata import Metadata

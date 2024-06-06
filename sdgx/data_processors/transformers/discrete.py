@@ -10,6 +10,7 @@ from sdgx.data_processors.transformers.base import Transformer
 from sdgx.models.components.optimize.ndarray_loader import NDArrayLoader
 from sdgx.utils import logger
 
+
 class DiscreteTransformer(Transformer):
     """
     A transformer class for handling discrete values in the input data.
@@ -35,9 +36,9 @@ class DiscreteTransformer(Transformer):
     Record which columns are of discrete type.
     """
 
-    one_hot_warning_cnt = 512  
+    one_hot_warning_cnt = 512
     """
-    The warning count for one-hot encoding. 
+    The warning count for one-hot encoding.
     If the number of new columns after one-hot encoding exceeds this count, a warning message will be issued.
     """
 
@@ -59,7 +60,6 @@ class DiscreteTransformer(Transformer):
     If set to 'ignore', new categories will be ignored.
     If set to 'error', an error will be raised when new categories are encountered.
     """
-    
 
     def fit(self, metadata: Metadata, tabular_data: DataLoader | pd.DataFrame):
         """
