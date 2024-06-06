@@ -16,6 +16,11 @@ class DataProcessor:
     fitted = False
 
     def check_fitted(self):
+        """Check if the processor is fitted.
+
+        Raises:
+            SynthesizerProcessorError: If the processor is not fitted.
+        """
         if not self.fitted:
             raise SynthesizerProcessorError("Processor NOT fitted.")
 

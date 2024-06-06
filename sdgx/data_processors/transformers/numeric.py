@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from typing import Any, Dict, Set
-
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
@@ -15,16 +14,41 @@ from sdgx.utils import logger
 
 class NumericValueTransformer(Transformer):
     """
-    Transformer class for handling numeric value (int + float) in data.
+    A transformer class for numeric data.
+
+    This class is used to transform numeric data by scaling it using the StandardScaler from sklearn.
+
+    Attributes:
+        standard_scale (bool): A flag indicating whether to scale the data using StandardScaler.
+        int_columns (Set): A set of column names that are of integer type.
+        float_columns (Set): A set of column names that are of float type.
+        scalers (Dict): A dictionary of scalers for each numeric column.
     """
 
     standard_scale: bool = True
+    """
+    A flag indicating whether to scale the data using StandardScaler.
+    If True, the data will be scaled using StandardScaler.
+    If False, the data will not be scaled.
+    """
 
     int_columns: Set = []
+    """
+    A set of column names that are of integer type.
+    These columns will be considered for scaling if `standard_scale` is True.
+    """
 
     float_columns: Set = []
+    """
+    A set of column names that are of float type.
+    These columns will be considered for scaling if `standard_scale` is True.
+    """
 
     scalers: Dict = {}
+    """
+    A dictionary of scalers for each numeric column.
+    The keys are the column names and the values are the corresponding scalers.
+    """
 
     def fit(
         self,

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from typing import Any, List
-
 import pandas as pd
 
 from sdgx.data_models.metadata import Metadata
@@ -16,6 +15,9 @@ class IntValueFormatter(Formatter):
     """
 
     int_columns: List = []
+    """
+    List of column names that are of type int, populated by the fit method using metadata.
+    """
 
     def fit(self, metadata: Metadata | None = None, **kwargs: dict[str, Any]):
         """

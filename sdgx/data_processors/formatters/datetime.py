@@ -3,7 +3,6 @@ from __future__ import annotations
 from collections import defaultdict
 from datetime import datetime
 from typing import Any, Dict
-
 import pandas as pd
 
 from sdgx.data_models.metadata import Metadata
@@ -14,7 +13,21 @@ from sdgx.utils import logger
 
 class DatetimeFormatter(Formatter):
     """
-    Formatter class for handling Datetime formats in pd.DataFrame.
+    A class for formatting datetime columns in a pandas DataFrame.
+
+    DatetimeFormatter is designed to handle the conversion of datetime columns to timestamp format and vice versa.
+    It uses metadata to identify datetime columns and their corresponding datetime formats.
+
+    Attributes:
+        datetime_columns (list): List of column names that are of datetime type.
+        datetime_formats (dict): Dictionary with column names as keys and datetime formats as values.
+        dead_columns (list): List of column names that are no longer needed or to be removed.
+        fitted (bool): Indicates whether the formatter has been fitted.
+
+    Methods:
+        fit(metadata: Metadata | None = None, **kwargs: dict[str, Any]): Fits the formatter by recording the datetime columns and their formats.
+        convert(raw_data: pd.DataFrame) -> pd.DataFrame: Converts datetime columns in raw_data to timestamp format.
+        reverse_convert(processed_data: pd.DataFrame) -> pd.DataFrame: Converts timestamp columns in processed_data back to datetime format.
     """
 
     datetime_columns: list = []
