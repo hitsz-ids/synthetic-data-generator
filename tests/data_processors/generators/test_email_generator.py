@@ -3,13 +3,14 @@ from __future__ import annotations
 import datetime
 import random
 import re
-
 import pandas as pd
 import pytest
 from faker import Faker
 
 from sdgx.data_models.metadata import Metadata
 from sdgx.data_processors.generators.email import EmailGenerator
+from pydantic import BaseModel, EmailStr
+
 
 fake = Faker(locale="zh_CN")
 fake_en = Faker(["en_US"])
@@ -70,11 +71,8 @@ def chn_personal_test_df():
 
     yield pd.DataFrame(X, columns=header)
 
-
-def is_email(input_str: str) -> bool:
-    email_regex = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
-    return bool(re.match(email_regex, input_str))
-
+class EmailCheckModel(BaseModel):
+    email: EmailStr
 
 def test_email_generator(chn_personal_test_df: pd.DataFrame):
 
@@ -102,4 +100,4 @@ def test_email_generator(chn_personal_test_df: pd.DataFrame):
     assert "email" in reverse_converted_df.columns
     # each generated value is email
     for each_value in chn_personal_test_df["email"].values:
-        assert is_email(each_value)
+        assert EmailCheckModel(email = each_value)
