@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from typing import Any
+
 import pandas as pd
 from faker import Faker
-from typing import Any
 
 from sdgx.data_models.metadata import Metadata
 from sdgx.data_processors.extension import hookimpl
