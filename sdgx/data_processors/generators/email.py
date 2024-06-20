@@ -7,7 +7,7 @@ from sdgx.data_models.metadata import Metadata
 from sdgx.data_processors.extension import hookimpl
 from sdgx.data_processors.generators.pii import PIIGenerator
 
-fake = Faker(locale="zh_CN")
+fake = Faker()
 
 
 class EmailGenerator(PIIGenerator):
