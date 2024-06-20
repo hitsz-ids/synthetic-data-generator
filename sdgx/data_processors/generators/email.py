@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pandas as pd
 from faker import Faker
+from typing import Any
 
 from sdgx.data_models.metadata import Metadata
 from sdgx.data_processors.extension import hookimpl
@@ -31,7 +32,7 @@ class EmailGenerator(PIIGenerator):
 
     fitted: bool = False
 
-    def fit(self, metadata: Metadata | None = None):
+    def fit(self, metadata: Metadata | None = None, **kwargs: dict[str, Any]):
 
         self.email_columns_list = list(metadata.get("email_columns"))
 
