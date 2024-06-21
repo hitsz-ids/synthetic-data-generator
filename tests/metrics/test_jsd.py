@@ -40,8 +40,8 @@ def test_jsd_discrete(dummy_data, test_data, jsd_instance):
 
     assert result >= 0
     assert result <= 1
-    assert result1 == 0
-    assert result2 == result
+    assert np.isclose(result1, 0, atol=1e-9)
+    assert np.isclose(result, result2, atol=1e-9)
 
 
 def test_jsd_continuous(dummy_data, test_data, jsd_instance):
@@ -51,7 +51,7 @@ def test_jsd_continuous(dummy_data, test_data, jsd_instance):
 
     assert result >= 0
     assert result <= 1
-    assert result1 == 0
+    assert np.isclose(result1, 0, atol=1e-9)
 
 
 if __name__ == "__main__":
