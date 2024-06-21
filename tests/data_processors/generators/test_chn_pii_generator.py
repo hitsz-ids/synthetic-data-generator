@@ -3,6 +3,7 @@ from __future__ import annotations
 import datetime
 import random
 import re
+
 import pandas as pd
 import pytest
 from faker import Faker
@@ -13,6 +14,7 @@ from sdgx.data_processors.generators.chn_pii import ChnPiiGenerator
 
 fake = Faker(locale="zh_CN")
 fake_en = Faker(["en_US"])
+
 
 @pytest.fixture
 def chn_personal_test_df():
@@ -68,14 +70,14 @@ def chn_personal_test_df():
         X.append(each_x)
 
     yield pd.DataFrame(X, columns=header)
-  
+
 
 def test_chn_pii_generator(chn_personal_test_df: pd.DataFrame):
 
     assert "chn_name" in chn_personal_test_df.columns
     assert "mobile_phone_no" in chn_personal_test_df.columns
     assert "ssn_sfz" in chn_personal_test_df.columns
-    
+
     # get metadata
     metadata_df = Metadata.from_dataframe(chn_personal_test_df)
 
@@ -106,15 +108,14 @@ def test_chn_pii_generator(chn_personal_test_df: pd.DataFrame):
     # each generated value is sfz
     for each_value in chn_personal_test_df["ssn_sfz"].values:
         assert len(each_value) == 18
-        pattern = r'^\d{17}[0-9X]$'
+        pattern = r"^\d{17}[0-9X]$"
         assert bool(re.match(pattern, each_value))
     for each_value in chn_personal_test_df["chn_name"].values:
-        pattern = r'^[\u4e00-\u9fa5]{2,5}$'
+        pattern = r"^[\u4e00-\u9fa5]{2,5}$"
         assert len(each_value) >= 2 and len(each_value) <= 5
         assert bool(re.match(pattern, each_value))
     for each_value in chn_personal_test_df["mobile_phone_no"].values:
-        assert each_value.startswith('1')
-        assert len(each_value)== 11 
-        pattern = r'^1[3-9]\d{9}$'
+        assert each_value.startswith("1")
+        assert len(each_value) == 11
+        pattern = r"^1[3-9]\d{9}$"
         assert bool(re.match(pattern, each_value))
-

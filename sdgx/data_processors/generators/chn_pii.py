@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Any
+
 import pandas as pd
 from faker import Faker
 
@@ -10,10 +11,9 @@ from sdgx.data_processors.generators.pii import PIIGenerator
 
 fake = Faker(locale="zh_CN")
 
+
 class ChnPiiGenerator(PIIGenerator):
-    """
-    
-    """
+    """ """
 
     chn_id_columns_list: list = []
 
@@ -34,10 +34,10 @@ class ChnPiiGenerator(PIIGenerator):
             if data_type == "chinese_name":
                 self.chn_name_columns_list.append(each_col)
                 continue
-            if data_type == 'china_mainland_mobile_phone':
+            if data_type == "china_mainland_mobile_phone":
                 self.chn_phone_columns_list.append(each_col)
                 continue
-            if data_type == 'china_mainland_id':
+            if data_type == "china_mainland_id":
                 self.chn_id_columns_list.append(each_col)
                 continue
         self.fitted = True
@@ -57,13 +57,13 @@ class ChnPiiGenerator(PIIGenerator):
         if not self.chn_pii_columns:
             return processed_data
         df_length = processed_data.shape[0]
-        
-        # chn id 
+
+        # chn id
         for each_col_name in self.chn_id_columns_list:
             each_email_col = [fake.ssn() for _ in range(df_length)]
             each_email_df = pd.DataFrame({each_col_name: each_email_col})
             processed_data = self.attach_columns(processed_data, each_email_df)
-        # chn phone 
+        # chn phone
         for each_col_name in self.chn_phone_columns_list:
             each_email_col = [fake.phone_number() for _ in range(df_length)]
             each_email_df = pd.DataFrame({each_col_name: each_email_col})

@@ -228,7 +228,7 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
         discrete_columns = self._filter_discrete_columns(dataloader.columns(), discrete_columns)
         # if the df is empty, we don't need to do anything
         if self.fit_data_empty:
-            return 
+            return
         # Fit Transformer and DataSampler
         self._transformer = DataTransformer()
         logger.info("Fitting model's transformer...")
@@ -519,8 +519,7 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
         return (loss * m).sum() / data.size()[0]
 
     def _filter_discrete_columns(self, train_data, discrete_columns):
-        """
-        """
+        """ """
         if isinstance(train_data, pd.DataFrame):
             invalid_columns = set(discrete_columns) - set(train_data.columns)
         elif isinstance(train_data, np.ndarray):
@@ -537,7 +536,7 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
 
         if len(rest_discrete_columns) == 0:
             self.fit_data_empty = True
-        
+
         return rest_discrete_columns
 
     def _validate_discrete_columns(self, train_data, discrete_columns):
