@@ -6,6 +6,7 @@ import pandas as pd
 
 from sdgx.data_models.metadata import Metadata
 from sdgx.exceptions import SynthesizerProcessorError
+from sdgx.log import logger
 
 
 class DataProcessor:
@@ -72,7 +73,12 @@ class DataProcessor:
         result_data = tabular_data.copy()
 
         # Remove specified columns
-        result_data = result_data.drop(columns=column_name_to_remove)
+        try:
+            result_data = result_data.drop(columns=column_name_to_remove)
+        except KeyError:
+            logger.warning(
+                "Duplicate column removal occurred, which might lead to unintended consequences."
+            )
 
         return result_data
 

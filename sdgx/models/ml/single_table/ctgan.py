@@ -213,6 +213,9 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
         if epochs is not None:
             self._epochs = epochs
         self._pre_fit(dataloader, discrete_columns)
+        if self.fit_data_empty:
+            logger.info("CTGAN fit finished because of empty df detected.")
+            return
         logger.info("CTGAN prefit finished, start CTGAN training.")
         self._fit(len(self._ndarry_loader))
         logger.info("CTGAN training finished.")
@@ -221,7 +224,11 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
         if not discrete_columns:
             discrete_columns = []
 
-        self._validate_discrete_columns(dataloader.columns(), discrete_columns)
+        # self._validate_discrete_columns(dataloader.columns(), discrete_columns)
+        discrete_columns = self._filter_discrete_columns(dataloader.columns(), discrete_columns)
+        # if the df is empty, we don't need to do anything
+        if self.fit_data_empty:
+            return
         # Fit Transformer and DataSampler
         self._transformer = DataTransformer()
         logger.info("Fitting model's transformer...")
@@ -364,6 +371,8 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
             )
 
     def sample(self, count: int, *args, **kwargs) -> pd.DataFrame:
+        if self.fit_data_empty:
+            return pd.DataFrame(index=range(count))
         return self._sample(count, *args, **kwargs)
 
     @random_state
@@ -508,6 +517,27 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
         loss = torch.stack(loss, dim=1)  # noqa: PD013
 
         return (loss * m).sum() / data.size()[0]
+
+    def _filter_discrete_columns(self, train_data, discrete_columns):
+        """ """
+        if isinstance(train_data, pd.DataFrame):
+            invalid_columns = set(discrete_columns) - set(train_data.columns)
+        elif isinstance(train_data, np.ndarray):
+            invalid_columns = []
+            for column in discrete_columns:
+                if column < 0 or column >= train_data.shape[1]:
+                    invalid_columns.append(column)
+        elif isinstance(train_data, list):
+            invalid_columns = set(discrete_columns) - set(train_data)
+        else:
+            raise TypeError("``train_data`` should be either pd.DataFrame or np.array.")
+
+        rest_discrete_columns = set(discrete_columns) - set(invalid_columns)
+
+        if len(rest_discrete_columns) == 0:
+            self.fit_data_empty = True
+
+        return rest_discrete_columns
 
     def _validate_discrete_columns(self, train_data, discrete_columns):
         """Check whether ``discrete_columns`` exists in ``train_data``.
