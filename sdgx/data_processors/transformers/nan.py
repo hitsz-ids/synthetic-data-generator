@@ -12,14 +12,33 @@ from sdgx.utils import logger
 
 class NonValueTransformer(Transformer):
     """
-    Transformer class for handling missing values in data.
+    A transformer class for handling missing values in a DataFrame.
 
-    This Transformer is mainly used as a reference for Transformer to facilitate developers to quickly understand the role of Transformer.
+    This class provides functionality to either drop rows with missing values or fill them with a specified value.
+
+    Attributes:
+        fill_na_value (int): The value to fill missing values in the data.
+        drop_na (bool): A boolean flag indicating whether to drop rows with missing values or fill them with `fill_na_value`.
+
+    Methods:
+        fit(metadata: Metadata | None = None, **kwargs: dict[str, Any]): Fit method for the transformer.
+        convert(raw_data: DataFrame) -> DataFrame: Convert method to handle missing values in the input data.
+        reverse_convert(processed_data: DataFrame) -> DataFrame: Reverse_convert method for the transformer.
     """
 
     fill_na_value = 0
+    """
+    The value to fill missing values in the data.
+
+    If `drop_na` is set to `False`, this value will be used to fill missing values in the data.
+    """
 
     drop_na = True
+    """
+    A boolean flag indicating whether to drop rows with missing values or fill them with `fill_na_value`.
+
+    If `True`, rows with missing values will be dropped. If `False`, missing values will be filled with `fill_na_value`.
+    """
 
     def fit(self, metadata: Metadata | None = None, **kwargs: dict[str, Any]):
         """

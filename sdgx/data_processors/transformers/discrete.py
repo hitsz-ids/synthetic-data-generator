@@ -13,9 +13,22 @@ from sdgx.utils import logger
 
 class DiscreteTransformer(Transformer):
     """
-    DiscreteTransformer is an important component of sdgx, used to handle discrete columns.
+    A transformer class for handling discrete values in the input data.
 
-    By default, DiscreteTransformer will perform one-hot encoding of discrete columns, and issue a warning message when dimensionality explosion occurs.
+    This class uses one-hot encoding to convert discrete values into a format that can be used by machine learning models.
+
+    Attributes:
+        discrete_columns (list): A list of column names that are of discrete type.
+        one_hot_warning_cnt (int): The warning count for one-hot encoding. If the number of new columns after one-hot encoding exceeds this count, a warning message will be issued.
+        one_hot_encoders (dict): A dictionary that stores the OneHotEncoder objects for each discrete column. The keys are the column names, and the values are the corresponding OneHotEncoder objects.
+        one_hot_column_names (dict): A dictionary that stores the new column names after one-hot encoding for each discrete column. The keys are the column names, and the values are lists of new column names.
+        onehot_encoder_handle_unknown (str): The parameter to handle unknown categories in the OneHotEncoder. If set to 'ignore', new categories will be ignored. If set to 'error', an error will be raised when new categories are encountered.
+
+    Methods:
+        fit(metadata: Metadata, tabular_data: DataLoader | pd.DataFrame): Fit the transformer to the input data.
+        _fit_column(column_name: str, column_data: pd.DataFrame): Fit a single discrete column.
+        convert(raw_data: pd.DataFrame) -> pd.DataFrame: Convert the input data using one-hot encoding.
+        reverse_convert(processed_data: pd.DataFrame) -> pd.DataFrame: Reverse the one-hot encoding process to get the original data.
     """
 
     discrete_columns: list = []
@@ -24,12 +37,29 @@ class DiscreteTransformer(Transformer):
     """
 
     one_hot_warning_cnt = 512
+    """
+    The warning count for one-hot encoding.
+    If the number of new columns after one-hot encoding exceeds this count, a warning message will be issued.
+    """
 
     one_hot_encoders: dict = {}
+    """
+    A dictionary that stores the OneHotEncoder objects for each discrete column.
+    The keys are the column names, and the values are the corresponding OneHotEncoder objects.
+    """
 
     one_hot_column_names: dict = {}
+    """
+    A dictionary that stores the new column names after one-hot encoding for each discrete column.
+    The keys are the column names, and the values are lists of new column names.
+    """
 
     onehot_encoder_handle_unknown: str = "ignore"
+    """
+    The parameter to handle unknown categories in the OneHotEncoder.
+    If set to 'ignore', new categories will be ignored.
+    If set to 'error', an error will be raised when new categories are encountered.
+    """
 
     def fit(self, metadata: Metadata, tabular_data: DataLoader | pd.DataFrame):
         """

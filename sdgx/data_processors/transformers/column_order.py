@@ -12,9 +12,16 @@ from sdgx.utils import logger
 
 class ColumnOrderTransformer(Transformer):
     """
-    Transformer class for handling missing values in data.
+    A transformer that rearranges the columns of a DataFrame to a specified order.
 
-    This Transformer is mainly used as a reference for Transformer to facilitate developers to quickly understand the role of Transformer.
+    Attributes:
+        column_list (list): The list of column names in the desired order.
+
+    Methods:
+        fit(metadata: Metadata | None = None, **kwargs: dict[str, Any]): Fits the transformer by remembering the order of the columns.
+        convert(raw_data: pd.DataFrame) -> pd.DataFrame: Converts the input DataFrame by rearranging its columns.
+        reverse_convert(processed_data: pd.DataFrame) -> pd.DataFrame: Reverse-converts the processed DataFrame by rearranging its columns back to their original order.
+        rearrange_columns(column_list, processed_data): Rearranges the columns of a DataFrame according to the provided column list.
     """
 
     column_list: list = None

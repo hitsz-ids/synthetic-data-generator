@@ -11,8 +11,9 @@ Built-in DataProcessor
 -----------------------------
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 3
 
+    Built-in DataProcessors <processors/index>
 
 Custom DataProcessor Relevant
 -----------------------------
