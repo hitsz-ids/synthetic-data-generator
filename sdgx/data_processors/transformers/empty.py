@@ -35,7 +35,6 @@ class EmptyTransformer(Transformer):
     and is used to remove these columns during the conversion process and restore them during the reverse conversion process.
     """
 
-
     def fit(self, metadata: Metadata | None = None, **kwargs: dict[str, Any]):
         """
         Fit method for the transformer.
@@ -49,7 +48,7 @@ class EmptyTransformer(Transformer):
             None
         """
 
-        self.empty_columns = list(metadata.get('empty_columns'))
+        self.empty_columns = list(metadata.get("empty_columns"))
 
         logger.info("EmptyTransformer Fitted.")
 
@@ -68,7 +67,7 @@ class EmptyTransformer(Transformer):
             pd.DataFrame: The processed DataFrame with empty columns removed.
         """
         processed_data = raw_data
-        
+
         logger.info("Converting data using EmptyTransformer...")
 
         for each_col in self.empty_columns:
@@ -98,6 +97,7 @@ class EmptyTransformer(Transformer):
         logger.info("Data reverse-converted by EmptyTransformer.")
 
         return processed_data
+
 
 @hookimpl
 def register(manager):
