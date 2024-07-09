@@ -22,12 +22,12 @@ def test_empty_data(raw_data: pd.DataFrame):
     # Set the values to None
     raw_data['age'].values[:] = None
     raw_data['fnlwgt'].values[:] = None
-    
+
     yield raw_data
 
 
 def test_inspector(inspector: EmptyInspector, test_empty_data):
-    inspector.fit(raw_data)
+    inspector.fit(test_empty_data)
     assert inspector.ready
     assert inspector.empty_columns
     assert sorted(inspector.inspect()["empty_columns"]) == sorted(
