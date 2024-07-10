@@ -22,7 +22,7 @@
 
 <p style="font-size: small;">切换语言:
     <a href="https://github.com/hitsz-ids/synthetic-data-generator/blob/main/README.md" target="_blank">English</a> &nbsp;| &nbsp;最新
-    <a href="https://synthetic-data-generator.readthedocs.io/en/latest/" target="value">API文档</a>&nbsp;| &nbsp; 加入 <a href="assets/wechat_QR_code.JPG" target="value">Wechat群组</a>
+    <a href="https://synthetic-data-generator.readthedocs.io/en/latest/" target="value">API文档</a>&nbsp;| &nbsp; 加入 <a href="assets/live_QR_code.PNG" target="value">Wechat群组</a>
   </p>
 
 <p style="font-size: small;">
@@ -207,7 +207,7 @@ SDG开源项目由**哈尔滨工业大学（深圳）数据安全研究院**发�
 - 加入微信群：
 
 <div align="left">
-  <img src="assets/wechat_QR_code.JPG" width="400" >
+  <img src="assets/live_QR_code.PNG" width="400" >
 </div>
 
 ## 📄 许可证
