@@ -180,6 +180,18 @@ class EnglishNameInspector(RegexInspector):
             return False
         return True
 
+# 公司名
+class ChineseCompanyNameInspector(RegexInspector):
+    pattern = r'.*?公司.*?'
+
+    _match_percentage = 0.7
+
+    data_type_name = "chinese_company_name"
+
+    _inspect_level = 40
+
+    pii = False
+
 
 @hookimpl
 def register(manager):
@@ -198,3 +210,5 @@ def register(manager):
     manager.register("ChineseNameInspector", ChineseNameInspector)
 
     manager.register("EnglishNameInspector", EnglishNameInspector)
+
+    manager.register("ChineseCompanyNameInspector", ChineseCompanyNameInspector)
