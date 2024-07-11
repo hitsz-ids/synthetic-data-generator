@@ -77,6 +77,7 @@ def test_chn_pii_generator(chn_personal_test_df: pd.DataFrame):
     assert "chn_name" in chn_personal_test_df.columns
     assert "mobile_phone_no" in chn_personal_test_df.columns
     assert "ssn_sfz" in chn_personal_test_df.columns
+    assert "company_name" in chn_personal_test_df.columns    
 
     # get metadata
     metadata_df = Metadata.from_dataframe(chn_personal_test_df)
@@ -89,6 +90,7 @@ def test_chn_pii_generator(chn_personal_test_df: pd.DataFrame):
     assert pii_generator.chn_name_columns_list == ["chn_name"]
     assert pii_generator.chn_phone_columns_list == ["mobile_phone_no"]
     assert pii_generator.chn_id_columns_list == ["ssn_sfz"]
+    assert pii_generator.chn_company_name_list == ["company_name"]
 
     converted_df = pii_generator.convert(chn_personal_test_df)
     assert len(converted_df) == len(chn_personal_test_df)
@@ -99,12 +101,14 @@ def test_chn_pii_generator(chn_personal_test_df: pd.DataFrame):
     assert "chn_name" not in converted_df.columns
     assert "mobile_phone_no" not in converted_df.columns
     assert "ssn_sfz" not in converted_df.columns
+    assert "company_name" not in converted_df.columns
 
     reverse_converted_df = pii_generator.reverse_convert(converted_df)
     assert len(reverse_converted_df) == len(chn_personal_test_df)
     assert "chn_name" in reverse_converted_df.columns
     assert "mobile_phone_no" in reverse_converted_df.columns
     assert "ssn_sfz" in reverse_converted_df.columns
+    assert "company_name" in reverse_converted_df.columns
     # each generated value is sfz
     for each_value in chn_personal_test_df["ssn_sfz"].values:
         assert len(each_value) == 18
@@ -118,4 +122,7 @@ def test_chn_pii_generator(chn_personal_test_df: pd.DataFrame):
         assert each_value.startswith("1")
         assert len(each_value) == 11
         pattern = r"^1[3-9]\d{9}$"
+        assert bool(re.match(pattern, each_value))
+    for each_value in chn_personal_test_df["company_name"].values:
+        pattern = r'.*?公司.*?'
         assert bool(re.match(pattern, each_value))

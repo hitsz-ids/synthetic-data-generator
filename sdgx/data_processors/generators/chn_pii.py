@@ -21,11 +21,13 @@ class ChnPiiGenerator(PIIGenerator):
 
     chn_name_columns_list: list = []
 
+    chn_company_name_list: list = []
+
     fitted: bool = False
 
     @property
     def chn_pii_columns(self):
-        return self.chn_id_columns_list + self.chn_name_columns_list + self.chn_phone_columns_list
+        return self.chn_id_columns_list + self.chn_name_columns_list + self.chn_phone_columns_list + self.chn_company_name_list
 
     def fit(self, metadata: Metadata | None = None, **kwargs: dict[str, Any]):
 
@@ -40,6 +42,9 @@ class ChnPiiGenerator(PIIGenerator):
             if data_type == "china_mainland_id":
                 self.chn_id_columns_list.append(each_col)
                 continue
+            if data_type == 'chinese_company_name':
+                self.chn_company_name_list.append(each_col)
+
         self.fitted = True
 
     def convert(self, raw_data: pd.DataFrame) -> pd.DataFrame:
@@ -56,6 +61,7 @@ class ChnPiiGenerator(PIIGenerator):
         # if empty, return directly
         if not self.chn_pii_columns:
             return processed_data
+        
         df_length = processed_data.shape[0]
 
         # chn id
@@ -73,6 +79,11 @@ class ChnPiiGenerator(PIIGenerator):
             each_email_col = [fake.name() for _ in range(df_length)]
             each_email_df = pd.DataFrame({each_col_name: each_email_col})
             processed_data = self.attach_columns(processed_data, each_email_df)
+        # chn company
+        for each_col_name in self.chn_company_name_list:
+            each_company_col = [fake.company() for _ in range(df_length)]
+            each_company_df = pd.DataFrame({each_col_name: each_company_col})
+            processed_data = self.attach_columns(processed_data, each_company_df)
 
         return processed_data
 
