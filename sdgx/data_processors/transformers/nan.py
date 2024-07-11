@@ -33,11 +33,14 @@ class NonValueTransformer(Transformer):
     If `drop_na` is set to `False`, this value will be used to fill missing values in the data.
     """
 
-    drop_na = True
+    drop_na = False
     """
     A boolean flag indicating whether to drop rows with missing values or fill them with `fill_na_value`.
 
-    If `True`, rows with missing values will be dropped. If `False`, missing values will be filled with `fill_na_value`.
+    If `True`, rows with missing values will be dropped.
+    If `False`, missing values will be filled with `fill_na_value`.
+
+    Currently, the default setting is False, which means rows with missing values are not dropped.
     """
 
     def fit(self, metadata: Metadata | None = None, **kwargs: dict[str, Any]):
@@ -48,9 +51,13 @@ class NonValueTransformer(Transformer):
         """
         logger.info("NonValueTransformer Fitted.")
 
-        self.fitted = True
+        for key, value in kwargs.items():
+            if key == "fill_na_value":
+                if not isinstance(value, str):
+                    raise ValueError("fill_na_value must be of type <str>")
+                self.fill_na_value = value
 
-        return
+        self.fitted = True
 
     def convert(self, raw_data: DataFrame) -> DataFrame:
         """
