@@ -5,6 +5,7 @@ import pytest
 from sdgx.data_models.metadata import Metadata
 from sdgx.data_processors.transformers.empty import EmptyTransformer
 
+
 @pytest.fixture
 def raw_data(demo_single_table_path):
     yield pd.read_csv(demo_single_table_path)
@@ -21,6 +22,7 @@ def test_empty_data(raw_data: pd.DataFrame):
     raw_data["fnlwgt"].values[:] = None
 
     yield raw_data
+
 
 def test_nan_handling_test_df(test_empty_data: pd.DataFrame):
     """
@@ -51,7 +53,7 @@ def test_nan_handling_test_df(test_empty_data: pd.DataFrame):
     # Check if the transformer has been fitted after the fit operation.
     assert empty_transformer.fitted
 
-    # Check the empty column 
+    # Check the empty column
     assert sorted(empty_transformer.empty_columns) == ["age", "fnlwgt"]
 
     # Transform the DataFrame using the transformer.
@@ -60,9 +62,9 @@ def test_nan_handling_test_df(test_empty_data: pd.DataFrame):
     # Check if the transformed DataFrame does not contain any empty columns.
     # assert not df_has_empty_col(transformed_df)
     processed_metadata = Metadata.from_dataframe(transformed_df)
-    assert not processed_metadata.get('empty_columns')
+    assert not processed_metadata.get("empty_columns")
 
     # reverse convert the df
     reverse_converted_df = empty_transformer.reverse_convert(transformed_df)
     reverse_converted_metadata = Metadata.from_dataframe(reverse_converted_df)
-    assert reverse_converted_metadata.get('empty_columns') == {'age', 'fnlwgt'}
+    assert reverse_converted_metadata.get("empty_columns") == {"age", "fnlwgt"}
