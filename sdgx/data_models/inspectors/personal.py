@@ -180,9 +180,10 @@ class EnglishNameInspector(RegexInspector):
             return False
         return True
 
+
 # 公司名
 class ChineseCompanyNameInspector(RegexInspector):
-    pattern = r'.*?公司.*?'
+    pattern = r".*?公司.*?"
 
     _match_percentage = 0.7
 

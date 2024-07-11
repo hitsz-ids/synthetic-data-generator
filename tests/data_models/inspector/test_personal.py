@@ -15,10 +15,10 @@ from sdgx.data_models.inspectors.personal import (
     ChinaMainlandMobilePhoneInspector,
     ChinaMainlandPostCode,
     ChinaMainlandUnifiedSocialCreditCode,
+    ChineseCompanyNameInspector,
     ChineseNameInspector,
     EmailInspector,
     EnglishNameInspector,
-    ChineseCompanyNameInspector,
 )
 
 
@@ -260,7 +260,8 @@ def test_eng_name_inspector_generated_data(chn_personal_test_df: pd.DataFrame):
     assert inspector_ENG_name.inspect_level == 40
     assert inspector_ENG_name.pii is True
 
-# Chinese Company Name 
+
+# Chinese Company Name
 def test_chn_company_inspector_demo_data(raw_data):
     inspector_PostCode = ChineseCompanyNameInspector()
     inspector_PostCode.fit(raw_data)
@@ -279,6 +280,7 @@ def test_chn_company_inspector_generated_data(chn_personal_test_df: pd.DataFrame
     )
     assert inspector_PostCode.inspect_level == 40
     assert inspector_PostCode.pii is False
+
 
 if __name__ == "__main__":
     pytest.main(["-vv", "-s", __file__])

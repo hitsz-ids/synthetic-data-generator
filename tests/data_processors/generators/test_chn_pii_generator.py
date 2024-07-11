@@ -77,7 +77,7 @@ def test_chn_pii_generator(chn_personal_test_df: pd.DataFrame):
     assert "chn_name" in chn_personal_test_df.columns
     assert "mobile_phone_no" in chn_personal_test_df.columns
     assert "ssn_sfz" in chn_personal_test_df.columns
-    assert "company_name" in chn_personal_test_df.columns    
+    assert "company_name" in chn_personal_test_df.columns
 
     # get metadata
     metadata_df = Metadata.from_dataframe(chn_personal_test_df)
@@ -124,5 +124,5 @@ def test_chn_pii_generator(chn_personal_test_df: pd.DataFrame):
         pattern = r"^1[3-9]\d{9}$"
         assert bool(re.match(pattern, each_value))
     for each_value in chn_personal_test_df["company_name"].values:
-        pattern = r'.*?公司.*?'
+        pattern = r".*?公司.*?"
         assert bool(re.match(pattern, each_value))
