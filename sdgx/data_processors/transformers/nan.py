@@ -51,9 +51,14 @@ class NonValueTransformer(Transformer):
         """
         logger.info("NonValueTransformer Fitted.")
 
+        for key, value in kwargs.items():
+            if key == 'fill_na_value':
+                if not isinstance(value, str):  
+                    raise ValueError("fill_na_value must be of type <str>")
+                self.fill_na_value = value
+        
         self.fitted = True
-
-        return
+            
 
     def convert(self, raw_data: DataFrame) -> DataFrame:
         """
