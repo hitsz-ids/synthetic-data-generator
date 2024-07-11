@@ -71,7 +71,7 @@ class EmptyTransformer(Transformer):
         logger.info("Converting data using EmptyTransformer...")
 
         for each_col in self.empty_columns:
-            processed_data = self.remove_columns(raw_data, each_col)
+            processed_data = self.remove_columns(processed_data, [each_col])
         logger.info("Converting data using EmptyTransformer... Finished (No action).")
 
         return processed_data
