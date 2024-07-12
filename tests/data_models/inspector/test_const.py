@@ -3,6 +3,7 @@ import pytest
 
 from sdgx.data_models.inspectors.const import ConstInspector
 
+
 @pytest.fixture
 def inspector():
     yield ConstInspector()
@@ -31,20 +32,13 @@ def test_inspector(inspector: ConstInspector, test_const_data):
     inspector.fit(test_const_data)
     assert inspector.ready
     assert inspector.const_columns
-    assert sorted(inspector.inspect()["const_columns"]) == sorted(
-        [
-            "age",
-            "fnlwgt","workclass"
-        ]
-    )
-    
+    assert sorted(inspector.inspect()["const_columns"]) == sorted(["age", "fnlwgt", "workclass"])
+
     assert inspector.inspect_level == 80
-    assert sorted(list(inspector.const_values.keys())) == sorted(["age",
-            "fnlwgt","workclass"])
+    assert sorted(list(inspector.const_values.keys())) == sorted(["age", "fnlwgt", "workclass"])
     assert inspector.const_values["age"] == 100
     assert inspector.const_values["fnlwgt"] == 3.14
-    assert inspector.const_values["workclass"] == 'President'
-
+    assert inspector.const_values["workclass"] == "President"
 
 
 if __name__ == "__main__":

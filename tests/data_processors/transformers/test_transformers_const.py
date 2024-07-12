@@ -68,6 +68,5 @@ def test_const_handling_test_df(test_const_data: pd.DataFrame):
     reverse_converted_df = const_transformer.reverse_convert(transformed_df)
     reverse_converted_metadata = Metadata.from_dataframe(reverse_converted_df)
     assert reverse_converted_metadata.get("const_columns") == {"age", "fnlwgt"}
-    assert reverse_converted_df['age'][0] == 100 
-    assert reverse_converted_df['fnlwgt'][0] == 1.41421 
-
+    assert reverse_converted_df["age"][0] == 100
+    assert reverse_converted_df["fnlwgt"][0] == 1.41421

@@ -82,9 +82,9 @@ class Metadata(BaseModel):
     def tag_fields(self) -> Iterable[str]:
         """
         Returns a list of fields that represent tags or labels associated with the data.
-        
+
         These fields might include labels used for categorization, such as tags for machine learning labels or data classification.
-        
+
         Returns:
             list[str]: List of field names that represent tags or labels.
         """
@@ -98,9 +98,9 @@ class Metadata(BaseModel):
     def format_fields(self) -> Iterable[str]:
         """
         Returns a list of fields that represent the format or structure of the data.
-        
+
         These fields might include metadata about how the data is structured, such as date formats, delimiters, etc.
-        
+
         Returns:
             list[str]: List of field names that represent data formats.
         """
@@ -109,14 +109,14 @@ class Metadata(BaseModel):
             (k for k in self.model_fields if k.endswith("_format")),
             (k for k in self._extend.keys() if k.endswith("_format")),
         )
-    
+
     @property
     def value_fields(self) -> Iterable[str]:
         """
         Returns a list of fields that represent the values in the dataset.
-        
+
         These fields are typically numeric or categorical values that are used for analysis or modeling.
-        
+
         Returns:
             list[str]: List of field names that represent values.
         """

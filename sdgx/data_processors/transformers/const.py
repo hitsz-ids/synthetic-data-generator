@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Any
+
 import pandas as pd
 
 from sdgx.data_models.metadata import Metadata
@@ -19,7 +20,7 @@ class ConstValueTransformer(Transformer):
     Attributes:
         const_value (dict[Any]): The constant value that will be returned.
     """
-    
+
     const_columns: list = []
 
     const_values: dict[Any] = {}
@@ -42,7 +43,7 @@ class ConstValueTransformer(Transformer):
         for each_col in metadata.column_list:
             if metadata.get_column_data_type(each_col) == "const":
                 self.const_columns.append(each_col)
-                self.const_values[each_col] = metadata.get('const_values')[each_col]
+                self.const_values[each_col] = metadata.get("const_values")[each_col]
 
         logger.info("ConstValueTransformer Fitted.")
 

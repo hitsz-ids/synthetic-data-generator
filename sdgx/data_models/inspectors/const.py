@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Any
+
 import pandas as pd
 
 from sdgx.data_models.inspectors.base import Inspector
@@ -23,7 +24,7 @@ class ConstInspector(Inspector):
     A set of column names that contain constant values. This attribute is populated during the fit method by identifying columns in the DataFrame where all values are the same.
     """
 
-    const_values : dict[Any] = {}
+    const_values: dict[Any] = {}
     """
     A dictionary mapping column names to their constant values. This attribute is populated during the fit method by storing the unique value found in each constant column.
     """
@@ -32,7 +33,7 @@ class ConstInspector(Inspector):
     """
     The inspection level for this inspector, set to 80. This attribute indicates the priority or depth of inspection that this inspector performs relative to other inspectors.
     """
-   
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -48,7 +49,7 @@ class ConstInspector(Inspector):
         Returns:
             None
         """
-        # iterate each column 
+        # iterate each column
         for column in raw_data.columns:
             if len(raw_data[column].value_counts(normalize=True)) == 1:
                 self.const_columns.add(column)
@@ -59,8 +60,7 @@ class ConstInspector(Inspector):
     def inspect(self, *args, **kwargs) -> dict[str, Any]:
         """Inspect raw data and generate metadata."""
 
-        return {"const_columns": list(self.const_columns),
-                "const_values": self.const_values}
+        return {"const_columns": list(self.const_columns), "const_values": self.const_values}
 
 
 @hookimpl
