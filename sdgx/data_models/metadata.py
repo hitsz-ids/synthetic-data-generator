@@ -46,7 +46,6 @@ class Metadata(BaseModel):
     """
 
     @field_validator("column_list")
-    @classmethod
     def check_column_list(cls, value) -> Any:
         # check if v has duplicate element
         if len(value) == len(set(value)):
@@ -101,6 +100,17 @@ class Metadata(BaseModel):
             (k for k in self.model_fields if k.endswith("_format")),
             (k for k in self._extend.keys() if k.endswith("_format")),
         )
+    
+    @property
+    def value_fields(self) -> Iterable[str]:
+        """
+        Return all tag fields in this metadata.
+        """
+
+        return chain(
+            (k for k in self.model_fields if k.endswith("_values")),
+            (k for k in self._extend.keys() if k.endswith("_values")),
+        )
 
     def __eq__(self, other):
         if not isinstance(other, Metadata):
@@ -114,6 +124,10 @@ class Metadata(BaseModel):
             and all(
                 self.get(key) == other.get(key)
                 for key in set(chain(self.format_fields, other.format_fields))
+            )
+            and all(
+                self.get(key) == other.get(key)
+                for key in set(chain(self.value_fields, other.value_fields))
             )
             and self.version == other.version
         )
