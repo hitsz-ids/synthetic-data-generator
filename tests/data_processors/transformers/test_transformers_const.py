@@ -1,7 +1,8 @@
+import copy
+
 import numpy as np
 import pandas as pd
 import pytest
-import copy
 
 from sdgx.data_models.metadata import Metadata
 from sdgx.data_processors.transformers.const import ConstValueTransformer

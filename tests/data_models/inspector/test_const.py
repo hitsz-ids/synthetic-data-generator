@@ -1,6 +1,7 @@
+import copy
+
 import pandas as pd
 import pytest
-import copy
 
 from sdgx.data_models.inspectors.const import ConstInspector
 
@@ -18,7 +19,7 @@ def raw_data(demo_single_table_path):
 @pytest.fixture
 def test_const_data(raw_data: pd.DataFrame):
     const_col_df = copy.deepcopy(raw_data)
-    
+
     # Convert the columns to float to allow None values
     const_col_df["age"] = const_col_df["age"].astype(float)
     const_col_df["fnlwgt"] = const_col_df["fnlwgt"].astype(float)
