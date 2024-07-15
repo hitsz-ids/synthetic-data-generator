@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 import pandas as pd
+import copy
 
 from sdgx.data_models.metadata import Metadata
 from sdgx.data_processors.extension import hookimpl
@@ -63,7 +64,7 @@ class ConstValueTransformer(Transformer):
             pd.DataFrame: A DataFrame with the specified columns removed.
         """
 
-        processed_data = raw_data
+        processed_data = copy.deepcopy(raw_data)
 
         logger.info("Converting data using ConstValueTransformer...")
 
