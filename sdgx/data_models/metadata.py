@@ -45,6 +45,7 @@ class Metadata(BaseModel):
     """
 
     @field_validator("column_list")
+    # @classmethod
     def check_column_list(cls, v) -> Any:
         # check if v has duplicate element
         if len(v) == len(set(v)):
@@ -70,6 +71,7 @@ class Metadata(BaseModel):
     discrete_columns: Set[str] = set()
     datetime_columns: Set[str] = set()
     datetime_format: Dict = defaultdict(str)
+    const_values: Dict = defaultdict(str)
 
     # version info
     version: str = "1.0"
@@ -206,6 +208,7 @@ class Metadata(BaseModel):
             key in self.model_fields
             and key not in self.tag_fields
             and key not in self.format_fields
+            and key not in self.value_fields
         ):
             raise MetadataInitError(
                 f"Set {key} not in tag_fields, try set it directly as m.{key} = value"
@@ -251,6 +254,9 @@ class Metadata(BaseModel):
         if isinstance(values, dict):
             # already in fields that contains dict
             if key in list(self.format_fields):
+                self.get(key).update(values)
+            
+            if key in list(self.value_fields):
                 self.get(key).update(values)
 
             # in extend
