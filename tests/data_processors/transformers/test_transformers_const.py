@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import pytest
+import copy
 
 from sdgx.data_models.metadata import Metadata
 from sdgx.data_processors.transformers.const import ConstValueTransformer
@@ -13,16 +14,18 @@ def raw_data(demo_single_table_path):
 
 @pytest.fixture
 def test_const_data(raw_data: pd.DataFrame):
+
+    const_col_df = copy.deepcopy(raw_data)
     # Convert the columns to float to allow None values
-    raw_data["age"] = raw_data["age"].astype(float)
-    raw_data["fnlwgt"] = raw_data["fnlwgt"].astype(float)
+    const_col_df["age"] = const_col_df["age"].astype(float)
+    const_col_df["fnlwgt"] = const_col_df["fnlwgt"].astype(float)
 
     # Set the values to None
-    raw_data["age"].values[:] = 100
-    raw_data["fnlwgt"].values[:] = 1.41421
-    raw_data["workclass"].values[:] = "President"
+    const_col_df["age"].values[:] = 100
+    const_col_df["fnlwgt"].values[:] = 1.41421
+    const_col_df["workclass"].values[:] = "President"
 
-    yield raw_data
+    yield const_col_df
 
 
 def test_const_handling_test_df(test_const_data: pd.DataFrame):
