@@ -1,9 +1,9 @@
 from __future__ import annotations
 
+import copy
 from typing import Any
 
 import pandas as pd
-import copy
 
 from sdgx.data_models.metadata import Metadata
 from sdgx.data_processors.extension import hookimpl
