@@ -5,20 +5,9 @@ import pytest
 
 from sdgx.data_models.inspectors.const import ConstInspector
 
-
 @pytest.fixture
-def inspector():
-    yield ConstInspector()
-
-
-@pytest.fixture
-def raw_data(demo_single_table_path):
-    yield pd.read_csv(demo_single_table_path)
-
-
-@pytest.fixture
-def test_const_data(raw_data: pd.DataFrame):
-    const_col_df = copy.deepcopy(raw_data)
+def test_const_data(demo_single_table_path):
+    const_col_df = pd.read_csv(demo_single_table_path)
 
     # Convert the columns to float to allow None values
     const_col_df["age"] = const_col_df["age"].astype(float)
@@ -32,7 +21,8 @@ def test_const_data(raw_data: pd.DataFrame):
     yield const_col_df
 
 
-def test_inspector(inspector: ConstInspector, test_const_data):
+def test_inspector(test_const_data):
+    inspector = ConstInspector()
     inspector.fit(test_const_data)
     assert inspector.ready
     assert inspector.const_columns

@@ -9,14 +9,9 @@ from sdgx.data_processors.transformers.const import ConstValueTransformer
 
 
 @pytest.fixture
-def raw_data(demo_single_table_path):
-    yield pd.read_csv(demo_single_table_path)
+def test_const_data(demo_single_table_path):
 
-
-@pytest.fixture
-def test_const_data(raw_data: pd.DataFrame):
-
-    const_col_df = copy.deepcopy(raw_data)
+    const_col_df = pd.read_csv(demo_single_table_path)
     # Convert the columns to float to allow None values
     const_col_df["age"] = const_col_df["age"].astype(float)
     const_col_df["fnlwgt"] = const_col_df["fnlwgt"].astype(float)
