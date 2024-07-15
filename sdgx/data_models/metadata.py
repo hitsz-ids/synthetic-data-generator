@@ -255,7 +255,7 @@ class Metadata(BaseModel):
             # already in fields that contains dict
             if key in list(self.format_fields):
                 self.get(key).update(values)
-            
+
             if key in list(self.value_fields):
                 self.get(key).update(values)
 
