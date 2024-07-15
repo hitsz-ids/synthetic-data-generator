@@ -20,6 +20,7 @@ def test_const_data(raw_data: pd.DataFrame):
     # Set the values to None
     raw_data["age"].values[:] = 100
     raw_data["fnlwgt"].values[:] = 1.41421
+    raw_data["workclass"].values[:] = "President"
 
     yield raw_data
 
@@ -54,7 +55,7 @@ def test_const_handling_test_df(test_const_data: pd.DataFrame):
     assert const_transformer.fitted
 
     # Check the const column
-    assert sorted(const_transformer.const_columns) == ["age", "fnlwgt"]
+    assert sorted(const_transformer.const_columns) == ["age", "fnlwgt", 'workclass',]
 
     # Transform the DataFrame using the transformer.
     transformed_df = const_transformer.convert(test_const_data)
@@ -67,6 +68,7 @@ def test_const_handling_test_df(test_const_data: pd.DataFrame):
     # reverse convert the df
     reverse_converted_df = const_transformer.reverse_convert(transformed_df)
     reverse_converted_metadata = Metadata.from_dataframe(reverse_converted_df)
-    assert reverse_converted_metadata.get("const_columns") == {"age", "fnlwgt"}
+    assert reverse_converted_metadata.get("const_columns") == {"age", "fnlwgt", 'workclass'}
     assert reverse_converted_df["age"][0] == 100
     assert reverse_converted_df["fnlwgt"][0] == 1.41421
+    assert reverse_converted_df["fnlwgt"][0] == "President"
