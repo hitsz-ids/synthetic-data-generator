@@ -70,6 +70,7 @@ class Metadata(BaseModel):
     bool_columns: Set[str] = set()
     discrete_columns: Set[str] = set()
     datetime_columns: Set[str] = set()
+    const_columns: Set[str] = set()
     datetime_format: Dict = defaultdict(str)
     const_values: Dict = defaultdict(str)
 
