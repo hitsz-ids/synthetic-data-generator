@@ -5,6 +5,7 @@ import pytest
 
 from sdgx.data_models.inspectors.const import ConstInspector
 
+
 @pytest.fixture
 def test_const_data(demo_single_table_path):
     const_col_df = pd.read_csv(demo_single_table_path)
