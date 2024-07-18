@@ -69,7 +69,7 @@ class ConstValueTransformer(Transformer):
         logger.info("Converting data using ConstValueTransformer...")
 
         for each_col in self.const_columns:
-            # record values here 
+            # record values here
             if each_col not in self.const_values.keys():
                 self.const_values[each_col] = processed_data[each_col].unique()[0]
             processed_data = self.remove_columns(processed_data, [each_col])
