@@ -31,5 +31,6 @@ def test_inspector(test_const_data: pd.DataFrame):
     assert sorted(inspector.inspect()["const_columns"]) == sorted(["age", "fnlwgt", "workclass"])
     assert inspector.inspect_level == 80
 
+
 if __name__ == "__main__":
     pytest.main(["-vv", "-s", __file__])
