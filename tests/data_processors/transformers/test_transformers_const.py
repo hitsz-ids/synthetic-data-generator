@@ -63,16 +63,16 @@ def test_const_handling_test_df(test_const_data: pd.DataFrame):
     # Transform the DataFrame using the transformer.
     transformed_df = const_transformer.convert(test_const_data)
 
-    assert 'age' not in transformed_df.columns
-    assert 'fnlwgt' not in transformed_df.columns
-    assert 'workclass' not in transformed_df.columns
+    assert "age" not in transformed_df.columns
+    assert "fnlwgt" not in transformed_df.columns
+    assert "workclass" not in transformed_df.columns
 
     # reverse convert the df
     reverse_converted_df = const_transformer.reverse_convert(transformed_df)
 
-    assert 'age'  in reverse_converted_df.columns
-    assert 'fnlwgt'  in reverse_converted_df.columns
-    assert 'workclass'  in reverse_converted_df.columns
+    assert "age" in reverse_converted_df.columns
+    assert "fnlwgt" in reverse_converted_df.columns
+    assert "workclass" in reverse_converted_df.columns
 
     assert reverse_converted_df["age"][0] == 100
     assert reverse_converted_df["fnlwgt"][0] == 1.41421
