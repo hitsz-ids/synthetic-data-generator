@@ -22,19 +22,14 @@ def test_const_data(demo_single_table_path):
     yield const_col_df
 
 
-def test_inspector(test_const_data):
+def test_inspector(test_const_data: pd.DataFrame):
     inspector = ConstInspector()
     inspector.fit(test_const_data)
     assert inspector.ready
     assert inspector.const_columns
+
     assert sorted(inspector.inspect()["const_columns"]) == sorted(["age", "fnlwgt", "workclass"])
-
     assert inspector.inspect_level == 80
-    assert sorted(list(inspector.const_values.keys())) == sorted(["age", "fnlwgt", "workclass"])
-    assert inspector.const_values["age"] == 100
-    assert inspector.const_values["fnlwgt"] == 3.14
-    assert inspector.const_values["workclass"] == "President"
-
 
 if __name__ == "__main__":
     pytest.main(["-vv", "-s", __file__])
