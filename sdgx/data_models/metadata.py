@@ -299,7 +299,7 @@ class Metadata(BaseModel):
         inspectors = im.init_inspcetors(
             include_inspectors, exclude_inspectors, **(inspector_init_kwargs or {})
         )
-        # set all inspectors not ready 
+        # set all inspectors not ready
         for inspector in inspectors:
             inspector.ready = False
         for i, chunk in enumerate(dataloader.iter()):
