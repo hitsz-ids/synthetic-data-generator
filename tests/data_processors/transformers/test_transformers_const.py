@@ -63,15 +63,21 @@ def test_const_handling_test_df(test_const_data: pd.DataFrame):
     # Transform the DataFrame using the transformer.
     transformed_df = const_transformer.convert(test_const_data)
 
-    # Check if the transformed DataFrame does not contain any const columns.
-    # assert not df_has_const_col(transformed_df)
-    processed_metadata = Metadata.from_dataframe(transformed_df)
-    assert not processed_metadata.get("const_columns")
+    assert 'age' not in transformed_df.columns
+    assert 'fnlwgt' not in transformed_df.columns
+    assert 'workclass' not in transformed_df.columns
 
     # reverse convert the df
     reverse_converted_df = const_transformer.reverse_convert(transformed_df)
-    reverse_converted_metadata = Metadata.from_dataframe(reverse_converted_df)
-    assert reverse_converted_metadata.get("const_columns") == {"age", "fnlwgt", "workclass"}
+
+    assert 'age'  in reverse_converted_df.columns
+    assert 'fnlwgt'  in reverse_converted_df.columns
+    assert 'workclass'  in reverse_converted_df.columns
+
     assert reverse_converted_df["age"][0] == 100
     assert reverse_converted_df["fnlwgt"][0] == 1.41421
-    assert reverse_converted_df["fnlwgt"][0] == "President"
+    assert reverse_converted_df["workclass"][0] == "President"
+
+    assert len(reverse_converted_df["age"].unique()) == 1
+    assert len(reverse_converted_df["fnlwgt"].unique()) == 1
+    assert len(reverse_converted_df["workclass"].unique()) == 1
