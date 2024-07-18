@@ -40,16 +40,17 @@ class Metadata(BaseModel):
     """
 
     column_list: List[str] = Field(default_factory=list, title="The List of Column Names")
+
     """"
     column_list is the actual value of self.column_list
     """
 
     @field_validator("column_list")
-    # @classmethod
-    def check_column_list(cls, v) -> Any:
+    @classmethod
+    def check_column_list(cls, value) -> Any:
         # check if v has duplicate element
-        if len(v) == len(set(v)):
-            return v
+        if len(value) == len(set(value)):
+            return value
         raise MetadataInitError("column_list has duplicate element!")
 
     column_inspect_level: Dict[str, int] = defaultdict(lambda: 10)
@@ -72,7 +73,6 @@ class Metadata(BaseModel):
     datetime_columns: Set[str] = set()
     const_columns: Set[str] = set()
     datetime_format: Dict = defaultdict(str)
-    const_values: Dict = defaultdict(str)
 
     # version info
     version: str = "1.0"
@@ -84,12 +84,7 @@ class Metadata(BaseModel):
     @property
     def tag_fields(self) -> Iterable[str]:
         """
-        Returns a list of fields that represent tags or labels associated with the data.
-
-        These fields might include labels used for categorization, such as tags for machine learning labels or data classification.
-
-        Returns:
-            list[str]: List of field names that represent tags or labels.
+        Return all tag fields in this metadata.
         """
 
         return chain(
@@ -100,33 +95,12 @@ class Metadata(BaseModel):
     @property
     def format_fields(self) -> Iterable[str]:
         """
-        Returns a list of fields that represent the format or structure of the data.
-
-        These fields might include metadata about how the data is structured, such as date formats, delimiters, etc.
-
-        Returns:
-            list[str]: List of field names that represent data formats.
+        Return all tag fields in this metadata.
         """
 
         return chain(
             (k for k in self.model_fields if k.endswith("_format")),
             (k for k in self._extend.keys() if k.endswith("_format")),
-        )
-
-    @property
-    def value_fields(self) -> Iterable[str]:
-        """
-        Returns a list of fields that represent the values in the dataset.
-
-        These fields are typically numeric or categorical values that are used for analysis or modeling.
-
-        Returns:
-            list[str]: List of field names that represent values.
-        """
-
-        return chain(
-            (k for k in self.model_fields if k.endswith("_values")),
-            (k for k in self._extend.keys() if k.endswith("_values")),
         )
 
     def __eq__(self, other):
@@ -141,10 +115,6 @@ class Metadata(BaseModel):
             and all(
                 self.get(key) == other.get(key)
                 for key in set(chain(self.format_fields, other.format_fields))
-            )
-            and all(
-                self.get(key) == other.get(key)
-                for key in set(chain(self.value_fields, other.value_fields))
             )
             and self.version == other.version
         )
@@ -209,7 +179,6 @@ class Metadata(BaseModel):
             key in self.model_fields
             and key not in self.tag_fields
             and key not in self.format_fields
-            and key not in self.value_fields
         ):
             raise MetadataInitError(
                 f"Set {key} not in tag_fields, try set it directly as m.{key} = value"
@@ -255,9 +224,6 @@ class Metadata(BaseModel):
         if isinstance(values, dict):
             # already in fields that contains dict
             if key in list(self.format_fields):
-                self.get(key).update(values)
-
-            if key in list(self.value_fields):
                 self.get(key).update(values)
 
             # in extend

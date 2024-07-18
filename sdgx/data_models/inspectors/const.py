@@ -53,14 +53,14 @@ class ConstInspector(Inspector):
         for column in raw_data.columns:
             if len(raw_data[column].value_counts(normalize=True)) == 1:
                 self.const_columns.add(column)
-                self.const_values[column] = raw_data[column][0]
+                # self.const_values[column] = raw_data[column][0]
 
         self.ready = True
 
     def inspect(self, *args, **kwargs) -> dict[str, Any]:
         """Inspect raw data and generate metadata."""
 
-        return {"const_columns": list(self.const_columns), "const_values": self.const_values}
+        return {"const_columns": list(self.const_columns)}
 
 
 @hookimpl

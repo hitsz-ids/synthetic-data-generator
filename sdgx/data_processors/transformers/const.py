@@ -44,7 +44,7 @@ class ConstValueTransformer(Transformer):
         for each_col in metadata.column_list:
             if metadata.get_column_data_type(each_col) == "const":
                 self.const_columns.append(each_col)
-                self.const_values[each_col] = metadata.get("const_values")[each_col]
+                # self.const_values[each_col] = metadata.get("const_values")[each_col]
 
         logger.info("ConstValueTransformer Fitted.")
 
@@ -69,6 +69,9 @@ class ConstValueTransformer(Transformer):
         logger.info("Converting data using ConstValueTransformer...")
 
         for each_col in self.const_columns:
+            # record values here 
+            if each_col not in self.const_values.keys():
+                self.const_values[each_col] = processed_data[each_col].unique()[0]
             processed_data = self.remove_columns(processed_data, [each_col])
 
         logger.info("Converting data using ConstValueTransformer... Finished.")
