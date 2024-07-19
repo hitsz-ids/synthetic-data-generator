@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from typing import Any
-import pandas as pd
 import copy
+from typing import Any
+
+import pandas as pd
 
 from sdgx.data_models.inspectors.base import Inspector
 from sdgx.data_models.inspectors.extension import hookimpl
@@ -61,7 +62,7 @@ class ConstInspector(Inspector):
         """Inspect raw data and generate metadata."""
 
         res_const_columns = copy.deepcopy(list(self.const_columns))
-        # reset the const columns after inspect 
+        # reset the const columns after inspect
         self.const_columns = set()
         return {"const_columns": res_const_columns}
 
