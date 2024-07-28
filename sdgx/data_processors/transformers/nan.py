@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from typing import Any
-
 from pandas import DataFrame
 
 from sdgx.data_models.metadata import Metadata
@@ -12,16 +11,47 @@ from sdgx.utils import logger
 
 class NonValueTransformer(Transformer):
     """
-    
+    A transformer class designed to handle missing values in a DataFrame. It can either drop rows with missing values or fill them with specified values.
+
+    Attributes:
+        int_columns (set): A set of column names that contain integer values.
+        float_columns (set): A set of column names that contain float values.
+        column_list (list): A list of all column names in the DataFrame.
+        fill_na_value_int (int): The value to fill missing integer values with. Default is 0.
+        fill_na_value_float (float): The value to fill missing float values with. Default is 0.0.
+        fill_na_value_default (str): The value to fill missing values for non-numeric columns with. Default is 'NAN_VALUE'.
+        drop_na (bool): A flag indicating whether to drop rows with missing values. If True, rows with missing values are dropped. If False, missing values are filled with specified values. Default is False.
     """
 
-    int_columns:set = set()
-    float_columns: set = set() 
-    column_list : set = set() 
+    int_columns: set = set()
+    """
+    A set of column names that contain integer values.
+    """
+
+    float_columns: set = set()
+    """
+    A set of column names that contain float values.
+    """
+
+    column_list: list = []
+    """
+    A list of all column names in the DataFrame.
+    """
 
     fill_na_value_int = 0
+    """
+    The value to fill missing integer values with. Default is 0.
+    """
+
     fill_na_value_float = 0.0
-    fill_na_value_defalut = 'NAN_VALUE'
+    """
+    The value to fill missing float values with. Default is 0.0.
+    """
+
+    fill_na_value_default = 'NAN_VALUE'
+    """
+    The value to fill missing values for non-numeric columns with. Default is 'NAN_VALUE'.
+    """
 
     drop_na = False
     """
@@ -36,8 +66,6 @@ class NonValueTransformer(Transformer):
     def fit(self, metadata: Metadata | None = None, **kwargs: dict[str, Any]):
         """
         Fit method for the transformer.
-
-        Does not require any action.
         """
         logger.info("NonValueTransformer Fitted.")
 
@@ -50,6 +78,7 @@ class NonValueTransformer(Transformer):
         # record numeric columns
         self.int_columns = metadata.int_columns
         self.float_columns = metadata.float_columns
+        self.column_list = metadata.column_list
 
         self.fitted = True
 
@@ -73,10 +102,10 @@ class NonValueTransformer(Transformer):
             res[each_col] = res[each_col].fillna(self.fill_na_value_float)
 
         # fill other non-numeric nan value 
-        for each_col in res.columns:
-            if each_col in self.int_columns  or each_col in self.float_columns:
+        for each_col in self.column_list:
+            if each_col in self.int_columns or each_col in self.float_columns:
                 continue
-            res[each_col] = res[each_col].fillna(self.fill_na_value_defalut)
+            res[each_col] = res[each_col].fillna(self.fill_na_value_default)
 
         logger.info("Converting data using NonValueTransformer... Finished.")
 
