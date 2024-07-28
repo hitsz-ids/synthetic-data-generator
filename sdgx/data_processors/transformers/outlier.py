@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from typing import Any
-
 from pandas import DataFrame
 
 from sdgx.data_models.metadata import Metadata
@@ -12,21 +11,44 @@ from sdgx.utils import logger
 
 class OutlierTransformer(Transformer):
     """
-    
+    A transformer class to handle outliers in the data by converting them to specified fill values.
+
+    Attributes:
+        int_columns (set): A set of column names that contain integer values.
+        int_outlier_fill_value (int): The value to fill in for outliers in integer columns. Default is 0.
+        float_columns (set): A set of column names that contain float values.
+        float_outlier_fill_value (float): The value to fill in for outliers in float columns. Default is 0.
     """
 
     int_columns: set = set() 
+    """
+    set: A set of column names that contain integer values. These columns will have their outliers replaced by `int_outlier_fill_value`.
+    """
+
     int_outlier_fill_value = 0
+    """
+    int: The value to fill in for outliers in integer columns. Default is 0.
+    """
 
     float_columns: set = set()
-    float_outlier_fill_value = 0
-    
+    """
+    set: A set of column names that contain float values. These columns will have their outliers replaced by `float_outlier_fill_value`.
+    """
 
+    float_outlier_fill_value = 0
+    """
+    float: The value to fill in for outliers in float columns. Default is 0.
+    """
+    
     def fit(self, metadata: Metadata | None = None, **kwargs: dict[str, Any]):
         """
         Fit method for the transformer.
 
-        Record int and float columns' name.
+        Records the names of integer and float columns from the metadata.
+
+        Args:
+            metadata (Metadata | None): The metadata object containing column type information.
+            **kwargs: Additional keyword arguments.
         """
         self.int_columns = metadata.int_columns
         self.float_columns = metadata.float_columns
@@ -37,14 +59,19 @@ class OutlierTransformer(Transformer):
 
     def convert(self, raw_data: DataFrame) -> DataFrame:
         """
-        Convert method to handle missing values in the input data.
-        """
+        Convert method to handle outliers in the input data by replacing them with specified fill values.
 
+        Args:
+            raw_data (DataFrame): The input DataFrame containing the data to be processed.
+
+        Returns:
+            DataFrame: The processed DataFrame with outliers replaced by fill values.
+        """
         res = raw_data
 
         logger.info("Converting data using OutlierTransformer...")
 
-        # dealing with the int value columns
+        # Dealing with the integer value columns
         def convert_to_int(value):
             try:
                 return int(value)
@@ -54,7 +81,7 @@ class OutlierTransformer(Transformer):
         for each_col in self.int_columns:
             res[each_col] = res[each_col].apply(convert_to_int)
         
-        # then dealing with the float value 
+        # Dealing with the float value columns
         def convert_to_float(value):
             try:
                 return float(value)
@@ -72,7 +99,11 @@ class OutlierTransformer(Transformer):
         """
         Reverse_convert method for the transformer.
 
-        Does not require any action.
+        Args:
+            processed_data (DataFrame): The processed DataFrame.
+
+        Returns:
+            DataFrame: The same processed DataFrame.
         """
         logger.info("Data reverse-converted by OutlierTransformer (No Action).")
 
@@ -81,4 +112,10 @@ class OutlierTransformer(Transformer):
 
 @hookimpl
 def register(manager):
+    """
+    Register the OutlierTransformer with the manager.
+
+    Args:
+        manager: The manager object responsible for registering transformers.
+    """
     manager.register("OutlierTransformer", OutlierTransformer)
