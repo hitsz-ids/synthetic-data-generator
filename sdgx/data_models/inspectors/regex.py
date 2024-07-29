@@ -82,7 +82,7 @@ class RegexInspector(Inspector):
         if match_percentage:
             self.match_percentage = match_percentage
 
-    def fit(self, raw_data: pd.DataFrame, *args, **kwargs):
+    def fit(self, input_raw_data: pd.DataFrame, *args, **kwargs):
         """Fit the inspector.
 
         Finds the list of regex columns from the tabular data (in pd.DataFrame).
@@ -90,8 +90,8 @@ class RegexInspector(Inspector):
         Args:
             raw_data (pd.DataFrame): Raw data
         """
-        for each_col in raw_data.columns:
-            each_match_rate = self._fit_column(raw_data[each_col])
+        for each_col in input_raw_data.columns:
+            each_match_rate = self._fit_column(input_raw_data[each_col])
             if each_match_rate > self.match_percentage:
                 self.regex_columns.add(each_col)
 
