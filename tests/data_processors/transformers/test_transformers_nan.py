@@ -2,8 +2,8 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from sdgx.data_processors.transformers.nan import NonValueTransformer
 from sdgx.data_models.metadata import Metadata
+from sdgx.data_processors.transformers.nan import NonValueTransformer
 
 
 @pytest.fixture
