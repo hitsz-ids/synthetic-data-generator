@@ -24,7 +24,7 @@ def test_empty_data(raw_data: pd.DataFrame):
     yield raw_data
 
 
-def test_nan_handling_test_df(test_empty_data: pd.DataFrame):
+def test_empty_handling_test_df(test_empty_data: pd.DataFrame):
     """
     Test the handling of empty columns in a DataFrame.
     This function tests the behavior of a DataFrame when it contains empty columns.
