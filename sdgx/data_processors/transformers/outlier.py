@@ -35,7 +35,7 @@ class OutlierTransformer(Transformer):
     set: A set of column names that contain float values. These columns will have their outliers replaced by `float_outlier_fill_value`.
     """
 
-    float_outlier_fill_value = 0
+    float_outlier_fill_value = float(0)
     """
     float: The value to fill in for outliers in float columns. Default is 0.
     """
@@ -97,7 +97,7 @@ class OutlierTransformer(Transformer):
 
     def reverse_convert(self, processed_data: DataFrame) -> DataFrame:
         """
-        Reverse_convert method for the transformer.
+        Reverse_convert method for the transformer (No action for OutlierTransformer). 
 
         Args:
             processed_data (DataFrame): The processed DataFrame.
