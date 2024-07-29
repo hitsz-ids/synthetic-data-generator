@@ -186,8 +186,9 @@ class DiscreteTransformer(Transformer):
 
     pass
 
-'''
+
+"""
 @hookimpl
 def register(manager):
     manager.register("DiscreteTransformer", DiscreteTransformer)
-'''
+"""

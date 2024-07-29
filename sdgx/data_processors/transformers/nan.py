@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Any
+
 from pandas import DataFrame
 
 from sdgx.data_models.metadata import Metadata
@@ -48,7 +49,7 @@ class NonValueTransformer(Transformer):
     The value to fill missing float values with. Default is 0.0.
     """
 
-    fill_na_value_default = 'NAN_VALUE'
+    fill_na_value_default = "NAN_VALUE"
     """
     The value to fill missing values for non-numeric columns with. Default is 'NAN_VALUE'.
     """
@@ -74,7 +75,7 @@ class NonValueTransformer(Transformer):
                 if not isinstance(value, str):
                     raise ValueError("fill_na_value must be of type <str>")
                 self.drop_na = value
-        
+
         # record numeric columns
         self.int_columns = metadata.int_columns
         self.float_columns = metadata.float_columns
@@ -91,17 +92,17 @@ class NonValueTransformer(Transformer):
 
         if self.drop_na:
             logger.info("Converting data using NonValueTransformer... Finished (Drop NA).")
-            return raw_data.dropna() 
-        
+            return raw_data.dropna()
+
         res = raw_data
 
-        # fill numeric nan value 
+        # fill numeric nan value
         for each_col in self.int_columns:
             res[each_col] = res[each_col].fillna(self.fill_na_value_int)
         for each_col in self.float_columns:
             res[each_col] = res[each_col].fillna(self.fill_na_value_float)
 
-        # fill other non-numeric nan value 
+        # fill other non-numeric nan value
         for each_col in self.column_list:
             if each_col in self.int_columns or each_col in self.float_columns:
                 continue

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Any
+
 from pandas import DataFrame
 
 from sdgx.data_models.metadata import Metadata
@@ -20,7 +21,7 @@ class OutlierTransformer(Transformer):
         float_outlier_fill_value (float): The value to fill in for outliers in float columns. Default is 0.
     """
 
-    int_columns: set = set() 
+    int_columns: set = set()
     """
     set: A set of column names that contain integer values. These columns will have their outliers replaced by `int_outlier_fill_value`.
     """
@@ -39,7 +40,7 @@ class OutlierTransformer(Transformer):
     """
     float: The value to fill in for outliers in float columns. Default is 0.
     """
-    
+
     def fit(self, metadata: Metadata | None = None, **kwargs: dict[str, Any]):
         """
         Fit method for the transformer.
@@ -52,7 +53,7 @@ class OutlierTransformer(Transformer):
         """
         self.int_columns = metadata.int_columns
         self.float_columns = metadata.float_columns
-        
+
         self.fitted = True
 
         logger.info("OutlierTransformer Fitted.")
@@ -77,27 +78,27 @@ class OutlierTransformer(Transformer):
                 return int(value)
             except ValueError:
                 return self.int_outlier_fill_value
-            
+
         for each_col in self.int_columns:
             res[each_col] = res[each_col].apply(convert_to_int)
-        
+
         # Dealing with the float value columns
         def convert_to_float(value):
             try:
                 return float(value)
             except ValueError:
                 return self.float_outlier_fill_value
-        
+
         for each_col in self.float_columns:
             res[each_col] = res[each_col].apply(convert_to_float)
-        
+
         logger.info("Converting data using OutlierTransformer... Finished.")
 
         return res
 
     def reverse_convert(self, processed_data: DataFrame) -> DataFrame:
         """
-        Reverse_convert method for the transformer (No action for OutlierTransformer). 
+        Reverse_convert method for the transformer (No action for OutlierTransformer).
 
         Args:
             processed_data (DataFrame): The processed DataFrame.

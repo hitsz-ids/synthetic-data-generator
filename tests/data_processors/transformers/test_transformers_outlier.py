@@ -2,8 +2,9 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from sdgx.data_processors.transformers.outlier import OutlierTransformer
 from sdgx.data_models.metadata import Metadata
+from sdgx.data_processors.transformers.outlier import OutlierTransformer
+
 
 @pytest.fixture
 def outlier_test_df():
@@ -46,8 +47,8 @@ def test_outlier_handling_test_df(outlier_test_df: pd.DataFrame):
         AssertionError: If the DataFrame does not handle outliers as expected.
     """
 
-    assert 'not_number_outlier' in outlier_test_df["int_random"].to_list()
-    assert 'not_number_outlier' in outlier_test_df["float_random"].to_list()
+    assert "not_number_outlier" in outlier_test_df["int_random"].to_list()
+    assert "not_number_outlier" in outlier_test_df["float_random"].to_list()
 
     # Initialize the OutlierTransformer.
     outlier_transformer = OutlierTransformer()
@@ -56,8 +57,8 @@ def test_outlier_handling_test_df(outlier_test_df: pd.DataFrame):
 
     # Fit the transformer with the DataFrame.
     metadata = Metadata.from_dataframe(outlier_test_df)
-    metadata.int_columns = set(['int_id', 'int_random'])
-    metadata.float_columns = set(['float_random'])
+    metadata.int_columns = set(["int_id", "int_random"])
+    metadata.float_columns = set(["float_random"])
     outlier_transformer.fit(metadata=metadata)
     # Check if the transformer has been fitted after the fit operation.
     assert outlier_transformer.fitted
@@ -66,12 +67,9 @@ def test_outlier_handling_test_df(outlier_test_df: pd.DataFrame):
     transformed_df = outlier_transformer.convert(outlier_test_df)
 
     # Check if the transformed DataFrame does not contain any outliers.
-    assert not 'not_number_outlier' in transformed_df["int_random"].to_list()
-    assert not 'not_number_outlier' in transformed_df["float_random"].to_list()
+    assert not "not_number_outlier" in transformed_df["int_random"].to_list()
+    assert not "not_number_outlier" in transformed_df["float_random"].to_list()
 
     # Check if the outliers have been replaced with the specified fill values.
     assert 0 in transformed_df["int_random"].to_list()
     assert 0.0 in transformed_df["float_random"].to_list()
-
-
-
