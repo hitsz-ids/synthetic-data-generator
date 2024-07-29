@@ -141,6 +141,12 @@ class SingleTableGPTModel(LLMBaseModel):
             self.openai_API_url = os.getenv("OPENAI_URL")
             logger.debug("Get OPENAI_URL from ENV.")
 
+    def openai_client(self):
+        """
+        Generate a openai request client.
+        """
+        return openai.OpenAI(api_key=self.openai_API_key, base_url=self.openai_API_url)
+
     def ask_gpt(self, question, model=None):
         """
         Sends a question to the GPT model.
@@ -156,13 +162,11 @@ class SingleTableGPTModel(LLMBaseModel):
             SynthesizerInitError: If the check method fails.
         """
         self.check()
-        api_key = self.openai_API_key
         if model:
             model = model
         else:
             model = self.gpt_model
-        openai.api_key = api_key
-        client = openai.OpenAI(api_key=api_key)
+        client = self.openai_client()
         logger.info(f"Ask GPT with temperature = {self.temperature}.")
         response = client.chat.completions.create(
             model=model,
