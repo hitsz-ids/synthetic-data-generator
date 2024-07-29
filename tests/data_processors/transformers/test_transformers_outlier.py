@@ -5,12 +5,6 @@ import pytest
 from sdgx.data_processors.transformers.outlier import OutlierTransformer
 from sdgx.data_models.metadata import Metadata
 
-
-@pytest.fixture
-def raw_data(demo_single_table_path):
-    yield pd.read_csv(demo_single_table_path)
-
-
 @pytest.fixture
 def outlier_test_df():
     row_cnt = 1000
@@ -30,8 +24,8 @@ def outlier_test_df():
     # Introduce outliers
     outlier_indices = np.random.choice(row_cnt, size=int(row_cnt * 0.1), replace=False)
     for idx in outlier_indices:
-        df.iat[idx, 2] = "two"  # Introduce string in int column
-        df.iat[idx, 3] = "pi"  # Introduce string in float column
+        df.iat[idx, 2] = "not_number_outlier"  # Introduce string in int column
+        df.iat[idx, 3] = "not_number_outlier"  # Introduce string in float column
 
     yield df
 
@@ -52,6 +46,9 @@ def test_outlier_handling_test_df(outlier_test_df: pd.DataFrame):
         AssertionError: If the DataFrame does not handle outliers as expected.
     """
 
+    assert 'not_number_outlier' in outlier_test_df["int_random"].to_list()
+    assert 'not_number_outlier' in outlier_test_df["float_random"].to_list()
+
     # Initialize the OutlierTransformer.
     outlier_transformer = OutlierTransformer()
     # Check if the transformer has not been fitted yet.
@@ -59,6 +56,8 @@ def test_outlier_handling_test_df(outlier_test_df: pd.DataFrame):
 
     # Fit the transformer with the DataFrame.
     metadata = Metadata.from_dataframe(outlier_test_df)
+    metadata.int_columns = set(['int_id', 'int_random'])
+    metadata.float_columns = set(['float_random'])
     outlier_transformer.fit(metadata=metadata)
     # Check if the transformer has been fitted after the fit operation.
     assert outlier_transformer.fitted
@@ -67,9 +66,12 @@ def test_outlier_handling_test_df(outlier_test_df: pd.DataFrame):
     transformed_df = outlier_transformer.convert(outlier_test_df)
 
     # Check if the transformed DataFrame does not contain any outliers.
-    assert not transformed_df["int_random"].apply(lambda x: isinstance(x, str)).any()
-    assert not transformed_df["float_random"].apply(lambda x: isinstance(x, str)).any()
+    assert not 'not_number_outlier' in transformed_df["int_random"].to_list()
+    assert not 'not_number_outlier' in transformed_df["float_random"].to_list()
 
     # Check if the outliers have been replaced with the specified fill values.
-    assert transformed_df["int_random"].apply(lambda x: x == 0).sum() > 0
-    assert transformed_df["float_random"].apply(lambda x: x == 0).sum() > 0
+    assert 0 in transformed_df["int_random"].to_list()
+    assert 0.0 in transformed_df["float_random"].to_list()
+
+
+
