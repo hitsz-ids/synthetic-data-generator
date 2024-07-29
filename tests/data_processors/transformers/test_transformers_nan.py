@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
+from sdgx.data_models.metadata import Metadata
 from sdgx.data_processors.transformers.nan import NonValueTransformer
 
 
@@ -73,8 +74,10 @@ def test_nan_handling_test_df(nan_test_df: pd.DataFrame):
     # Check if the transformer has not been fitted yet.
     assert nan_transformer.fitted is False
 
+    nan_csv_metadata = Metadata.from_dataframe(nan_test_df)
+
     # Fit the transformer with the DataFrame.
-    nan_transformer.fit(nan_test_df)
+    nan_transformer.fit(nan_csv_metadata)
     # Check if the transformer has been fitted after the fit operation.
     assert nan_transformer.fitted
 
