@@ -14,7 +14,7 @@ from sdgx.data_models.metadata import Metadata
 from sdgx.data_processors.base import DataProcessor
 from sdgx.data_processors.manager import DataProcessorManager
 from sdgx.exceptions import SynthesizerInitError, SynthesizerSampleError
-from sdgx.log import logger
+from sdgx.utils import logger
 from sdgx.models.base import SynthesizerModel
 from sdgx.models.manager import ModelManager
 from sdgx.models.statistics.single_table.base import StatisticSynthesizerModel

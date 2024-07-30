@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from sdgx.log import logger
+from sdgx.utils import logger
 
 
 class ColumnMetric(object):

@@ -170,7 +170,8 @@ class NumericValueTransformer(Transformer):
 
     pass
 
-
+'''
 @hookimpl
 def register(manager):
     manager.register("NumericValueTransformer", NumericValueTransformer)
+'''

@@ -9,7 +9,7 @@ import pandas as pd
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.combiner import MetadataCombiner
 from sdgx.exceptions import SynthesizerInitError
-from sdgx.log import logger
+from sdgx.utils import logger
 from sdgx.models.base import SynthesizerModel
 
 

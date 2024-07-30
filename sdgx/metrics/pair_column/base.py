@@ -1,6 +1,6 @@
 import pandas as pd
 
-from sdgx.log import logger
+from sdgx.utils import logger
 
 
 class PairMetric(object):
