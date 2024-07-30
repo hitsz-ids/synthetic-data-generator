@@ -9,8 +9,7 @@ import pluggy
 
 from sdgx import models
 from sdgx.exceptions import InitializationError, NotFoundError, RegisterError
-from sdgx.utils import logger
-from sdgx.utils import Singleton
+from sdgx.utils import Singleton, logger
 
 
 class Manager(metaclass=Singleton):

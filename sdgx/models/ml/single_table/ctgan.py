@@ -21,7 +21,6 @@ from torch.nn import (
 
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.metadata import Metadata
-from sdgx.utils import logger
 from sdgx.models.components.optimize.ndarray_loader import NDArrayLoader
 from sdgx.models.components.optimize.sdv_ctgan.data_sampler import DataSampler
 from sdgx.models.components.optimize.sdv_ctgan.data_transformer import DataTransformer
@@ -31,6 +30,7 @@ from sdgx.models.components.sdv_ctgan.synthesizers.base import (
 from sdgx.models.components.sdv_ctgan.synthesizers.base import random_state
 from sdgx.models.extension import hookimpl
 from sdgx.models.ml.single_table.base import MLSynthesizerModel
+from sdgx.utils import logger
 
 
 class Discriminator(Module):
