@@ -11,7 +11,7 @@ from sdgx.cachers.base import Cacher
 from sdgx.cachers.extension import hookimpl
 from sdgx.data_connectors.base import DataConnector
 from sdgx.exceptions import CacheError
-from sdgx.log import logger
+from sdgx.utils import logger
 
 
 class DiskCache(Cacher):

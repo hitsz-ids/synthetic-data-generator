@@ -9,12 +9,12 @@ import pandas as pd
 from joblib import Parallel, delayed
 
 from sdgx.data_loader import DataLoader
-from sdgx.log import logger
 from sdgx.models.components.optimize.ndarray_loader import NDArrayLoader
 from sdgx.models.components.sdv_rdt.transformers import (
     ClusterBasedNormalizer,
     OneHotEncoder,
 )
+from sdgx.utils import logger
 
 SpanInfo = namedtuple("SpanInfo", ["dim", "activation_fn"])
 ColumnTransformInfo = namedtuple(

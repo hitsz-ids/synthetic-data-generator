@@ -6,7 +6,7 @@ import pandas as pd
 
 from sdgx.data_models.metadata import Metadata
 from sdgx.exceptions import SynthesizerProcessorError
-from sdgx.log import logger
+from sdgx.utils import logger
 
 
 class DataProcessor:
