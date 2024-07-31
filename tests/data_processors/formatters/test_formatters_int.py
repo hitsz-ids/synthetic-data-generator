@@ -69,8 +69,8 @@ def test_int_formatter_fit_test_df():
     # It seems that in GitHub Actions, metadata can interfere with each other, resulting in columns that do not exist in the original DataFrame but come from other datasets.
     # We will open another PR to address this issue.
     # assert formatter.int_columns == {"int_random", "int_id"}
-    assert 'int_random' in formatter.int_columns
-    assert 'int_id' in formatter.int_columns
+    assert "int_random" in formatter.int_columns
+    assert "int_id" in formatter.int_columns
     # add float_random column to formatter
     reverse_df = formatter.reverse_convert(df)
     assert is_an_integer_list(reverse_df["int_id"].tolist())
