@@ -5,6 +5,7 @@ import pytest
 from sdgx.data_models.metadata import Metadata
 from sdgx.data_processors.formatters.int import IntValueFormatter
 
+
 def int_formatter_df():
     row_cnt = 1000
     header = ["int_id", "str_id", "int_random", "float_random"]
