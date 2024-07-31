@@ -51,8 +51,19 @@ class OutlierTransformer(Transformer):
             metadata (Metadata | None): The metadata object containing column type information.
             **kwargs: Additional keyword arguments.
         """
-        self.int_columns = metadata.int_columns
-        self.float_columns = metadata.float_columns
+        # int columns
+        for each_col in metadata.int_columns:
+            if each_col not in metadata.column_list:
+                continue
+            if metadata.get_column_data_type(each_col) == "int":
+                self.int_columns.add(each_col)
+
+        # float columns
+        for each_col in metadata.float_columns:
+            if each_col not in metadata.column_list:
+                continue
+            if metadata.get_column_data_type(each_col) == "float":
+                self.float_columns.add(each_col)
 
         self.fitted = True
 
