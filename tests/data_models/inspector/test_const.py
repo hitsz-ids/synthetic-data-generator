@@ -22,7 +22,7 @@ def test_const_data(demo_single_table_path):
     yield const_col_df
 
 
-def test_inspector(test_const_data: pd.DataFrame):
+def test_const_inspector(test_const_data: pd.DataFrame):
     inspector = ConstInspector()
     inspector.fit(test_const_data)
     assert inspector.ready
