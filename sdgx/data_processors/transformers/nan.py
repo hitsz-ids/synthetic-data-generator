@@ -77,8 +77,17 @@ class NonValueTransformer(Transformer):
                 self.drop_na = value
 
         # record numeric columns
-        self.int_columns = metadata.int_columns
-        self.float_columns = metadata.float_columns
+        # int columns 
+        for each_col in metadata.int_columns:
+            if metadata.get_column_data_type(each_col) == 'int':
+                self.int_columns.add(each_col)
+
+        # float columns 
+        for each_col in metadata.float_columns:
+            if metadata.get_column_data_type(each_col) == 'float':
+                self.float_columns_columns.add(each_col)
+        
+        # get all column list 
         self.column_list = metadata.column_list
 
         self.fitted = True
