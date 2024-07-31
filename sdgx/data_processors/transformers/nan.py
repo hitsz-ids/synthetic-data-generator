@@ -83,6 +83,8 @@ class NonValueTransformer(Transformer):
                 continue
             if metadata.get_column_data_type(each_col) == "int":
                 self.int_columns.add(each_col)
+            
+        logger.info(f'NonValueTransformer get int columns: {self.int_columns}.')
 
         # float columns
         for each_col in metadata.float_columns:
@@ -90,9 +92,13 @@ class NonValueTransformer(Transformer):
                 continue
             if metadata.get_column_data_type(each_col) == "float":
                 self.float_columns.add(each_col)
+        
+        logger.info(f'NonValueTransformer get float columns: {self.float_columns}.')
 
         # get all column list
         self.column_list = metadata.column_list
+
+        logger.info(f'NonValueTransformer get column list from metadata: {self.column_list}.')
 
         self.fitted = True
 
