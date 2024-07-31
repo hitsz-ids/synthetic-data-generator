@@ -63,15 +63,15 @@ class NumericValueTransformer(Transformer):
         Data columns of int and float types need to be recorded here (Get data from metadata).
         """
 
-        # get exact final data type from metadata 
-        # int columns 
+        # get exact final data type from metadata
+        # int columns
         for each_col in metadata.int_columns:
-            if metadata.get_column_data_type(each_col) == 'int':
+            if metadata.get_column_data_type(each_col) == "int":
                 self.int_columns.add(each_col)
 
-        # float columns 
+        # float columns
         for each_col in metadata.float_columns:
-            if metadata.get_column_data_type(each_col) == 'float':
+            if metadata.get_column_data_type(each_col) == "float":
                 self.float_columns_columns.add(each_col)
 
         if len(self.int_columns) == 0 and len(self.float_columns) == 0:

@@ -48,7 +48,7 @@ class EmptyTransformer(Transformer):
             None
         """
         for each_col in metadata.get("empty_columns"):
-            if metadata.get_column_data_type(each_col) == 'empty':
+            if metadata.get_column_data_type(each_col) == "empty":
                 self.empty_columns.add(each_col)
 
         logger.info("EmptyTransformer Fitted.")
