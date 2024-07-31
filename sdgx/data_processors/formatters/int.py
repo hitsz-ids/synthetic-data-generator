@@ -15,7 +15,7 @@ class IntValueFormatter(Formatter):
     Formatter class for handling Int values in pd.DataFrame.
     """
 
-    int_columns: List = []
+    int_columns: set = set()
     """
     List of column names that are of type int, populated by the fit method using metadata.
     """
@@ -28,7 +28,12 @@ class IntValueFormatter(Formatter):
         """
 
         # get from metadata
-        self.int_columns = metadata.get("int_columns")
+        for each_col in metadata.int_columns:
+            if metadata.get_column_data_type(each_col) == "int":
+                self.int_columns.add(each_col)
+                continue
+            if metadata.get_column_data_type(each_col) == 'id':
+                self.int_columns.add(each_col)
 
         logger.info("IntValueFormatter Fitted.")
         self.fitted = True

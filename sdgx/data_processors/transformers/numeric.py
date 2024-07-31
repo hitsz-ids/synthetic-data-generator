@@ -68,6 +68,9 @@ class NumericValueTransformer(Transformer):
         for each_col in metadata.int_columns:
             if metadata.get_column_data_type(each_col) == "int":
                 self.int_columns.add(each_col)
+                continue
+            if metadata.get_column_data_type(each_col) == 'id':
+                self.int_columns.add(each_col)
 
         # float columns
         for each_col in metadata.float_columns:
