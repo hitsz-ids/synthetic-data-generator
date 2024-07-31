@@ -137,6 +137,7 @@ class NonValueTransformer(Transformer):
 
         Does not require any action.
         """
+
         def replace_nan_value(df):
             """
             Scans all rows and columns in the DataFrame and replaces all cells with the value "NAN_VALUE", which is self.fill_na_value_default, with an empty string.
@@ -148,7 +149,7 @@ class NonValueTransformer(Transformer):
             pd.DataFrame: The DataFrame after replacement.
             """
             # Use the replace method of DataFrame to replace "NAN_VALUE" with an empty string
-            df_replaced = df.replace(self.fill_na_value_default, '')
+            df_replaced = df.replace(self.fill_na_value_default, "")
             return df_replaced
 
         logger.info("Data reverse-converted by NonValueTransformer.")
