@@ -87,6 +87,9 @@ class NumericInspector(Inspector):
             raw_data (pd.DataFrame): Raw data
         """
 
+        self.int_columns = set()
+        self.float_columns = set()
+
         self.df_length = len(raw_data)
 
         float_candidate = self.float_columns.union(
