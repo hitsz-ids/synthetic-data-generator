@@ -85,7 +85,7 @@ class NonValueTransformer(Transformer):
         # float columns
         for each_col in metadata.float_columns:
             if metadata.get_column_data_type(each_col) == "float":
-                self.float_columns_columns.add(each_col)
+                self.float_columns.add(each_col)
 
         # get all column list
         self.column_list = metadata.column_list
