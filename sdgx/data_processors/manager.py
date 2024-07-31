@@ -47,6 +47,7 @@ class DataProcessorManager(Manager):
         p.lower()
         for p in [
             "NonValueTransformer",
+            "OutlierTransformer",
             "EmailGenerator",
             "ChnPiiGenerator",
             "IntValueFormatter",

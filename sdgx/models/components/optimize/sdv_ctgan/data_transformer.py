@@ -9,12 +9,12 @@ import pandas as pd
 from joblib import Parallel, delayed
 
 from sdgx.data_loader import DataLoader
-from sdgx.log import logger
 from sdgx.models.components.optimize.ndarray_loader import NDArrayLoader
 from sdgx.models.components.sdv_rdt.transformers import (
     ClusterBasedNormalizer,
     OneHotEncoder,
 )
+from sdgx.utils import logger
 
 SpanInfo = namedtuple("SpanInfo", ["dim", "activation_fn"])
 ColumnTransformInfo = namedtuple(
@@ -196,6 +196,7 @@ class DataTransformer(object):
     def _inverse_transform_continuous(self, column_transform_info, column_data, sigmas, st):
         gm = column_transform_info.transform
         data = pd.DataFrame(column_data[:, :2], columns=list(gm.get_output_sdtypes()))
+        data = data.astype(float)
         data.iloc[:, 1] = np.argmax(column_data[:, 1:], axis=1)
         if sigmas is not None:
             selected_normalized_value = np.random.normal(data.iloc[:, 0], sigmas[st])

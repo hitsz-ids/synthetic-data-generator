@@ -11,9 +11,9 @@ from sdgx.cli.utils import cli_wrapper, torch_run_warpper
 from sdgx.data_connectors.manager import DataConnectorManager
 from sdgx.data_exporters.manager import DataExporterManager
 from sdgx.data_processors.manager import DataProcessorManager
-from sdgx.log import logger
 from sdgx.models.manager import ModelManager
 from sdgx.synthesizer import Synthesizer
+from sdgx.utils import logger
 
 
 @click.command()

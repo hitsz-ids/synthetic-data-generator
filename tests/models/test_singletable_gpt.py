@@ -119,6 +119,18 @@ marital-status = Married-civ-spouse, capital-gain = 0, occupation = Craft-repair
 gpt_response_sample_count = [20, 15, 20, 5, 5]
 
 
+def test_singletable_gpt_model_openapi_setting(single_table_gpt_model: SingleTableGPTModel):
+    open_ai_key = "sk-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    open_ai_base = "https://api.mock.openai.base.com"
+    open_ai_model = "gpt-4o-mini"
+    single_table_gpt_model.set_openAI_settings(open_ai_base, open_ai_key)
+    single_table_gpt_model.gpt_model = open_ai_model
+    client = single_table_gpt_model.openai_client()
+    assert client.base_url == open_ai_base
+    assert client.api_key == open_ai_key
+    assert single_table_gpt_model.gpt_model == open_ai_model
+
+
 def test_singletable_gpt_model(
     single_table_gpt_model: SingleTableGPTModel,
     raw_data: pd.DataFrame,

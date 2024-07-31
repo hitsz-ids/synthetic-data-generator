@@ -12,25 +12,46 @@ from sdgx.utils import logger
 
 class NonValueTransformer(Transformer):
     """
-    A transformer class for handling missing values in a DataFrame.
-
-    This class provides functionality to either drop rows with missing values or fill them with a specified value.
+    A transformer class designed to handle missing values in a DataFrame. It can either drop rows with missing values or fill them with specified values.
 
     Attributes:
-        fill_na_value (int): The value to fill missing values in the data.
-        drop_na (bool): A boolean flag indicating whether to drop rows with missing values or fill them with `fill_na_value`.
-
-    Methods:
-        fit(metadata: Metadata | None = None, **kwargs: dict[str, Any]): Fit method for the transformer.
-        convert(raw_data: DataFrame) -> DataFrame: Convert method to handle missing values in the input data.
-        reverse_convert(processed_data: DataFrame) -> DataFrame: Reverse_convert method for the transformer.
+        int_columns (set): A set of column names that contain integer values.
+        float_columns (set): A set of column names that contain float values.
+        column_list (list): A list of all column names in the DataFrame.
+        fill_na_value_int (int): The value to fill missing integer values with. Default is 0.
+        fill_na_value_float (float): The value to fill missing float values with. Default is 0.0.
+        fill_na_value_default (str): The value to fill missing values for non-numeric columns with. Default is 'NAN_VALUE'.
+        drop_na (bool): A flag indicating whether to drop rows with missing values. If True, rows with missing values are dropped. If False, missing values are filled with specified values. Default is False.
     """
 
-    fill_na_value = 0
+    int_columns: set = set()
     """
-    The value to fill missing values in the data.
+    A set of column names that contain integer values.
+    """
 
-    If `drop_na` is set to `False`, this value will be used to fill missing values in the data.
+    float_columns: set = set()
+    """
+    A set of column names that contain float values.
+    """
+
+    column_list: list = []
+    """
+    A list of all column names in the DataFrame.
+    """
+
+    fill_na_value_int = 0
+    """
+    The value to fill missing integer values with. Default is 0.
+    """
+
+    fill_na_value_float = 0.0
+    """
+    The value to fill missing float values with. Default is 0.0.
+    """
+
+    fill_na_value_default = "NAN_VALUE"
+    """
+    The value to fill missing values for non-numeric columns with. Default is 'NAN_VALUE'.
     """
 
     drop_na = False
@@ -46,16 +67,38 @@ class NonValueTransformer(Transformer):
     def fit(self, metadata: Metadata | None = None, **kwargs: dict[str, Any]):
         """
         Fit method for the transformer.
-
-        Does not require any action.
         """
         logger.info("NonValueTransformer Fitted.")
 
         for key, value in kwargs.items():
-            if key == "fill_na_value":
+            if key == "drop_na":
                 if not isinstance(value, str):
                     raise ValueError("fill_na_value must be of type <str>")
-                self.fill_na_value = value
+                self.drop_na = value
+
+        # record numeric columns
+        # int columns
+        for each_col in metadata.int_columns:
+            if each_col not in metadata.column_list:
+                continue
+            if metadata.get_column_data_type(each_col) == "int":
+                self.int_columns.add(each_col)
+
+        logger.info(f"NonValueTransformer get int columns: {self.int_columns}.")
+
+        # float columns
+        for each_col in metadata.float_columns:
+            if each_col not in metadata.column_list:
+                continue
+            if metadata.get_column_data_type(each_col) == "float":
+                self.float_columns.add(each_col)
+
+        logger.info(f"NonValueTransformer get float columns: {self.float_columns}.")
+
+        # get all column list
+        self.column_list = metadata.column_list
+
+        logger.info(f"NonValueTransformer get column list from metadata: {self.column_list}.")
 
         self.fitted = True
 
@@ -67,9 +110,22 @@ class NonValueTransformer(Transformer):
         logger.info("Converting data using NonValueTransformer...")
 
         if self.drop_na:
-            res = raw_data.dropna()
-        else:
-            res = raw_data.fillna(value=self.fill_na_value)
+            logger.info("Converting data using NonValueTransformer... Finished (Drop NA).")
+            return raw_data.dropna()
+
+        res = raw_data
+
+        # fill numeric nan value
+        for each_col in self.int_columns:
+            res[each_col] = res[each_col].fillna(self.fill_na_value_int)
+        for each_col in self.float_columns:
+            res[each_col] = res[each_col].fillna(self.fill_na_value_float)
+
+        # fill other non-numeric nan value
+        for each_col in self.column_list:
+            if each_col in self.int_columns or each_col in self.float_columns:
+                continue
+            res[each_col] = res[each_col].fillna(self.fill_na_value_default)
 
         logger.info("Converting data using NonValueTransformer... Finished.")
 

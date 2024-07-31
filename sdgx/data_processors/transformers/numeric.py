@@ -33,13 +33,13 @@ class NumericValueTransformer(Transformer):
     If False, the data will not be scaled.
     """
 
-    int_columns: Set = []
+    int_columns: Set = set()
     """
     A set of column names that are of integer type.
     These columns will be considered for scaling if `standard_scale` is True.
     """
 
-    float_columns: Set = []
+    float_columns: Set = set()
     """
     A set of column names that are of float type.
     These columns will be considered for scaling if `standard_scale` is True.
@@ -63,9 +63,23 @@ class NumericValueTransformer(Transformer):
         Data columns of int and float types need to be recorded here (Get data from metadata).
         """
 
-        # TODO The methods to obtain these data types need to be changed
-        self.int_columns = metadata.int_columns
-        self.float_columns = metadata.float_columns
+        # get exact final data type from metadata
+        # int columns
+        for each_col in metadata.int_columns:
+            if each_col not in metadata.column_list:
+                continue
+            if metadata.get_column_data_type(each_col) == "int":
+                self.int_columns.add(each_col)
+                continue
+            if metadata.get_column_data_type(each_col) == "id":
+                self.int_columns.add(each_col)
+
+        # float columns
+        for each_col in metadata.float_columns:
+            if each_col not in metadata.column_list:
+                continue
+            if metadata.get_column_data_type(each_col) == "float":
+                self.float_columns.add(each_col)
 
         if len(self.int_columns) == 0 and len(self.float_columns) == 0:
             logger.info("NumericValueTransformer Fitted (No numeric columns).")

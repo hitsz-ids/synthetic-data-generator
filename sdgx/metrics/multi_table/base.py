@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from sdgx.log import logger
+from sdgx.utils import logger
 
 
 class MultiTableMetric:
