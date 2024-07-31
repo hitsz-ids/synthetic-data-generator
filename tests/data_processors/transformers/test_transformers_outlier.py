@@ -30,6 +30,7 @@ def outlier_test_df():
 
     yield df
 
+
 @pytest.mark.skip(reason="success in local, failed in GitHub Action")
 def test_outlier_handling_test_df(outlier_test_df: pd.DataFrame):
     """
