@@ -22,6 +22,7 @@ class BoolInspector(Inspector):
         Args:
             raw_data (pd.DataFrame): Raw data
         """
+        self.bool_columns = set()
         self.bool_columns = self.bool_columns.union(
             set(raw_data.infer_objects().select_dtypes(include=["bool"]).columns)
         )

@@ -29,6 +29,8 @@ class IDInspector(Inspector):
             raw_data (pd.DataFrame): Raw data
         """
 
+        self.ID_columns = set()
+
         df_length = len(raw_data)
         candidate_columns = set(raw_data.select_dtypes(include=["object", "int64"]).columns)
 

@@ -21,6 +21,7 @@ class DiscreteInspector(Inspector):
         Args:
             raw_data (pd.DataFrame): Raw data
         """
+        self.discrete_columns = set()
 
         self.discrete_columns = self.discrete_columns.union(
             set(raw_data.select_dtypes(include="object").columns)

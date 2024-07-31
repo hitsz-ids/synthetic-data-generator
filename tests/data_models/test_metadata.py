@@ -90,7 +90,7 @@ def test_demo_multi_table_data_metadata_child(demo_multi_data_child_matadata):
     assert demo_multi_data_child_matadata.get_column_data_type("Store") == "int"
     assert demo_multi_data_child_matadata.get_column_data_type("Date") == "datetime"
     assert demo_multi_data_child_matadata.get_column_data_type("Customers") == "int"
-    assert demo_multi_data_child_matadata.get_column_data_type("StateHoliday") == "int"
+    assert demo_multi_data_child_matadata.get_column_data_type("StateHoliday") == "const"
     assert demo_multi_data_child_matadata.get_column_data_type("Sales") == "int"
     assert demo_multi_data_child_matadata.get_column_data_type("Promo") == "int"
     assert demo_multi_data_child_matadata.get_column_data_type("DayOfWeek") == "int"
