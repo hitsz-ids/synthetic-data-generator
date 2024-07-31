@@ -66,6 +66,8 @@ class NumericValueTransformer(Transformer):
         # get exact final data type from metadata
         # int columns
         for each_col in metadata.int_columns:
+            if each_col not in metadata.column_list:
+                continue
             if metadata.get_column_data_type(each_col) == "int":
                 self.int_columns.add(each_col)
                 continue
@@ -74,6 +76,8 @@ class NumericValueTransformer(Transformer):
 
         # float columns
         for each_col in metadata.float_columns:
+            if each_col not in metadata.column_list:
+                continue
             if metadata.get_column_data_type(each_col) == "float":
                 self.float_columns.add(each_col)
 
