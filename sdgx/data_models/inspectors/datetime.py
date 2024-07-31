@@ -62,8 +62,8 @@ class DatetimeInspector(Inspector):
         Args:
             raw_data (pd.DataFrame): Raw data
         """
-        self.datetime_columns = set() 
-        
+        self.datetime_columns = set()
+
         self.datetime_columns = self.datetime_columns.union(
             set(raw_data.infer_objects().select_dtypes(include=["datetime64"]).columns)
         )
