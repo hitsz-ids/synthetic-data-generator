@@ -56,10 +56,13 @@ def test_outlier_handling_test_df(outlier_test_df: pd.DataFrame):
     assert outlier_transformer.fitted is False
 
     # Fit the transformer with the DataFrame.
-    metadata = Metadata.from_dataframe(outlier_test_df)
-    metadata.int_columns = set(["int_id", "int_random"])
-    metadata.float_columns = set(["float_random"])
-    outlier_transformer.fit(metadata=metadata)
+    metadata_outlier = Metadata.from_dataframe(outlier_test_df)
+    metadata_outlier.column_list = ["int_id", "str_id", "int_random", "float_random"]
+    metadata_outlier.int_columns = set(["int_id", "int_random"])
+    metadata_outlier.float_columns = set(["float_random"])
+    
+    # Fit the transformer
+    outlier_transformer.fit(metadata=metadata_outlier)
     # Check if the transformer has been fitted after the fit operation.
     assert outlier_transformer.fitted
 
