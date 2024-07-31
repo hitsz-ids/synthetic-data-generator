@@ -61,6 +61,7 @@ def test_int_formatter_fit_test_df():
     # fit the formatter
     formatter = IntValueFormatter()
     formatter.fit(metadata_df)
+    assert sorted(metadata_df.column_list) == sorted(["int_id", "str_id", "int_random", "float_random"])
     assert formatter.int_columns == {"int_random", "int_id"}
     # add float_random column to formatter
     formatter.int_columns.add("float_random")
