@@ -32,7 +32,7 @@ class IntValueFormatter(Formatter):
             if metadata.get_column_data_type(each_col) == "int":
                 self.int_columns.add(each_col)
                 continue
-            if metadata.get_column_data_type(each_col) == 'id':
+            if metadata.get_column_data_type(each_col) == "id":
                 self.int_columns.add(each_col)
 
         logger.info("IntValueFormatter Fitted.")
