@@ -14,70 +14,132 @@ class NumericInspector(Inspector):
 
     This class is a subclass of `Inspector` and is designed to provide methods for inspecting
     and analyzing numeric data. It includes methods for detecting int or float data type.
+
+    In August 2024, we introduced a new feature that will continue to judge the positivity or
+    negativity after determining the type, thereby effectively improving the quality of synthetic
+    data in subsequent processing.
+    """
+
+    int_columns: set = set()
+    """
+    A set of column names that contain integer values.
+    """
+
+    float_columns: set = set()
+    """
+    A set of column names that contain float values.
+    """
+
+    positive_columns: set = set() 
+    """
+    A set of column names that contain only positive numeric values.
+    """
+
+    negative_columns: set = set() 
+    """
+    A set of column names that contain only negative numeric values.
+    """
+
+    pos_threshold: float = 0.95
+    """
+    The threshold proportion of positive values in a column to consider it as a positive column.
+    """
+
+    negative_threshold: float = 0.95
+    """
+    The threshold proportion of negative values in a column to consider it as a negative column.
     """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.int_columns: set[str] = set()
-        self.float_columns: set[str] = set()
         self._int_rate = 0.9
         self.df_length = 0
 
     def _is_int_column(self, col_series: pd.Series):
         """
-        Determine whether a column of pd.DataFrame is of type int
-        In the original pd.DataFrame automatically updated dtype, some int types will be marked as float.
-        In fact, we can make an accurate result by getting the decimal part of the value.
+        Determine if a column contains predominantly integer values.
+
+        This method checks if the proportion of integer values in the given column
+        exceeds a predefined threshold.
 
         Args:
-            col_series (pd.Series): One single column of the raw data.
+            col_series (pd.Series): The column series to be inspected.
+
+        Returns:
+            bool: True if the column is predominantly integer, False otherwise.
         """
+        # Convert the column series to numeric values, coercing errors to NaN and dropping them
+        numeric_values = pd.to_numeric(col_series, errors='coerce').dropna()
+        
+        # Count how many of the numeric values are integers
+        int_cnt = (numeric_values == numeric_values.astype(int)).sum()
+        
+        # Calculate the ratio of integer values to the total numeric values
+        int_rate = int_cnt / len(numeric_values)
+        
+        # Return True if the integer rate is greater than the predefined threshold
+        return int_rate > self._int_rate
 
-        def is_decimal_part_zero(num: float):
-            """
-            Is the decimal part == 0.0 ?
 
-            Args:
-                col_series (float): The number.
-            """
-            try:
-                decimal_part = num - int(num)
-            except ValueError:
-                return None
-            if decimal_part == 0.0:
-                return True
-            else:
-                return False
+    
+    def _is_positive_or_negative_column(self, col_series: pd.Series, threshold: float, comparison_func) -> bool:
+        """
+        Determine if a column contains predominantly positive or negative values.
 
-        # Initialize the counter for values with zero decimal part
-        int_cnt = 0
-        col_length = self.df_length
+        This method checks if the proportion of values that satisfy a given comparison
+        function exceeds a predefined threshold.
 
-        # Iterate over each value in the series
-        for each_val in col_series:
-            decimal_zer0 = is_decimal_part_zero(each_val)
-            # If the decimal part is zero, increment the counter and continue to the next value
-            if decimal_zer0 is True:
-                int_cnt += 1
-                continue
-            # If the decimal part is not zero or not a decimal number
-            # decrease the length of the series and continue to the next value
-            if decimal_zer0 is None:
-                col_length -= 1
-                continue
+        Args:
+            col_series (pd.Series): The column series to be inspected.
+            threshold (float): The proportion threshold for considering the column as positive or negative.
+            comparison_func (function): A function that takes a numeric value and returns a boolean.
 
-        # Calculate the rate of values with zero decimal part
-        if col_length <= 0:
-            int_rate = 0
-        else:
-            int_rate = int_cnt / col_length
+        Returns:
+            bool: True if the column satisfies the condition, False otherwise.
+        """
+        # Convert the column series to numeric values, coercing errors to NaN and dropping NaN values
+        numeric_values = pd.to_numeric(col_series, errors='coerce').dropna()
 
-        # Check if the rate is greater than the predefined rate
-        if int_rate > self._int_rate:
-            return True
-        else:
-            return False
+        # Apply the comparison function to the numeric values and sum the results
+        count = comparison_func(numeric_values).sum()
 
+        # Calculate the proportion of values that meet the comparison criteria
+        proportion = count / len(numeric_values)
+
+        # Return True if the proportion meets or exceeds the threshold, otherwise False
+        return proportion >= threshold
+
+
+    def _is_positive_column(self, col_series: pd.Series) -> bool:
+        """
+        Determine if a column contains predominantly positive values.
+
+        This method checks if the proportion of positive values in the given column
+        exceeds a predefined threshold.
+
+        Args:
+            col_series (pd.Series): The column series to be inspected.
+
+        Returns:
+            bool: True if the column is predominantly positive, False otherwise.
+        """
+        return self._is_positive_or_negative_column(col_series, self.pos_threshold, lambda x: x > 0)
+
+    def _is_negative_column(self, col_series: pd.Series) -> bool:
+        """
+        Determine if a column contains predominantly negative values.
+
+        This method checks if the proportion of negative values in the given column
+        exceeds a predefined threshold.
+
+        Args:
+            col_series (pd.Series): The column series to be inspected.
+
+        Returns:
+            bool: True if the column is predominantly negative, False otherwise.
+        """
+        return self._is_positive_or_negative_column(col_series, self.negative_threshold, lambda x: x < 0)
+    
     def fit(self, raw_data: pd.DataFrame, *args, **kwargs):
         """Fit the inspector.
 
@@ -87,33 +149,58 @@ class NumericInspector(Inspector):
             raw_data (pd.DataFrame): Raw data
         """
 
+        # Initialize sets for integer and float columns
         self.int_columns = set()
         self.float_columns = set()
 
+        # Store the length of the DataFrame
         self.df_length = len(raw_data)
 
+        # Identify columns with float data types
         float_candidate = self.float_columns.union(
             set(raw_data.select_dtypes(include=["float64"]).columns)
         )
 
+        # Classify columns as integer or float based on the proportion of integer values
         for candidate in float_candidate:
             if self._is_int_column(raw_data[candidate]):
                 self.int_columns.add(candidate)
             else:
                 self.float_columns.add(candidate)
 
+        # Add columns with integer data types to the integer columns set
         self.int_columns = self.int_columns.union(
             set(raw_data.select_dtypes(include=["int64"]).columns)
         )
 
+        # Initialize sets for positive and negative columns
+        self.positive_columns = set()
+        self.negative_columns = set()
+
+        # Classify columns as positive or negative based on the proportion of positive or negative values
+        for col in self.int_columns.union(self.float_columns):
+            if self._is_positive_column(raw_data[col]):
+                self.positive_columns.add(col)
+            elif self._is_negative_column(raw_data[col]):
+                self.negative_columns.add(col)
+
+        # Mark the inspector as ready
         self.ready = True
+
 
     def inspect(self, *args, **kwargs) -> dict[str, Any]:
         """Inspect raw data and generate metadata."""
 
+        # Positive and negative columns should not be strictly considered as label columns
+        # We use the format dict to inspect and output to metadata
+        numeric_format: dict = {}
+        numeric_format['positive'] = sorted(list(self.positive_columns))
+        numeric_format['negative'] = sorted(list(self.negative_columns))
+
         return {
             "int_columns": list(self.int_columns),
             "float_columns": list(self.float_columns),
+            "numeric_format": numeric_format
         }
 
 

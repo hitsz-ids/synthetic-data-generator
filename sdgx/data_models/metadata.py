@@ -73,6 +73,7 @@ class Metadata(BaseModel):
     datetime_columns: Set[str] = set()
     const_columns: Set[str] = set()
     datetime_format: Dict = defaultdict(str)
+    numeric_format: Dict = defaultdict(list)
 
     # version info
     version: str = "1.0"
