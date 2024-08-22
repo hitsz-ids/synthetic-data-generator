@@ -47,7 +47,7 @@ def test_positive_negative_filter(pos_neg_test_df: pd.DataFrame):
     # Test fit method
     pos_neg_filter.fit(metadata_df)
     assert pos_neg_filter.fitted
-    assert pos_neg_filter.positive_columns == {"pos_int", "pos_float"}
+    assert pos_neg_filter.positive_columns == {"int_id", "pos_int", "pos_float"}
     assert pos_neg_filter.negative_columns == {"neg_int", "neg_float"}
 
     # Test convert method
