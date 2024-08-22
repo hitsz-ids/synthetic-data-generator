@@ -30,12 +30,12 @@ class NumericInspector(Inspector):
     A set of column names that contain float values.
     """
 
-    positive_columns: set = set() 
+    positive_columns: set = set()
     """
     A set of column names that contain only positive numeric values.
     """
 
-    negative_columns: set = set() 
+    negative_columns: set = set()
     """
     A set of column names that contain only negative numeric values.
     """
@@ -69,20 +69,20 @@ class NumericInspector(Inspector):
             bool: True if the column is predominantly integer, False otherwise.
         """
         # Convert the column series to numeric values, coercing errors to NaN and dropping them
-        numeric_values = pd.to_numeric(col_series, errors='coerce').dropna()
-        
+        numeric_values = pd.to_numeric(col_series, errors="coerce").dropna()
+
         # Count how many of the numeric values are integers
         int_cnt = (numeric_values == numeric_values.astype(int)).sum()
-        
+
         # Calculate the ratio of integer values to the total numeric values
         int_rate = int_cnt / len(numeric_values)
-        
+
         # Return True if the integer rate is greater than the predefined threshold
         return int_rate > self._int_rate
 
-
-    
-    def _is_positive_or_negative_column(self, col_series: pd.Series, threshold: float, comparison_func) -> bool:
+    def _is_positive_or_negative_column(
+        self, col_series: pd.Series, threshold: float, comparison_func
+    ) -> bool:
         """
         Determine if a column contains predominantly positive or negative values.
 
@@ -98,7 +98,7 @@ class NumericInspector(Inspector):
             bool: True if the column satisfies the condition, False otherwise.
         """
         # Convert the column series to numeric values, coercing errors to NaN and dropping NaN values
-        numeric_values = pd.to_numeric(col_series, errors='coerce').dropna()
+        numeric_values = pd.to_numeric(col_series, errors="coerce").dropna()
 
         # Apply the comparison function to the numeric values and sum the results
         count = comparison_func(numeric_values).sum()
@@ -108,7 +108,6 @@ class NumericInspector(Inspector):
 
         # Return True if the proportion meets or exceeds the threshold, otherwise False
         return proportion >= threshold
-
 
     def _is_positive_column(self, col_series: pd.Series) -> bool:
         """
@@ -138,8 +137,10 @@ class NumericInspector(Inspector):
         Returns:
             bool: True if the column is predominantly negative, False otherwise.
         """
-        return self._is_positive_or_negative_column(col_series, self.negative_threshold, lambda x: x < 0)
-    
+        return self._is_positive_or_negative_column(
+            col_series, self.negative_threshold, lambda x: x < 0
+        )
+
     def fit(self, raw_data: pd.DataFrame, *args, **kwargs):
         """Fit the inspector.
 
@@ -187,20 +188,19 @@ class NumericInspector(Inspector):
         # Mark the inspector as ready
         self.ready = True
 
-
     def inspect(self, *args, **kwargs) -> dict[str, Any]:
         """Inspect raw data and generate metadata."""
 
         # Positive and negative columns should not be strictly considered as label columns
         # We use the format dict to inspect and output to metadata
         numeric_format: dict = {}
-        numeric_format['positive'] = sorted(list(self.positive_columns))
-        numeric_format['negative'] = sorted(list(self.negative_columns))
+        numeric_format["positive"] = sorted(list(self.positive_columns))
+        numeric_format["negative"] = sorted(list(self.negative_columns))
 
         return {
             "int_columns": list(self.int_columns),
             "float_columns": list(self.float_columns),
-            "numeric_format": numeric_format
+            "numeric_format": numeric_format,
         }
 
 

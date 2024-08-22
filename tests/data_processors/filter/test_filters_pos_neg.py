@@ -21,7 +21,15 @@ def pos_neg_test_df():
     mixed_float = np.random.uniform(-50, 50, size=row_cnt)
 
     X = [
-        [int_id[i], pos_int[i], neg_int[i], pos_float[i], neg_float[i], mixed_int[i], mixed_float[i]]
+        [
+            int_id[i],
+            pos_int[i],
+            neg_int[i],
+            pos_float[i],
+            neg_float[i],
+            mixed_int[i],
+            mixed_float[i],
+        ]
         for i in range(row_cnt)
     ]
 
@@ -60,10 +68,13 @@ def test_positive_negative_filter(pos_neg_test_df: pd.DataFrame):
 
     # Check: whether mixed columns remained unchanged
     pd.testing.assert_series_equal(pos_neg_test_df["mixed_int"], reverse_converted_df["mixed_int"])
-    pd.testing.assert_series_equal(pos_neg_test_df["mixed_float"], reverse_converted_df["mixed_float"])
+    pd.testing.assert_series_equal(
+        pos_neg_test_df["mixed_float"], reverse_converted_df["mixed_float"]
+    )
 
     # Check if reverse_convert correctly filtered out non-compliant rows (samples)
     assert reverse_converted_df.shape[0] <= pos_neg_test_df.shape[0]
+
 
 if __name__ == "__main__":
     pytest.main(["-vv", "-s", __file__])
