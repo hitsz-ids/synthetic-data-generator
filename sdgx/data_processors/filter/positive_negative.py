@@ -9,15 +9,17 @@ from sdgx.utils import logger
 
 class PositiveNegativeFilter(Filter):
     """
-    一个用于过滤正负值的数据处理器。
+    A data processor for filtering positive and negative values.
 
-    此过滤器用于确保特定列中的值保持正值或负值。在反向转换过程中,将移除不符合预期正负性的行。
+    This filter is used to ensure that values in specific columns remain positive or negative. 
+    During the reverse conversion process, rows that do not meet the expected positivity or 
+    negativity will be removed.
 
     Attributes:
-        int_columns (set): 包含整数值的列名集合。
-        float_columns (set): 包含浮点数值的列名集合。
-        positive_columns (set): 应包含正值的列名集合。
-        negative_columns (set): 应包含负值的列名集合。
+        int_columns (set): A set of column names containing integer values.
+        float_columns (set): A set of column names containing float values.
+        positive_columns (set): A set of column names that should contain positive values.
+        negative_columns (set): A set of column names that should contain negative values.
     """
 
     int_columns: set = set()
@@ -69,8 +71,8 @@ class PositiveNegativeFilter(Filter):
         """
         Reverse_convert method for the pos_neg data filter.
         
-        遍历每一行数据,检查 positive_columns 中是否有负值,
-        negative_columns 中是否有正值。如果不符合条件,则丢弃该行。
+        Iterate through each row of data, check if there are negative values in positive_columns,
+        or positive values in negative_columns. If the conditions are not met, discard the row.
         """
         logger.info(f"Data reverse-converted by PositiveNegativeFilter Start with Shape: {processed_data.shape}.")
         

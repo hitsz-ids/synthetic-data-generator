@@ -29,20 +29,20 @@ def pos_neg_test_df():
 
 
 def test_positive_negative_filter(pos_neg_test_df: pd.DataFrame):
-    # 获取元数据
+    # Get metadata
     metadata_df = Metadata.from_dataframe(pos_neg_test_df)
 
-    # 初始化 PositiveNegativeFilter
+    # Initialize PositiveNegativeFilter
     pos_neg_filter = PositiveNegativeFilter()
     assert not pos_neg_filter.fitted
 
-    # 测试 fit 方法
+    # Test fit method
     pos_neg_filter.fit(metadata_df)
     assert pos_neg_filter.fitted
     assert pos_neg_filter.positive_columns == {"pos_int", "pos_float"}
     assert pos_neg_filter.negative_columns == {"neg_int", "neg_float"}
 
-    # 测试 convert 方法
+    # Test convert method
     converted_df = pos_neg_filter.convert(pos_neg_test_df)
     assert converted_df.shape == pos_neg_test_df.shape
     assert (converted_df["pos_int"] >= 0).all()
@@ -50,7 +50,7 @@ def test_positive_negative_filter(pos_neg_test_df: pd.DataFrame):
     assert (converted_df["neg_int"] <= 0).all()
     assert (converted_df["neg_float"] <= 0).all()
 
-    # 测试 reverse_convert 方法
+    # Test reverse_convert method
     reverse_converted_df = pos_neg_filter.reverse_convert(converted_df)
     assert reverse_converted_df.shape[1] == converted_df.shape[1]
     assert (reverse_converted_df["pos_int"] >= 0).all()
@@ -58,13 +58,12 @@ def test_positive_negative_filter(pos_neg_test_df: pd.DataFrame):
     assert (reverse_converted_df["neg_int"] <= 0).all()
     assert (reverse_converted_df["neg_float"] <= 0).all()
 
-    # 检查：混合列是否保持了不变
+    # Check: whether mixed columns remained unchanged
     pd.testing.assert_series_equal(pos_neg_test_df["mixed_int"], reverse_converted_df["mixed_int"])
     pd.testing.assert_series_equal(pos_neg_test_df["mixed_float"], reverse_converted_df["mixed_float"])
 
-    # 检查 reverse_convert 是否正确过滤了不符合条件的行（样本）
+    # Check if reverse_convert correctly filtered out non-compliant rows (samples)
     assert reverse_converted_df.shape[0] <= pos_neg_test_df.shape[0]
-
 
 if __name__ == "__main__":
     pytest.main(["-vv", "-s", __file__])
