@@ -9,10 +9,15 @@ from sdgx.utils import logger
 
 class PositiveNegativeFilter(Filter):
     """
-    Add docstring here.
+    一个用于过滤正负值的数据处理器。
+
+    此过滤器用于确保特定列中的值保持正值或负值。在反向转换过程中,将移除不符合预期正负性的行。
 
     Attributes:
-        # add attribute here. 
+        int_columns (set): 包含整数值的列名集合。
+        float_columns (set): 包含浮点数值的列名集合。
+        positive_columns (set): 应包含正值的列名集合。
+        negative_columns (set): 应包含负值的列名集合。
     """
 
     int_columns: set = set()
@@ -63,15 +68,31 @@ class PositiveNegativeFilter(Filter):
     def reverse_convert(self, processed_data: pd.DataFrame) -> pd.DataFrame:
         """
         Reverse_convert method for the pos_neg data filter.
-        """
-
-        logger.info(f"Data reverse-converted by PositiveNegativeFilter Start with Shape: {processed_data.shape}.")
-
         
-
-        logger.info(f"Data reverse-converted by PositiveNegativeFilter with Output Shape: {processed_data.shape}.")
-
-        return processed_data
+        遍历每一行数据,检查 positive_columns 中是否有负值,
+        negative_columns 中是否有正值。如果不符合条件,则丢弃该行。
+        """
+        logger.info(f"Data reverse-converted by PositiveNegativeFilter Start with Shape: {processed_data.shape}.")
+        
+        # 创建一个布尔掩码,用于标记需要保留的行
+        mask = pd.Series(True, index=processed_data.index)
+        
+        # 检查 positive_columns
+        for col in self.positive_columns:
+            if col in processed_data.columns:
+                mask &= processed_data[col] >= 0
+        
+        # 检查 negative_columns
+        for col in self.negative_columns:
+            if col in processed_data.columns:
+                mask &= processed_data[col] <= 0
+        
+        # 应用掩码筛选数据
+        filtered_data = processed_data[mask]
+        
+        logger.info(f"Data reverse-converted by PositiveNegativeFilter with Output Shape: {filtered_data.shape}.")
+        
+        return filtered_data
 
 @hookimpl
 def register(manager):
