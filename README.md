@@ -21,7 +21,7 @@
 
 <p style="font-size: small;">Switch Language:
     <a href="https://github.com/hitsz-ids/synthetic-data-generator/blob/main/README_ZH_CN.md" target="_blank">简体中文</a> &nbsp;| &nbsp;Latest
-    <a href="https://synthetic-data-generator.readthedocs.io/en/latest/" target="value">API Docs</a>&nbsp;| &nbsp; Join <a href="assets/live_QR_code.PNG" target="value">Wechat Group</a>
+    <a href="https://synthetic-data-generator.readthedocs.io/en/latest/" target="value">API Docs</a>&nbsp;| &nbsp; Join <a href="assets/live_QR_code.jpg" target="value">Wechat Group</a>
 </p>
 
 <p style="font-size: small;">
@@ -78,7 +78,7 @@ Infer new column data based on the existing data in the table and the knowledge 
 
 - Technological advancements:
   - Supports a wide range of statistical data synthesis algorithms, LLM-based synthetic data generation model is also integrated;
-  - Optimised for big data scenarios, effectively reducing memory consumption;
+  - Optimized for big data, effectively reducing memory consumption;
   - Continuously tracking the latest advances in academia and industry, and introducing support for excellent algorithms and models in a timely manner.
 - Privacy enhancements:
   - SDG supports differential privacy, anonymization and other methods to enhance the security of synthetic data.
@@ -203,7 +203,7 @@ The SDG project was initiated by **Institute of Data Security, Harbin Institute 
 - Join our Wechat Group through QR code.
 
 <div align="left">
-  <img src="assets/live_QR_code.PNG" width="400" >
+  <img src="assets/live_QR_code.jpg" width="200" >
 </div>
 
 ## 📄 License
