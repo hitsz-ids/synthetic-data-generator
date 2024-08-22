@@ -59,6 +59,8 @@ class PositiveNegativeFilter(Filter):
         self.positive_columns = set(metadata.numeric_format["positive"])
         self.negative_columns = set(metadata.numeric_format["negative"])
 
+        self.fitted = True
+
     def convert(self, raw_data: pd.DataFrame) -> pd.DataFrame:
         """
         Convert method for data filter (No Action).
