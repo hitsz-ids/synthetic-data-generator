@@ -122,9 +122,7 @@ class NumericInspector(Inspector):
         Returns:
             bool: True if the column is predominantly positive, False otherwise.
         """
-        return self._is_positive_or_negative_column(
-            col_series, self.pos_threshold, lambda x: x > 0
-        )
+        return self._is_positive_or_negative_column(col_series, self.pos_threshold, lambda x: x > 0)
 
     def _is_negative_column(self, col_series: pd.Series) -> bool:
         """
