@@ -76,20 +76,20 @@ class PositiveNegativeFilter(Filter):
         """
         logger.info(f"Data reverse-converted by PositiveNegativeFilter Start with Shape: {processed_data.shape}.")
         
-        # 创建一个布尔掩码,用于标记需要保留的行
+        # Create a boolean mask to mark the rows that need to be retained
         mask = pd.Series(True, index=processed_data.index)
         
-        # 检查 positive_columns
+        # Check positive_columns
         for col in self.positive_columns:
             if col in processed_data.columns:
                 mask &= processed_data[col] >= 0
         
-        # 检查 negative_columns
+        # Check negative_columns
         for col in self.negative_columns:
             if col in processed_data.columns:
                 mask &= processed_data[col] <= 0
         
-        # 应用掩码筛选数据
+        # Apply the mask to filter the data
         filtered_data = processed_data[mask]
         
         logger.info(f"Data reverse-converted by PositiveNegativeFilter with Output Shape: {filtered_data.shape}.")
