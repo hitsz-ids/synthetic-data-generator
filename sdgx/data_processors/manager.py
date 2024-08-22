@@ -55,6 +55,7 @@ class DataProcessorManager(Manager):
         ]
     ] + [
         "ConstValueTransformer".lower(),
+        "PositiveNegativeFilter".lower(),
         "EmptyTransformer".lower(),
         "ColumnOrderTransformer".lower(),
     ]
