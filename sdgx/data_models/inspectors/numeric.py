@@ -156,21 +156,21 @@ class NumericInspector(Inspector):
 
         # Initialize sets for positive and negative columns
         self.positive_columns = set()
-        self.negative_columns = set()   
+        self.negative_columns = set()
 
         # Store the length of the DataFrame
         self.df_length = len(raw_data)
 
         # Iterate all columns and determain the final data type
         for col in raw_data.columns:
-            if raw_data[col].dtype in ['int64', 'float64']:
-                # float or int 
+            if raw_data[col].dtype in ["int64", "float64"]:
+                # float or int
                 if self._is_int_column(raw_data[col]):
                     self.int_columns.add(col)
                 else:
                     self.float_columns.add(col)
-                
-                # positive? negative? 
+
+                # positive? negative?
                 if self._is_positive_column(raw_data[col]):
                     self.positive_columns.add(col)
                 elif self._is_negative_column(raw_data[col]):
