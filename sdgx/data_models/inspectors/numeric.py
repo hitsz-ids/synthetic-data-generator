@@ -55,7 +55,7 @@ class NumericInspector(Inspector):
         self._int_rate = 0.9
         self.df_length = 0
 
-    def _is_int_column(self, col_series: pd.Series):
+    def _is_int_column(self, col_series: pd.Series) -> bool:
         """
         Determine if a column contains predominantly integer values.
 
@@ -154,36 +154,27 @@ class NumericInspector(Inspector):
         self.int_columns = set()
         self.float_columns = set()
 
+        # Initialize sets for positive and negative columns
+        self.positive_columns = set()
+        self.negative_columns = set()   
+
         # Store the length of the DataFrame
         self.df_length = len(raw_data)
 
-        # Identify columns with float data types
-        float_candidate = self.float_columns.union(
-            set(raw_data.select_dtypes(include=["float64"]).columns)
-        )
-
-        # Classify columns as integer or float based on the proportion of integer values
-        for candidate in float_candidate:
-            if self._is_int_column(raw_data[candidate]):
-                self.int_columns.add(candidate)
-            else:
-                self.float_columns.add(candidate)
-
-        # Add columns with integer data types to the integer columns set
-        self.int_columns = self.int_columns.union(
-            set(raw_data.select_dtypes(include=["int64"]).columns)
-        )
-
-        # Initialize sets for positive and negative columns
-        self.positive_columns = set()
-        self.negative_columns = set()
-
-        # Classify columns as positive or negative based on the proportion of positive or negative values
-        for col in self.int_columns.union(self.float_columns):
-            if self._is_positive_column(raw_data[col]):
-                self.positive_columns.add(col)
-            elif self._is_negative_column(raw_data[col]):
-                self.negative_columns.add(col)
+        # Iterate all columns and determain the final data type
+        for col in raw_data.columns:
+            if raw_data[col].dtype in ['int64', 'float64']:
+                # float or int 
+                if self._is_int_column(raw_data[col]):
+                    self.int_columns.add(col)
+                else:
+                    self.float_columns.add(col)
+                
+                # positive? negative? 
+                if self._is_positive_column(raw_data[col]):
+                    self.positive_columns.add(col)
+                elif self._is_negative_column(raw_data[col]):
+                    self.negative_columns.add(col)
 
         # Mark the inspector as ready
         self.ready = True
