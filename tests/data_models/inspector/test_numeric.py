@@ -23,6 +23,9 @@ def test_inspector(inspector: NumericInspector, raw_data):
     )
     assert not inspector.float_columns
     assert inspector.inspect_level == 10
+    assert inspector.negative_columns == set()
+    assert inspector.positive_columns == {"age", "hours-per-week", "fnlwgt", "educational-num"}
+    assert set(inspector.inspect().keys()) == {"int_columns", "float_columns", "numeric_format"}
 
 
 if __name__ == "__main__":
