@@ -1,10 +1,10 @@
 import pandas as pd
 import pytest
 
-from sdgx.data_models.inspectors.fix_combination import FixCombinationInspector
+from sdgx.data_models.inspectors.fixed_combination import FixedCombinationInspector
 
 @pytest.fixture
-def test_fix_combination_data():
+def test_fixed_combination_data():
     data = {
         "A": [1, 2, 3, 4, 5],
         "B": [2, 4, 6, 8, 10],  # B is 2 * A
@@ -15,9 +15,9 @@ def test_fix_combination_data():
     df = pd.DataFrame(data)
     yield df
 
-def test_fix_combination_inspector(test_fix_combination_data: pd.DataFrame):
-    inspector = FixCombinationInspector()
-    inspector.fit(test_fix_combination_data)
+def test_fixed_combination_inspector(test_fixed_combination_data: pd.DataFrame):
+    inspector = FixedCombinationInspector()
+    inspector.fit(test_fixed_combination_data)
     assert inspector.ready
     assert inspector.fixed_combinations
 

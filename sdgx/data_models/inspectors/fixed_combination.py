@@ -7,7 +7,7 @@ import pandas as pd
 from sdgx.data_models.inspectors.base import Inspector
 from sdgx.data_models.inspectors.extension import hookimpl
 
-class FixCombinationInspector(Inspector):
+class FixedCombinationInspector(Inspector):
     """
     FixCombinationInspector is designed to identify columns in a DataFrame that have fixed relationships based on covariance.
 
@@ -62,4 +62,4 @@ class FixCombinationInspector(Inspector):
 
 @hookimpl
 def register(manager):
-    manager.register("FixCombinationInspector", FixCombinationInspector)
+    manager.register("FixCombinationInspector", FixedCombinationInspector)
