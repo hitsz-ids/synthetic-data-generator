@@ -2,15 +2,18 @@ import pandas as pd
 import pytest
 
 from sdgx.data_models.metadata import Metadata
-from sdgx.data_processors.transformers.fixed_combination import FixedCombinationTransformer
+from sdgx.data_processors.transformers.fixed_combination import (
+    FixedCombinationTransformer,
+)
+
 
 @pytest.fixture
 def test_fixed_combination_data():
     data = {
         "A": [1, 2, 3, 4, 5],
         "B": [2, 4, 6, 8, 10],  # B is 2 * A
-        "C": [5, 5, 5, 5, 5],   # C is constant
-        "D": [1, 3, 5, 7, 9],   # D is not related to A or B
+        "C": [5, 5, 5, 5, 5],  # C is constant
+        "D": [1, 3, 5, 7, 9],  # D is not related to A or B
         "E": [2, 4, 6, 8, 10],  # E is 2 * A
     }
     df = pd.DataFrame(data)
@@ -34,7 +37,12 @@ def test_fixed_combination_handling_test_df(test_fixed_combination_data: pd.Data
     """
 
     metadata = Metadata.from_dataframe(test_fixed_combination_data)
-    assert metadata.get("fixed_combinations") == {'A': {'E', 'D', 'B'}, 'B': {'A', 'E', 'D'}, 'D': {'A', 'E', 'B'}, 'E': {'A', 'D', 'B'}}
+    assert metadata.get("fixed_combinations") == {
+        "A": {"E", "D", "B"},
+        "B": {"A", "E", "D"},
+        "D": {"A", "E", "B"},
+        "E": {"A", "D", "B"},
+    }
 
     # Initialize the FixedCombinationTransformer.
     fixed_combination_transformer = FixedCombinationTransformer()
@@ -48,8 +56,12 @@ def test_fixed_combination_handling_test_df(test_fixed_combination_data: pd.Data
     assert fixed_combination_transformer.fitted
 
     # Check the fixed combination columns
-    assert fixed_combination_transformer.fixed_combinations == {'A': {'E', 'D', 'B'}, 'B': {'A', 'E', 'D'}, 'D': {'A', 'E', 'B'}, 'E': {'A', 'D', 'B'}}
-
+    assert fixed_combination_transformer.fixed_combinations == {
+        "A": {"E", "D", "B"},
+        "B": {"A", "E", "D"},
+        "D": {"A", "E", "B"},
+        "E": {"A", "D", "B"},
+    }
 
     # Transform the DataFrame using the transformer.
     transformed_df = fixed_combination_transformer.convert(test_fixed_combination_data)
@@ -59,7 +71,7 @@ def test_fixed_combination_handling_test_df(test_fixed_combination_data: pd.Data
 
     # reverse convert the df
     reverse_converted_df = fixed_combination_transformer.reverse_convert(transformed_df)
-    
+
     # 添加调试信息
     print("Original DataFrame:\n", test_fixed_combination_data)
     print("Transformed DataFrame:\n", transformed_df)

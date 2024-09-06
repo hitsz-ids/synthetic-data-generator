@@ -2,10 +2,12 @@
 from __future__ import annotations
 
 from typing import Any
+
 import pandas as pd
 
 from sdgx.data_models.inspectors.base import Inspector
 from sdgx.data_models.inspectors.extension import hookimpl
+
 
 class FixedCombinationInspector(Inspector):
     """
