@@ -42,7 +42,7 @@ class FixCombinationInspector(Inspector):
             None
         """
         # Calculate the covariance matrix, ignoring NaN values
-        covariance_matrix = raw_data.cov()
+        covariance_matrix = raw_data.dropna().cov()
 
         self.fixed_combinations = {}
         for column in covariance_matrix.columns:
