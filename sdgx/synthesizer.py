@@ -288,7 +288,7 @@ class Synthesizer:
             )
         )
         self.metadata = metadata  # Ensure update metadata
-
+        print(self.metadata.model_dump())
         logger.info("Fitting data processors...")
         if not self.dataloader:
             logger.info("Fitting without dataloader.")
