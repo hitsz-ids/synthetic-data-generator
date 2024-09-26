@@ -1,0 +1,113 @@
+{
+    "primary_keys": [
+        "Unnamed: 0"
+    ],
+    "column_list": [
+        "Unnamed: 0",
+        "loan_id",
+        "book_id",
+        "student_id",
+        "loan_date",
+        "return_date",
+        "title",
+        "author",
+        "isbn",
+        "library_id",
+        "name_x",
+        "location",
+        "name_y",
+        "email",
+        "date_of_birth",
+        "major",
+        "enrollment_id",
+        "course_id",
+        "semester",
+        "grade_x",
+        "submission_id",
+        "assignment_id",
+        "submission_date",
+        "grade_y"
+    ],
+    "column_inspect_level": {
+        "china_mainland_address_columns": 30,
+        "int_columns": 10,
+        "float_columns": 10,
+        "chinese_name_columns": 40,
+        "datetime_columns": 20,
+        "unified_social_credit_code_columns": 30,
+        "empty_columns": 90,
+        "email_columns": 30,
+        "discrete_columns": 10,
+        "china_mainland_id_columns": 30,
+        "bool_columns": 10,
+        "chinese_company_name_columns": 40,
+        "const_columns": 80,
+        "china_mainland_postcode_columns": 20,
+        "china_mainland_mobile_phone_columns": 30,
+        "id_columns": 20,
+        "english_name_columns": 40
+    },
+    "pii_columns": [
+        "author",
+        "title",
+        "name_y",
+        "email"
+    ],
+    "id_columns": [
+        "Unnamed: 0"
+    ],
+    "int_columns": [
+        "course_id",
+        "student_id",
+        "assignment_id",
+        "book_id",
+        "library_id",
+        "loan_id",
+        "major",
+        "submission_id",
+        "enrollment_id",
+        "Unnamed: 0"
+    ],
+    "float_columns": [],
+    "bool_columns": [],
+    "discrete_columns": [
+        "loan_date",
+        "return_date",
+        "grade_x",
+        "name_x",
+        "date_of_birth",
+        "semester",
+        "isbn",
+        "author",
+        "title",
+        "location",
+        "name_y",
+        "submission_date",
+        "email",
+        "grade_y"
+    ],
+    "datetime_columns": [
+        "date_of_birth",
+        "submission_date",
+        "loan_date",
+        "return_date"
+    ],
+    "const_columns": [],
+    "datetime_format": {},
+    "numeric_format": {
+        "positive": [
+            "Unnamed: 0",
+            "assignment_id",
+            "book_id",
+            "course_id",
+            "enrollment_id",
+            "library_id",
+            "loan_id",
+            "major",
+            "student_id",
+            "submission_id"
+        ],
+        "negative": []
+    },
+    "version": "1.0"
+}

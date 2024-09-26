@@ -1,0 +1,5 @@
+pandas numpy scipy pyyaml scikit-learn Faker matplotlib click pluggy loguru pyarrow pydantic cloudpickle importlib_metadata openai python-dotenv joblib
+
+ torch table-evaluator
+
+# pandas numpy<2 scipy pyyaml scikit-learn>=0.24,<2 Faker>=10 matplotlib torch>=2 table-evaluator click pluggy loguru pyarrow pydantic>=2 cloudpickle importlib_metadata openai>=1.10.0 python-dotenv joblib>=1.4.0

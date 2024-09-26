@@ -1,0 +1,96 @@
+{
+    "primary_keys": [
+        "Unnamed: 0",
+        "location",
+        "isbn"
+    ],
+    "column_list": [
+        "Unnamed: 0",
+        "loan_id",
+        "book_id",
+        "student_id",
+        "loan_date",
+        "return_date",
+        "title",
+        "author",
+        "isbn",
+        "library_id",
+        "name_x",
+        "location",
+        "name_y",
+        "email",
+        "date_of_birth",
+        "major"
+    ],
+    "column_inspect_level": {
+        "china_mainland_mobile_phone_columns": 30,
+        "const_columns": 80,
+        "unified_social_credit_code_columns": 30,
+        "discrete_columns": 10,
+        "china_mainland_id_columns": 30,
+        "english_name_columns": 40,
+        "id_columns": 20,
+        "chinese_company_name_columns": 40,
+        "datetime_columns": 20,
+        "china_mainland_postcode_columns": 20,
+        "chinese_name_columns": 40,
+        "china_mainland_address_columns": 30,
+        "bool_columns": 10,
+        "int_columns": 10,
+        "float_columns": 10,
+        "empty_columns": 90,
+        "email_columns": 30
+    },
+    "pii_columns": [
+        "name_y",
+        "email",
+        "author",
+        "title"
+    ],
+    "id_columns": [
+        "Unnamed: 0",
+        "location",
+        "isbn"
+    ],
+    "int_columns": [
+        "Unnamed: 0",
+        "book_id",
+        "loan_id",
+        "student_id",
+        "major",
+        "library_id"
+    ],
+    "float_columns": [],
+    "bool_columns": [],
+    "discrete_columns": [
+        "return_date",
+        "loan_date",
+        "location",
+        "name_y",
+        "email",
+        "date_of_birth",
+        "name_x",
+        "author",
+        "title",
+        "isbn"
+    ],
+    "datetime_columns": [
+        "return_date",
+        "date_of_birth",
+        "loan_date"
+    ],
+    "const_columns": [],
+    "datetime_format": {},
+    "numeric_format": {
+        "positive": [
+            "Unnamed: 0",
+            "book_id",
+            "library_id",
+            "loan_id",
+            "major",
+            "student_id"
+        ],
+        "negative": []
+    },
+    "version": "1.0"
+}

@@ -255,3 +255,5 @@ cython_debug/
 
 .sdgx_cache
 .ndarry_cache
+**/model/ctgan.pkl
+log_*.txt

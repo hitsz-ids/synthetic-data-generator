@@ -3,7 +3,7 @@ from __future__ import annotations
 import time
 from pathlib import Path
 from typing import Any, Generator
-
+from tqdm import notebook as tqdm
 import pandas as pd
 
 from sdgx.data_connectors.base import DataConnector
@@ -243,6 +243,8 @@ class Synthesizer:
 
     def fit(
         self,
+        prefit = False,
+        from_prefit = False,
         metadata: None | Metadata = None,
         inspector_max_chunk: int = 10,
         metadata_include_inspectors: None | list[str] = None,
@@ -318,7 +320,14 @@ class Synthesizer:
         logger.info(f"Initialized processed data loader in {time.time() - start_time}s")
         try:
             logger.info("Model fit Started...")
-            self.model.fit(metadata, processed_dataloader, **(model_fit_kwargs or {}))
+            if not prefit and not from_prefit:
+                self.model.fit(metadata, processed_dataloader,**(model_fit_kwargs or {}))
+            elif prefit and not from_prefit:
+                self.model.pre_fit_test(metadata, processed_dataloader, **(model_fit_kwargs or {}))
+                return
+            elif not prefit and from_prefit:
+                self.model.fit(metadata, processed_dataloader,prefited=True,**(model_fit_kwargs or {}))
+                
             logger.info("Model fit... Finished")
         finally:
             processed_dataloader.finalize(clear_cache=True)
@@ -391,12 +400,14 @@ class Synthesizer:
         missing_count = count
         max_trails = 5
         sample_data_list = []
+        psb = tqdm.tqdm(total=missing_count)
         while missing_count > 0 and max_trails > 0:
             sample_data = self.model.sample(int(missing_count * 1.2), **model_sample_args)
             for d in self.data_processors:
                 sample_data = d.reverse_convert(sample_data)
             sample_data_list.append(sample_data)
             missing_count = missing_count - len(sample_data)
+            psb.update(len(sample_data))
             max_trails -= 1
 
         return pd.concat(sample_data_list)[:count]

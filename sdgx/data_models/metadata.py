@@ -1,5 +1,5 @@
 from __future__ import annotations
-
+import cloudpickle
 import json
 from collections import defaultdict
 from collections.abc import Iterable
@@ -58,7 +58,7 @@ class Metadata(BaseModel):
     column_inspect_level is used to store every inspector's level, to specify the true type of each column.
     """
 
-    pii_columns: Set[set] = set()
+    pii_columns: Set[str] = set()
     """
     pii_columns is used to store all PII columns' name
     """
@@ -391,6 +391,10 @@ class Metadata(BaseModel):
         """
         Save metadata to json file.
         """
+
+        # with path.open("wb") as f:
+        #     cloudpickle.dump(self, f)
+        #     f.write(self._dump_json())
 
         with path.open("w") as f:
             f.write(self._dump_json())
