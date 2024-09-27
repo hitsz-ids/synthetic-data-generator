@@ -452,8 +452,8 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
         return SDVBaseSynthesizer.save(self, save_dir / self.MODEL_SAVE_NAME)
 
     @classmethod
-    def load(cls, save_dir: str | Path) -> "CTGANSynthesizerModel":
-        return SDVBaseSynthesizer.load(save_dir / cls.MODEL_SAVE_NAME)
+    def load(cls, save_dir: str | Path, device) -> "CTGANSynthesizerModel":
+        return SDVBaseSynthesizer.load(save_dir / cls.MODEL_SAVE_NAME, device)
 
     @staticmethod
     def _gumbel_softmax(logits, tau=1, hard=False, eps=1e-10, dim=-1):

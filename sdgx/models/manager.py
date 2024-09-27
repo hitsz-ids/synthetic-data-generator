@@ -35,7 +35,7 @@ class ModelManager(Manager):
 
         return self.init(model_name, **kwargs)
 
-    def load(self, model: type[SynthesizerModel] | str, model_path) -> SynthesizerModel:
+    def load(self, model: type[SynthesizerModel] | str, model_path, **kwargs) -> SynthesizerModel:
         if not (isinstance(model, type) or isinstance(model, str)):
             raise ManagerLoadModelError(
                 "model must be type of SynthesizerModel or str for model_name"
@@ -48,6 +48,6 @@ class ModelManager(Manager):
         model = model if isinstance(model, type) else self.registed_models[model]
 
         try:
-            return model.load(model_path)
+            return model.load(model_path, **kwargs)
         except Exception as e:
             raise ManagerLoadModelError(e)

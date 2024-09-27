@@ -138,7 +138,7 @@ class Synthesizer:
             )
         if (isinstance(model, str) or isinstance(model, type)) and model_path:
             # Load model by cls or str
-            self.model = self.model_manager.load(model, model_path)
+            self.model = self.model_manager.load(model, model_path, **(model_kwargs or {}))
             if model_kwargs:
                 logger.warning("model_kwargs will be ignored when loading model from model_path")
         elif isinstance(model, str) or isinstance(model, type):
@@ -189,6 +189,7 @@ class Synthesizer:
         processed_data_loaders_kwargs: None | dict[str, Any] = None,
         data_processors: None | list[str | DataProcessor | type[DataProcessor]] = None,
         data_processors_kwargs: None | dict[str, dict[str, Any]] = None,
+        model_kwargs = None 
     ) -> "Synthesizer":
         """
         Load metadata and model, allow rebuilding Synthesizer for finetuning or other use cases.
@@ -233,6 +234,7 @@ class Synthesizer:
             model_path=model_path,
             metadata=metadata,
             metadata_path=metadata_path,
+            model_kwargs=model_kwargs,
             data_connector=data_connector,
             data_connector_kwargs=data_connector_kwargs,
             raw_data_loaders_kwargs=raw_data_loaders_kwargs,
