@@ -499,7 +499,16 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
                     st = ed
                 elif span_info.activation_fn == "softmax":
                     ed = st + span_info.dim
+                    #if len(column_info) == 1: # 是分类变量
+
+                    #else: # 其他变量
                     transformed = self._gumbel_softmax(data[:, st:ed], tau=0.2)
+                    data_t.append(transformed)
+                    st = ed
+                elif span_info.activation_fn == "liner":
+                    # 修改为了线性
+                    ed = st + span_info.dim
+                    transformed = data[:, st:ed]
                     data_t.append(transformed)
                     st = ed
                 else:

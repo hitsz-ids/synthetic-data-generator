@@ -15,7 +15,7 @@ class DataSampler(object):
         self._data: NDArrayLoader | np.ndarray = data
 
         def is_discrete_column(column_info):
-            return len(column_info) == 1 and column_info[0].activation_fn == "softmax"
+            return len(column_info) == 1 and column_info[0].activation_fn == "softmax"  # todo 修改了tanh
 
         n_discrete_columns = sum(
             [1 for column_info in output_info if is_discrete_column(column_info)]

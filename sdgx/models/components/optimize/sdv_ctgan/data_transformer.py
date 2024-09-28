@@ -63,7 +63,7 @@ class DataTransformer(object):
             column_name=column_name,
             column_type="continuous",
             transform=gm,
-            output_info=[SpanInfo(1, "tanh"), SpanInfo(num_components, "softmax")],
+            output_info=[SpanInfo(1, "tanh"), SpanInfo(num_components, "softmax")], # 贝叶斯gmm，多个正态分布，选择一个
             output_dimensions=1 + num_components,
         )
 
@@ -79,15 +79,15 @@ class DataTransformer(object):
                 A ``ColumnTransformInfo`` object.
         """
         column_name = data.columns[0]
-        ohe = LabelEncoder() # OneHotEncoder()
+        ohe = LabelEncoder(order_by="alphabetical")  # OneHotEncoder()
         ohe.fit(data, column_name)
-        num_categories = 1 # len(ohe.dummies)
+        num_categories = 1  # len(ohe.categories_to_values)  # len(ohe.dummies)
 
         return ColumnTransformInfo(
             column_name=column_name,
             column_type="discrete",
             transform=ohe,
-            output_info=[SpanInfo(num_categories, "softmax")],
+            output_info=[SpanInfo(num_categories, "liner")],
             output_dimensions=num_categories,
         )
 
@@ -221,7 +221,7 @@ class DataTransformer(object):
         column_names = []
         for column_transform_info in self._column_transform_info_list:
             dim = column_transform_info.output_dimensions
-            column_data = data[:, st : st + dim]
+            column_data = data[:, st: st + dim]
             if column_transform_info.column_type == "continuous":
                 recovered_column_data = self._inverse_transform_continuous(
                     column_transform_info, column_data, sigmas, st
