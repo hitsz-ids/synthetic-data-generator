@@ -14,6 +14,7 @@ from sdgx.models.components.sdv_rdt.transformers import (
     ClusterBasedNormalizer,
     OneHotEncoder,
 )
+from sdgx.models.components.sdv_rdt.transformers.categorical import LabelEncoder
 from sdgx.utils import logger
 
 SpanInfo = namedtuple("SpanInfo", ["dim", "activation_fn"])
@@ -78,9 +79,9 @@ class DataTransformer(object):
                 A ``ColumnTransformInfo`` object.
         """
         column_name = data.columns[0]
-        ohe = OneHotEncoder()
+        ohe = LabelEncoder() # OneHotEncoder()
         ohe.fit(data, column_name)
-        num_categories = len(ohe.dummies)
+        num_categories = 1 # len(ohe.dummies)
 
         return ColumnTransformInfo(
             column_name=column_name,
