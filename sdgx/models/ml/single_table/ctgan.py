@@ -216,7 +216,7 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
         if epochs is not None:
             self._epochs = epochs
         if not prefited:
-            self._pre_fit(dataloader, discrete_columns)
+            self._pre_fit(dataloader, discrete_columns, metadata)
         if self.fit_data_empty:
             logger.info("CTGAN fit finished because of empty df detected.")
             return
@@ -228,13 +228,13 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
         discrete_columns = list(metadata.get("discrete_columns"))
         if epochs is not None:
             self._epochs = epochs
-        self._pre_fit(dataloader, discrete_columns)
+        self._pre_fit(dataloader, discrete_columns, metadata)
         if self.fit_data_empty:
             logger.info("CTGAN fit finished because of empty df detected.")
             return
         logger.info("CTGAN prefit finished.")
 
-    def _pre_fit(self, dataloader: DataLoader, discrete_columns: list[str] = None) -> NDArrayLoader:
+    def _pre_fit(self, dataloader: DataLoader, discrete_columns: list[str] = None, metadata: Metadata = None) -> NDArrayLoader:
         if not discrete_columns:
             discrete_columns = []
 
@@ -244,7 +244,7 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
         if self.fit_data_empty:
             return
         # Fit Transformer and DataSampler
-        self._transformer = DataTransformer()
+        self._transformer = DataTransformer(metadata=metadata)
         logger.info("Fitting model's transformer...")
         self._transformer.fit(dataloader, discrete_columns)
         logger.info("Transforming data...")
@@ -558,8 +558,8 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
 
         rest_discrete_columns = set(discrete_columns) - set(invalid_columns)
 
-        if len(rest_discrete_columns) == 0:
-            self.fit_data_empty = True
+        # if len(rest_discrete_columns) == 0:
+        #     self.fit_data_empty = True
 
         return rest_discrete_columns
 

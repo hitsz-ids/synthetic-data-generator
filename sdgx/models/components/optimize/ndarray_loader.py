@@ -23,7 +23,7 @@ class NDArrayLoader:
     def __init__(self, cache_root: str | Path = DEFAULT_CACHE_ROOT) -> None:
         self.store_index = 0
         self.cache_root = Path(cache_root).expanduser().resolve()
-        print(self.cache_root)
+        # print(self.cache_root)
         self.cache_root.mkdir(exist_ok=True, parents=True)
 
     @cached_property

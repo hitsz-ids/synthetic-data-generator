@@ -457,7 +457,8 @@ class LabelEncoder(BaseTransformer):
     def _order_categories(self, unique_data):
         if self.order_by == "alphabetical":
             if unique_data.dtype.type not in [np.str_, np.object_]:
-                raise Error("The data must be of type string if order_by is 'alphabetical'.")
+                pass # 修改自动适应
+                # raise Error("The data must be of type string if order_by is 'alphabetical'.")
 
         elif self.order_by == "numerical_value":
             if not np.issubdtype(unique_data.dtype.type, np.number):

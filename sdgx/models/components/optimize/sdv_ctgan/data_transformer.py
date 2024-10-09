@@ -31,7 +31,7 @@ class DataTransformer(object):
     Discrete columns are encoded using a scikit-learn OneHotEncoder.
     """
 
-    def __init__(self, max_clusters=10, weight_threshold=0.005):
+    def __init__(self, max_clusters=10, weight_threshold=0.005, metadata=None):
         """Create a data transformer.
 
         Args:
@@ -40,6 +40,7 @@ class DataTransformer(object):
             weight_threshold (float):
                 Weight threshold for a Gaussian distribution to be kept.
         """
+        self.metadata = metadata
         self._max_clusters = max_clusters
         self._weight_threshold = weight_threshold
 
@@ -63,11 +64,11 @@ class DataTransformer(object):
             column_name=column_name,
             column_type="continuous",
             transform=gm,
-            output_info=[SpanInfo(1, "tanh"), SpanInfo(num_components, "softmax")], # 贝叶斯gmm，多个正态分布，选择一个
+            output_info=[SpanInfo(1, "tanh"), SpanInfo(num_components, "softmax")],  # 贝叶斯gmm，多个正态分布，选择一个
             output_dimensions=1 + num_components,
         )
 
-    def _fit_discrete(self, data):
+    def _fit_discrete(self, data, encoder="onehot"):
         """Fit one hot encoder for discrete column.
 
         Args:
@@ -79,15 +80,24 @@ class DataTransformer(object):
                 A ``ColumnTransformInfo`` object.
         """
         column_name = data.columns[0]
-        ohe = LabelEncoder(order_by="alphabetical")  # OneHotEncoder()
-        ohe.fit(data, column_name)
-        num_categories = 1  # len(ohe.categories_to_values)  # len(ohe.dummies)
+        if encoder == 'onehot':
+            ohe = OneHotEncoder()  # LabelEncoder(order_by="alphabetical")  # OneHotEncoder()
+            ohe.fit(data, column_name)
+            num_categories = len(ohe.dummies)  #1  # len(ohe.categories_to_values)  # len(ohe.dummies)
+            activate_fn = "softmax"
+        elif encoder == 'label':
+            ohe = LabelEncoder(order_by="alphabetical")
+            ohe.fit(data, column_name)
+            num_categories = 1  # len(ohe.categories_to_values)  # len(ohe.dummies)
+            activate_fn = "liner"
+        else:
+            raise ValueError("column encoder must be either 'onehot'(default) or 'label'")
 
         return ColumnTransformInfo(
             column_name=column_name,
-            column_type="discrete",
+            column_type="discrete",  # if activate_fn == "softmax" else "continuous",
             transform=ohe,
-            output_info=[SpanInfo(num_categories, "liner")],
+            output_info=[SpanInfo(num_categories, activate_fn)],
             output_dimensions=num_categories,
         )
 
@@ -106,9 +116,11 @@ class DataTransformer(object):
         self._column_raw_dtypes = data_loader[: data_loader.chunksize].infer_objects().dtypes
         self._column_transform_info_list = []
         for column_name in data_loader.columns():
-            if column_name in discrete_columns:
+            if column_name in discrete_columns or column_name in self.metadata.label_columns:
                 logger.debug(f"Fitting discrete column {column_name}...")
-                column_transform_info = self._fit_discrete(data_loader[[column_name]])
+
+                column_transform_info = self._fit_discrete(data_loader[[column_name]], self.metadata.column_encoder[
+                    column_name] if column_name in self.metadata.column_encoder else 'onehot')
             else:
                 logger.debug(f"Fitting continuous column {column_name}...")
                 column_transform_info = self._fit_continuous(data_loader[[column_name]])
