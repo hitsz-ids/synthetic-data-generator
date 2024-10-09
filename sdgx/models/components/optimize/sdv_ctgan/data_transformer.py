@@ -183,12 +183,14 @@ class DataTransformer(object):
             else:
                 process = delayed(self._transform_discrete)(column_transform_info, data)
             processes.append(process)
-        try:
-            # For Future versions of joblib
-            p = Parallel(n_jobs=-1, return_as="generator_unordered")
-            logger.warning("Using generator_unordered in joblib, time to remove this exception!")
-        except ValueError:
-            p = Parallel(n_jobs=-1, return_as="generator")
+
+        ## 这里有bug
+        # try:
+        #     # For Future versions of joblib
+        #     p = Parallel(n_jobs=-1, return_as="generator_unordered")
+        #     logger.warning("Using generator_unordered in joblib, time to remove this exception!")
+        # except ValueError:
+        p = Parallel(n_jobs=-1, return_as="generator")
 
         loader = NDArrayLoader()
         for ndarray in tqdm.tqdm(p(processes), desc="Transforming data", total=len(processes)):

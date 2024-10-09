@@ -508,7 +508,7 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
                 elif span_info.activation_fn == "liner":
                     # 修改为了线性
                     ed = st + span_info.dim
-                    transformed = data[:, st:ed]
+                    transformed = data[:, st:ed].clone()
                     data_t.append(transformed)
                     st = ed
                 else:

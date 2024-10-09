@@ -67,7 +67,11 @@ class DataSampler(object):
                 ed = st + span_info.dim
                 category_freq = np.sum(data[:, st:ed], axis=0)
                 if log_frequency:
-                    category_freq = np.log(category_freq + 1)
+                    try:
+                        category_freq = np.log(category_freq + 1)
+                    except RuntimeWarning as e:
+                        # print(category_freq.min())
+                        raise e
                 category_prob = category_freq / np.sum(category_freq)
                 self._discrete_column_category_prob[current_id, : span_info.dim] = category_prob
                 self._discrete_column_cond_st[current_id] = current_cond_st

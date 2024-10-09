@@ -1,5 +1,5 @@
 """Transformers for categorical data."""
-
+import math
 import warnings
 
 import numpy as np
@@ -446,6 +446,7 @@ class LabelEncoder(BaseTransformer):
 
     def __init__(self, add_noise=False, order_by=None):
         self.add_noise = add_noise
+        self._round_digit = None
         if order_by not in [None, "alphabetical", "numerical_value"]:
             raise Error(
                 "order_by must be one of the following values: None, 'numerical_value' or "
@@ -457,7 +458,7 @@ class LabelEncoder(BaseTransformer):
     def _order_categories(self, unique_data):
         if self.order_by == "alphabetical":
             if unique_data.dtype.type not in [np.str_, np.object_]:
-                pass # 修改自动适应
+                pass  # 修改自动适应
                 # raise Error("The data must be of type string if order_by is 'alphabetical'.")
 
         elif self.order_by == "numerical_value":
@@ -485,7 +486,20 @@ class LabelEncoder(BaseTransformer):
         """
         unique_data = pd.unique(data.fillna(np.nan))
         unique_data = self._order_categories(unique_data)
-        self.values_to_categories = dict(enumerate(unique_data))
+
+        def normalize_array_to_dict(arr):
+            # 获取数组的长度
+            n = len(arr)
+            digit = math.ceil(math.log10(n)) + 1
+            self._round_digit = digit
+            # 生成归一化到 [-1, 1] 的索引作为键
+            normalized_dict = {round((2 * i / (n - 1)) - 1, digit): arr[i] for i in range(n)}
+            return normalized_dict
+
+        # values_to_categories = dict(enumerate(unique_data))
+
+        self.values_to_categories = normalize_array_to_dict(unique_data)
+
         self.categories_to_values = {
             category: value for value, category in self.values_to_categories.items()
         }
@@ -535,10 +549,19 @@ class LabelEncoder(BaseTransformer):
             pandas.Series
         """
         if self.add_noise:
-            data = np.floor(data)
+            pass
+            # data = np.floor(data)
 
-        data = data.clip(min(self.values_to_categories), max(self.values_to_categories))
-        return data.round().map(self.values_to_categories)
+        value_dict_keys = self.values_to_categories.keys()
+        value_dict = self.values_to_categories
+
+        # 查找最近的键的函数
+        def find_nearest_key(x):
+            nearest_key = min(value_dict_keys, key=lambda k: abs(k - x))
+            return value_dict[nearest_key]
+
+        data: pd.Series = data.clip(min(self.values_to_categories), max(self.values_to_categories))
+        return data.apply(find_nearest_key)  # data.round(decimals=self._round_digit).map(self.values_to_categories)
 
 
 class CustomLabelEncoder(LabelEncoder):
