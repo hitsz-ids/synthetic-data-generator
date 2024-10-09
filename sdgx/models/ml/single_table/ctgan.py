@@ -302,7 +302,7 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
         steps_per_epoch = max(data_size // self._batch_size, 1)
         for i in range(epochs):
             start_time = time.time()
-            for id_ in tqdm.tqdm(range(steps_per_epoch)):
+            for id_ in tqdm.tqdm(range(steps_per_epoch), desc="Fitting batches"):
                 for n in range(self._discriminator_steps):
                     fakez = torch.normal(mean=mean, std=std)
 
@@ -421,7 +421,7 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
 
         steps = n // self._batch_size + 1
         data = []
-        for i in tqdm.tqdm(range(steps)):
+        for i in tqdm.tqdm(range(steps), desc="Sampling batches"):
             mean = torch.zeros(self._batch_size, self._embedding_dim)
             std = mean + 1
             fakez = torch.normal(mean=mean, std=std).to(self._device)

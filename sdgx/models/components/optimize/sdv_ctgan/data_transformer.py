@@ -6,6 +6,7 @@ from collections import namedtuple
 
 import numpy as np
 import pandas as pd
+from tqdm import notebook as tqdm
 from joblib import Parallel, delayed
 
 from sdgx.data_loader import DataLoader
@@ -115,7 +116,7 @@ class DataTransformer(object):
 
         self._column_raw_dtypes = data_loader[: data_loader.chunksize].infer_objects().dtypes
         self._column_transform_info_list = []
-        for column_name in data_loader.columns():
+        for column_name in tqdm.tqdm(data_loader.columns(), desc="Preparing data"):
             if column_name in discrete_columns or column_name in self.metadata.label_columns:
                 logger.debug(f"Fitting discrete column {column_name}...")
 
@@ -190,7 +191,7 @@ class DataTransformer(object):
             p = Parallel(n_jobs=-1, return_as="generator")
 
         loader = NDArrayLoader()
-        for ndarray in p(processes):
+        for ndarray in tqdm.tqdm(p(processes), desc="Transforming data", total=len(processes)):
             loader.store(ndarray.astype(float))
         return loader
 

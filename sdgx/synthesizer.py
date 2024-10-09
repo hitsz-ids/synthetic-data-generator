@@ -292,7 +292,7 @@ class Synthesizer:
             )
         )
         self.metadata = metadata  # Ensure update metadata
-        print(self.metadata.model_dump())
+        # print(self.metadata.model_dump())
         logger.info("Fitting data processors...")
         if not self.dataloader:
             logger.info("Fitting without dataloader.")
@@ -402,7 +402,7 @@ class Synthesizer:
         missing_count = count
         max_trails = 5
         sample_data_list = []
-        psb = tqdm.tqdm(total=missing_count)
+        psb = tqdm.tqdm(total=count, desc="Sampling")
         while missing_count > 0 and max_trails > 0:
             sample_data = self.model.sample(int(missing_count * 1.2), **model_sample_args)
             for d in self.data_processors:
