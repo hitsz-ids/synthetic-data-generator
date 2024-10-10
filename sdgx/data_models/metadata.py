@@ -75,7 +75,7 @@ class Metadata(BaseModel):
     datetime_format: Dict = defaultdict(str)
     numeric_format: Dict = defaultdict(list)
 
-    label_columns: Set[str] = set()
+    # label_columns: Set[str] = set()
     column_encoder: Dict = defaultdict(str)
 
     # version info

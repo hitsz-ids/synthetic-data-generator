@@ -272,6 +272,7 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
             dataloader: :ref:`DataLoader` for the training data processed by :ref:`DataProcessor`.
 
         """
+        print(self._transformer.get_column_transform_info_list())
         logger.info(f"Fit using data_size:{data_size}, data_dim: {self.data_dim}.")
         epochs = self._epochs
         # data_dim = self._transformer.output_dimensions

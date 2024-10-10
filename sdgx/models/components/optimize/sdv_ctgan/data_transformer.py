@@ -117,7 +117,8 @@ class DataTransformer(object):
         self._column_raw_dtypes = data_loader[: data_loader.chunksize].infer_objects().dtypes
         self._column_transform_info_list = []
         for column_name in tqdm.tqdm(data_loader.columns(), desc="Preparing data"):
-            if column_name in discrete_columns or column_name in self.metadata.label_columns:
+            if column_name in discrete_columns:
+                #  or column_name in self.metadata.label_columns
                 logger.debug(f"Fitting discrete column {column_name}...")
 
                 column_transform_info = self._fit_discrete(data_loader[[column_name]], self.metadata.column_encoder[
@@ -129,6 +130,9 @@ class DataTransformer(object):
             self.output_info_list.append(column_transform_info.output_info)
             self.output_dimensions += column_transform_info.output_dimensions
             self._column_transform_info_list.append(column_transform_info)
+
+    def get_column_transform_info_list(self):
+        return self._column_transform_info_list
 
     def _transform_continuous(self, column_transform_info, data):
         logger.debug(f"Transforming continuous column {column_transform_info.column_name}...")
