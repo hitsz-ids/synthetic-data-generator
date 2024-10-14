@@ -238,7 +238,7 @@ class DataTransformer(object):
         st = 0
         recovered_column_data_list = []
         column_names = []
-        for column_transform_info in self._column_transform_info_list:
+        for column_transform_info in tqdm.tqdm(self._column_transform_info_list, desc="Inverse transforming"):
             dim = column_transform_info.output_dimensions
             column_data = data[:, st: st + dim]
             if column_transform_info.column_type == "continuous":
