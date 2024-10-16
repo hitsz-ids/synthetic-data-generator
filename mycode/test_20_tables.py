@@ -30,7 +30,7 @@ RELATIONSHIPS = {
 }
 
 # from .dataset import x_args_type
-def fetch_data_from_sqlite_filterx(x_arg: 'x_args_type' , path='./data_sqlite.db'):
+def fetch_data_from_sqlite_filterx(x_arg: 'x_args_type' , path='./mycode/data_sqlite.db'):
     conn = sqlite3.connect(path)
     #query = "SELECT name FROM sqlite_master WHERE type='table';"
     #tables = pd.read_sql_query(query, conn)
@@ -93,7 +93,7 @@ def fetch_data_from_sqlite_filterx(x_arg: 'x_args_type' , path='./data_sqlite.db
     return Metadata(metadata), tables_dict
 
 
-def fetch_data_from_sqlite(path='./data_sqlite.db'):
+def fetch_data_from_sqlite(path='./mycode/data_sqlite.db'):
     conn = sqlite3.connect(path)
     query = "SELECT name FROM sqlite_master WHERE type='table';"
     tables = pd.read_sql_query(query, conn)
