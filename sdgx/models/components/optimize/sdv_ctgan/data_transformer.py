@@ -81,18 +81,23 @@ class DataTransformer(object):
                 A ``ColumnTransformInfo`` object.
         """
         column_name = data.columns[0]
+
+        #
+        ohe = OneHotEncoder()  # LabelEncoder(order_by="alphabetical")  # OneHotEncoder()
+        ohe.fit(data, column_name)
+        num_categories = len(ohe.dummies)  # 1  # len(ohe.categories_to_values)  # len(ohe.dummies)
+        activate_fn = "softmax"
         if encoder == 'onehot':
-            ohe = OneHotEncoder()  # LabelEncoder(order_by="alphabetical")  # OneHotEncoder()
-            ohe.fit(data, column_name)
-            num_categories = len(ohe.dummies)  #1  # len(ohe.categories_to_values)  # len(ohe.dummies)
-            activate_fn = "softmax"
-        elif encoder == 'label':
+            # 阈值
+            pass
+        elif encoder == 'label' and num_categories > 100:
             ohe = LabelEncoder(order_by="alphabetical")
             ohe.fit(data, column_name)
             num_categories = 1  # len(ohe.categories_to_values)  # len(ohe.dummies)
             activate_fn = "liner"
         else:
-            raise ValueError("column encoder must be either 'onehot'(default) or 'label'")
+            pass
+            # raise ValueError("column encoder must be either 'onehot'(default) or 'label'")
 
         return ColumnTransformInfo(
             column_name=column_name,
