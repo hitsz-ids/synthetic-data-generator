@@ -43,6 +43,26 @@ class XArgs:
         meta_datetime_escapes=[("Submission", "submission_date")],
         meta_time_escapes=[("Schedule", "time_slot")]
     )
+    
+    tables_14 = x_args_type(
+        x_table=["BookLoan",
+                 "Book", "Library", "Student",
+                 "Enrollment", "Submission", "Course",
+                 # "Assignment"
+                 "CourseTextbook", "Textbook",
+                 "Schedule", "Professor", 'ProjectMember', 
+                 'ResearchProject', 'ResearchGroup'],
+        x_key=[
+            'book_id', "library_id", "student_id",
+            "student_id", "student_id", "course_id",
+            # "assignment_id",
+            "course_id", "textbook_id",
+            "course_id", "professor_id", "professor_id",
+            "project_id", "group_id"],
+        x_how=['inner' for _ in range(13)],
+        meta_datetime_escapes=[("Submission", "submission_date")],
+        meta_time_escapes=[("Schedule", "time_slot")]
+    )
 
 
 class XMetaBuilder(MetaBuilder):
