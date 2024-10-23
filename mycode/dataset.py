@@ -1,6 +1,6 @@
 from typing import NamedTuple, List, Tuple
 
-from multi_ctgan import MetaBuilder, MultiTableCTGAN
+from mycode.multi_ctgan import MetaBuilder, MultiTableCTGAN
 
 
 class Database:
