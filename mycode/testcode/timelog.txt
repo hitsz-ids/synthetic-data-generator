@@ -5,3 +5,4 @@
 1k14t15a: 3556 lines, 254 columns, 1815 dims, 83.87s train time, 10.12s sample 1000 time, eva 1000 mean: 0.65142, ks: 0.8966,cs: 0.40623, 78.3s sample 10000 time, eva 10000 mean: 0.65642, ks: 0.90661,cs: 0.40624, 
 1k14t20a: 3556 lines, 324 columns, 2149 dims, 112.07s train time, 10.84s sample 1000 time, eva 1000 mean: 0.65541, ks: 0.9089,cs: 0.40192, 88.13s sample 10000 time, eva 10000 mean: 0.657, ks: 0.91207,cs: 0.40193, 
 10k14t10a: 48157 lines, 184 columns, 1311 dims, 441.35s train time, 26.15s sample 1000 time, =eva 1000 mean: 0.68006, ks: 0.90413,cs: 0.45599, 226.65s sample 10000 time, eva 10000 mean: 0.68364, ks: 0.91128,cs: 0.45599, 
+10k14t10a: 3556 lines, 184 columns, 1219 dims, 54.42s train time, 9.1s sample 1000 time, eva 1000 mean: 0.81414, ks: 0.90107,cs: 0.72721, evatime: 1.89, 77.47s sample 10000 time, eva 10000 mean: 0.81562, ks: 0.90404,cs: 0.7272, evatime: 39.11,
