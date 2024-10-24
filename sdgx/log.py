@@ -1,6 +1,6 @@
 import os
 
-USER_DEFINED_LOG_LEVEL = os.getenv("SDGX_LOG_LEVEL", "DEBUG")
+USER_DEFINED_LOG_LEVEL = os.getenv("SDGX_LOG_LEVEL", "INFO")
 LOG_TO_FILE = os.getenv("SDGX_LOG_TO_FILE", "false") in ["True", "true"]
 
 os.environ["LOGURU_LEVEL"] = USER_DEFINED_LOG_LEVEL

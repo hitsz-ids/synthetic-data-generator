@@ -1,0 +1,5 @@
+"table-evaluator"  sdmetrics~=0.8.1
+
+conda install pytorch torchvision torchaudio cpuonly -c pytorch
+
+  openpyxl  "pandas"  "numpy<2"  "scipy"  "pyyaml"  'scikit-learn>=0.24,<2'  'Faker>=10'  "matplotlib" "click" "pluggy" "loguru" "pyarrow" "pydantic>=2" "cloudpickle" "importlib_metadata" "openai>=1.10.0" "python-dotenv" "joblib>=1.4.0"

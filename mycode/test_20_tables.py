@@ -3,9 +3,11 @@ import json
 import os
 import sqlite3
 from collections import defaultdict
+from typing import Dict
 
 import pandas as pd
 import tqdm
+from pandas import DataFrame
 
 RELATIONSHIPS = {
     "Assignment": {
@@ -29,11 +31,50 @@ RELATIONSHIPS = {
     "EquipmentMaintenance": {"equipment_id": ("LabEquipment", "equipment_id")}
 }
 
+
+def remove_copy_tag(key: str):
+    index = key.find("_COPY")
+    if index != -1:
+        return key[:index]
+    else:
+        return key
+
+
+def build_sdv_metadata_from_origin_tables(added_origin: Dict[str, DataFrame], x_arg: 'x_args_type', path='./mycode/data_sqlite.db'):
+    meta, otables = fetch_data_from_sqlite_filterx(x_arg, path)
+    meta = meta.to_dict()
+
+    def del_ref(obj: dict, key: str):
+        o = obj.copy()
+        if 'ref' in obj:
+            del o['ref']
+        if o['type'] == 'id':
+            o["type"] = "numerical"
+            o["subtype"] = "integer"
+        return o
+
+
+    for table_name, table in added_origin.items():
+        cols = otables[table_name].columns
+        maps = {
+            key: [
+                k for k in table.columns if k.find(f"{key}_COPY") != -1
+            ] for key in cols
+        }
+
+        new_fields = {}
+        for k, v in maps.items():
+            new_fields.update({item: del_ref(meta["tables"][table_name]["fields"][k], item) for item in v})
+        meta["tables"][table_name]["fields"].update(new_fields)
+
+    return meta
+
+
 # from .dataset import x_args_type
-def fetch_data_from_sqlite_filterx(x_arg: 'x_args_type' , path='./mycode/data_sqlite.db'):
+def fetch_data_from_sqlite_filterx(x_arg: 'x_args_type', path='./mycode/data_sqlite.db'):
     conn = sqlite3.connect(path)
-    #query = "SELECT name FROM sqlite_master WHERE type='table';"
-    #tables = pd.read_sql_query(query, conn)
+    # query = "SELECT name FROM sqlite_master WHERE type='table';"
+    # tables = pd.read_sql_query(query, conn)
     table_names = x_arg.x_table
 
     tables_dict = {}
@@ -57,14 +98,14 @@ def fetch_data_from_sqlite_filterx(x_arg: 'x_args_type' , path='./mycode/data_sq
             extra = {}
             if 'id' in field_name:
                 field_type = 'id'
-                if field_name in ["course_id", "assignment_id"]:
+                if field_name in ["assignment_id"]:  # "course_id",
                     field_type = 'numerical'
                     extra["subtype"] = 'integer'
             elif 'date' in field_name:
                 field_type = 'datetime'
-                if field_name in x_arg.meta_datetime_escapes:
+                if (table_name, field_name) in x_arg.meta_datetime_escapes:
                     extra['format'] = "%Y-%m-%d %H:%M:%S"
-                elif field_name in x_arg.meta_time_escapes:
+                elif (table_name, field_name) in x_arg.meta_time_escapes:
                     extra['format'] = "%H:%M:%S"
                 else:
                     extra['format'] = "%Y-%m-%d"
