@@ -85,6 +85,8 @@ class MultiTableCTGAN:
         elif add_cols_num == 0 and added_data_path:
             with open(added_data_path, 'rb') as f:
                 self.origin_tables = pickle.load(f)
+        elif add_cols_num == 0 and not added_data_path:
+            pass
         else:
             raise ValueError("不能同时指定 add_path 和 add_cols ")
 
