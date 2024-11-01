@@ -178,7 +178,9 @@ class DataTransformer(object):
             p = Parallel(n_jobs=-1, return_as="generator")
 
         loader = NDArrayLoader()
-        for ndarray in tqdm.tqdm(p(processes), desc="Transforming data", total=len(processes), delay=3):
+        for ndarray in tqdm.tqdm(
+            p(processes), desc="Transforming data", total=len(processes), delay=3
+        ):
             loader.store(ndarray.astype(float))
         return loader
 
@@ -219,7 +221,9 @@ class DataTransformer(object):
         st = 0
         recovered_column_data_list = []
         column_names = []
-        for column_transform_info in tqdm.tqdm(self._column_transform_info_list, desc="Inverse transforming", delay=3):
+        for column_transform_info in tqdm.tqdm(
+            self._column_transform_info_list, desc="Inverse transforming", delay=3
+        ):
             dim = column_transform_info.output_dimensions
             column_data = data[:, st : st + dim]
             if column_transform_info.column_type == "continuous":
