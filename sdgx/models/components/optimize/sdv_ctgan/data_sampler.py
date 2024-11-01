@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from tqdm import autonotebook as tqdm
 import numpy as np
 
 from sdgx.models.components.optimize.ndarray_loader import NDArrayLoader
@@ -116,7 +117,7 @@ class DataSampler(object):
 
         cond = np.zeros((batch, self._n_categories), dtype="float32")
 
-        for i in range(batch):
+        for i in tqdm.tqdm(range(batch), desc='Sampling in batch', delay=3, leave=False):
             row_idx = np.random.randint(0, len(self._data))
             col_idx = np.random.randint(0, self._n_discrete_columns)
             matrix_st = self._discrete_column_matrix_st[col_idx]
