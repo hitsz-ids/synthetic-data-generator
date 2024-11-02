@@ -107,8 +107,6 @@ def test_build(parent_table, parent_metadata, child_table, child_metadata, forei
         assert relationship.parent_table == parent_table
         assert relationship.child_table == child_table
         assert relationship.foreign_keys == foreign_keys
-        assert relationship.parent_metadata == parent_metadata
-        assert relationship.child_metadata == child_metadata
 
 
 def test_save_and_load(tmpdir):

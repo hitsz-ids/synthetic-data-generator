@@ -9,8 +9,6 @@ from pydantic import BaseModel
 
 from sdgx.exceptions import RelationshipInitError
 
-# from sdgx.data_models.metadata import Metadata
-
 KeyTuple = namedtuple("KeyTuple", ["parent", "child"])
 
 
@@ -25,12 +23,10 @@ class Relationship(BaseModel):
 
     version: str = "1.0"
 
-    # table names with metadata
+    # table names
     parent_table: str
-    parent_metadata: Metadata
 
     child_table: str
-    child_metadata: Metadata
 
     foreign_keys: List[KeyTuple]
     """
@@ -43,19 +39,19 @@ class Relationship(BaseModel):
     def build(
         cls,
         parent_table: str,
-        parent_metadata: Metadata,
         child_table: str,
-        child_metadata: Metadata,
         foreign_keys: Iterable[str | tuple[str, str] | KeyTuple],
+        parent_metadata: Metadata | None = None,
+        child_metadata: Metadata | None = None,
     ) -> "Relationship":
         """
         Build relationship from parent table, child table and foreign keys
 
         Args:
             parent_table (str): parent table
-            parent_metadata (Metadata): metadata of parent table
+            parent_metadata : metadata of parent table
             child_table (str): child table
-            child_metadata (Metadata): metadata of child table
+            child_metadata : metadata of child table
             foreign_keys (Iterable[str | tuple[str, str]]): foreign keys. If key is a tuple, the first element is parent column name and the second element is child column name
         """
 
@@ -72,23 +68,21 @@ class Relationship(BaseModel):
             raise RelationshipInitError("foreign keys cannot be empty")
         if parent_table == child_table:
             raise RelationshipInitError("child table and parent table cannot be the same")
-        for key in foreign_keys:
-            if type(parent_metadata) is not dict:
-                if key[0] not in parent_metadata.id_columns:
-                    raise RelationshipInitError("type of foreign key in parent table is not id")
-                if key[1] not in child_metadata.id_columns:
-                    raise RelationshipInitError("type of foreign key in child table is not id")
-            else:  # if load from json file, Metadata is a dict
-                if key[0] not in parent_metadata["id_columns"]:
-                    raise RelationshipInitError("type of foreign key in parent table is not id")
-                if key[1] not in child_metadata["id_columns"]:
-                    raise RelationshipInitError("type of foreign key in child table is not id")
-
+        if parent_metadata and child_metadata:
+            for key in foreign_keys:
+                if type(parent_metadata) is not dict:
+                    if key[0] not in parent_metadata.id_columns:
+                        raise RelationshipInitError("type of foreign key in parent table is not id")
+                    if key[1] not in child_metadata.id_columns:
+                        raise RelationshipInitError("type of foreign key in child table is not id")
+                else:  # if load from json file, Metadata is a dict
+                    if key[0] not in parent_metadata["id_columns"]:
+                        raise RelationshipInitError("type of foreign key in parent table is not id")
+                    if key[1] not in child_metadata["id_columns"]:
+                        raise RelationshipInitError("type of foreign key in child table is not id")
         return cls(
             parent_table=parent_table,
-            parent_metadata=parent_metadata,
             child_table=child_table,
-            child_metadata=child_metadata,
             foreign_keys=foreign_keys,
         )
 
