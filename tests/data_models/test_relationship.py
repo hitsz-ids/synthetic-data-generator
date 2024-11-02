@@ -2,14 +2,25 @@ from __future__ import annotations
 
 import pytest
 
-from sdgx.data_models.relationship import KeyTuple, Relationship
 from sdgx.data_models.metadata import Metadata
+from sdgx.data_models.relationship import KeyTuple, Relationship
 from sdgx.exceptions import RelationshipInitError
 
-parent_metadata = Metadata(primary_keys=["parent_id"], column_list=["parent_id"], id_columns={"parent_id"})
-error_parent_metadata = Metadata(primary_keys=["parent_id"], column_list=["parent_id"], id_columns={"foo"})
-child_metadata = Metadata(primary_keys=["child_id"], column_list=["parent_id", "child_id"], id_columns={"parent_id", "child_id"})
-error_child_metadata = Metadata(primary_keys=["child_id"], column_list=["parent_id", "child_id"], id_columns={"child_id"})
+parent_metadata = Metadata(
+    primary_keys=["parent_id"], column_list=["parent_id"], id_columns={"parent_id"}
+)
+error_parent_metadata = Metadata(
+    primary_keys=["parent_id"], column_list=["parent_id"], id_columns={"foo"}
+)
+child_metadata = Metadata(
+    primary_keys=["child_id"],
+    column_list=["parent_id", "child_id"],
+    id_columns={"parent_id", "child_id"},
+)
+error_child_metadata = Metadata(
+    primary_keys=["child_id"], column_list=["parent_id", "child_id"], id_columns={"child_id"}
+)
+
 
 @pytest.mark.parametrize(
     "parent_table, parent_metadata, child_table, child_metadata, foreign_keys, exception",
@@ -44,23 +55,16 @@ error_child_metadata = Metadata(primary_keys=["child_id"], column_list=["parent_
             "parent",
             parent_metadata,
             [KeyTuple("parent_id", "parent_id")],
-            RelationshipInitError
+            RelationshipInitError,
         ),
-        (
-            "parent",
-            parent_metadata,
-            "parent",
-            parent_metadata,
-            [],
-            RelationshipInitError
-        ),
+        ("parent", parent_metadata, "parent", parent_metadata, [], RelationshipInitError),
         (
             "",
             parent_metadata,
             "child",
             child_metadata,
             [KeyTuple("parent_id", "parent_id")],
-            RelationshipInitError
+            RelationshipInitError,
         ),
         (
             "parent",
@@ -68,7 +72,7 @@ error_child_metadata = Metadata(primary_keys=["child_id"], column_list=["parent_
             "",
             child_metadata,
             [KeyTuple("parent_id", "parent_id")],
-            RelationshipInitError
+            RelationshipInitError,
         ),
         (
             "",
@@ -76,16 +80,9 @@ error_child_metadata = Metadata(primary_keys=["child_id"], column_list=["parent_
             "",
             child_metadata,
             [KeyTuple("parent_id", "parent_id")],
-            RelationshipInitError
+            RelationshipInitError,
         ),
-        (
-            "",
-            parent_metadata,
-            "",
-            child_metadata,
-            [],
-            RelationshipInitError
-        ),
+        ("", parent_metadata, "", child_metadata, [], RelationshipInitError),
     ],
 )
 def test_build(parent_table, parent_metadata, child_table, child_metadata, foreign_keys, exception):
@@ -118,9 +115,15 @@ def test_save_and_load(tmpdir):
     save_file = tmpdir / "relationship.json"
     relationship = Relationship.build(
         parent_table="parent",
-        parent_metadata=Metadata(primary_keys=["parent_id"], column_list=["parent_id"], id_columns={"parent_id"}),
+        parent_metadata=Metadata(
+            primary_keys=["parent_id"], column_list=["parent_id"], id_columns={"parent_id"}
+        ),
         child_table="child",
-        child_metadata=Metadata(primary_keys=["child_id"], column_list=["parent_id", "child_id"], id_columns={"parent_id", "child_id"}),
+        child_metadata=Metadata(
+            primary_keys=["child_id"],
+            column_list=["parent_id", "child_id"],
+            id_columns={"parent_id", "child_id"},
+        ),
         foreign_keys=[KeyTuple("parent_id", "parent_id")],
     )
 

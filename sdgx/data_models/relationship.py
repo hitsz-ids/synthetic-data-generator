@@ -8,6 +8,7 @@ from typing import Any, Iterable, List, Union
 from pydantic import BaseModel
 
 from sdgx.exceptions import RelationshipInitError
+
 # from sdgx.data_models.metadata import Metadata
 
 KeyTuple = namedtuple("KeyTuple", ["parent", "child"])
@@ -27,10 +28,10 @@ class Relationship(BaseModel):
     # table names with metadata
     parent_table: str
     parent_metadata: Metadata
-    
+
     child_table: str
     child_metadata: Metadata
-    
+
     foreign_keys: List[KeyTuple]
     """
     foreign keys.
@@ -77,7 +78,7 @@ class Relationship(BaseModel):
                     raise RelationshipInitError("type of foreign key in parent table is not id")
                 if key[1] not in child_metadata.id_columns:
                     raise RelationshipInitError("type of foreign key in child table is not id")
-            else: # if load from json file, Metadata is a dict
+            else:  # if load from json file, Metadata is a dict
                 if key[0] not in parent_metadata["id_columns"]:
                     raise RelationshipInitError("type of foreign key in parent table is not id")
                 if key[1] not in child_metadata["id_columns"]:
