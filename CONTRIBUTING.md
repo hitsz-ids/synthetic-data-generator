@@ -4,27 +4,27 @@
 
 The following is a list of technologies involved in this project.
 
-| Technology               | Category           | Purpose                                                      |
-| ------------------------ | ------------------ | ------------------------------------------------------------ |
-| PyTorch (>=2)            | Deep Learning      | Mainstream deep learning framework providing dynamic computation graphs and automatic differentiation. Used for: - Building and training generative models like VAE - GPU-accelerated model training - Implementing custom neural network layers and loss functions - Model saving and loading |
-| NumPy (<2)               | Deep Learning      | Fundamental scientific computing library with version constraint for stability. Used for: - Efficient multi-dimensional array operations - Data preprocessing and feature engineering - Numerical computation and statistical analysis - Data interchange with other scientific libraries |
-| SciPy                    | Deep Learning      | Advanced scientific computing toolkit built on NumPy. Used for: - Advanced statistical analysis and hypothesis testing - Probability distribution calculation and random number generation - Optimization algorithms - Sparse matrix operations and linear algebra computations |
-| Pandas                   | Deep Learning      | Powerful data analysis and manipulation library. Used for: - Structured data I/O - Data cleaning and preprocessing - Complex data transformation and aggregation - Time series data handling |
-| scikit-learn (>=0.24,<2) | Deep Learning      | Machine learning algorithm toolkit. Used for: - Data preprocessing and feature scaling - Model evaluation and cross-validation - Feature selection and dimensionality reduction - ML model benchmarking |
-| Faker (>=10)             | Data Generation    | Multi-language fake data generation library. Used for: - Test dataset generation - System testing with mock data - Example data generation - Custom data generation rule support |
-| Matplotlib               | Data Evaluation    | Comprehensive plotting library. Used for: - Training process visualization - Data distribution and statistical plotting - Model evaluation visualization - Report and documentation graphics |
-| table-evaluator          | Data Evaluation    | Specialized tabular data evaluation tool. Used for: - Statistical comparison between real and synthetic data - Data generation quality assessment - Data quality reporting - Distribution comparison visualization |
-| PyArrow                  | Data Processing    | High-performance data processing library. Used for: - Fast I/O for large-scale data - Memory-efficient data processing - Integration with big data tools - Columnar data format handling |
-| OpenAI (>=1.10.0)        | AI Integration     | OpenAI API client. Used for: - Large language model integration - Natural language processing tasks - AI-assisted data generation - Intelligent feature engineering |
-| Pydantic (>=2)           | Data Processing    | Data validation and settings management framework. Used for: - Type-safe configuration loading - API data validation - Model parameter validation - Data schema definition and verification |
-| python-dotenv            | Configuration      | Environment variable management tool. Used for: - Sensitive configuration management - Environment-specific config handling - Development and production environment separation - API key and credential management |
-| loguru                   | Logging            | Modern logging utility. Used for: - Training process logging - Error tracking and debugging - Performance monitoring - Structured log output |
-| cloudpickle              | Data Processing    | Enhanced Python object serialization tool. Used for: - Model serialization and deserialization - Complex Python object persistence - Data transfer in distributed computing - Intermediate result caching |
-| pluggy                   | Plugin System      | Python plugin framework. Used for: - Implementing extensible architecture - Managing model and processor plugins - Supporting custom component integration - Implementing modular design |
-| joblib (>=1.4.0)         | Parallel Computing | Parallel computing support library. Used for: - Data processing parallelization - CPU-intensive task optimization - Result caching - Parallel model training |
-| importlib_metadata       | Data Processing    | Package metadata access tool. Used for: - Plugin discovery and loading - Package version management - Runtime package information retrieval - Dynamic feature loading |
-| Click                    | CLI Tools          | Command-line interface framework. Used for: - Building CLI tools - Parameter parsing and validation - Subcommand management - User interaction interface |
-| PyYAML                   | Data Processing    | YAML format parsing tool. Used for: - Configuration file I/O - Model parameter management - Experiment configuration management - Data processing pipeline configuration |
+| Technology                | Category           | Purpose                                                                                                                                                                                                                                                                                        |
+| ------------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| PyTorch (>=2)             | Deep Learning      | Mainstream deep learning framework providing dynamic computation graphs and automatic differentiation. Used for: - Building and training generative models like VAE - GPU-accelerated model training - Implementing custom neural network layers and loss functions - Model saving and loading |
+| NumPy (\<2)               | Deep Learning      | Fundamental scientific computing library with version constraint for stability. Used for: - Efficient multi-dimensional array operations - Data preprocessing and feature engineering - Numerical computation and statistical analysis - Data interchange with other scientific libraries      |
+| SciPy                     | Deep Learning      | Advanced scientific computing toolkit built on NumPy. Used for: - Advanced statistical analysis and hypothesis testing - Probability distribution calculation and random number generation - Optimization algorithms - Sparse matrix operations and linear algebra computations                |
+| Pandas                    | Deep Learning      | Powerful data analysis and manipulation library. Used for: - Structured data I/O - Data cleaning and preprocessing - Complex data transformation and aggregation - Time series data handling                                                                                                   |
+| scikit-learn (>=0.24,\<2) | Deep Learning      | Machine learning algorithm toolkit. Used for: - Data preprocessing and feature scaling - Model evaluation and cross-validation - Feature selection and dimensionality reduction - ML model benchmarking                                                                                        |
+| Faker (>=10)              | Data Generation    | Multi-language fake data generation library. Used for: - Test dataset generation - System testing with mock data - Example data generation - Custom data generation rule support                                                                                                               |
+| Matplotlib                | Data Evaluation    | Comprehensive plotting library. Used for: - Training process visualization - Data distribution and statistical plotting - Model evaluation visualization - Report and documentation graphics                                                                                                   |
+| table-evaluator           | Data Evaluation    | Specialized tabular data evaluation tool. Used for: - Statistical comparison between real and synthetic data - Data generation quality assessment - Data quality reporting - Distribution comparison visualization                                                                             |
+| PyArrow                   | Data Processing    | High-performance data processing library. Used for: - Fast I/O for large-scale data - Memory-efficient data processing - Integration with big data tools - Columnar data format handling                                                                                                       |
+| OpenAI (>=1.10.0)         | AI Integration     | OpenAI API client. Used for: - Large language model integration - Natural language processing tasks - AI-assisted data generation - Intelligent feature engineering                                                                                                                            |
+| Pydantic (>=2)            | Data Processing    | Data validation and settings management framework. Used for: - Type-safe configuration loading - API data validation - Model parameter validation - Data schema definition and verification                                                                                                    |
+| python-dotenv             | Configuration      | Environment variable management tool. Used for: - Sensitive configuration management - Environment-specific config handling - Development and production environment separation - API key and credential management                                                                            |
+| loguru                    | Logging            | Modern logging utility. Used for: - Training process logging - Error tracking and debugging - Performance monitoring - Structured log output                                                                                                                                                   |
+| cloudpickle               | Data Processing    | Enhanced Python object serialization tool. Used for: - Model serialization and deserialization - Complex Python object persistence - Data transfer in distributed computing - Intermediate result caching                                                                                      |
+| pluggy                    | Plugin System      | Python plugin framework. Used for: - Implementing extensible architecture - Managing model and processor plugins - Supporting custom component integration - Implementing modular design                                                                                                       |
+| joblib (>=1.4.0)          | Parallel Computing | Parallel computing support library. Used for: - Data processing parallelization - CPU-intensive task optimization - Result caching - Parallel model training                                                                                                                                   |
+| importlib_metadata        | Data Processing    | Package metadata access tool. Used for: - Plugin discovery and loading - Package version management - Runtime package information retrieval - Dynamic feature loading                                                                                                                          |
+| Click                     | CLI Tools          | Command-line interface framework. Used for: - Building CLI tools - Parameter parsing and validation - Subcommand management - User interaction interface                                                                                                                                       |
+| PyYAML                    | Data Processing    | YAML format parsing tool. Used for: - Configuration file I/O - Model parameter management - Experiment configuration management - Data processing pipeline configuration                                                                                                                       |
 
 ## Core Process Diagram
 
@@ -38,25 +38,25 @@ sequenceDiagram
     participant DataProcessor
     participant Model
     participant Evaluator
-    
+
     User->>DataConnector: create_connector()
     DataConnector-->>DataLoader: connector
     User->>DataLoader: load_data()
     DataLoader->>Metadata: from_dataloader()
-    
+
     User->>Synthesizer: fit(metadata)
     Synthesizer->>DataProcessor: convert(data)
     DataProcessor-->>Synthesizer: processed_data
     Synthesizer->>Model: fit(metadata, processed_data)
     Model-->>Synthesizer: trained_model
-    
-    User->>Synthesizer: sample(n_samples) 
+
+    User->>Synthesizer: sample(n_samples)
     Synthesizer->>Model: generate()
     Model-->>Synthesizer: synthetic_data
     Synthesizer->>DataProcessor: reverse_convert(synthetic_data)
     DataProcessor-->>Synthesizer: restored_data
     Synthesizer-->>User: restored_data
-    
+
     User->>Evaluator: evaluate(real_data, restored_data)
     Evaluator-->>User: evaluation_results
 ```
@@ -76,13 +76,13 @@ graph TB
 
     subgraph Core["SDG Core Library"]
         direction TB
-        
+
         subgraph DataEngine["Data Engine Layer"]
             DataLoader["DataLoader<br/>Data Loader"]
             Metadata["Metadata<br/>Metadata Management"]
             ProcessedData["ProcessedData<br/>Unified Data Format"]
         end
-        
+
         subgraph Processing["Processing Layer"]
             Inspector["Inspector<br/>Data Inspector"]
             Processor["Processor<br/>Data Processor"]
@@ -91,14 +91,14 @@ graph TB
         end
 
         Synthesizer["Synthesizer<br/>Data Synthesizer"]
-        
+
         subgraph Models["Model Layer"]
             Traditional["Traditional Models"]
             LLM["LLM Models"]
-            
+
             Traditional --GAN Network--> CTGAN
             Traditional --Gaussian Copula--> GaussianCopula
-            
+
             LLM --No Data Generation--> Synthesis["Data Synthesis"]
         end
 
@@ -114,7 +114,7 @@ graph TB
         Inspector --Inspection Results--> Processor
         Processor --Processed Data--> Transformer
         Transformer --Transformed Features--> Formatter
-        
+
         %% Synthesizer Relations
         Metadata --Metadata Config--> Synthesizer
         Formatter --Normalized Data--> Synthesizer
@@ -155,7 +155,7 @@ flowchart TB
     subgraph SDGProcess[SDG Main Process]
         direction TB
         CLI[CLI Interface] --> Synthesizer
-        
+
         subgraph DataAccess[Data Access Layer]
             DataConnector[Data Connector]
             DataLoader[Data Loader]
@@ -163,16 +163,16 @@ flowchart TB
             ProcessedData[Processed Data]
             ConnectorManager[Connector Manager]
         end
-        
+
         subgraph DataProcessing[Data Processing Layer]
             Inspector[Inspector]
-            Processor[Data Processor] 
+            Processor[Data Processor]
             Transformer[Data Transformer]
             Formatter[Data Formatter]
             Sampler[Data Sampler]
             ProcessorManager[Processor Manager]
         end
-        
+
         subgraph ModelLayer[Model Layer]
             ModelManager[Model Manager]
             CTGAN[CTGAN Model]
@@ -190,7 +190,7 @@ flowchart TB
 graph TB
     subgraph SDGPackages["SDG Package Structure"]
         direction TB
-        
+
         subgraph Core["sdgx"]
             DataModels["data_models<br/>(Metadata and Data Processing)"]
             Models["models<br/>(Synthesis Model Implementation)"]
@@ -218,7 +218,7 @@ graph TB
     DataConnectors --Uses--> DataModels
     CLI --Uses--> Models
     CLI --Uses--> DataConnectors
-    
+
     %% Infrastructure Dependencies
     Models --Deep Learning--> PyTorch
     Models --LLM--> OpenAI
@@ -244,7 +244,7 @@ graph TB
         subgraph Container[Docker Container]
             SDGX1["SDGX Service"]
         end
-        
+
         subgraph PythonRuntime[Python Environment]
             SDGX2["SDGX Package"]
             PyTorch["PyTorch >= 2.0"]
@@ -293,8 +293,6 @@ sequenceDiagram
         Model->>User: Return Generated Results
     end
 ```
-
-
 
 # Development Guide
 
@@ -382,4 +380,3 @@ Please provide a detailed explanation of the logic and implementation of the fol
 2. Analyze each method in the class, explaining its functionality and parameters.
 3. Explain any important algorithms or design patterns used in the class.
 ```
-
