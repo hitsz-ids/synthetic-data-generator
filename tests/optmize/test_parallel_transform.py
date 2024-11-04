@@ -19,7 +19,7 @@ warnings.showwarning = custom_warning_handler
 
 def preparing_data():
     # Same code with CTGAN prefit.
-    dataset_csv = './data_for_test_parallel_transform.csv'
+    dataset_csv = "./data_for_test_parallel_transform.csv"
     data_connector = CsvConnector(path=dataset_csv)
     data_loader = DataLoader(data_connector)
     data_metadata = Metadata.from_dataloader(data_loader)
