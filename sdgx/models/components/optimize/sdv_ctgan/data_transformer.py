@@ -7,6 +7,7 @@ from collections import namedtuple
 import numpy as np
 import pandas as pd
 from joblib import Parallel, delayed
+from tqdm import autonotebook as tqdm
 
 from sdgx.data_loader import DataLoader
 from sdgx.models.components.optimize.ndarray_loader import NDArrayLoader
@@ -104,7 +105,7 @@ class DataTransformer(object):
 
         self._column_raw_dtypes = data_loader[: data_loader.chunksize].infer_objects().dtypes
         self._column_transform_info_list = []
-        for column_name in data_loader.columns():
+        for column_name in tqdm.tqdm(data_loader.columns(), desc="Preparing data", delay=3):
             if column_name in discrete_columns:
                 logger.debug(f"Fitting discrete column {column_name}...")
                 column_transform_info = self._fit_discrete(data_loader[[column_name]])
@@ -177,7 +178,9 @@ class DataTransformer(object):
             p = Parallel(n_jobs=-1, return_as="generator")
 
         loader = NDArrayLoader()
-        for ndarray in p(processes):
+        for ndarray in tqdm.tqdm(
+            p(processes), desc="Transforming data", total=len(processes), delay=3
+        ):
             loader.store(ndarray.astype(float))
         return loader
 
@@ -218,7 +221,9 @@ class DataTransformer(object):
         st = 0
         recovered_column_data_list = []
         column_names = []
-        for column_transform_info in self._column_transform_info_list:
+        for column_transform_info in tqdm.tqdm(
+            self._column_transform_info_list, desc="Inverse transforming", delay=3
+        ):
             dim = column_transform_info.output_dimensions
             column_data = data[:, st : st + dim]
             if column_transform_info.column_type == "continuous":

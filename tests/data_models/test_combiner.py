@@ -7,6 +7,7 @@ from sdgx.data_connectors.csv_connector import CsvConnector
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.combiner import MetadataCombiner
 from sdgx.data_models.inspectors.base import RelationshipInspector
+from sdgx.data_models.metadata import Metadata
 from sdgx.data_models.relationship import Relationship
 
 
@@ -26,7 +27,13 @@ def test_from_dataloader(demo_relational_table_path, tmp_path):
     dl_b = DataLoader(CsvConnector(path=table_b_path))
     relationship = Relationship.build(
         parent_table=dl_a.identity,
+        parent_metadata=Metadata(primary_keys=["id"], column_list=["id"], id_columns={"id"}),
         child_table=dl_b.identity,
+        child_metadata=Metadata(
+            primary_keys=["child_id"],
+            column_list=["child_id", "foreign_id"],
+            id_columns={"child_id", "foreign_id"},
+        ),
         foreign_keys=pairs,
     )
 
@@ -52,7 +59,13 @@ def test_from_dataframe(demo_relational_table_path, tmp_path):
     table_a_path, table_b_path, pair = demo_relational_table_path
     relationship = Relationship.build(
         parent_table="table_a",
+        parent_metadata=Metadata(primary_keys=["id"], column_list=["id"], id_columns={"id"}),
         child_table="table_b",
+        child_metadata=Metadata(
+            primary_keys=["child_id"],
+            column_list=["child_id", "foreign_id"],
+            id_columns={"child_id", "foreign_id"},
+        ),
         foreign_keys=pair,
     )
 
@@ -84,7 +97,13 @@ def test_custom_build_from_dataloaders(demo_relational_table_path, tmp_path):
     dl_b = DataLoader(CsvConnector(path=table_b_path))
     relationship = Relationship.build(
         parent_table=dl_a.identity,
+        parent_metadata=Metadata(primary_keys=["id"], column_list=["id"], id_columns={"id"}),
         child_table=dl_b.identity,
+        child_metadata=Metadata(
+            primary_keys=["child_id"],
+            column_list=["child_id", "foreign_id"],
+            id_columns={"child_id", "foreign_id"},
+        ),
         foreign_keys=pairs,
     )
     combiner = MetadataCombiner.from_dataloader(
@@ -94,7 +113,15 @@ def test_custom_build_from_dataloaders(demo_relational_table_path, tmp_path):
         relationships_inspector_kwargs=dict(
             dummy_data=Relationship.build(
                 parent_table="balaP",
+                parent_metadata=Metadata(
+                    primary_keys=["balabala"], column_list=["balabala"], id_columns={"balabala"}
+                ),
                 child_table="balaC",
+                child_metadata=Metadata(
+                    primary_keys=["child_id"],
+                    column_list=["balabala", "child_id"],
+                    id_columns={"balabala", "child_id"},
+                ),
                 foreign_keys=["balabala"],
             )
         ),
@@ -115,7 +142,13 @@ def test_custom_build_from_dataframe(demo_relational_table_path, tmp_path):
     table_a_path, table_b_path, pair = demo_relational_table_path
     relationship = Relationship.build(
         parent_table="table_a",
+        parent_metadata=Metadata(primary_keys=["id"], column_list=["id"], id_columns={"id"}),
         child_table="table_b",
+        child_metadata=Metadata(
+            primary_keys=["child_id"],
+            column_list=["child_id", "foreign_id"],
+            id_columns={"child_id", "foreign_id"},
+        ),
         foreign_keys=pair,
     )
     tb_a = pd.read_csv(table_a_path)
@@ -129,7 +162,15 @@ def test_custom_build_from_dataframe(demo_relational_table_path, tmp_path):
         relationships_inspector_kwargs=dict(
             dummy_data=Relationship.build(
                 parent_table="balaP",
+                parent_metadata=Metadata(
+                    primary_keys=["balabala"], column_list=["balabala"], id_columns={"balabala"}
+                ),
                 child_table="balaC",
+                child_metadata=Metadata(
+                    primary_keys=["child_id"],
+                    column_list=["balabala", "child_id"],
+                    id_columns={"balabala", "child_id"},
+                ),
                 foreign_keys=["balabala"],
             )
         ),
