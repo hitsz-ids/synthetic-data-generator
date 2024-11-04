@@ -1,5 +1,6 @@
 import os
 import warnings
+
 import numpy as np
 
 from sdgx.data_connectors.csv_connector import CsvConnector
@@ -69,7 +70,7 @@ def find_not_matching_column_type(data, column_transform_info_list):
     for column_transform_info in column_transform_info_list:
         output_dim = column_transform_info.output_dimensions
         if column_transform_info.column_type == "discrete":
-            arr = data[:, col_index: col_index + output_dim]
+            arr = data[:, col_index : col_index + output_dim]
             # if bug occurred, the arr is switched as continuous
             print(
                 f"Filter not one-hot data for column {column_transform_info.column_name}: ",
@@ -86,6 +87,7 @@ def test_parallel_transform_fixed_not_columns_switching():
     )
 
     find_not_matching_column_type(ndarry_loader, transformer._column_transform_info_list)
+
 
 # def test_parallel_transform_unfixed_caused_columns_switching():
 #     unfixed_transformer, unfixed_data_loader = preparing_data()
