@@ -23,3 +23,4 @@
 10k14t0a: 48157 lines, 44 columns, 304 dims, 82.7s train time, 10.18s sample 1000 time, 85.53s sample 10000 time, 
 10k14t5a: 48157 lines, 114 columns, 851 dims, 235.09s train time, 18.47s sample 1000 time, 153.1s sample 10000 time, 
 1k14t5a: 3556 lines, 114 columns, 738 dims, 36.14s train time, 7.29s sample 1000 time, 83.63s sample 10000 time, 
+1k14t0a: 3556 lines, 44 columns, 271 dims, 16.01s train time, 4.36s sample 1000 time, eva 1000 mean: 0.7917, ks: 0.90347,cs: 0.67993, evatime: 0.32, 

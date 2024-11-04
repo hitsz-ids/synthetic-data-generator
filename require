@@ -1,3 +1,10 @@
+syndiff的依赖
+
+appdirs~=1.4.4
+types-appdirs~=1.4.3.5
+flake8-pyproject~=1.2.3
+==================
+
 "table-evaluator"  sdmetrics~=0.8.1
 
 conda install pytorch torchvision torchaudio cpuonly -c pytorch
