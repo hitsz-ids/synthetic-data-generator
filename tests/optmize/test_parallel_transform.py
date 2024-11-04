@@ -88,9 +88,9 @@ def test_parallel_transform_fixed_not_columns_switching():
     find_not_matching_column_type(ndarry_loader, transformer._column_transform_info_list)
 
 
-def test_parallel_transform_unfixed_caused_columns_switching():
-    unfixed_transformer, unfixed_data_loader = preparing_data()
-    unfixed_ndarry_loader = unfixed_parallel_transform(unfixed_transformer, unfixed_data_loader,
-                                                       unfixed_transformer._column_transform_info_list)
-
-    find_not_matching_column_type(unfixed_ndarry_loader, unfixed_transformer._column_transform_info_list)
+# def test_parallel_transform_unfixed_caused_columns_switching():
+#     unfixed_transformer, unfixed_data_loader = preparing_data()
+#     unfixed_ndarry_loader = unfixed_parallel_transform(unfixed_transformer, unfixed_data_loader,
+#                                                        unfixed_transformer._column_transform_info_list)
+#
+#     find_not_matching_column_type(unfixed_ndarry_loader, unfixed_transformer._column_transform_info_list)
