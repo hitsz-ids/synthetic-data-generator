@@ -14,18 +14,22 @@ from sdgx.models.components.sdv_rdt.transformers import OneHotEncoder
 def preparing_data():
     fake = faker.Faker()
     data = [
-        (i,
-         random.choice("abcdefg"),
-         (random.random() - 0.5) * 1000,
-         fake.name(),
-         fake.date_between(start_date='today', end_date='+1y'),
-         (random.random() - 0.5) * 1000,
-         fake.sentence(nb_words=3)
-         ) for i in range(1000)]
+        (
+            i,
+            random.choice("abcdefg"),
+            (random.random() - 0.5) * 1000,
+            fake.name(),
+            fake.date_between(start_date="today", end_date="+1y"),
+            (random.random() - 0.5) * 1000,
+            fake.sentence(nb_words=3),
+        )
+        for i in range(1000)
+    ]
     df = pd.DataFrame(data, columns=["id", "grade", "num2", "author", "date", "num", "title"])
 
     def gen_func():
         yield df.copy()
+
     connector = GeneratorConnector(gen_func)
     data_metadata = Metadata.from_dataframe(df)
     dl = DataLoader(connector)
@@ -39,9 +43,10 @@ def find_not_matching_column_type_onehot(data, column_transform_info_list):
     col_index = 0
     for column_transform_info in column_transform_info_list:
         output_dim = column_transform_info.output_dimensions
-        if (column_transform_info.column_type == "discrete" and
-                isinstance(column_transform_info.transform, OneHotEncoder)):
-            arr = data[:, col_index: col_index + output_dim]
+        if column_transform_info.column_type == "discrete" and isinstance(
+            column_transform_info.transform, OneHotEncoder
+        ):
+            arr = data[:, col_index : col_index + output_dim]
             # if bug occurred, the arr is switched as continuous
             print(
                 f"Filter not one-hot data for column {column_transform_info.column_name}: ",
