@@ -171,7 +171,6 @@ class DataTransformer(object):
                 process = delayed(self._transform_discrete)(column_transform_info, data)
             processes.append(process)
 
-        # TODO This method has bug, which are deprecated. Time to find a better method instead.
         # try:
         #     # For Future versions of joblib
         #     p = Parallel(n_jobs=-1, return_as="generator_unordered")
