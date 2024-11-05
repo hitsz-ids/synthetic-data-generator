@@ -20,8 +20,10 @@
 # 🚀 Synthetic Data Generator
 
 <p style="font-size: small;">Switch Language:
-    <a href="https://github.com/hitsz-ids/synthetic-data-generator/blob/main/README_ZH_CN.md" target="_blank">简体中文</a> &nbsp;| &nbsp;Latest
-    <a href="https://synthetic-data-generator.readthedocs.io/en/latest/" target="value">API Docs</a>&nbsp;| &nbsp; Join <a href="assets/live_QR_code.jpg" target="value">Wechat Group</a>
+    <a href="https://github.com/hitsz-ids/synthetic-data-generator/blob/main/README_ZH_CN.md" target="_blank">简体中文</a> &nbsp;| &nbsp;
+    Latest <a href="https://synthetic-data-generator.readthedocs.io/en/latest/" target="value">API Docs</a> &nbsp;| &nbsp;
+    <a href="ROADMAP.md" target="value">Roadmap</a> &nbsp;| &nbsp;
+    Join <a href="assets/live_QR_code.jpg" target="value">Wechat Group</a>
 </p>
 
 <p style="font-size: small;">
