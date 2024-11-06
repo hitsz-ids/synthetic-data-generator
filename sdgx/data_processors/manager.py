@@ -98,6 +98,7 @@ class DataProcessorManager(Manager):
         self._load_dir(data_processors.generators)
         self._load_dir(data_processors.samplers)
         self._load_dir(data_processors.transformers)
+        self._load_dir(data_processors.filter)
 
     def init_data_processor(self, processor_name, **kwargs: dict[str, Any]) -> DataProcessor:
         """
