@@ -2,7 +2,6 @@ import pytest
 
 from sdgx.models.ml.single_table.ctgan import CTGANSynthesizerModel
 from sdgx.synthesizer import Synthesizer
-from tests.conftest import demo_single_table_data_pos_neg_metadata
 
 
 @pytest.fixture
