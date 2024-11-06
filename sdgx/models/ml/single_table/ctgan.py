@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import time
 from pathlib import Path
+from typing import List
 
 import numpy as np
 import pandas as pd
@@ -519,26 +520,38 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
 
         return (loss * m).sum() / data.size()[0]
 
-    def _filter_discrete_columns(self, train_data, discrete_columns):
-        """ """
-        if isinstance(train_data, pd.DataFrame):
-            invalid_columns = set(discrete_columns) - set(train_data.columns)
-        elif isinstance(train_data, np.ndarray):
-            invalid_columns = []
-            for column in discrete_columns:
-                if column < 0 or column >= train_data.shape[1]:
-                    invalid_columns.append(column)
-        elif isinstance(train_data, list):
-            invalid_columns = set(discrete_columns) - set(train_data)
-        else:
-            raise TypeError("``train_data`` should be either pd.DataFrame or np.array.")
+    def _filter_discrete_columns(self, train_data: List[str], discrete_columns: List[str]):
+        """
+        We filter PII Column here, which PII would only be discrete for now.
+        As PII would be generating from PII Generator which not synthetic from model.
 
-        rest_discrete_columns = set(discrete_columns) - set(invalid_columns)
+        Besides we need to figure it out when to stop model fitting:
+        The original data consists entirely of discrete column data, and all of this discrete column data is PII.
 
-        if len(rest_discrete_columns) == 0:
+        For `train_data`, there are three possibilities for the columns type.
+         - train_data = valid_discrete + valid_continue
+         - train_data = valid_continue
+         - train_data = valid_discrete
+
+        For `discrete_columns`, discrete_columns = invalid_discrete(PII) + valid_discrete
+
+        Thus, valid_discrete = discrete_columns - invalid_discrete
+                             = discrete_columns - Set.intersection(train_data, discrete_columns)
+
+        Thus, original_data_is_all_PII: discrete_columns is not empty & train_data is empty
+        """
+        # Discrete_columns is empty - simple an empty list, but we need to continue fitting continue columns
+        if len(discrete_columns) == 0:
+            return discrete_columns
+
+        # Discrete_columns is not empty - check if train_data is empty for stop model fitting
+        if len(train_data) == 0:
             self.fit_data_empty = True
+            return discrete_columns
 
-        return rest_discrete_columns
+        # Filter valid discrete columns
+        invalid_columns = set(discrete_columns) - set(train_data)
+        return set(discrete_columns) - set(invalid_columns)
 
     def _validate_discrete_columns(self, train_data, discrete_columns):
         """Check whether ``discrete_columns`` exists in ``train_data``.
