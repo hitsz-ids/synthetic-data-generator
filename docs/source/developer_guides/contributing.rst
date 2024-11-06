@@ -1,3 +1,11 @@
+Overview
+========
+
+In
+`CONTRIBUTING <https://github.com/hitsz-ids/synthetic-data-generator/blob/main/CONTRIBUTING.md>`__,
+there are some Overview diagrams, refer to them for details.
+
+
 Contributing guides
 ==================================================
 

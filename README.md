@@ -42,6 +42,8 @@ Synthetic data does not contain any sensitive information, yet it retains the es
 
 High-quality synthetic data can be safely utilized across various domains including data sharing, model training and debugging, system development and testing, etc.
 
+We are excited to have you here and look forward to your contributions, get started with the project through this [Contributing Overview Guide](CONTRIBUTING.md)!
+
 ## 💥News
 
 Our current key achievements and timelines are as follows:
