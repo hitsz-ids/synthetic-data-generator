@@ -22,7 +22,9 @@
 
 <p style="font-size: small;">切换语言:
     <a href="https://github.com/hitsz-ids/synthetic-data-generator/blob/main/README.md" target="_blank">English</a> &nbsp;| &nbsp;最新
-    <a href="https://synthetic-data-generator.readthedocs.io/en/latest/" target="value">API文档</a>&nbsp;| &nbsp; 加入 <a href="assets/live_QR_code.jpg" target="value">Wechat群组</a>
+    <a href="https://synthetic-data-generator.readthedocs.io/en/latest/" target="value">API文档</a>&nbsp;| &nbsp;
+     <a href="ROADMAP_ZH_CN.md" target="value">项目发展规划</a> &nbsp;| &nbsp;
+    加入 <a href="assets/live_QR_code.jpg" target="value">Wechat群组</a>
   </p>
 
 <p style="font-size: small;">
