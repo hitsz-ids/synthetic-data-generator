@@ -1,7 +1,5 @@
 import os
 
-import numpy as np
-
 os.environ["SDG_NDARRAY_CACHE_ROOT"] = "/tmp/sdgx/ndarray_cache"
 
 import random
