@@ -31,35 +31,42 @@ class DiscreteTransformer(Transformer):
         reverse_convert(processed_data: pd.DataFrame) -> pd.DataFrame: Reverse the one-hot encoding process to get the original data.
     """
 
-    discrete_columns: list = []
+    discrete_columns: list
     """
     Record which columns are of discrete type.
     """
 
-    one_hot_warning_cnt = 512
+    one_hot_warning_cnt: int
     """
     The warning count for one-hot encoding.
     If the number of new columns after one-hot encoding exceeds this count, a warning message will be issued.
     """
 
-    one_hot_encoders: dict = {}
+    one_hot_encoders: dict
     """
     A dictionary that stores the OneHotEncoder objects for each discrete column.
     The keys are the column names, and the values are the corresponding OneHotEncoder objects.
     """
 
-    one_hot_column_names: dict = {}
+    one_hot_column_names: dict
     """
     A dictionary that stores the new column names after one-hot encoding for each discrete column.
     The keys are the column names, and the values are lists of new column names.
     """
 
-    onehot_encoder_handle_unknown: str = "ignore"
+    onehot_encoder_handle_unknown: str
     """
     The parameter to handle unknown categories in the OneHotEncoder.
     If set to 'ignore', new categories will be ignored.
     If set to 'error', an error will be raised when new categories are encountered.
     """
+
+    def __init__(self):
+        self.discrete_columns = []
+        self.one_hot_warning_cnt = 512
+        self.one_hot_encoders = {}
+        self.one_hot_column_names = {}
+        self.onehot_encoder_handle_unknown = "ignore"
 
     def fit(self, metadata: Metadata, tabular_data: DataLoader | pd.DataFrame):
         """

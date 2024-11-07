@@ -24,10 +24,13 @@ class ColumnOrderTransformer(Transformer):
         rearrange_columns(column_list, processed_data): Rearranges the columns of a DataFrame according to the provided column list.
     """
 
-    column_list: list = None
+    column_list: list
     """
     The list of tabular data's columns.
     """
+
+    def __init__(self):
+        self.column_list = None
 
     def fit(self, metadata: Metadata | None = None, **kwargs: dict[str, Any]):
         """

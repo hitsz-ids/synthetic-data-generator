@@ -25,25 +25,31 @@ class PositiveNegativeFilter(Filter):
         negative_columns (set): A set of column names that should contain negative values.
     """
 
-    int_columns: set = set()
+    int_columns: set
     """
     A set of column names that contain integer values.
     """
 
-    float_columns: set = set()
+    float_columns: set
     """
     A set of column names that contain float values.
     """
 
-    positive_columns: set = set()
+    positive_columns: set
     """
     A set of column names that are identified as containing positive numeric values.
     """
 
-    negative_columns: set = set()
+    negative_columns: set
     """
     A set of column names that are identified as containing negative numeric values.
     """
+
+    def __init__(self):
+        self.int_columns = set()
+        self.float_columns = set()
+        self.positive_columns = set()
+        self.negative_columns = set()
 
     def fit(self, metadata: Metadata | None = None, **kwargs: dict[str, Any]):
         """
