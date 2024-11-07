@@ -15,10 +15,13 @@ class IntValueFormatter(Formatter):
     Formatter class for handling Int values in pd.DataFrame.
     """
 
-    int_columns: set = set()
+    int_columns: set
     """
     List of column names that are of type int, populated by the fit method using metadata.
     """
+
+    def __init__(self):
+        self.int_columns = set()
 
     def fit(self, metadata: Metadata | None = None, **kwargs: dict[str, Any]):
         """
@@ -64,9 +67,6 @@ class IntValueFormatter(Formatter):
         logger.info("Data reverse-converted by IntValueFormatter.")
 
         return processed_data
-
-    def clear(self):
-        self.int_columns = set()
 
 
 @hookimpl

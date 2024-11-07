@@ -33,23 +33,28 @@ class NumericValueTransformer(Transformer):
     If False, the data will not be scaled.
     """
 
-    int_columns: Set = set()
+    int_columns: Set
     """
     A set of column names that are of integer type.
     These columns will be considered for scaling if `standard_scale` is True.
     """
 
-    float_columns: Set = set()
+    float_columns: Set
     """
     A set of column names that are of float type.
     These columns will be considered for scaling if `standard_scale` is True.
     """
 
-    scalers: Dict = {}
+    scalers: Dict
     """
     A dictionary of scalers for each numeric column.
     The keys are the column names and the values are the corresponding scalers.
     """
+
+    def __init__(self):
+        self.int_columns = set()
+        self.float_columns = set()
+        self.scalers = {}
 
     def fit(
         self,

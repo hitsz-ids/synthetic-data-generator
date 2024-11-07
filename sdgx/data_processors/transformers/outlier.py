@@ -21,25 +21,31 @@ class OutlierTransformer(Transformer):
         float_outlier_fill_value (float): The value to fill in for outliers in float columns. Default is 0.
     """
 
-    int_columns: set = set()
+    int_columns: set
     """
     set: A set of column names that contain integer values. These columns will have their outliers replaced by `int_outlier_fill_value`.
     """
 
-    int_outlier_fill_value = 0
+    int_outlier_fill_value: int
     """
     int: The value to fill in for outliers in integer columns. Default is 0.
     """
 
-    float_columns: set = set()
+    float_columns: set
     """
     set: A set of column names that contain float values. These columns will have their outliers replaced by `float_outlier_fill_value`.
     """
 
-    float_outlier_fill_value = float(0)
+    float_outlier_fill_value: float
     """
     float: The value to fill in for outliers in float columns. Default is 0.
     """
+
+    def __init__(self):
+        self.int_columns = set()
+        self.int_outlier_fill_value = 0
+        self.float_columns = set()
+        self.float_outlier_fill_value = float(0)
 
     def fit(self, metadata: Metadata | None = None, **kwargs: dict[str, Any]):
         """
@@ -120,12 +126,6 @@ class OutlierTransformer(Transformer):
         logger.info("Data reverse-converted by OutlierTransformer (No Action).")
 
         return processed_data
-
-    def clear(self):
-        self.int_columns = set()
-        self.int_outlier_fill_value = 0
-        self.float_columns = set()
-        self.float_outlier_fill_value = float(0)
 
 
 @hookimpl

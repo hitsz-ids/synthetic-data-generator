@@ -16,10 +16,6 @@ class DataProcessor:
 
     fitted = False
 
-    def clear(self):
-        """Clear the data carried by the processor itself."""
-        pass
-
     def check_fitted(self):
         """Check if the processor is fitted.
 

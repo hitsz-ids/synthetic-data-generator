@@ -29,11 +29,14 @@ class EmptyTransformer(Transformer):
             Reverses the conversion by restoring the previously removed empty columns.
     """
 
-    empty_columns: set = set()
+    empty_columns: set
     """
     Set of column names that are identified as empty. This attribute is populated during the fitting process
     and is used to remove these columns during the conversion process and restore them during the reverse conversion process.
     """
+
+    def __init__(self):
+        self.empty_columns = set()
 
     def fit(self, metadata: Metadata | None = None, **kwargs: dict[str, Any]):
         """
@@ -98,9 +101,6 @@ class EmptyTransformer(Transformer):
         logger.info("Data reverse-converted by EmptyTransformer.")
 
         return processed_data
-
-    def clear(self):
-        self.empty_columns = set()
 
 
 @hookimpl
