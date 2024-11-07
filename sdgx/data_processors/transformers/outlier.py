@@ -51,6 +51,7 @@ class OutlierTransformer(Transformer):
             metadata (Metadata | None): The metadata object containing column type information.
             **kwargs: Additional keyword arguments.
         """
+        _clear(self)
         # int columns
         for each_col in metadata.int_columns:
             if each_col not in metadata.column_list:
@@ -120,6 +121,13 @@ class OutlierTransformer(Transformer):
         logger.info("Data reverse-converted by OutlierTransformer (No Action).")
 
         return processed_data
+
+
+def _clear(self):
+    self.int_columns = set()
+    self.int_outlier_fill_value = 0
+    self.float_columns = set()
+    self.float_outlier_fill_value = float(0)
 
 
 @hookimpl

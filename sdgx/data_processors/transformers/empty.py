@@ -47,6 +47,7 @@ class EmptyTransformer(Transformer):
         Returns:
             None
         """
+        _clear(self)
         for each_col in metadata.get("empty_columns"):
             if metadata.get_column_data_type(each_col) == "empty":
                 self.empty_columns.add(each_col)
@@ -98,6 +99,10 @@ class EmptyTransformer(Transformer):
         logger.info("Data reverse-converted by EmptyTransformer.")
 
         return processed_data
+
+
+def _clear(self):
+    self.empty_columns = set()
 
 
 @hookimpl

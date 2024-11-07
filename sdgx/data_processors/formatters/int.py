@@ -27,6 +27,7 @@ class IntValueFormatter(Formatter):
         Formatter need to use metadata to record which columns belong to the int type, and convert them back to the int type during post-processing.
         """
 
+        _clear(self)
         # get from metadata
         for each_col in metadata.int_columns:
             if each_col not in metadata.column_list:
@@ -64,6 +65,10 @@ class IntValueFormatter(Formatter):
         logger.info("Data reverse-converted by IntValueFormatter.")
 
         return processed_data
+
+
+def _clear(self):
+    self.int_columns = set()
 
 
 @hookimpl
