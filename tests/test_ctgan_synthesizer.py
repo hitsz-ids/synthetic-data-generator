@@ -85,9 +85,7 @@ def test_ctgan_synthesizer_with_pos_neg(
     metadata = demo_single_table_data_pos_neg_metadata
 
     # Train the CTGAN model
-    ctgan_synthesizer.fit(
-        demo_single_table_data_pos_neg_metadata, demo_single_table_data_pos_neg_loader
-    )
+    ctgan_synthesizer.fit(demo_single_table_data_pos_neg_metadata)
     sampled_data = ctgan_synthesizer.sample(1000)
 
     # Check each column
