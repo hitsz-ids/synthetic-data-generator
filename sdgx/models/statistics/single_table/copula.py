@@ -10,6 +10,9 @@ import sdgx.models.components.sdv_copulas as copulas
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.metadata import Metadata
 from sdgx.exceptions import NonParametricError, SynthesizerInitError
+from sdgx.models.components.optimize.sdv_copulas.data_transformer import (
+    StatisticDataTransformer,
+)
 from sdgx.models.components.sdv_copulas import multivariate
 from sdgx.models.components.sdv_ctgan.data_transformer import DataTransformer
 from sdgx.models.components.sdv_rdt.transformers import OneHotEncoder
@@ -138,7 +141,7 @@ class GaussianCopulaSynthesizer(StatisticSynthesizerModel):
         self.metadata = metadata
 
         # load the original transformer
-        self._transformer = DataTransformer()
+        self._transformer = StatisticDataTransformer()
 
         # self._transformer.fit(processed_data, self.metadata[0])
         self._transformer.fit(processed_data, self.discrete_cols)
