@@ -55,7 +55,6 @@ class DatetimeFormatter(Formatter):
         Formatter need to use metadata to record which columns belong to datetime type, and convert timestamp back to datetime type during post-processing.
         """
 
-        _clear(self)
         # get from metadata
         self.datetime_formats = metadata.get("datetime_format")
         datetime_columns = []
@@ -223,11 +222,10 @@ class DatetimeFormatter(Formatter):
 
         return result_data
 
-
-def _clear(self):
-    self.datetime_columns = []
-    self.datetime_formats = defaultdict(str)
-    self.dead_columns = []
+    def clear(self):
+        self.datetime_columns = []
+        self.datetime_formats = defaultdict(str)
+        self.dead_columns = []
 
 
 @hookimpl

@@ -68,7 +68,6 @@ class NonValueTransformer(Transformer):
         """
         Fit method for the transformer.
         """
-        _clear(self)
 
         logger.info("NonValueTransformer Fitted.")
 
@@ -160,15 +159,14 @@ class NonValueTransformer(Transformer):
 
     pass
 
-
-def _clear(self):
-    self.int_columns = set()
-    self.float_columns = set()
-    self.column_list = []
-    self.fill_na_value_int = 0
-    self.fill_na_value_float = 0.0
-    self.fill_na_value_default = "NAN_VALUE"
-    self.drop_na = False
+    def clear(self):
+        self.int_columns = set()
+        self.float_columns = set()
+        self.column_list = []
+        self.fill_na_value_int = 0
+        self.fill_na_value_float = 0.0
+        self.fill_na_value_default = "NAN_VALUE"
+        self.drop_na = False
 
 
 @hookimpl

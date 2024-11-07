@@ -294,6 +294,7 @@ class Synthesizer:
             logger.info("Fitting without dataloader.")
         start_time = time.time()
         for d in self.data_processors:
+            d.clear()
             if self.dataloader:
                 d.fit(metadata=metadata, tabular_data=self.dataloader)
             else:
