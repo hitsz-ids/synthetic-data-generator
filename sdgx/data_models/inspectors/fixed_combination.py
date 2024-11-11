@@ -53,27 +53,38 @@ class FixedCombinationInspector(Inspector):
                     self.fixed_combinations[column] = related_columns
 
         # 2. 处理字符串列
-        # 2. 处理字符串列
         string_columns = raw_data.columns
         if len(string_columns) > 0:
-            # 对每对字符串列检查是否存在一一对应关系
-            for col1 in string_columns:
-                for col2 in string_columns:
-                    if col1 >= col2:  # 避免重复检查
+            # 记录已经找到对应关系的列
+            matched_columns = set()
+
+            # 对每列寻找一个对应关系
+            for i, col1 in enumerate(string_columns):
+                # 如果当前列已经找到对应关系，跳过
+                if col1 in matched_columns:
+                    continue
+
+                # 只检查当前列之后的列
+                for col2 in string_columns[i + 1 :]:
+                    if col2 in matched_columns:  # 跳过已匹配的列
                         continue
 
                     # 检查两列的值是否一一对应
                     pairs = raw_data[[col1, col2]].dropna().drop_duplicates()
-                    if (pairs.groupby(col1)[col2].nunique() == 1).all() and (
-                        pairs.groupby(col2)[col1].nunique() == 1
-                    ).all():
-                        # 添加双向的固定关系
+                    if (
+                        len(pairs) > 0
+                        and (pairs.groupby(col1)[col2].nunique() == 1).all()
+                        and (pairs.groupby(col2)[col1].nunique() == 1).all()
+                    ):
+                        # 添加单向的固定关系
                         if col1 not in self.fixed_combinations:
                             self.fixed_combinations[col1] = set()
-                        if col2 not in self.fixed_combinations:
-                            self.fixed_combinations[col2] = set()
                         self.fixed_combinations[col1].add(col2)
-                        self.fixed_combinations[col2].add(col1)
+                        # 标记这两列已经匹配
+                        matched_columns.add(col1)
+                        matched_columns.add(col2)
+                        # 找到一个匹配就跳出内层循环
+                        break
 
         self.ready = True
 

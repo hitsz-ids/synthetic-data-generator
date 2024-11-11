@@ -52,7 +52,6 @@ def test_fixed_combination_handling_test_df(test_fixed_combination_data: pd.Data
         "D": {"A", "E", "B"},
         "E": {"A", "D", "B"},
         "categorical_one": {"categorical_two"},
-        "categorical_two": {"categorical_one"},
     }
 
     # Initialize the FixedCombinationTransformer.
@@ -73,7 +72,6 @@ def test_fixed_combination_handling_test_df(test_fixed_combination_data: pd.Data
         "D": {"A", "E", "B"},
         "E": {"A", "D", "B"},
         "categorical_one": {"categorical_two"},
-        "categorical_two": {"categorical_one"},
     }
 
     # Transform the DataFrame using the transformer.

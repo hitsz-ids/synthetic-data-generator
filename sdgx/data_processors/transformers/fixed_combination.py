@@ -121,9 +121,10 @@ class FixedCombinationTransformer(Transformer):
                     if len(related_vals) == 1:
                         value_mapping[base_val] = related_vals[0]
 
-                # save the mapping relationship
-                self.column_mappings[(base_col, related_col)] = value_mapping
-                logger.debug(f"Saved mapping relationship between {base_col} and {related_col}")
+                # Save when the mapping dictionary is non-empty and the reference column is not entirely NaN.
+                if value_mapping and not any(pd.isna(v) for v in value_mapping.values()):
+                    self.column_mappings[(base_col, related_col)] = value_mapping
+                    logger.debug(f"Saved mapping relationship between {base_col} and {related_col}")
 
         logger.info("Converting data using FixedCombinationTransformer... Finished.")
 
@@ -174,7 +175,6 @@ class FixedCombinationTransformer(Transformer):
             result_df[related_col] = replaced[related_col]
 
         logger.info("Reverse converting data using FixedCombinationTransformer... Finished.")
-
         return result_df
 
 

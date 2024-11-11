@@ -92,12 +92,12 @@ class PositiveNegativeFilter(Filter):
 
         # Check positive_columns
         for col in self.positive_columns:
-            if col in processed_data.columns:
+            if col in processed_data.columns and pd.api.types.is_numeric_dtype(processed_data[col]):
                 mask &= processed_data[col] >= 0
 
         # Check negative_columns
         for col in self.negative_columns:
-            if col in processed_data.columns:
+            if col in processed_data.columns and pd.api.types.is_numeric_dtype(processed_data[col]):
                 mask &= processed_data[col] <= 0
 
         # Apply the mask to filter the data
