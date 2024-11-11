@@ -37,7 +37,8 @@ def test_fixed_combination_handling_test_df(test_fixed_combination_data: pd.Data
     """
 
     metadata = Metadata.from_dataframe(test_fixed_combination_data)
-    assert metadata.get("fixed_combinations") == {
+    fixed_combinations = metadata.get("fixed_combinations")
+    assert fixed_combinations == {
         "A": {"E", "D", "B"},
         "B": {"A", "E", "D"},
         "D": {"A", "E", "B"},
