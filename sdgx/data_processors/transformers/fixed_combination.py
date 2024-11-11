@@ -1,7 +1,4 @@
 from __future__ import annotations
-
-from typing import Any
-
 import pandas as pd
 
 from sdgx.data_models.metadata import Metadata
@@ -26,24 +23,26 @@ class FixedCombinationTransformer(Transformer):
     A dictionary mapping column names to sets of column names that have fixed relationships with them.
     """
 
-    def fit(self, metadata: Metadata | None = None, **kwargs: dict[str, Any]):
-        """
-        Fit method for the transformer.
-
-        This method processes the metadata to identify columns that have fixed relationships.
-        It updates the internal state of the transformer with the columns and their corresponding fixed combinations.
-
+    def fit(self, metadata: Metadata, **kwargs):
+        """Fit the transformer and save the relationships between columns.
+    
         Args:
-            metadata (Metadata | None): The metadata object containing information about the columns and their fixed combinations.
-            **kwargs (dict[str, Any]): Additional keyword arguments.
-
-        Returns:
-            None
+            metadata (Metadata): Metadata object
         """
-        self.fixed_combinations = metadata.get("fixed_combinations")
-
-        logger.info("FixedCombinationTransformer Fitted.")
-
+        self.fixed_combinations = metadata.get("fixed_combinations", {})
+        self.column_ratios = {}  # New: Save the ratio relationships between columns
+    
+        # Calculate and save the ratio relationships between columns from the raw data
+        if "raw_data" in kwargs:
+            raw_data = kwargs["raw_data"]
+            for base_col, related_cols in self.fixed_combinations.items():
+                base_values = raw_data[base_col]
+                for related_col in related_cols:
+                    if related_col in raw_data.columns:
+                        # Calculate the ratio relationship (assuming a linear relationship)
+                        ratio = (raw_data[related_col] / base_values).mean()
+                        self.column_ratios[(base_col, related_col)] = ratio
+    
         self.fitted = True
 
     def convert(self, raw_data: pd.DataFrame) -> pd.DataFrame:
@@ -70,30 +69,27 @@ class FixedCombinationTransformer(Transformer):
 
         return processed_data
 
-    def reverse_convert(self, processed_data: pd.DataFrame) -> pd.DataFrame:
-        """
-        Reverse_convert method for the transformer.
-
-        This method restores the original columns that were removed during the conversion process.
-        It iterates over the columns identified for fixed combinations and adds them back to the DataFrame.
-
+    def reverse_convert(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Reverse convert data, reconstructing the removed fixed combination columns using saved ratio relationships.
+        
         Args:
-            processed_data (pd.DataFrame): The input DataFrame containing the processed data.
-
+            df (pd.DataFrame): Input DataFrame
+            
         Returns:
-            pd.DataFrame: A DataFrame with the original columns restored.
+            pd.DataFrame: DataFrame containing the reconstructed columns
         """
-        df_length = processed_data.shape[0]
-
-        for _, related_columns in self.fixed_combinations.items():
-            for related_column in related_columns:
-                each_fixed_col = [None for _ in range(df_length)]
-                each_fixed_df = pd.DataFrame({related_column: each_fixed_col})
-                processed_data = self.attach_columns(processed_data, each_fixed_df)
-
-        logger.info("Data reverse-converted by FixedCombinationTransformer.")
-
-        return processed_data
+        result_df = df.copy()
+        
+        for base_col, related_cols in self.fixed_combinations.items():
+            if base_col in df.columns:
+                base_data = df[base_col]
+                for related_col in related_cols:
+                    if related_col not in df.columns:
+                        # Reconstruct the column using the saved ratio relationship
+                        ratio = self.column_ratios.get((base_col, related_col), 2)  # Default value is 2
+                        result_df[related_col] = base_data * ratio
+        
+        return result_df
 
 
 @hookimpl
