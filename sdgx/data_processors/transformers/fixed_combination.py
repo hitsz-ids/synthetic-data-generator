@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import random
+
 import pandas as pd
 
 from sdgx.data_models.metadata import Metadata
@@ -24,9 +25,7 @@ class FixedCombinationTransformer(Transformer):
         super().__init__()  # Call the parent class's initialization method
         # Initialize the variable in the initialization method
 
-        self.fixed_combinations: dict[str, set[str]] = (
-            {}
-        ) 
+        self.fixed_combinations: dict[str, set[str]] = {}
         """
         A dictionary mapping column names to sets of column names that have fixed relationships with them.
         """
@@ -40,7 +39,6 @@ class FixedCombinationTransformer(Transformer):
         """
         A dictionary mapping tuples of column names to dictionaries of value mappings.
         """
-        
 
     def fit(self, metadata: Metadata, **kwargs):
         """Fit the transformer and save the relationships between columns.
@@ -57,7 +55,7 @@ class FixedCombinationTransformer(Transformer):
         for base_col, related_cols in self.fixed_combinations.items():
             # create a immutable set of base_col and related_cols
             combination = frozenset([base_col]) | frozenset(related_cols)
-            
+
             # if the combination has not been seen, add it to the simplified_fixed_combinations
             if combination not in seen:
                 simplified_fixed_combinations[base_col] = related_cols
@@ -95,40 +93,42 @@ class FixedCombinationTransformer(Transformer):
         """
 
         if self.has_column_mappings:
-            logger.info("Converting data using FixedCombinationTransformer... Finished (No action).")
+            logger.info(
+                "Converting data using FixedCombinationTransformer... Finished (No action)."
+            )
             return raw_data
-        
+
         logger.info("Converting data using FixedCombinationTransformer... ")
-        
+
         # iterate through all simplified fixed combination relationships
         for base_col, related_cols in self.simplified_fixed_combinations.items():
             if base_col not in raw_data.columns:
                 continue
-                
+
             # get the unique values of the base column
             base_values = raw_data[base_col].unique()
-            
+
             # process each related column
             for related_col in related_cols:
                 if related_col not in raw_data.columns:
                     continue
-                    
+
                 # creating a value mapping dictionary
                 value_mapping = {}
                 for base_val in base_values:
                     # create a value mapping dictionary
                     related_vals = raw_data[raw_data[base_col] == base_val][related_col].unique()
-                    if len(related_vals) == 1:  
+                    if len(related_vals) == 1:
                         value_mapping[base_val] = related_vals[0]
-                
+
                 # save the mapping relationship
                 self.column_mappings[(base_col, related_col)] = value_mapping
                 logger.debug(f"Saved mapping relationship between {base_col} and {related_col}")
-        
+
         logger.info("Converting data using FixedCombinationTransformer... Finished.")
 
         self.has_column_mappings = True
-        
+
         return raw_data
 
     def reverse_convert(self, processed_data: pd.DataFrame) -> pd.DataFrame:
@@ -136,7 +136,7 @@ class FixedCombinationTransformer(Transformer):
         Reverses the conversion process applied by the FixedCombinationTransformer.
 
         This method takes the processed DataFrame and uses the saved column mappings
-        to restore the original values based on the relationships defined during the 
+        to restore the original values based on the relationships defined during the
         conversion process. If a base value does not have a corresponding related value,
         a random base value is selected to ensure that the DataFrame remains consistent.
 
@@ -146,7 +146,7 @@ class FixedCombinationTransformer(Transformer):
         Returns:
             pd.DataFrame: The DataFrame with original values restored based on the defined mappings.
         """
-        
+
         result_df = processed_data.copy()
 
         logger.info("Reverse converting data using FixedCombinationTransformer...")
@@ -176,6 +176,7 @@ class FixedCombinationTransformer(Transformer):
         logger.info("Reverse converting data using FixedCombinationTransformer... Finished.")
 
         return result_df
+
 
 @hookimpl
 def register(manager):
