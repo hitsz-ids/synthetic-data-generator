@@ -34,36 +34,39 @@ class FixedCombinationInspector(Inspector):
     def fit(self, raw_data: pd.DataFrame, *args, **kwargs):
         """
         Fit the inspector to the raw data.
-        
+
         处理数值列和字符串列的固定组合关系:
         - 数值列: 通过协方差矩阵计算相关性
         - 字符串列: 通过值的一一对应关系判断
         """
         self.fixed_combinations = {}
-        
+
         # 1. 处理数值型列
-        numeric_columns = raw_data.select_dtypes(include=['int64','float64']).columns
+        numeric_columns = raw_data.select_dtypes(include=["int64", "float64"]).columns
         if len(numeric_columns) > 0:
             covariance_matrix = raw_data[numeric_columns].dropna().cov()
             for column in covariance_matrix.columns:
-                related_columns = set(covariance_matrix.index[covariance_matrix[column].abs() > 0.9])
+                related_columns = set(
+                    covariance_matrix.index[covariance_matrix[column].abs() > 0.9]
+                )
                 related_columns.discard(column)
                 if related_columns:
                     self.fixed_combinations[column] = related_columns
-        
+
         # 2. 处理字符串列
-        string_columns = raw_data.select_dtypes(include=['object', 'string']).columns
+        string_columns = raw_data.select_dtypes(include=["object", "string"]).columns
         if len(string_columns) > 0:
             # 对每对字符串列检查是否存在一一对应关系
             for col1 in string_columns:
                 for col2 in string_columns:
                     if col1 >= col2:  # 避免重复检查
                         continue
-                        
+
                     # 检查两列的值是否一一对应
                     pairs = raw_data[[col1, col2]].dropna().drop_duplicates()
-                    if (pairs.groupby(col1)[col2].nunique() == 1).all() and \
-                       (pairs.groupby(col2)[col1].nunique() == 1).all():
+                    if (pairs.groupby(col1)[col2].nunique() == 1).all() and (
+                        pairs.groupby(col2)[col1].nunique() == 1
+                    ).all():
                         # 添加双向的固定关系
                         if col1 not in self.fixed_combinations:
                             self.fixed_combinations[col1] = set()
@@ -71,7 +74,7 @@ class FixedCombinationInspector(Inspector):
                             self.fixed_combinations[col2] = set()
                         self.fixed_combinations[col1].add(col2)
                         self.fixed_combinations[col2].add(col1)
-        
+
         self.ready = True
 
     def inspect(self, *args, **kwargs) -> dict[str, Any]:
