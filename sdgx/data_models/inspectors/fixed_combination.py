@@ -24,7 +24,7 @@ class FixedCombinationInspector(Inspector):
         """
         A dictionary mapping column names to sets of column names that have fixed relationships with them.
         """
-        
+
         self._inspect_level: int = 70
         """
         The inspection level for this inspector, set to 70. This attribute indicates the priority or depth of inspection that this inspector performs relative to other inspectors.
