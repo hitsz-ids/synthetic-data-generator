@@ -24,6 +24,12 @@ class FixedCombinationTransformer(Transformer):
     A dictionary mapping column names to sets of column names that have fixed relationships with them.
     """
 
+    def __init__(self):
+        super().__init__()  # Call the parent class's initialization method
+        self.fixed_combinations: dict[str, set[str]] = {}  # Initialize the variable in the initialization method
+        self.column_ratios = {}  # New: Save the ratio relationships between columns
+
+
     def fit(self, metadata: Metadata, **kwargs):
         """Fit the transformer and save the relationships between columns.
 

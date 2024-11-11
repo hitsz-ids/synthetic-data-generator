@@ -30,6 +30,7 @@ class FixedCombinationInspector(Inspector):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fixed_combinations = {} 
 
     def fit(self, raw_data: pd.DataFrame, *args, **kwargs):
         """
