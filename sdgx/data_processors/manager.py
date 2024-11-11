@@ -57,6 +57,7 @@ class DataProcessorManager(Manager):
         "ConstValueTransformer".lower(),
         "PositiveNegativeFilter".lower(),
         "EmptyTransformer".lower(),
+        "FixedCombinationTransformer".lower(),
         "ColumnOrderTransformer".lower(),
     ]
     """
