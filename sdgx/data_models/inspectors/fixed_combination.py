@@ -53,7 +53,7 @@ class FixedCombinationInspector(Inspector):
                     self.fixed_combinations[column] = related_columns
 
         # 2. 处理字符串列
-  # 2. 处理字符串列
+        # 2. 处理字符串列
         string_columns = raw_data.columns
         if len(string_columns) > 0:
             # 对每对字符串列检查是否存在一一对应关系
