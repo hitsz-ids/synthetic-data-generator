@@ -31,20 +31,26 @@ class DatetimeFormatter(Formatter):
         reverse_convert(processed_data: pd.DataFrame) -> pd.DataFrame: Converts timestamp columns in processed_data back to datetime format.
     """
 
-    datetime_columns: list = []
+    datetime_columns: list
     """
     List to store the columns that are of datetime type.
     """
 
-    datetime_formats: Dict = defaultdict(str)
+    datetime_formats: Dict
     """
     Dictionary to store the datetime formats for each column, with default value as an empty string.
     """
 
-    dead_columns: list = []
+    dead_columns: list
     """
     List to store columns that are no longer needed or to be removed.
     """
+
+    def __init__(self):
+        self.fitted = False
+        self.datetime_columns = []
+        self.datetime_formats = defaultdict(str)
+        self.dead_columns = []
 
     def fit(self, metadata: Metadata | None = None, **kwargs: dict[str, Any]):
         """

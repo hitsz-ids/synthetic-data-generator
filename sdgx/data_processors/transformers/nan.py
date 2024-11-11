@@ -24,37 +24,37 @@ class NonValueTransformer(Transformer):
         drop_na (bool): A flag indicating whether to drop rows with missing values. If True, rows with missing values are dropped. If False, missing values are filled with specified values. Default is False.
     """
 
-    int_columns: set = set()
+    int_columns: set
     """
     A set of column names that contain integer values.
     """
 
-    float_columns: set = set()
+    float_columns: set
     """
     A set of column names that contain float values.
     """
 
-    column_list: list = []
+    column_list: list
     """
     A list of all column names in the DataFrame.
     """
 
-    fill_na_value_int = 0
+    fill_na_value_int: int
     """
     The value to fill missing integer values with. Default is 0.
     """
 
-    fill_na_value_float = 0.0
+    fill_na_value_float: float
     """
     The value to fill missing float values with. Default is 0.0.
     """
 
-    fill_na_value_default = "NAN_VALUE"
+    fill_na_value_default: str
     """
     The value to fill missing values for non-numeric columns with. Default is 'NAN_VALUE'.
     """
 
-    drop_na = False
+    drop_na: bool
     """
     A boolean flag indicating whether to drop rows with missing values or fill them with `fill_na_value`.
 
@@ -64,10 +64,20 @@ class NonValueTransformer(Transformer):
     Currently, the default setting is False, which means rows with missing values are not dropped.
     """
 
+    def __init__(self):
+        self.int_columns = set()
+        self.float_columns = set()
+        self.column_list = []
+        self.fill_na_value_int = 0
+        self.fill_na_value_float = 0.0
+        self.fill_na_value_default = "NAN_VALUE"
+        self.drop_na = False
+
     def fit(self, metadata: Metadata | None = None, **kwargs: dict[str, Any]):
         """
         Fit method for the transformer.
         """
+
         logger.info("NonValueTransformer Fitted.")
 
         for key, value in kwargs.items():

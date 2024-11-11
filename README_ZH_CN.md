@@ -22,7 +22,9 @@
 
 <p style="font-size: small;">切换语言:
     <a href="https://github.com/hitsz-ids/synthetic-data-generator/blob/main/README.md" target="_blank">English</a> &nbsp;| &nbsp;最新
-    <a href="https://synthetic-data-generator.readthedocs.io/en/latest/" target="value">API文档</a>&nbsp;| &nbsp; 加入 <a href="assets/live_QR_code.jpg" target="value">Wechat群组</a>
+    <a href="https://synthetic-data-generator.readthedocs.io/en/latest/" target="value">API文档</a>&nbsp;| &nbsp;
+     <a href="ROADMAP_ZH_CN.md" target="value">项目发展规划</a> &nbsp;| &nbsp;
+    加入 <a href="assets/live_QR_code.jpg" target="value">Wechat群组</a>
   </p>
 
 <p style="font-size: small;">
@@ -42,6 +44,8 @@
 合成数据（Synthetic Data）不包含任何敏感信息，但它保留了原始数据的基本特性，使其免于GDPR和ADPPA等隐私法规的约束，消除实际应用中的隐私泄露风险。
 
 高质量的合成数据可以安全、多样化地在各种领域中使用，包括数据共享、模型训练和调试、系统开发和测试等应用。
+
+我们很期待您的贡献，请通过这个[贡献概述指南](CONTRIBUTING_ZH_CN.md)开始项目！
 
 ## 💥 相关信息
 

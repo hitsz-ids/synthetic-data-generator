@@ -20,8 +20,10 @@
 # 🚀 Synthetic Data Generator
 
 <p style="font-size: small;">Switch Language:
-    <a href="https://github.com/hitsz-ids/synthetic-data-generator/blob/main/README_ZH_CN.md" target="_blank">简体中文</a> &nbsp;| &nbsp;Latest
-    <a href="https://synthetic-data-generator.readthedocs.io/en/latest/" target="value">API Docs</a>&nbsp;| &nbsp; Join <a href="assets/live_QR_code.jpg" target="value">Wechat Group</a>
+    <a href="https://github.com/hitsz-ids/synthetic-data-generator/blob/main/README_ZH_CN.md" target="_blank">简体中文</a> &nbsp;| &nbsp;
+    Latest <a href="https://synthetic-data-generator.readthedocs.io/en/latest/" target="value">API Docs</a> &nbsp;| &nbsp;
+    <a href="ROADMAP.md" target="value">Roadmap</a> &nbsp;| &nbsp;
+    Join <a href="assets/live_QR_code.jpg" target="value">Wechat Group</a>
 </p>
 
 <p style="font-size: small;">
@@ -41,6 +43,8 @@ The Synthetic Data Generator (SDG) is a specialized framework designed to genera
 Synthetic data does not contain any sensitive information, yet it retains the essential characteristics of the original data, making it exempt from privacy regulations such as GDPR and ADPPA.
 
 High-quality synthetic data can be safely utilized across various domains including data sharing, model training and debugging, system development and testing, etc.
+
+We are excited to have you here and look forward to your contributions, get started with the project through this [Contributing Overview Guide](CONTRIBUTING.md)!
 
 ## 💥News
 

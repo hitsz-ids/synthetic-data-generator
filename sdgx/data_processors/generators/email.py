@@ -29,9 +29,13 @@ class EmailGenerator(PIIGenerator):
         reverse_convert(processed_data: pd.DataFrame) -> pd.DataFrame: Reverses the conversion of the email addresses in the pd.DataFrame.
     """
 
-    email_columns_list: list = []
+    email_columns_list: list
 
-    fitted: bool = False
+    fitted: bool
+
+    def __init__(self):
+        self.email_columns_list = []
+        self.fitted = False
 
     def fit(self, metadata: Metadata | None = None, **kwargs: dict[str, Any]):
 

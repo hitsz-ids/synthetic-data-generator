@@ -71,6 +71,10 @@ class NumericInspector(Inspector):
         # Convert the column series to numeric values, coercing errors to NaN and dropping them
         numeric_values = pd.to_numeric(col_series, errors="coerce").dropna()
 
+        # If there are no numeric values, return False to avoid division by zero
+        if len(numeric_values) == 0:
+            return False
+
         # Count how many of the numeric values are integers
         int_cnt = (numeric_values == numeric_values.astype(int)).sum()
 
@@ -99,6 +103,10 @@ class NumericInspector(Inspector):
         """
         # Convert the column series to numeric values, coercing errors to NaN and dropping NaN values
         numeric_values = pd.to_numeric(col_series, errors="coerce").dropna()
+
+        # If there are no numeric values, return False to avoid division by zero
+        if len(numeric_values) == 0:
+            return False
 
         # Apply the comparison function to the numeric values and sum the results
         count = comparison_func(numeric_values).sum()
