@@ -1,7 +1,11 @@
-import pytest
 import pandas as pd
+import pytest
+
 from sdgx.data_models.metadata import Metadata
-from sdgx.data_processors.transformers.fixed_combination import FixedCombinationTransformer
+from sdgx.data_processors.transformers.fixed_combination import (
+    FixedCombinationTransformer,
+)
+
 
 @pytest.fixture
 def test_fixed_combination_data():

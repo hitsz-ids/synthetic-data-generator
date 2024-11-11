@@ -94,15 +94,18 @@ class FixedCombinationTransformer(Transformer):
                 base_data = df[base_col]
                 for related_col in related_cols:
                     if related_col in df.columns:
-                       
+
                         ratio = self.column_ratios.get((base_col, related_col), 2)  # 默认比例为2
                         original_values = base_data * ratio
                         result_df[related_col] = original_values
-                        logger.debug(f"Replaced values in column {related_col} using ratio {ratio} based on {base_col}.")
+                        logger.debug(
+                            f"Replaced values in column {related_col} using ratio {ratio} based on {base_col}."
+                        )
 
         logger.info("Reverse converting data using FixedCombinationTransformer... Finished.")
 
         return result_df
+
 
 @hookimpl
 def register(manager):
