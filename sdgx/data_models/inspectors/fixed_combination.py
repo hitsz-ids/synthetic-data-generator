@@ -18,19 +18,17 @@ class FixedCombinationInspector(Inspector):
         _inspect_level (int): The inspection level for this inspector, set to 70.
     """
 
-    fixed_combinations: dict[str, set[str]] = {}
-    """
-    A dictionary mapping column names to sets of column names that have fixed relationships with them.
-    """
-
-    _inspect_level = 70
-    """
-    The inspection level for this inspector, set to 70. This attribute indicates the priority or depth of inspection that this inspector performs relative to other inspectors.
-    """
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fixed_combinations = {}
+        self.fixed_combinations: dict[str, set[str]] = {}
+        """
+        A dictionary mapping column names to sets of column names that have fixed relationships with them.
+        """
+        
+        self._inspect_level: int = 70
+        """
+        The inspection level for this inspector, set to 70. This attribute indicates the priority or depth of inspection that this inspector performs relative to other inspectors.
+        """
 
     def fit(self, raw_data: pd.DataFrame, *args, **kwargs):
         """
