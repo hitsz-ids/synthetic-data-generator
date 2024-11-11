@@ -19,7 +19,7 @@ class FixedCombinationTransformer(Transformer):
         fixed_combinations (dict[str, set[str]]): A dictionary mapping column names to sets of column names that have fixed relationships with them.
     """
 
-    fixed_combinations: dict[str, set[str]] = {}
+    fixed_combinations: dict[str, set[str]]
     """
     A dictionary mapping column names to sets of column names that have fixed relationships with them.
     """
