@@ -57,50 +57,52 @@ class FixedCombinationTransformer(Transformer):
         """
         Convert method to handle columns with fixed combinations in the input data.
 
-        This method iterates over the columns identified for fixed combinations and removes them from the input DataFrame.
-        The removal is based on the columns specified during the fitting process.
+        保留所有列的数据，不删除任何列，以防止后续组件报错。
 
         Args:
             raw_data (pd.DataFrame): The input DataFrame containing the data to be processed.
 
         Returns:
-            pd.DataFrame: A DataFrame with the specified columns removed.
+            pd.DataFrame: The original DataFrame without any modifications.
         """
         processed_data = raw_data.copy()
 
-        logger.info("Converting data using FixedCombinationTransformer...")
+        logger.info("Converting data using FixedCombinationTransformer... 保留所有列的数据。")
 
-        for column, related_columns in self.fixed_combinations.items():
-            processed_data = self.remove_columns(processed_data, list(related_columns))
+        # If additional processing is needed during the conversion, it can be added here.
+        # For example, a marker column can be added to indicate which columns have fixed combination relationships.
 
         logger.info("Converting data using FixedCombinationTransformer... Finished.")
 
         return processed_data
 
     def reverse_convert(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Reverse convert data, reconstructing the removed fixed combination columns using saved ratio relationships.
+        """Reverse convert data by replacing the values of fixed combination columns using saved ratio relationships.
 
         Args:
             df (pd.DataFrame): Input DataFrame
 
         Returns:
-            pd.DataFrame: DataFrame containing the reconstructed columns
+            pd.DataFrame: DataFrame with the values of fixed combination columns replaced based on the saved ratios
         """
         result_df = df.copy()
+
+        logger.info("Reverse converting data using FixedCombinationTransformer...")
 
         for base_col, related_cols in self.fixed_combinations.items():
             if base_col in df.columns:
                 base_data = df[base_col]
                 for related_col in related_cols:
-                    if related_col not in df.columns:
-                        # Reconstruct the column using the saved ratio relationship
-                        ratio = self.column_ratios.get(
-                            (base_col, related_col), 2
-                        )  # Default value is 2
-                        result_df[related_col] = base_data * ratio
+                    if related_col in df.columns:
+                       
+                        ratio = self.column_ratios.get((base_col, related_col), 2)  # 默认比例为2
+                        original_values = base_data * ratio
+                        result_df[related_col] = original_values
+                        logger.debug(f"Replaced values in column {related_col} using ratio {ratio} based on {base_col}.")
+
+        logger.info("Reverse converting data using FixedCombinationTransformer... Finished.")
 
         return result_df
-
 
 @hookimpl
 def register(manager):

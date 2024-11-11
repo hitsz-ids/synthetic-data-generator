@@ -46,6 +46,7 @@ class DataProcessorManager(Manager):
     preset_defalut_processors = [
         p.lower()
         for p in [
+            "FixedCombinationTransformer",
             "NonValueTransformer",
             "OutlierTransformer",
             "EmailGenerator",
@@ -55,7 +56,6 @@ class DataProcessorManager(Manager):
         ]
     ] + [
         "ConstValueTransformer".lower(),
-        "FixedCombinationTransformer".lower(),
         "PositiveNegativeFilter".lower(),
         "EmptyTransformer".lower(),
         "ColumnOrderTransformer".lower(),
