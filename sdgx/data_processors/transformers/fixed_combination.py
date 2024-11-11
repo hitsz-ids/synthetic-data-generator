@@ -37,7 +37,7 @@ class FixedCombinationTransformer(Transformer):
         Args:
             metadata (Metadata): Metadata object
         """
-        self.fixed_combinations = metadata.get("fixed_combinations", {})
+        self.fixed_combinations = metadata.get("fixed_combinations")
         self.column_ratios = {}  # New: Save the ratio relationships between columns
 
         # Calculate and save the ratio relationships between columns from the raw data
