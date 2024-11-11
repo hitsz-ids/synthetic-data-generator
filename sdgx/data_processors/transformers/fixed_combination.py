@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 import pandas as pd
 
 from sdgx.data_models.metadata import Metadata
@@ -25,13 +26,13 @@ class FixedCombinationTransformer(Transformer):
 
     def fit(self, metadata: Metadata, **kwargs):
         """Fit the transformer and save the relationships between columns.
-    
+
         Args:
             metadata (Metadata): Metadata object
         """
         self.fixed_combinations = metadata.get("fixed_combinations", {})
         self.column_ratios = {}  # New: Save the ratio relationships between columns
-    
+
         # Calculate and save the ratio relationships between columns from the raw data
         if "raw_data" in kwargs:
             raw_data = kwargs["raw_data"]
@@ -42,7 +43,7 @@ class FixedCombinationTransformer(Transformer):
                         # Calculate the ratio relationship (assuming a linear relationship)
                         ratio = (raw_data[related_col] / base_values).mean()
                         self.column_ratios[(base_col, related_col)] = ratio
-    
+
         self.fitted = True
 
     def convert(self, raw_data: pd.DataFrame) -> pd.DataFrame:
@@ -71,24 +72,26 @@ class FixedCombinationTransformer(Transformer):
 
     def reverse_convert(self, df: pd.DataFrame) -> pd.DataFrame:
         """Reverse convert data, reconstructing the removed fixed combination columns using saved ratio relationships.
-        
+
         Args:
             df (pd.DataFrame): Input DataFrame
-            
+
         Returns:
             pd.DataFrame: DataFrame containing the reconstructed columns
         """
         result_df = df.copy()
-        
+
         for base_col, related_cols in self.fixed_combinations.items():
             if base_col in df.columns:
                 base_data = df[base_col]
                 for related_col in related_cols:
                     if related_col not in df.columns:
                         # Reconstruct the column using the saved ratio relationship
-                        ratio = self.column_ratios.get((base_col, related_col), 2)  # Default value is 2
+                        ratio = self.column_ratios.get(
+                            (base_col, related_col), 2
+                        )  # Default value is 2
                         result_df[related_col] = base_data * ratio
-        
+
         return result_df
 
 
