@@ -1,4 +1,4 @@
-# FixCombinationInspector
+# FixedCombinationInspector
 from __future__ import annotations
 
 from typing import Any
@@ -11,7 +11,7 @@ from sdgx.data_models.inspectors.extension import hookimpl
 
 class FixedCombinationInspector(Inspector):
     """
-    FixCombinationInspector is designed to identify columns in a DataFrame that have fixed relationships based on covariance.
+    FixedCombinationInspector is designed to identify columns in a DataFrame that have fixed relationships based on covariance.
 
     Attributes:
         fixed_combinations (dict[str, set[str]]): A dictionary mapping column names to sets of column names that have fixed relationships with them.
