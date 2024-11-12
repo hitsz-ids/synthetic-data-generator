@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import random
+from typing import Any
 
 import pandas as pd
 
@@ -40,7 +41,7 @@ class FixedCombinationTransformer(Transformer):
         A dictionary mapping tuples of column names to dictionaries of value mappings.
         """
 
-    def fit(self, metadata: Metadata, **kwargs):
+    def fit(self, metadata: Metadata | None = None, **kwargs: dict[str, Any]):
         """Fit the transformer and save the relationships between columns.
 
         Args:
@@ -51,6 +52,13 @@ class FixedCombinationTransformer(Transformer):
         # simplify the fixed_combinations, remove the symmetric and duplicate combinations
         simplified_fixed_combinations = {}
         seen = set()
+
+        if not isinstance(self.fixed_combinations, dict):
+            raise TypeError(
+                "fixed_combinations should be a dict, rather than {}".format(
+                    type(self.fixed_combinations).__name__
+                )
+            )
 
         for base_col, related_cols in self.fixed_combinations.items():
             # create a immutable set of base_col and related_cols

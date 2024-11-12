@@ -33,14 +33,20 @@ class FixedCombinationInspector(Inspector):
     def fit(self, raw_data: pd.DataFrame, *args, **kwargs):
         """
         Fit the inspector to the raw data.
-
-        处理数值列和字符串列的固定组合关系:
-        - 数值列: 通过协方差矩阵计算相关性
-        - 字符串列: 通过值的一一对应关系判断
+            Process fixed combinations of numerical and string columns:
+            Numerical Columns: Calculate correlation using the covariance matrix.
+            String Columns: Determine relationships based on one-to-one value mapping.
         """
         self.fixed_combinations = {}
+        self._fit_numeric_relationships(raw_data)
+        self._fit_one_to_one_relationships(raw_data)
+        self.ready = True
 
-        # 1. 处理数值型列
+    def _fit_numeric_relationships(self, raw_data: pd.DataFrame) -> None:
+        """
+        Calculate correlation using the covariance matrix.
+        """
+        # 1. Handle numeric relationships.
         numeric_columns = raw_data.select_dtypes(include=["int64", "float64"]).columns
         if len(numeric_columns) > 0:
             covariance_matrix = raw_data[numeric_columns].dropna().cov()
@@ -52,41 +58,46 @@ class FixedCombinationInspector(Inspector):
                 if related_columns:
                     self.fixed_combinations[column] = related_columns
 
-        # 2. 处理字符串列
+    def _fit_one_to_one_relationships(self, raw_data: pd.DataFrame) -> None:
+        """
+        Determine relationships based on one-to-one value mapping.
+        """
         string_columns = raw_data.columns
         if len(string_columns) > 0:
-            # 记录已经找到对应关系的列
+            # Pre-compute the number of unique values for each column. - (Col_Name, Count) ...
+            # Filter out potential PII columns and empty columns
+            # Prioritizing those with a smaller number of unique values for processing.
             matched_columns = set()
+            unique_counts = raw_data[string_columns].nunique(dropna=True)
+            filter_condition = (unique_counts < (raw_data.shape[0] * 0.9)) & (unique_counts != 0)
+            unique_counts = unique_counts[filter_condition]
+            sorted_columns = unique_counts.sort_values().index.tolist()
 
-            # 对每列寻找一个对应关系
-            for i, col1 in enumerate(string_columns):
-                # 如果当前列已经找到对应关系，跳过
+            # For each unmatched column, check if there is a one-to-one correspondence.
+            for i, col1 in enumerate(sorted_columns):
                 if col1 in matched_columns:
                     continue
-
-                # 只检查当前列之后的列
-                for col2 in string_columns[i + 1 :]:
-                    if col2 in matched_columns:  # 跳过已匹配的列
+                for col2 in sorted_columns[i + 1 :]:
+                    if col2 in matched_columns:
                         continue
+                    if unique_counts[col1] != unique_counts[col2]:
+                        continue
+                    # For the two columns of data:
+                    # 1. Remove the duplicate rows based on their combination
+                    # 2. And then check if there are any duplicate values in the remaining rows of both columns.
+                    pairs = raw_data[[col1, col2]].dropna()
+                    mapping_from_col = pairs.drop_duplicates(subset=[col1, col2])
+                    duplicates_in_col1 = mapping_from_col.duplicated(subset=col1, keep=False)
+                    duplicates_in_col2 = mapping_from_col.duplicated(subset=col2, keep=False)
 
-                    # 检查两列的值是否一一对应
-                    pairs = raw_data[[col1, col2]].dropna().drop_duplicates()
-                    if (
-                        len(pairs) > 0
-                        and (pairs.groupby(col1)[col2].nunique() == 1).all()
-                        and (pairs.groupby(col2)[col1].nunique() == 1).all()
-                    ):
-                        # 添加单向的固定关系
+                    # Save the relationships when both columns have no duplicate values.
+                    if not duplicates_in_col1.any() and not duplicates_in_col2.any():
                         if col1 not in self.fixed_combinations:
                             self.fixed_combinations[col1] = set()
                         self.fixed_combinations[col1].add(col2)
-                        # 标记这两列已经匹配
                         matched_columns.add(col1)
                         matched_columns.add(col2)
-                        # 找到一个匹配就跳出内层循环
                         break
-
-        self.ready = True
 
     def inspect(self, *args, **kwargs) -> dict[str, Any]:
         """Inspect raw data and generate metadata."""
