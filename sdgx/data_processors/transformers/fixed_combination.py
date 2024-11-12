@@ -83,6 +83,8 @@ class FixedCombinationTransformer(Transformer):
         to optimize performance.
 
         NOTE:
+            TODO-Enhance-Designed configuration interface. Use the user's configured Constrain if provided.
+            TODO-Enhance-Refactor Inspector by chain-of-responsibility, base one-to-one on Identified discrete_columns.
             The current implementation has space for optimization:
             - If column_mappings already exist, no recalculation is performed
             - The column_mappings definition depends on the first batch of data from the DataLoader
