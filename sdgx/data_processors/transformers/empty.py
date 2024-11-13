@@ -91,14 +91,13 @@ class EmptyTransformer(Transformer):
             pd.DataFrame: The DataFrame with previously removed empty columns restored.
         """
 
-        df_length = processed_data.shape[0]
+        if not self.fitted or not self.empty_columns:
+            return processed_data
 
-        for each_col_name in self.empty_columns:
-            each_empty_col = [None for _ in range(df_length)]
-            each_empty_df = pd.DataFrame({each_col_name: each_empty_col})
-            processed_data = self.attach_columns(processed_data, each_empty_df)
-
-        logger.info("Data reverse-converted by EmptyTransformer.")
+        for col_name in self.empty_columns:
+            # Create an empty column with the same number of rows as `processed_data`.
+            empty_df = pd.DataFrame({col_name: [None] * len(processed_data)})
+            processed_data = self.attach_columns(processed_data, empty_df)
 
         return processed_data
 
