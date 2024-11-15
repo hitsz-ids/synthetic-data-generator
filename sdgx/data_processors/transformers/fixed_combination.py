@@ -89,7 +89,7 @@ class FixedCombinationTransformer(Transformer):
             return
 
         # Check if exist fixed combinations, if not exist, needn't run this auto-detect transform.
-        self.fixed_combinations = metadata.get("fixed_combinations")
+        self.fixed_combinations = metadata.get("fixed_combinations") or dict()
         if not self.is_exist_fixed_combinations:
             logger.info(
                 "Fit data using FixedCombinationTransformer(not existed)... Finished (No action)."
