@@ -51,6 +51,19 @@ def test_metadata_primary_key(metadata: Metadata):
     assert metadata.primary_keys == set(["fnlwgt"])
 
 
+def test_metadata_primary_query_filed_tags():
+    metadata = Metadata()
+    metadata.set("id_columns", {"user_id"})
+    metadata.set("int_columns", {"user_id", "age"})
+
+    # query the "user_id" field tags
+    results = metadata.query("user_id")
+    results_list = list(results)
+    print(results_list)
+    assert "id_columns" in results_list
+    assert "int_columns" in results_list
+
+
 def test_metadata_check(metadata: Metadata):
     # For the example table, it does not contain a primary key
     # but it can be used in  single-table data synthetic tasks.
