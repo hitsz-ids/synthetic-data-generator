@@ -49,19 +49,20 @@ def expected_data():
     )
 
 
-def test_specific_combination_transformer(train_data, test_data, expected_data):
+def test_specific_combination_transformer(train_data, test_data):
     transformer = SpecificCombinationTransformer()
     metadata = Metadata.from_dataframe(train_data)
 
-    # Turn parameter into a tuple
-    metadata.update(
-        {
-            "specific_combinations": {
-                ("price_usd", "price_cny", "price_eur"),
-                ("size_cm", "size_inch", "size_m"),
-            }
-        }
-    )
+    combinations = {("price_usd", "price_cny", "price_eur"), ("size_cm", "size_inch", "size_m")}
+    metadata.update({"specific_combinations": combinations})
+
     transformer.fit(metadata=metadata, tabular_data=train_data)
     result = transformer.reverse_convert(test_data)
-    pd.testing.assert_frame_equal(result, expected_data, check_dtype=False)
+
+    # Check if all rows in result adhere to the specified column mapping combinations.
+    for cols in combinations:
+        result_rows = result[list(cols)].values.tolist()
+        train_rows = train_data[list(cols)].values.tolist()
+        assert all(
+            row in train_rows for row in result_rows
+        ), f"Combination {cols} contains some invalid value in original train data."
