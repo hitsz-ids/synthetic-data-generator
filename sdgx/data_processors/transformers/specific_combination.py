@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Dict, List, Set
 
+import numpy as np
 import pandas as pd
 
 from sdgx.data_loader import DataLoader
@@ -12,9 +13,6 @@ from sdgx.utils import logger
 
 
 class SpecificCombinationTransformer(Transformer):
-
-    # // TODO-2024/11/15 Optimize performance of reverse_convert()
-
     """
     A transformer used to handle specific combinations of columns in tabular data.
 
@@ -122,28 +120,16 @@ class SpecificCombinationTransformer(Transformer):
             return processed_data
 
         result_df = processed_data.copy()
+        n_rows = len(result_df)
 
+        # For each column-mapping groups, replace with random choice
+        # Here we random_indices for len(processed_data) from column-mapping and replaced processed_data.
         for group in self.column_groups:
             group_mapping = self.mappings[frozenset(group)]
             group_cols = list(group)
-
-            # Check and correct each row
-            for idx in range(len(result_df)):
-                row_values = result_df.loc[idx, group_cols].to_dict()
-
-                # Find the best matching row in the mapping table
-                best_match = None
-                max_matches = -1
-
-                for _, mapping_row in group_mapping.iterrows():
-                    matches = sum(row_values[col] == mapping_row[col] for col in group_cols)
-                    if matches > max_matches:
-                        max_matches = matches
-                        best_match = mapping_row
-
-                # Update the current row using the best match
-                if best_match is not None:
-                    result_df.loc[idx, group_cols] = best_match
+            random_indices = np.random.choice(len(group_mapping), size=n_rows)
+            random_mappings = group_mapping.iloc[random_indices]
+            result_df[group_cols] = random_mappings[group_cols].values
 
         return result_df
 
