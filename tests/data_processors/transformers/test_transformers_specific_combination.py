@@ -52,22 +52,16 @@ def expected_data():
 def test_specific_combination_transformer(train_data, test_data, expected_data):
     transformer = SpecificCombinationTransformer()
     metadata = Metadata.from_dataframe(train_data)
-    # TODO-2024/11/14 Here we should support a easy way to assign this param
-    # column_groups = [
-    #     ['price_usd', 'price_cny', 'price_eur'],
-    #     ['size_cm', 'size_inch', 'size_m']
-    # ]
-    # column_groups = tuple(column_groups)
 
     # Turn parameter into a tuple
-    price_group = tuple(["price_usd", "price_cny", "price_eur"])
-    size_group = tuple(["size_cm", "size_inch", "size_m"])
-    column_groups = {price_group, size_group}
-    metadata_dict = {"specific_combinations": column_groups}
-    metadata.update(metadata_dict)
-
-    metadata_dict = {"specific_combination": column_groups}
-    metadata.update(metadata_dict)
+    metadata.update(
+        {
+            "specific_combinations": {
+                ("price_usd", "price_cny", "price_eur"),
+                ("size_cm", "size_inch", "size_m"),
+            }
+        }
+    )
     transformer.fit(metadata=metadata, tabular_data=train_data)
     result = transformer.reverse_convert(test_data)
     pd.testing.assert_frame_equal(result, expected_data, check_dtype=False)
