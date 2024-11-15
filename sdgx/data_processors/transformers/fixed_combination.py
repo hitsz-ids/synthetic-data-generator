@@ -58,19 +58,20 @@ class FixedCombinationTransformer(Transformer):
     If true, needn't running this auto detect transform.
     """
 
-    is_exist_fixed_combinations: bool
-    """
-    A boolean that flag if inspector have inspected some fixed combinations.
-    If False, needn't running this auto detect transform.
-    """
-
     def __init__(self):
         super().__init__()
         self.fixed_combinations: dict[str, set[str]] = {}
         self.simplified_fixed_combinations: dict[str, set[str]] = {}
         self.column_mappings: dict[(str, str), dict[str, str]] = {}
         self.is_been_specified = False
-        self.is_exist_fixed_combinations = False
+
+    @property
+    def is_exist_fixed_combinations(self) -> bool:
+        """
+        A boolean that flag if inspector have inspected some fixed combinations.
+        If False, needn't running this auto detect transform.
+        """
+        return bool(self.fixed_combinations)
 
     def fit(self, metadata: Metadata | None = None, **kwargs: dict[str, Any]):
         """Fit the transformer and save the relationships between columns.
@@ -89,11 +90,10 @@ class FixedCombinationTransformer(Transformer):
 
         # Check if exist fixed combinations, if not exist, needn't run this auto-detect transform.
         self.fixed_combinations = metadata.get("fixed_combinations")
-        if self.fixed_combinations:
+        if not self.is_exist_fixed_combinations:
             logger.info(
                 "Fit data using FixedCombinationTransformer(not existed)... Finished (No action)."
             )
-            self.is_exist_fixed_combinations = False
             self.fitted = True
             return
 
@@ -119,7 +119,6 @@ class FixedCombinationTransformer(Transformer):
 
         self.simplified_fixed_combinations = simplified_fixed_combinations
         self.has_column_mappings = False
-        self.is_exist_fixed_combinations = True
         self.fitted = True
 
     def convert(self, raw_data: pd.DataFrame) -> pd.DataFrame:
