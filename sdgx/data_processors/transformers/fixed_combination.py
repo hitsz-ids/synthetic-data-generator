@@ -79,8 +79,7 @@ class FixedCombinationTransformer(Transformer):
             metadata (Metadata): Metadata object
         """
         # Check if exist specific combinations by user. If True, needn't run this auto-detect transform.
-        specific_combinations = metadata.get("specific_combinations")
-        if specific_combinations is not None and len(specific_combinations) > 0:
+        if metadata.get("specific_combinations"):
             logger.info(
                 "Fit data using FixedCombinationTransformer(been specified)... Finished (No action)."
             )
@@ -90,7 +89,7 @@ class FixedCombinationTransformer(Transformer):
 
         # Check if exist fixed combinations, if not exist, needn't run this auto-detect transform.
         self.fixed_combinations = metadata.get("fixed_combinations")
-        if self.fixed_combinations is not None and len(self.fixed_combinations) > 0:
+        if self.fixed_combinations:
             logger.info(
                 "Fit data using FixedCombinationTransformer(not existed)... Finished (No action)."
             )
