@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "sdgx"
 description = "synthetic-data-generator"
 keywords = ["synthetic data", "hitsz-ids"]
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 
 dependencies = [
     "pandas",
