@@ -1,4 +1,4 @@
-name: Testing docker image build
+name: Test docker image build
 
 on:
   pull_request:

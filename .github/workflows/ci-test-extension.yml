@@ -1,4 +1,4 @@
-name: Testing example extensions
+name: Test example extensions
 
 on:
   push:
