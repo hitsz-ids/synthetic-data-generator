@@ -1,20 +1,20 @@
 # 📝 TODO
 
-- [ ] **Feature**| Support multi-table data synthesis
 - [ ] **Feature**| Support more single-table data synthetic models
   - [ ] OCT-GAN Model
   - [ ] CTAB-GAN Model
   - [ ] Table-GAN Model
-  - [ ] TVAE Model
 
 # 🚧 Doing
 
-- [ ] **Enhance**| Automatic identification and handling of fixed relationships
-- [ ] **Docs**| Improved CONTRIBUTING documentation with 4+1 view and overview diagram
-- [ ] **Enhance**| Hundred Thousand Level Discrete Data supported Gaussian Copula
+- [ ] **Feature**| Support multi-table data synthesis
+- [ ] **Feature**| Support more single-table data synthetic models - TVAE Model
 
 # ✅ Done
 
+- [x] **Enhance**| Hundred Thousand Level Discrete Data supported Gaussian Copula
+- [x] **Docs**| Improved CONTRIBUTING documentation with 4+1 view and overview diagram
+- [x] **Enhance**| Automatic identification and handling of fixed relationships
 - [x] **Feature**| Support for single-table data synthesis based on CTGAN
 - [x] **Feature**| Support for single-table data synthesis based on GaussianCopula
 - [x] **Feature**| Support for single-table data synthesis without real data based on LLM
