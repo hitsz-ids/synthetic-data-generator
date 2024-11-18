@@ -15,31 +15,63 @@ class FixedCombinationTransformer(Transformer):
     """
     A transformer that handles columns with fixed combinations in a DataFrame.
 
-    This transformer identifies and processes columns that have fixed relationships (high covariance) in a given DataFrame.
-    It can remove these columns during the conversion process and restore them during the reverse conversion process.
+    This transformer goal to auto identifies and processes columns that have fixed relationships (high covariance) in
+    a given DataFrame.
 
-    Attributes:
-        fixed_combinations (dict[str, set[str]]): A dictionary mapping column names to sets of column names that have fixed relationships with them.
+    The relationships between columns include:
+      - Numerical function relationships: assess them based on covariance between the columns.
+      - Categorical mapping relationships: check for duplicate values for each column.
+
+    Note that we support one-to-one mappings between columns now, and each corresponding relationship will not
+    include duplicate columns.
+
+    For example:
+    we detect that,
+    1 numerical relationship: (key1, Value1, Value2)
+    3 one-to-one relationships: (key1, Key2) , (Category1, Category2)
+
+    | Key1 | Key2 | Category1 | Category2 | Value1 | Value2 |
+    | :--: | :--: | :-------: | :-------: | :----: | :----: |
+    |  1   |  A   |   1001   |   Apple   |   10   |   20   |
+    |  2   |  B   |   1002   | Broccoli  |   15   |   30   |
+    |  2   |  B   |   1001   |  Apple   |   20   |   20   |
+    """
+
+    fixed_combinations: dict[str, set[str]]
+    """
+    A dictionary mapping column names to sets of column names that have fixed relationships with them.
+    """
+
+    simplified_fixed_combinations: dict[str, set[str]]
+    """
+    A dictionary mapping column names to sets of column names that have fixed relationships with them.
+    """
+
+    column_mappings: dict[(str, str), dict[str, str]]
+    """
+    A dictionary mapping tuples of column names to dictionaries of value mappings.
+    """
+
+    is_been_specified: bool
+    """
+    A boolean that flag if exist specific combinations by user.
+    If true, needn't running this auto detect transform.
     """
 
     def __init__(self):
-        super().__init__()  # Call the parent class's initialization method
-        # Initialize the variable in the initialization method
-
+        super().__init__()
         self.fixed_combinations: dict[str, set[str]] = {}
-        """
-        A dictionary mapping column names to sets of column names that have fixed relationships with them.
-        """
-
         self.simplified_fixed_combinations: dict[str, set[str]] = {}
-        """
-        A dictionary mapping column names to sets of column names that have fixed relationships with them.
-        """
-
         self.column_mappings: dict[(str, str), dict[str, str]] = {}
+        self.is_been_specified = False
+
+    @property
+    def is_exist_fixed_combinations(self) -> bool:
         """
-        A dictionary mapping tuples of column names to dictionaries of value mappings.
+        A boolean that flag if inspector have inspected some fixed combinations.
+        If False, needn't running this auto detect transform.
         """
+        return bool(self.fixed_combinations)
 
     def fit(self, metadata: Metadata | None = None, **kwargs: dict[str, Any]):
         """Fit the transformer and save the relationships between columns.
@@ -47,9 +79,25 @@ class FixedCombinationTransformer(Transformer):
         Args:
             metadata (Metadata): Metadata object
         """
-        self.fixed_combinations = metadata.get("fixed_combinations")
+        # Check if exist specific combinations by user. If True, needn't run this auto-detect transform.
+        if metadata.get("specific_combinations"):
+            logger.info(
+                "Fit data using FixedCombinationTransformer(been specified)... Finished (No action)."
+            )
+            self.is_been_specified = True
+            self.fitted = True
+            return
 
-        # simplify the fixed_combinations, remove the symmetric and duplicate combinations
+        # Check if exist fixed combinations, if not exist, needn't run this auto-detect transform.
+        self.fixed_combinations = metadata.get("fixed_combinations") or dict()
+        if not self.is_exist_fixed_combinations:
+            logger.info(
+                "Fit data using FixedCombinationTransformer(not existed)... Finished (No action)."
+            )
+            self.fitted = True
+            return
+
+        # Simplify the fixed_combinations, remove the symmetric and duplicate combinations
         simplified_fixed_combinations = {}
         seen = set()
 
@@ -61,7 +109,7 @@ class FixedCombinationTransformer(Transformer):
             )
 
         for base_col, related_cols in self.fixed_combinations.items():
-            # create a immutable set of base_col and related_cols
+            # create an immutable set of base_col and related_cols
             combination = frozenset([base_col]) | frozenset(related_cols)
 
             # if the combination has not been seen, add it to the simplified_fixed_combinations
@@ -70,9 +118,7 @@ class FixedCombinationTransformer(Transformer):
                 seen.add(combination)
 
         self.simplified_fixed_combinations = simplified_fixed_combinations
-
         self.has_column_mappings = False
-
         self.fitted = True
 
     def convert(self, raw_data: pd.DataFrame) -> pd.DataFrame:
@@ -83,10 +129,8 @@ class FixedCombinationTransformer(Transformer):
         to optimize performance.
 
         NOTE:
-            TODO-Enhance-Designed configuration interface. Use the user's configured Constrain if provided.
             TODO-Enhance-Refactor Inspector by chain-of-responsibility, base one-to-one on Identified discrete_columns.
             The current implementation has space for optimization:
-            - If column_mappings already exist, no recalculation is performed
             - The column_mappings definition depends on the first batch of data from the DataLoader
             - This might miss some edge cases where column relationships are very comprehensive
               (e.g., some column correspondences might only appear in later batches)
@@ -101,6 +145,18 @@ class FixedCombinationTransformer(Transformer):
         Returns:
             pd.DataFrame: The processed DataFrame (unchanged in this implementation)
         """
+
+        if self.is_been_specified:
+            logger.info(
+                "Converting data using FixedCombinationTransformer(been specified)... Finished (No action)."
+            )
+            return raw_data
+
+        if not self.is_exist_fixed_combinations:
+            logger.info(
+                "Converting data using FixedCombinationTransformer(not existed)... Finished (No action)."
+            )
+            return raw_data
 
         if self.has_column_mappings:
             logger.info(
@@ -157,6 +213,17 @@ class FixedCombinationTransformer(Transformer):
         Returns:
             pd.DataFrame: The DataFrame with original values restored based on the defined mappings.
         """
+        if self.is_been_specified:
+            logger.info(
+                "Reverse converting data using FixedCombinationTransformer(been specified)... Finished (No action)."
+            )
+            return processed_data
+
+        if not self.is_exist_fixed_combinations:
+            logger.info(
+                "Reverse converting data using FixedCombinationTransformer(not existed)... Finished (No action)."
+            )
+            return processed_data
 
         result_df = processed_data.copy()
 
