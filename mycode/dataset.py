@@ -1,7 +1,7 @@
 from typing import NamedTuple, List, Tuple
 
 from mycode.multi_ctgan import MetaBuilder, MultiTableCTGAN
-from mycode.testcode.Xargs import x_args_type
+from mycode.testcode.Xargs import XArg
 
 
 class DatabaseTest:
@@ -17,7 +17,7 @@ class Database:
 
 
 class XMetaBuilder(MetaBuilder):
-    def __init__(self, x_args: x_args_type):
+    def __init__(self, x_args: XArg):
         super().__init__()
         self.x_args = x_args
 
@@ -25,7 +25,7 @@ class XMetaBuilder(MetaBuilder):
         x_args = self.x_args
 
         def remove_copy_tag(key: str):
-            index = key.find("_COPY")
+            index = key.find("_COPY")  # TODO 更换为常量COPY_NAME_SEPERATOR
             if index != -1:
                 return key[:index]
             else:
@@ -34,7 +34,7 @@ class XMetaBuilder(MetaBuilder):
         # datetime key
         escapes_columns = list(x_args.meta_datetime_escapes.copy())
         escapes_columns.extend(x_args.meta_time_escapes)
-        escape_key = [x[0] + MultiTableCTGAN.SEPERATOR + x[1] for x in set(escapes_columns)]
+        escape_key = [MultiTableCTGAN.column_name_encode(x[0], x[1]) for x in set(escapes_columns)]
         metadata.datetime_format = {
             key: "%Y-%m-%d" for key in metadata.datetime_columns if remove_copy_tag(key) not in escape_key
         }

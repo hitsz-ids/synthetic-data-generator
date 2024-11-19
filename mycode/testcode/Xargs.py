@@ -1,17 +1,25 @@
-from typing import NamedTuple, List, Tuple
+from typing import List, Tuple
 
-x_args_type = NamedTuple('x_args_type', [
-    ('x_table', List[str]),
-    ('x_key', List[str]),
-    ('x_how', List[str]),
-    ('meta_id_escapes', List[str]),
-    ('meta_datetime_escapes', List[Tuple[str, str]]),
-    ('meta_time_escapes', List[Tuple[str, str]])
-])
+from pydantic.dataclasses import dataclass
+
+
+@dataclass
+class XArg:
+    x_table: List[str]
+    x_key: List[str]
+    x_how: List[str]
+    meta_id_escapes: List[str]
+    meta_datetime_escapes: List[Tuple[str, str]]
+    meta_time_escapes: List[Tuple[str, str]]
+
+    def copy(self):
+        return XArg(
+            self.x_table, self.x_key, self.x_how,
+            self.meta_id_escapes, self.meta_datetime_escapes, self.meta_time_escapes)
 
 
 class XArgs:
-    tables_6 = x_args_type(
+    tables_6 = XArg(
         x_table=["BookLoan", "Book", "Library", "Student", "Enrollment", "Submission"],
         x_key=['book_id', "library_id", "student_id", "student_id", "student_id"],
         x_how=['inner' for _ in range(5)],
@@ -19,7 +27,7 @@ class XArgs:
         meta_datetime_escapes=[("Submission", "submission_date")],
         meta_time_escapes=[],
     )
-    tables_11 = x_args_type(
+    tables_11 = XArg(
         x_table=["BookLoan",
                  "Book", "Library", "Student",
                  "Enrollment", "Submission", "Course",
@@ -38,7 +46,7 @@ class XArgs:
         meta_time_escapes=[("Schedule", "time_slot")]
     )
 
-    tables_14 = x_args_type(
+    tables_14 = XArg(
         x_table=["BookLoan",
                  "Book", "Library", "Student",
                  "Enrollment", "Submission", "Course",

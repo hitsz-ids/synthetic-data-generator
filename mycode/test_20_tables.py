@@ -9,7 +9,7 @@ import pandas as pd
 import tqdm
 from pandas import DataFrame
 
-from mycode.testcode.Xargs import x_args_type
+from mycode.testcode.Xargs import XArg
 
 RELATIONSHIPS = {
     "Assignment": {
@@ -42,7 +42,7 @@ def remove_copy_tag(key: str):
         return key
 
 
-def build_sdv_metadata_from_origin_tables(added_origin: Dict[str, DataFrame], x_arg: x_args_type, path='./mycode/data_sqlite.db'):
+def build_sdv_metadata_from_origin_tables(added_origin: Dict[str, DataFrame], x_arg: XArg, path='./mycode/data_sqlite.db'):
     meta, otables = fetch_data_from_sqlite_filterx(x_arg, path)
     meta = meta.to_dict()
 
@@ -73,7 +73,7 @@ def build_sdv_metadata_from_origin_tables(added_origin: Dict[str, DataFrame], x_
 
 
 # from .dataset import x_args_type
-def fetch_data_from_sqlite_filterx(x_arg: x_args_type, path='./mycode/data_sqlite.db'):
+def fetch_data_from_sqlite_filterx(x_arg: XArg, path='./mycode/data_sqlite.db'):
     conn = sqlite3.connect(path)
     # query = "SELECT name FROM sqlite_master WHERE type='table';"
     # tables = pd.read_sql_query(query, conn)
