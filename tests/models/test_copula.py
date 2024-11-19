@@ -1,10 +1,7 @@
-from pathlib import Path
-
 import pandas as pd
 import pytest
 
-from sdgx.models.statistics.single_table.copula import GaussianCopulaSynthesizer
-from sdgx.utils import get_demo_single_table
+from sdgx.models.statistics.single_table.copula import GaussianCopulaSynthesizerModel
 
 
 @pytest.fixture
@@ -13,7 +10,7 @@ def dummy_data(dummy_single_table_path):
 
 
 def test_gaussian_copula(dummy_single_table_metadata, dummy_single_table_data_loader):
-    model = GaussianCopulaSynthesizer()
+    model = GaussianCopulaSynthesizerModel()
     model.fit(dummy_single_table_metadata, dummy_single_table_data_loader)
 
     sampled_data = model.sample(10)
