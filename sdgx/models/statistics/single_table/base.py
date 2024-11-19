@@ -2,24 +2,28 @@
 # Which is Lincensed by MIT License
 
 import os
-from copy import deepcopy
-from typing import List, Optional
 
 import numpy as np
 import torch
 
+from sdgx.data_loader import DataLoader
+from sdgx.data_models.metadata import Metadata
+from sdgx.models.base import SynthesizerModel
 
-class StatisticSynthesizerModel:
+
+class StatisticSynthesizerModel(SynthesizerModel):
     random_states = None
 
-    def __init__(self, transformer=None, sampler=None) -> None:
+    def __init__(self, transformer=None, sampler=None, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self._generator = None
         self.model = None
         self.status = "UNFINED"
         self.model_type = "MODEL_TYPE_UNDEFINED"
         # self.epochs = epochs
         self._device = "CPU"
 
-    def fit(self, input_df, discrete_cols: Optional[List] = None):
+    def fit(self, metadata: Metadata, dataloader: DataLoader, *args, **kwargs):
         raise NotImplementedError
 
     def set_device(self, device):
