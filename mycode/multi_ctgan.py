@@ -67,9 +67,10 @@ class MultiTableCTGAN:
         self.x_how = temp
         self.TABLE_TEMP_NAME = temp_name
         self.origin_tables = {}
+        self.tablekeyed_columns_order: Dict[str, List[str]] = {}
         self.join_tables = None
-        self.join_columns_table_name_map = {} # Encode Name -> List(Tables name)
-        self.join_columns_map = {}  # Table Name: { Encode -> Name Old Name }
+        self.join_columns_table_name_map: Dict[str, List[str]] = {}  # Encode Name -> List(Tables name)
+        self.join_columns_map: Dict[str, Dict[str, str]] = {}  # Table Name: { Encode -> Name Old Name }
         # self.columns_convert_map = {}  # Table Name: { Old Name -> Encode Name }
 
     def init(self, add_cols_num=0, added_data_path=False):
@@ -120,6 +121,7 @@ class MultiTableCTGAN:
         join_keys = set(self.x_key) - {None}
         for i, table_name in enumerate(self.x_table):
             current_table = self.origin_tables[table_name]
+            self.tablekeyed_columns_order[table_name] = list(current_table.columns)
             table_columns = set(current_table.columns)
             self.join_columns_map[table_name] = {}
             unique_columns = table_columns - join_keys

@@ -275,7 +275,7 @@ class Metadata(BaseModel):
         cls,
         dataloader: DataLoader,
         max_chunk: int = 10,
-        primary_keys: set[str] = None,
+        primary_keys: Set[str] = None,
         include_inspectors: Iterable[str] | None = None,
         exclude_inspectors: Iterable[str] | None = None,
         inspector_init_kwargs: dict[str, Any] | None = None,
@@ -401,6 +401,11 @@ class Metadata(BaseModel):
 
         with path.open("w") as f:
             f.write(self._dump_json())
+
+
+    @classmethod
+    def load_json(cls, attributes):
+        return Metadata(**attributes)
 
     @classmethod
     def load(cls, path: str | Path) -> "Metadata":
