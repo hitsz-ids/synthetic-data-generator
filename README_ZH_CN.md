@@ -6,7 +6,7 @@
 <p align="center">
 
 <p align="center">
-<a href="https://github.com/hitsz-ids/synthetic-data-generator/actions"><img alt="Actions Status" src="https://github.com/hitsz-ids/synthetic-data-generator/actions/workflows/python-package.yml/badge.svg"></a>
+<a href="https://github.com/hitsz-ids/synthetic-data-generator/actions"><img alt="Actions Status" src="https://github.com/hitsz-ids/synthetic-data-generator/actions/workflows/ci-test-python-package.yml/badge.svg"></a>
 <a href='https://synthetic-data-generator.readthedocs.io/en/latest/?badge=latest'><img src='https://readthedocs.org/projects/synthetic-data-generator/badge/?version=latest' alt='Documentation Status' /></a>
 <a href="https://results.pre-commit.ci/latest/github/hitsz-ids/synthetic-data-generator/main"><img alt="pre-commit.ci status" src="https://results.pre-commit.ci/badge/github/hitsz-ids/synthetic-data-generator/main.svg"></a>
 <a href="https://github.com/hitsz-ids/synthetic-data-generator/blob/main/LICENSE"><img alt="LICENSE" src="https://img.shields.io/github/license/hitsz-ids/synthetic-data-generator"></a>
@@ -50,6 +50,8 @@
 ## 💥 相关信息
 
 我们的里程碑和时间节点如下所示：
+
+🔥 2024年11月21日：1) 模型集成 - 现在我们集成 GaussianCopula 模型到我们的 Data Processor 体系，可以查看此 [PR](https://github.com/hitsz-ids/synthetic-data-generator/pull/241) 的代码实例; 2) 合成质量增强 - 我们做了数据列关系的自动检测，同时也提供数据列的关系指定，进一步提高合成数据保真度质量（[代码实例](https://synthetic-data-generator.readthedocs.io/en/latest/user_guides/single_table_column_combinations.html)）; 3) 性能增强 - 我们大大降低 GaussianCopula 处理离散数据的内存占用，使其能在 2C4G 的配置下完成万级别的离散列数据训练！
 
 🔥 2024年5月30日：Data Processor 模块被正式合并，该模块可以：1）可以帮助 SDG 将部分数据列（如 Datetime 类型的列）在送入模型前进行格式转换，从而避免被当作离散类型处理，对模型生成数据反向转换成原有格式；2）对各种数据类型进行更加定制化的预处理和后处理；3）轻松应对原始数据中的空值等问题；4）支持插件系统。
 
