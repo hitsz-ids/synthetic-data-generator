@@ -426,15 +426,16 @@ class MultiTableRfecvCTGAN:
             max_trails -= 1
         res = pd.concat(sample_data_list)[:count]
         assert len(res) == count
-        return res.reset_index()
+        # TODO 这里有bug
+        return res.reset_index(drop=True)
 
     def sample(self, n) -> Dict[str, pd.DataFrame]:
         # TODO 外键约束被破坏？join之后恢复？
         keyed_columns_convert_map = self.multi_x_join.join_columns_map
         tables_name = self.multi_x_join.origin_tables.keys()
         columns_table_name_map = self.multi_x_join.join_columns_table_name_map
-        synthesized_tables = {
-            tbn: pd.DataFrame() for tbn in tables_name
+        synthesized_tables: Dict[str: List[pd.DataFrame]] = {
+            tbn: [] for tbn in tables_name
         }
         for i, v in enumerate(self.to_training):
             if not v.need_fitted:
@@ -462,6 +463,7 @@ class MultiTableRfecvCTGAN:
             reference_columns = {col for col in columns if self.multi_x_join.is_ref_column(col)}
             other_columns = set(v.relative_columns)
             to_add_columns = reference_columns.union(other_columns)
+            # TODO pd.concat只使用一次，一次性使用pd.concat()比迭代concat更快。
             for col in to_add_columns:  # 寻找匹配的表名
                 to_add_table_set = set(columns_table_name_map[col]) - {v.table_name}
 
@@ -472,10 +474,8 @@ class MultiTableRfecvCTGAN:
                         continue
                     # assert col not in synthesized_tables[to_add_table_name]
                     if col in synthesized_tables[to_add_table_name].columns:
-                        pass
                         # TODO REF有重复，只取前面的REF。影响评估结果，但保证Join
-                        # TODO test
-                        #  continue
+                        continue
                     synthesized_tables[to_add_table_name] = pd.concat([
                         synthesized_tables[to_add_table_name],
                         data[[col]]
