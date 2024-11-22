@@ -124,9 +124,10 @@ class DatetimeFormatter(Formatter):
         Returns:
             - result_data (pd.DataFrame): Processed table data with datetime columns converted to timestamp
         """
+
         def datetime_formatter(each_value, datetime_format):
             """
-                    convert each single column datetime string to timestamp int value.
+            convert each single column datetime string to timestamp int value.
             """
             try:
                 datetime_obj = datetime.strptime(str(each_value), datetime_format)
@@ -144,7 +145,9 @@ class DatetimeFormatter(Formatter):
         # Convert each datetime column in datetime_column_list to timestamp
         for column in datetime_column_list:
             # Convert datetime to timestamp (int)
-            result_data[column] = result_data[column].apply(datetime_formatter, datetime_format=datetime_formats[column])
+            result_data[column] = result_data[column].apply(
+                datetime_formatter, datetime_format=datetime_formats[column]
+            )
         return result_data
 
     def reverse_convert(self, processed_data: pd.DataFrame) -> pd.DataFrame:

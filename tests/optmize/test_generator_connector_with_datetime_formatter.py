@@ -15,7 +15,7 @@ CHUNK_SIZE = 100
 def datetime_test_df():
     total_row = 150
     ff = faker.Faker()
-    df = pd.DataFrame([ff.date() for i in range(total_row)], columns=['date'])
+    df = pd.DataFrame([ff.date() for i in range(total_row)], columns=["date"])
     return df
 
 
@@ -30,9 +30,7 @@ def test_datetime_formatter_test_df(datetime_test_df: pd.DataFrame):
     metadata = Metadata.from_dataloader(dataloader)
     metadata.datetime_columns = ["date"]
     metadata.discrete_columns = []
-    metadata.datetime_format = {
-        "date": "%Y-%m-%d"
-    }
+    metadata.datetime_format = {"date": "%Y-%m-%d"}
 
     for d in data_processors:
         d.fit(metadata=metadata, tabular_data=dataloader)
@@ -47,8 +45,7 @@ def test_datetime_formatter_test_df(datetime_test_df: pd.DataFrame):
             yield chunk
 
     processed_dataloader = DataLoader(
-        GeneratorConnector(chunk_generator),
-        identity=dataloader.identity
+        GeneratorConnector(chunk_generator), identity=dataloader.identity
     )
 
     df = processed_dataloader.load_all()
