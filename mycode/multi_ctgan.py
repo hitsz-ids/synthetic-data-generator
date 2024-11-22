@@ -9,12 +9,15 @@ from pandas import DataFrame
 from mycode.sdv.evaluation import evaluate
 from mycode.test_20_tables import fetch_data_from_sqlite, build_sdv_metadata_from_origin_tables
 from mycode.testcode.Xargs import XArg
+from mycode.testcode.metabuilder import MetaBuilder
 from sdgx.data_connectors.generator_connector import GeneratorConnector
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.metadata import Metadata
 from sdgx.models.ml.single_table.ctgan import CTGANSynthesizerModel
 from sdgx.synthesizer import Synthesizer
 
+def column_name_encode(table_name, col_name):
+    return table_name + MultiTableCTGAN.TABLE_NAME_SEPERATOR + col_name
 
 class MultiTableCTGAN:
     TABLE_NAME_SEPERATOR = "_TABLE_"
@@ -30,8 +33,8 @@ class MultiTableCTGAN:
         return MultiTableCTGAN.REF_NAME_SEPERATOR + MultiTableCTGAN.TABLE_NAME_SEPERATOR + col_name
 
     @staticmethod
-    def column_name_encode(table_name, col_name):
-        return table_name + MultiTableCTGAN.TABLE_NAME_SEPERATOR + col_name
+    def column_name_encode(table_name, column_name):
+        return column_name_encode(table_name, column_name)
 
     def __del__(self):
         self.TIME_LOGGER.close()

@@ -472,8 +472,10 @@ class MultiTableRfecvCTGAN:
                         continue
                     # assert col not in synthesized_tables[to_add_table_name]
                     if col in synthesized_tables[to_add_table_name].columns:
+                        pass
                         # TODO REF有重复，只取前面的REF。影响评估结果，但保证Join
-                        continue
+                        # TODO test
+                        #  continue
                     synthesized_tables[to_add_table_name] = pd.concat([
                         synthesized_tables[to_add_table_name],
                         data[[col]]

@@ -72,10 +72,14 @@ class XArgs:
 
 class XMetaBuilder(MetaBuilder):
     def __init__(self, x_args: XArg):
+
         super().__init__()
         self.x_args = x_args
 
     def build(self, multi_wrapper, metadata):
+
+        from mycode.multi_ctgan import column_name_encode
+
         x_args = self.x_args
 
         def remove_copy_tag(key: str):
@@ -88,7 +92,7 @@ class XMetaBuilder(MetaBuilder):
         # datetime key
         escapes_columns = list(x_args.meta_datetime_escapes.copy())
         escapes_columns.extend(x_args.meta_time_escapes)
-        escape_key = [MultiTableCTGAN.column_name_encode(x[0], x[1]) for x in set(escapes_columns)]
+        escape_key = [column_name_encode(x[0], x[1]) for x in set(escapes_columns)]
         metadata.datetime_format = {
             key: "%Y-%m-%d" for key in metadata.datetime_columns if remove_copy_tag(key) not in escape_key
         }
