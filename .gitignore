@@ -261,3 +261,8 @@ log_*.txt
 *.xlsx
 *.db
 /syndiffix
+mycode/sdf/__init__.py
+bug_report2.ipynb
+bug_report.ipynb
+test.ipynb
+1.json
