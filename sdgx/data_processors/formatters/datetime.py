@@ -125,24 +125,19 @@ class DatetimeFormatter(Formatter):
             - result_data (pd.DataFrame): Processed table data with datetime columns converted to timestamp
         """
 
-        def convert_single_column_datetime_to_timestamp(
-            column_data: pd.Series, datetime_format: str
-        ):
+        def datetime_formatter(each_value, datetime_format):
             """
             convert each single column datetime string to timestamp int value.
             """
-            res = []
-            for each_value in column_data:
-                try:
-                    datetime_obj = datetime.strptime(str(each_value), datetime_format)
-                    each_stamp = datetime.timestamp(datetime_obj)
-                except Exception as e:
-                    logger.warning(f"An error occured when convert str to timestamp {e}.")
-                    logger.warning(f"Input parameters: ({str(each_value)}, {datetime_format})")
-                    logger.warning(f"Input type: ({type(each_value)}, {type(datetime_format)})")
-                    each_stamp = 0
-                res.append(each_stamp)
-            return pd.Series(res)
+            try:
+                datetime_obj = datetime.strptime(str(each_value), datetime_format)
+                each_stamp = datetime.timestamp(datetime_obj)
+            except Exception as e:
+                logger.warning(f"An error occured when convert str to timestamp {e}.")
+                logger.warning(f"Input parameters: ({str(each_value)}, {datetime_format})")
+                logger.warning(f"Input type: ({type(each_value)}, {type(datetime_format)})")
+                each_stamp = 0
+            return each_stamp
 
         # Make a copy of processed_data to avoid modifying the original data
         result_data = processed_data.copy()
@@ -150,11 +145,9 @@ class DatetimeFormatter(Formatter):
         # Convert each datetime column in datetime_column_list to timestamp
         for column in datetime_column_list:
             # Convert datetime to timestamp (int)
-            timestamp_col = convert_single_column_datetime_to_timestamp(
-                processed_data[column], datetime_formats[column]
+            result_data[column] = result_data[column].apply(
+                datetime_formatter, datetime_format=datetime_formats[column]
             )
-            result_data[column] = timestamp_col
-
         return result_data
 
     def reverse_convert(self, processed_data: pd.DataFrame) -> pd.DataFrame:
