@@ -5,23 +5,15 @@ from typing import List, Dict
 
 import pandas as pd
 from pandas import DataFrame
+
 from mycode.sdv.evaluation import evaluate
 from mycode.test_20_tables import fetch_data_from_sqlite, build_sdv_metadata_from_origin_tables
 from mycode.testcode.Xargs import XArg
-from sdgx.data_connectors.csv_connector import CsvConnector
 from sdgx.data_connectors.generator_connector import GeneratorConnector
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.metadata import Metadata
 from sdgx.models.ml.single_table.ctgan import CTGANSynthesizerModel
 from sdgx.synthesizer import Synthesizer
-
-
-class MetaBuilder:
-    def __init__(self):
-        pass
-
-    def build(self, multi_wrapper, metadata):
-        raise NotImplementedError
 
 
 class MultiTableCTGAN:

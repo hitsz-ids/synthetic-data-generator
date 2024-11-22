@@ -236,9 +236,12 @@ class DataTransformer(object):
         Output uses the same type as input to the transform function.
         Either np array or pd dataframe.
         """
+
+        # 这里可以考虑并行化或者 apply TODO
         st = 0
         recovered_column_data_list = []
         column_names = []
+
         for column_transform_info in tqdm.tqdm(
             self._column_transform_info_list, desc="Inverse transforming", delay=3
         ):
@@ -252,7 +255,6 @@ class DataTransformer(object):
                 recovered_column_data = self._inverse_transform_discrete(
                     column_transform_info, column_data
                 )
-
             recovered_column_data_list.append(recovered_column_data)
             column_names.append(column_transform_info.column_name)
             st += dim
@@ -263,7 +265,7 @@ class DataTransformer(object):
         )
         if not self.dataframe:
             recovered_data = recovered_data.to_numpy()
-
+        print("Recovered {} samples".format(len(recovered_data)))
         return recovered_data
 
     def convert_column_name_value_to_id(self, column_name, value):

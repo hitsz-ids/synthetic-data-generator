@@ -391,7 +391,7 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
         return self._sample(count, *args, **kwargs)
 
     @random_state
-    def _sample(self, n, condition_column=None, condition_value=None):
+    def _sample(self, n, condition_column=None, condition_value=None, drop_more=True):
         """Sample data similar to the training data.
 
         Choosing a condition_column and condition_value will increase the probability of the
@@ -443,8 +443,9 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
             data.append(fakeact.detach().cpu().numpy())
 
         data = np.concatenate(data, axis=0)
-        data = data[:n]
-
+        print("CTGAN Generated {} raw samples".format(len(data)))
+        if drop_more:
+            data = data[:n]
         return self._transformer.inverse_transform(data)
 
     def save(self, save_dir: str | Path):

@@ -8,7 +8,8 @@ from sklearn.feature_selection import RFECV
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from tqdm import notebook as tqdm
 
-from mycode.multi_ctgan import MultiTableCTGAN, MetaBuilder
+from mycode.multi_ctgan import MultiTableCTGAN
+from mycode.testcode.metabuilder import MetaBuilder
 from mycode.sdv.evaluation import evaluate
 from mycode.test_20_tables import build_sdv_metadata_from_origin_tables
 from mycode.testcode import Xargs
@@ -52,17 +53,20 @@ class RFECV_CTGANTrainingData:
 
 
 class MultiTableRfecvCTGAN:
-    def __init__(self, db_path, x_args: Xargs.XArg, temp_name="testrfecv"):
+    def __init__(self, db_path, x_args: Xargs.XArg, temp_name="testrfecv", exclude_processor=[]):
         self.metadata: Optional[Metadata] = None
         self.multi_x_join = MultiTableCTGAN(db_path=db_path, x_args=x_args, temp_name=temp_name)
         self.meta_builder: Optional[MetaBuilder] = None
         self.to_training: List[RFECV_CTGANTrainingData] = []
         self.data_processors_manager = DataProcessorManager()
-        data_processors = self.data_processors_manager.registed_default_processor_list
+        data_processors = [item for item in self.data_processors_manager.registed_default_processor_list if
+                           item not in exclude_processor]
         logger.info(f"Using data processors: {data_processors}")
         self.data_processors = [
             (
-                d if isinstance(d, DataProcessor) else self.data_processors_manager.init_data_processor(d)
+                d if isinstance(d, DataProcessor) else (
+                    self.data_processors_manager.init_data_processor(d)
+                )
             )
             for d in data_processors
         ]
@@ -410,16 +414,19 @@ class MultiTableRfecvCTGAN:
         sample_data_list = []
         psb = tqdm.tqdm(total=count, desc="Sampling")
         while missing_count > 0 and max_trails > 0:
-            sample_data = model.sample(int(missing_count * 1.2))
+            sample_data = model.sample(max(int(missing_count * 1.2), model._batch_size), drop_more=False)
             # 这里需要忽略错误（列不存在），因为processor是根据整个表训练的
             for d in self.data_processors:
                 sample_data = d.reverse_convert(sample_data)
             # TODO attached列会重复出现（email），每次reverse都会生成一次。
+            # TODO 这里面有Nan
             sample_data_list.append(sample_data)
             missing_count = missing_count - len(sample_data)
             psb.update(len(sample_data))
             max_trails -= 1
-        return pd.concat(sample_data_list)[:count]
+        res = pd.concat(sample_data_list)[:count]
+        assert len(res) == count
+        return res.reset_index()
 
     def sample(self, n) -> Dict[str, pd.DataFrame]:
         # TODO 外键约束被破坏？join之后恢复？
