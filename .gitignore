@@ -260,3 +260,4 @@ log_*.txt
 *.pkl
 *.xlsx
 *.db
+/syndiffix
