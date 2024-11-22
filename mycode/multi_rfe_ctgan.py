@@ -23,6 +23,10 @@ from sdgx.utils import logger
 CATEGORY_THRESHOLD = 15
 
 
+def _is_categorical(column: pd.Series | pd.DataFrame) -> bool:
+    return int(column.nunique()) <= CATEGORY_THRESHOLD
+
+
 class RFECV_CTGANTrainingData:
     def __init__(self,
                  table_name: str,
@@ -77,7 +81,11 @@ class MultiTableRfecvCTGAN:
             self.metadata = self.meta_builder.build(multi_wrapper=self.multi_x_join, metadata=self.metadata)
         preprocessed_loader = self._data_preprocess(data_loader, metadata=self.metadata)
 
+        # TODO 优化，这里调用了loadall两次 ？？ ，一次在loader的__init__时候
         preprocessed_data = preprocessed_loader.load_all()
+
+        assert not preprocessed_data.isna().any().any()
+        assert not preprocessed_data.isnull().any().any()
 
         attached_columns_data = None
         if set(preprocessed_data.columns) != set(self.multi_x_join.join_tables):
@@ -95,7 +103,7 @@ class MultiTableRfecvCTGAN:
 
         preprocessed_loader.finalize(clear_cache=True)
 
-    def _data_preprocess(self, dataloader, metadata):
+    def _data_preprocess(self, dataloader: DataLoader, metadata):
         start_time = time.time()
         for d in self.data_processors:
             if dataloader:
@@ -110,6 +118,9 @@ class MultiTableRfecvCTGAN:
             for chunk in dataloader.iter():
                 for d in self.data_processors:
                     chunk = d.convert(chunk)
+
+                assert not chunk.isna().any().any()
+                assert not chunk.isnull().any().any()
                 yield chunk
 
         logger.info("Initializing processed data loader...")
@@ -132,22 +143,15 @@ class MultiTableRfecvCTGAN:
         return processed_dataloader
 
     @staticmethod
-    def _do_rfecv(target_column_name: str, data: pd.DataFrame, metadata) -> set[str]:
-        def _is_categorical(column: pd.Series | pd.DataFrame) -> bool:
-            return int(column.nunique()) <= CATEGORY_THRESHOLD
-
-        #     return column.dtype == "object" or column.nunique() <= CATEGORY_THRESHOLD
-
-        # data = data.copy()
-        # TODO 这是临时使用的onehot，每次会重复很多次。考虑优化
-        discrete_columns = set(metadata.get("discrete_columns"))
+    def _convert_categorical(data: pd.DataFrame, metadata: Metadata, target_column_name: str):
+        discrete_columns = set(metadata.discrete_columns)
         onehot_columns_map = {}
         for col in discrete_columns:
             if col not in data:
                 continue
-            if target_column_name != col and _is_categorical(data[col]):
+            if target_column_name != col and _is_categorical(data[[col]]):
                 # Onehot Encode
-                onehot_data = pd.get_dummies(data[col], prefix=col, prefix_sep="_Onehot_")
+                onehot_data = pd.get_dummies(data[[col]], prefix=col, prefix_sep="_Onehot_")
                 data = data.drop(col, axis=1)
                 data = pd.concat([data, onehot_data], axis=1)
                 onehot_columns_map.update({
@@ -157,6 +161,49 @@ class MultiTableRfecvCTGAN:
                 # Label encode
                 mapper = {v: k for k, v in enumerate(sorted(pd.unique(data[col]), key=lambda x: x))}
                 data[col] = data[col].map(mapper)
+        return onehot_columns_map, discrete_columns, data
+
+    @staticmethod
+    def _convert_nan(data: pd.DataFrame, metadata: Metadata, target_column_name: str):
+        filled_value = 'NAN_VALUE'
+        if target_column_name in metadata.int_columns:
+            filled_value = 0
+        elif target_column_name in metadata.float_columns:
+            filled_value = 0.0
+        elif target_column_name in metadata.datetime_columns:
+            filled_value = data[target_column_name].mean()
+        data[target_column_name] = data[[target_column_name]].fillna(filled_value)
+        return data
+        # # int columns
+        # int_columns = set(metadata.int_columns)
+        # # float columns
+        # float_columns = set(metadata.float_columns)
+        #
+        # # fill numeric nan value
+        # for col in int_columns:
+        #     data[col] = data[col].fillna(fill_na_value_int)
+        # for col in float_columns:
+        #     data[col] = data[col].fillna(fill_na_value_float)
+        #
+        # # fill other non-numeric nan value
+        # for col in data.columns:
+        #     if col in int_columns or col in float_columns:
+        #         continue
+        #     data[col] = data[col].fillna(fill_na_value_default)
+
+    @staticmethod
+    def _do_rfecv(target_column_name: str, data: pd.DataFrame, metadata: Metadata) -> set[str]:
+        # data = data.copy()
+
+        # TODO 在这里添加处理NaN值。这里应该不需要，因为在上面的process处理了，但是现在有bug
+        # data = MultiTableRfecvCTGAN._convert_nan(data, metadata, target_column_name)
+
+        # TODO 这是临时使用的onehot，每次会重复很多次。考虑优化
+        onehot_columns_map, discrete_columns, data = MultiTableRfecvCTGAN._convert_categorical(data, metadata,
+                                                                                               target_column_name)
+
+        assert not data[[target_column_name]].isnull().any().any()
+        assert not data[[target_column_name]].isna().any().any()
 
         # RFECV
         X = data.drop(target_column_name, axis=1)
@@ -206,12 +253,14 @@ class MultiTableRfecvCTGAN:
             assert set(tablekeyd_convert_to_origin_columns_map[tbn].values()).issubset(
                 set(join_tables.columns).union(attached_columns_data.columns))
         attached_tables = pd.concat([attached_columns_data, join_tables], axis=1)
+        attached_columns = set(attached_columns_data.columns)
 
         selected_columns = set()
         to_training = []
 
         # testset = frozenset(join_tables.columns)
 
+        psb = tqdm.tqdm(desc="Choosing Cols", total=len(join_tables.columns))
         # 对每一个表的每一列 和 未被选择的列 进行 RFECV
         for table_name in tables_name:
 
@@ -237,14 +286,16 @@ class MultiTableRfecvCTGAN:
             target_column_name_selected_map: Dict[str, List[str]] = {}
             to_training_columns = set(current_table_columns)
             for target_column_name in current_table_columns:
+                psb.update(1)
                 # 如果是参考列，只算全大表第一次的RFECV，后续选择不再考虑，但还要跟随本表其他列进行计算RFECV。
                 # 如果是独特列，同理。
                 # if MultiTableCTGAN.is_ref_column(target_column_name):
-                if target_column_name in selected_columns:
+                if target_column_name in selected_columns or target_column_name in attached_columns:
                     continue
                 to_rfe_columns_name = set(current_table_columns).union(other_table_columns_name)
                 try:
                     to_rfe_columns = join_tables[list(to_rfe_columns_name)].copy()
+                    # 对被processor删掉的列（如email）进行REFCV，没有意义。还会吧混杂在里面的None和Nan加入到已经清洗的数据里。
                 except KeyError:
                     to_rfe_columns = attached_tables[list(to_rfe_columns_name)].copy()
 
@@ -263,7 +314,12 @@ class MultiTableRfecvCTGAN:
                 })
             # 每个表生成一个模型
             current_attached_columns = set(attached_columns_data.columns).intersection(to_training_columns)
+
             to_training_tables = join_tables[list(to_training_columns - current_attached_columns)].copy()
+
+            assert not to_training_tables.isnull().any().any()
+            assert not to_training_tables.isna().any().any()
+
             relative_columns = []
             for rset in target_column_name_selected_map.values():
                 relative_columns.extend(rset)
@@ -282,6 +338,9 @@ class MultiTableRfecvCTGAN:
     def _fit_argument_table_ctgan(self, to_training_info: RFECV_CTGANTrainingData, *, epochs=1, batch_size=500,
                                   device="cpu"):
         logger.info("Fitting RFE-CTGAN model on table {}...".format(to_training_info.table_name))
+
+        assert not to_training_info.tables.isnull().any().any()
+        assert not to_training_info.tables.isna().any().any()
 
         def partition_generator():
             yield to_training_info.tables.copy()
@@ -355,6 +414,7 @@ class MultiTableRfecvCTGAN:
             # 这里需要忽略错误（列不存在），因为processor是根据整个表训练的
             for d in self.data_processors:
                 sample_data = d.reverse_convert(sample_data)
+            # TODO attached列会重复出现（email），每次reverse都会生成一次。
             sample_data_list.append(sample_data)
             missing_count = missing_count - len(sample_data)
             psb.update(len(sample_data))
