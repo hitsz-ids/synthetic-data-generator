@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import numpy as np
-from tqdm import notebook as tqdm
+from tqdm import autonotebook as tqdm
 
 from sdgx.models.components.optimize.ndarray_loader import NDArrayLoader
 
@@ -67,11 +67,7 @@ class DataSampler(object):
                 ed = st + span_info.dim
                 category_freq = np.sum(data[:, st:ed], axis=0)
                 if log_frequency:
-                    try:
-                        category_freq = np.log(category_freq + 1)
-                    except RuntimeWarning as e:
-                        # print(category_freq.min())
-                        raise e
+                    category_freq = np.log(category_freq + 1)
                 category_prob = category_freq / np.sum(category_freq)
                 self._discrete_column_category_prob[current_id, : span_info.dim] = category_prob
                 self._discrete_column_cond_st[current_id] = current_cond_st
@@ -121,7 +117,7 @@ class DataSampler(object):
 
         cond = np.zeros((batch, self._n_categories), dtype="float32")
 
-        for i in tqdm.tqdm(range(batch)):
+        for i in tqdm.tqdm(range(batch), desc="Sampling in batch", delay=3, leave=False):
             row_idx = np.random.randint(0, len(self._data))
             col_idx = np.random.randint(0, self._n_discrete_columns)
             matrix_st = self._discrete_column_matrix_st[col_idx]

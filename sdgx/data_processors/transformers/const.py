@@ -22,9 +22,13 @@ class ConstValueTransformer(Transformer):
         const_value (dict[Any]): The constant value that will be returned.
     """
 
-    const_columns: list = []
+    const_columns: list
 
-    const_values: dict[Any] = {}
+    const_values: dict[Any, Any]
+
+    def __init__(self):
+        self.const_columns = []
+        self.const_values = {}
 
     def fit(self, metadata: Metadata | None = None, **kwargs: dict[str, Any]):
         """

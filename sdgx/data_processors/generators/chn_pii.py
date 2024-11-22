@@ -15,15 +15,22 @@ fake = Faker(locale="zh_CN")
 class ChnPiiGenerator(PIIGenerator):
     """ """
 
-    chn_id_columns_list: list = []
+    chn_id_columns_list: list
 
-    chn_phone_columns_list: list = []
+    chn_phone_columns_list: list
 
-    chn_name_columns_list: list = []
+    chn_name_columns_list: list
 
-    chn_company_name_list: list = []
+    chn_company_name_list: list
 
-    fitted: bool = False
+    fitted: bool
+
+    def __init__(self):
+        self.chn_id_columns_list = []
+        self.chn_phone_columns_list = []
+        self.chn_name_columns_list = []
+        self.chn_company_name_list = []
+        self.fitted = False
 
     @property
     def chn_pii_columns(self):

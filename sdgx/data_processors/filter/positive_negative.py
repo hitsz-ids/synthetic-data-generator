@@ -25,25 +25,31 @@ class PositiveNegativeFilter(Filter):
         negative_columns (set): A set of column names that should contain negative values.
     """
 
-    int_columns: set = set()
+    int_columns: set
     """
     A set of column names that contain integer values.
     """
 
-    float_columns: set = set()
+    float_columns: set
     """
     A set of column names that contain float values.
     """
 
-    positive_columns: set = set()
+    positive_columns: set
     """
     A set of column names that are identified as containing positive numeric values.
     """
 
-    negative_columns: set = set()
+    negative_columns: set
     """
     A set of column names that are identified as containing negative numeric values.
     """
+
+    def __init__(self):
+        self.int_columns = set()
+        self.float_columns = set()
+        self.positive_columns = set()
+        self.negative_columns = set()
 
     def fit(self, metadata: Metadata | None = None, **kwargs: dict[str, Any]):
         """
@@ -86,12 +92,12 @@ class PositiveNegativeFilter(Filter):
 
         # Check positive_columns
         for col in self.positive_columns:
-            if col in processed_data.columns:
+            if col in processed_data.columns and pd.api.types.is_numeric_dtype(processed_data[col]):
                 mask &= processed_data[col] >= 0
 
         # Check negative_columns
         for col in self.negative_columns:
-            if col in processed_data.columns:
+            if col in processed_data.columns and pd.api.types.is_numeric_dtype(processed_data[col]):
                 mask &= processed_data[col] <= 0
 
         # Apply the mask to filter the data

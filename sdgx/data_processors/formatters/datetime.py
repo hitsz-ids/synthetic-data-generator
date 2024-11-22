@@ -31,20 +31,26 @@ class DatetimeFormatter(Formatter):
         reverse_convert(processed_data: pd.DataFrame) -> pd.DataFrame: Converts timestamp columns in processed_data back to datetime format.
     """
 
-    datetime_columns: list = []
+    datetime_columns: list
     """
     List to store the columns that are of datetime type.
     """
 
-    datetime_formats: Dict = defaultdict(str)
+    datetime_formats: Dict
     """
     Dictionary to store the datetime formats for each column, with default value as an empty string.
     """
 
-    dead_columns: list = []
+    dead_columns: list
     """
     List to store columns that are no longer needed or to be removed.
     """
+
+    def __init__(self):
+        self.fitted = False
+        self.datetime_columns = []
+        self.datetime_formats = defaultdict(str)
+        self.dead_columns = []
 
     def fit(self, metadata: Metadata | None = None, **kwargs: dict[str, Any]):
         """
@@ -118,9 +124,10 @@ class DatetimeFormatter(Formatter):
         Returns:
             - result_data (pd.DataFrame): Processed table data with datetime columns converted to timestamp
         """
+
         def datetime_formatter(each_value, datetime_format):
             """
-                    convert each single column datetime string to timestamp int value.
+            convert each single column datetime string to timestamp int value.
             """
             try:
                 datetime_obj = datetime.strptime(str(each_value), datetime_format)
@@ -138,7 +145,9 @@ class DatetimeFormatter(Formatter):
         # Convert each datetime column in datetime_column_list to timestamp
         for column in datetime_column_list:
             # Convert datetime to timestamp (int)
-            result_data[column] = result_data[column].apply(datetime_formatter, datetime_format=datetime_formats[column])
+            result_data[column] = result_data[column].apply(
+                datetime_formatter, datetime_format=datetime_formats[column]
+            )
         return result_data
 
     def reverse_convert(self, processed_data: pd.DataFrame) -> pd.DataFrame:

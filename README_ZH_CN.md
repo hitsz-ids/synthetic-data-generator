@@ -6,7 +6,7 @@
 <p align="center">
 
 <p align="center">
-<a href="https://github.com/hitsz-ids/synthetic-data-generator/actions"><img alt="Actions Status" src="https://github.com/hitsz-ids/synthetic-data-generator/actions/workflows/python-package.yml/badge.svg"></a>
+<a href="https://github.com/hitsz-ids/synthetic-data-generator/actions"><img alt="Actions Status" src="https://github.com/hitsz-ids/synthetic-data-generator/actions/workflows/ci-test-python-package.yml/badge.svg"></a>
 <a href='https://synthetic-data-generator.readthedocs.io/en/latest/?badge=latest'><img src='https://readthedocs.org/projects/synthetic-data-generator/badge/?version=latest' alt='Documentation Status' /></a>
 <a href="https://results.pre-commit.ci/latest/github/hitsz-ids/synthetic-data-generator/main"><img alt="pre-commit.ci status" src="https://results.pre-commit.ci/badge/github/hitsz-ids/synthetic-data-generator/main.svg"></a>
 <a href="https://github.com/hitsz-ids/synthetic-data-generator/blob/main/LICENSE"><img alt="LICENSE" src="https://img.shields.io/github/license/hitsz-ids/synthetic-data-generator"></a>
@@ -22,7 +22,9 @@
 
 <p style="font-size: small;">切换语言:
     <a href="https://github.com/hitsz-ids/synthetic-data-generator/blob/main/README.md" target="_blank">English</a> &nbsp;| &nbsp;最新
-    <a href="https://synthetic-data-generator.readthedocs.io/en/latest/" target="value">API文档</a>&nbsp;| &nbsp; 加入 <a href="assets/live_QR_code.jpg" target="value">Wechat群组</a>
+    <a href="https://synthetic-data-generator.readthedocs.io/en/latest/" target="value">API文档</a>&nbsp;| &nbsp;
+     <a href="ROADMAP_ZH_CN.md" target="value">项目发展规划</a> &nbsp;| &nbsp;
+    加入 <a href="assets/live_QR_code.jpg" target="value">Wechat群组</a>
   </p>
 
 <p style="font-size: small;">
@@ -43,9 +45,13 @@
 
 高质量的合成数据可以安全、多样化地在各种领域中使用，包括数据共享、模型训练和调试、系统开发和测试等应用。
 
+我们很期待您的贡献，请通过这个[贡献概述指南](CONTRIBUTING_ZH_CN.md)开始项目！
+
 ## 💥 相关信息
 
 我们的里程碑和时间节点如下所示：
+
+🔥 2024年11月21日：1) 模型集成 - 现在我们集成 GaussianCopula 模型到我们的 Data Processor 体系，可以查看此 [PR](https://github.com/hitsz-ids/synthetic-data-generator/pull/241) 的代码实例; 2) 合成质量增强 - 我们做了数据列关系的自动检测，同时也提供数据列的关系指定，进一步提高合成数据保真度质量（[代码实例](https://synthetic-data-generator.readthedocs.io/en/latest/user_guides/single_table_column_combinations.html)）; 3) 性能增强 - 我们大大降低 GaussianCopula 处理离散数据的内存占用，使其能在 2C4G 的配置下完成万级别的离散列数据训练！
 
 🔥 2024年5月30日：Data Processor 模块被正式合并，该模块可以：1）可以帮助 SDG 将部分数据列（如 Datetime 类型的列）在送入模型前进行格式转换，从而避免被当作离散类型处理，对模型生成数据反向转换成原有格式；2）对各种数据类型进行更加定制化的预处理和后处理；3）轻松应对原始数据中的空值等问题；4）支持插件系统。
 
@@ -198,7 +204,7 @@ print(sampled_data)
 - CTAB-GAN:[CTAB-GAN: Effective Table Data Synthesizing](https://proceedings.mlr.press/v157/zhao21a/zhao21a.pdf)
 - OCT-GAN: [OCT-GAN: Neural ODE-based Conditional Tabular GANs](https://arxiv.org/pdf/2105.14969.pdf)
 
-## 🤝  如何贡献
+## 🤝 如何贡献
 
 SDG开源项目由**哈尔滨工业大学（深圳）数据安全研究院**发起，若您对SDG项目感兴趣并愿意一起完善它，欢迎加入我们的开源社区：
 

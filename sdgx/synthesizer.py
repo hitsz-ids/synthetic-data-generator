@@ -400,13 +400,14 @@ class Synthesizer:
 
         """
         missing_count = count
-        max_trails = 5
+        max_trails = 50
         sample_data_list = []
         psb = tqdm.tqdm(total=count, desc="Sampling")
         while missing_count > 0 and max_trails > 0:
-            sample_data = self.model.sample(int(missing_count * 1.2), **model_sample_args)
+            sample_data = self.model.sample(int(missing_count * 4), **model_sample_args)
             for d in self.data_processors:
                 sample_data = d.reverse_convert(sample_data)
+            sample_data = sample_data.dropna(how="all")
             sample_data_list.append(sample_data)
             missing_count = missing_count - len(sample_data)
             psb.update(len(sample_data))

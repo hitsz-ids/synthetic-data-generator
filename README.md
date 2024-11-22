@@ -5,7 +5,7 @@
 <p align="center">
 
 <p align="center">
-<a href="https://github.com/hitsz-ids/synthetic-data-generator/actions"><img alt="Actions Status" src="https://github.com/hitsz-ids/synthetic-data-generator/actions/workflows/python-package.yml/badge.svg"></a>
+<a href="https://github.com/hitsz-ids/synthetic-data-generator/actions"><img alt="Actions Status" src="https://github.com/hitsz-ids/synthetic-data-generator/actions/workflows/ci-test-python-package.yml/badge.svg"></a>
 <a href='https://synthetic-data-generator.readthedocs.io/en/latest/?badge=latest'><img src='https://readthedocs.org/projects/synthetic-data-generator/badge/?version=latest' alt='Documentation Status' /></a>
 <a href="https://results.pre-commit.ci/latest/github/hitsz-ids/synthetic-data-generator/main"><img alt="pre-commit.ci status" src="https://results.pre-commit.ci/badge/github/hitsz-ids/synthetic-data-generator/main.svg"></a>
 <a href="https://github.com/hitsz-ids/synthetic-data-generator/blob/main/LICENSE"><img alt="LICENSE" src="https://img.shields.io/github/license/hitsz-ids/synthetic-data-generator"></a>
@@ -20,8 +20,10 @@
 # 🚀 Synthetic Data Generator
 
 <p style="font-size: small;">Switch Language:
-    <a href="https://github.com/hitsz-ids/synthetic-data-generator/blob/main/README_ZH_CN.md" target="_blank">简体中文</a> &nbsp;| &nbsp;Latest
-    <a href="https://synthetic-data-generator.readthedocs.io/en/latest/" target="value">API Docs</a>&nbsp;| &nbsp; Join <a href="assets/live_QR_code.jpg" target="value">Wechat Group</a>
+    <a href="https://github.com/hitsz-ids/synthetic-data-generator/blob/main/README_ZH_CN.md" target="_blank">简体中文</a> &nbsp;| &nbsp;
+    Latest <a href="https://synthetic-data-generator.readthedocs.io/en/latest/" target="value">API Docs</a> &nbsp;| &nbsp;
+    <a href="ROADMAP.md" target="value">Roadmap</a> &nbsp;| &nbsp;
+    Join <a href="assets/live_QR_code.jpg" target="value">Wechat Group</a>
 </p>
 
 <p style="font-size: small;">
@@ -42,9 +44,13 @@ Synthetic data does not contain any sensitive information, yet it retains the es
 
 High-quality synthetic data can be safely utilized across various domains including data sharing, model training and debugging, system development and testing, etc.
 
+We are excited to have you here and look forward to your contributions, get started with the project through this [Contributing Overview Guide](CONTRIBUTING.md)!
+
 ## 💥News
 
 Our current key achievements and timelines are as follows:
+
+🔥 Nov 21, 2024: 1) Model Integration - We've integrated the `GaussianCopula` model into our Data Processor System. Check out the code example in this [PR](https://github.com/hitsz-ids/synthetic-data-generator/pull/241); 2) Synthetic Quality - We implemented automatic detection of data column relationships and allowed for relationship specification, improved the quality of synthetic data([Code Example](https://synthetic-data-generator.readthedocs.io/en/latest/user_guides/single_table_column_combinations.html)); 3) Performance Enhancement - We significantly reduced the memory usage of GaussianCopula when handling discrete data, enabling training on thousands of categorical data entries with a `2C4G` setup!
 
 🔥 May 30, 2024: The Data Processor module was officially merged. This module will: 1) help SDG convert the format of some data columns (such as Datetime columns) before feeded into the model (so as to avoid being treated as discrete types), and reversely convert the model-generated data into the original format; 2) perform more customized pre-processing and post-processing on various data types; 3) easily deal with problems such as null values ​​in the original data; 4) support the plug-in system.
 

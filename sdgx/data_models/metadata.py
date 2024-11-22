@@ -137,7 +137,7 @@ class Metadata(BaseModel):
                 # Assume that user_id looks like 1,2,3,4
                 m.query("user_id") == ["id_columns", "numeric_columns"]
         """
-        return (k for k in self.tag_fields() if field in self.get(k))
+        return (k for k in self.tag_fields if field in self.get(k))
 
     def get(self, key: str) -> Set[str]:
         """

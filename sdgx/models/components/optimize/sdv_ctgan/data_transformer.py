@@ -6,8 +6,8 @@ from collections import namedtuple
 
 import numpy as np
 import pandas as pd
-from tqdm import notebook as tqdm
 from joblib import Parallel, delayed
+from tqdm import autonotebook as tqdm
 
 from sdgx.data_loader import DataLoader
 from sdgx.models.components.optimize.ndarray_loader import NDArrayLoader
@@ -121,7 +121,7 @@ class DataTransformer(object):
 
         self._column_raw_dtypes = data_loader[: data_loader.chunksize].infer_objects().dtypes
         self._column_transform_info_list = []
-        for column_name in tqdm.tqdm(data_loader.columns(), desc="Preparing data"):
+        for column_name in tqdm.tqdm(data_loader.columns(), desc="Preparing data", delay=3):
             if column_name in discrete_columns:
                 #  or column_name in self.metadata.label_columns
                 logger.debug(f"Fitting discrete column {column_name}...")
@@ -193,16 +193,12 @@ class DataTransformer(object):
                 process = delayed(self._transform_discrete)(column_transform_info, data)
             processes.append(process)
 
-        ## 这里有bug
-        # try:
-        #     # For Future versions of joblib
-        #     p = Parallel(n_jobs=-1, return_as="generator_unordered")
-        #     logger.warning("Using generator_unordered in joblib, time to remove this exception!")
-        # except ValueError:
         p = Parallel(n_jobs=-1, return_as="generator")
 
         loader = NDArrayLoader()
-        for ndarray in tqdm.tqdm(p(processes), desc="Transforming data", total=len(processes)):
+        for ndarray in tqdm.tqdm(
+            p(processes), desc="Transforming data", total=len(processes), delay=3
+        ):
             loader.store(ndarray.astype(float))
         return loader
 
@@ -243,9 +239,11 @@ class DataTransformer(object):
         st = 0
         recovered_column_data_list = []
         column_names = []
-        for column_transform_info in tqdm.tqdm(self._column_transform_info_list, desc="Inverse transforming"):
+        for column_transform_info in tqdm.tqdm(
+            self._column_transform_info_list, desc="Inverse transforming", delay=3
+        ):
             dim = column_transform_info.output_dimensions
-            column_data = data[:, st: st + dim]
+            column_data = data[:, st : st + dim]
             if column_transform_info.column_type == "continuous":
                 recovered_column_data = self._inverse_transform_continuous(
                     column_transform_info, column_data, sigmas, st
