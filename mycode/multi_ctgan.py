@@ -11,11 +11,11 @@ from mycode.test_20_tables import fetch_data_from_sqlite, build_sdv_metadata_fro
 from mycode.testcode.Xargs import XArg
 from mycode.testcode.metabuilder import MetaBuilder
 from sdgx.data_connectors.dataframe_connector import DataFrameConnector
-from sdgx.data_connectors.generator_connector import GeneratorConnector
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.metadata import Metadata
 from sdgx.models.ml.single_table.ctgan import CTGANSynthesizerModel
 from sdgx.synthesizer import Synthesizer
+
 
 def column_name_encode(table_name, col_name):
     return table_name + MultiTableCTGAN.TABLE_NAME_SEPERATOR + col_name

@@ -1,7 +1,7 @@
 import json
 import time
 import warnings
-from typing import Dict, List, Generator, Optional, NamedTuple, Set
+from typing import Dict, List, Optional, Set
 
 import pandas as pd
 from sklearn.feature_selection import RFECV
@@ -9,11 +9,11 @@ from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from tqdm import notebook as tqdm
 
 from mycode.multi_ctgan import MultiTableCTGAN
-from mycode.testcode.metabuilder import MetaBuilder
 from mycode.sdv.evaluation import evaluate
 from mycode.test_20_tables import build_sdv_metadata_from_origin_tables
 from mycode.testcode import Xargs
-from sdgx.data_connectors.generator_connector import GeneratorConnector
+from mycode.testcode.metabuilder import MetaBuilder
+from sdgx.data_connectors.dataframe_connector import DataFrameConnector
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.metadata import Metadata
 from sdgx.data_processors.base import DataProcessor
@@ -92,21 +92,13 @@ class MultiTableRfecvCTGAN:
         self.multi_x_join.init(add_cols_num=add_cols_num, added_data_path=added_data_path)
         self.meta_builder = meta_builder
 
-        def generator():
-            yield self.multi_x_join.join_tables.copy()
-
-        data_connector = GeneratorConnector(generator)
+        data_connector = DataFrameConnector(self.multi_x_join.join_tables.copy())
         data_loader = DataLoader(data_connector)
         self.metadata = Metadata.from_dataloader(data_loader)
         if self.meta_builder:
             self.metadata = self.meta_builder.build(multi_wrapper=self.multi_x_join, metadata=self.metadata)
-        preprocessed_loader = self._data_preprocess(data_loader, metadata=self.metadata)
-
-        # TODO 优化，这里调用了loadall两次 ？？ ，一次在loader的__init__时候
-        preprocessed_data = preprocessed_loader.load_all()
-
-        assert not preprocessed_data.isna().any().any()
-        assert not preprocessed_data.isnull().any().any()
+        preprocessed_data = self._data_preprocess(data_loader, metadata=self.metadata)
+        data_connector.reset_df(preprocessed_data)
 
         attached_columns_data = None
         if set(preprocessed_data.columns) != set(self.multi_x_join.join_tables):
@@ -122,7 +114,7 @@ class MultiTableRfecvCTGAN:
             join_columns_map=self.multi_x_join.join_columns_map,
             metadata=self.metadata)
 
-        preprocessed_loader.finalize(clear_cache=True)
+        # preprocessed_loader.finalize(clear_cache=True)
 
     def _data_preprocess(self, dataloader: DataLoader, metadata):
         start_time = time.time()
@@ -134,23 +126,11 @@ class MultiTableRfecvCTGAN:
         logger.info(
             f"Fitted {len(self.data_processors)} data processors in  {time.time() - start_time}s."
         )
-
-        def chunk_generator() -> Generator[pd.DataFrame, None, None]:
-            for chunk in dataloader.iter():
-                for d in self.data_processors:
-                    chunk = d.convert(chunk)
-
-                assert not chunk.isna().any().any()
-                assert not chunk.isnull().any().any()
-                yield chunk
-
-        logger.info("Initializing processed data loader...")
-        start_time = time.time()
-        processed_dataloader = DataLoader(
-            GeneratorConnector(chunk_generator),
-            identity=dataloader.identity
-        )
-        logger.info(f"Initialized processed data loader in {time.time() - start_time}s")
+        data = dataloader.load_all()
+        for d in self.data_processors:
+            data = d.convert(data)
+        assert not data.isna().any().any()
+        assert not data.isnull().any().any()
 
         # TODO 优化 Onehot转换 到此处
         # discrete_columns = list(metadata.get("discrete_columns"))
@@ -161,7 +141,7 @@ class MultiTableRfecvCTGAN:
         # self._ndarry_loader = self._transformer.transform(dataloader)
         # TODO 还需要考虑CTGAN后续的训练。
 
-        return processed_dataloader
+        return data
 
     @staticmethod
     def _convert_categorical(data: pd.DataFrame, metadata: Metadata, target_column_name: str):
@@ -360,13 +340,7 @@ class MultiTableRfecvCTGAN:
                                   device="cpu"):
         logger.info("Fitting RFE-CTGAN model on table {}...".format(to_training_info.table_name))
 
-        assert not to_training_info.tables.isnull().any().any()
-        assert not to_training_info.tables.isna().any().any()
-
-        def partition_generator():
-            yield to_training_info.tables.copy()
-
-        partition_data_connector = GeneratorConnector(partition_generator)
+        partition_data_connector = DataFrameConnector(to_training_info.tables.copy())
         partition_data_loader = DataLoader(partition_data_connector)
 
         # metadata 从全局的提取，不要新建，不然已经转换完类型存在错误
