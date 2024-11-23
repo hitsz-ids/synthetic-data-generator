@@ -10,6 +10,7 @@ from mycode.sdv.evaluation import evaluate
 from mycode.test_20_tables import fetch_data_from_sqlite, build_sdv_metadata_from_origin_tables
 from mycode.testcode.Xargs import XArg
 from mycode.testcode.metabuilder import MetaBuilder
+from sdgx.data_connectors.dataframe_connector import DataFrameConnector
 from sdgx.data_connectors.generator_connector import GeneratorConnector
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.metadata import Metadata
@@ -169,11 +170,7 @@ class MultiTableCTGAN:
         dataset_csv = f"{self.TABLE_TEMP_NAME}_original_joined.csv"
         self.join_tables.to_csv(dataset_csv, index=False)
 
-        # self.data_connector = CsvConnector(path=dataset_csv)
-        def generator():
-            yield self.join_tables.copy()
-
-        self.data_connector = GeneratorConnector(generator)
+        self.data_connector = DataFrameConnector(self.join_tables.copy())
         self.data_loader = DataLoader(self.data_connector)
         self.metadata = Metadata.from_dataloader(self.data_loader)
         if builder:

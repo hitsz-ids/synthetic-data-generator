@@ -1,7 +1,7 @@
 import json
 import time
 import warnings
-from typing import Dict, List, Generator, Optional
+from typing import Dict, List, Generator, Optional, NamedTuple, Set
 
 import pandas as pd
 from sklearn.feature_selection import RFECV
@@ -22,6 +22,23 @@ from sdgx.models.ml.single_table.ctgan import CTGANSynthesizerModel
 from sdgx.utils import logger
 
 CATEGORY_THRESHOLD = 15
+
+
+class SampledDataList:
+    def __init__(self):
+        self.__list: List[pd.DataFrame] = []
+        self.__column_names: Set[str] = set()
+
+    def add_data(self, df: pd.DataFrame):
+        self.__list.append(df)
+        self.__column_names.union(df.columns.tolist())
+
+    @property
+    def columns(self):
+        return frozenset(self.__column_names)
+
+    def concat_and_return(self):
+        return pd.concat(self.__list, axis=1)
 
 
 def _is_categorical(column: pd.Series | pd.DataFrame) -> bool:
@@ -430,12 +447,13 @@ class MultiTableRfecvCTGAN:
         return res.reset_index(drop=True)
 
     def sample(self, n) -> Dict[str, pd.DataFrame]:
+
         # TODO 外键约束被破坏？join之后恢复？
         keyed_columns_convert_map = self.multi_x_join.join_columns_map
         tables_name = self.multi_x_join.origin_tables.keys()
         columns_table_name_map = self.multi_x_join.join_columns_table_name_map
-        synthesized_tables: Dict[str: List[pd.DataFrame]] = {
-            tbn: [] for tbn in tables_name
+        synthesized_tables: Dict[str: SampledDataList] = {
+            tbn: SampledDataList() for tbn in tables_name
         }
         for i, v in enumerate(self.to_training):
             if not v.need_fitted:
@@ -454,16 +472,13 @@ class MultiTableRfecvCTGAN:
             # REF在后面代码会被附到每个生成表中，这里有可能重复生成了，只取前面生成的。
             # assert np.all(pd.Series(exists_columns).apply(self.multi_x_join.is_ref_column))
             fil_columns = list(set(real_current_columns) - set(exists_columns))
-            synthesized_tables[v.table_name] = pd.concat([
-                synthesized_tables[v.table_name],
-                data[fil_columns]
-            ], axis=1)
+            synthesized_tables[v.table_name].add_data(data[fil_columns])
 
             # 提取其他表列，当前表列有可能是REF（其他表的），因此不能直接用relative
             reference_columns = {col for col in columns if self.multi_x_join.is_ref_column(col)}
             other_columns = set(v.relative_columns)
             to_add_columns = reference_columns.union(other_columns)
-            # TODO pd.concat只使用一次，一次性使用pd.concat()比迭代concat更快。
+
             for col in to_add_columns:  # 寻找匹配的表名
                 to_add_table_set = set(columns_table_name_map[col]) - {v.table_name}
 
@@ -476,19 +491,18 @@ class MultiTableRfecvCTGAN:
                     if col in synthesized_tables[to_add_table_name].columns:
                         # TODO REF有重复，只取前面的REF。影响评估结果，但保证Join
                         continue
-                    synthesized_tables[to_add_table_name] = pd.concat([
-                        synthesized_tables[to_add_table_name],
-                        data[[col]]
-                    ], axis=1)
+                    # pd.concat只使用一次，一次性使用pd.concat()比迭代concat更快。
+                    synthesized_tables[to_add_table_name].add_data(data[[col]])
 
         # if save:
         #     self.save_xlsx(synthesized_tables, f"{self.TABLE_TEMP_NAME}_sample_split.xlsx")
         #     self.save_xlsx(self.origin_tables, f"{self.TABLE_TEMP_NAME}_origin_split.xlsx")
 
+        results_tables: Dict[str, pd.DataFrame] = {}
         # 恢复列名，重新排序
         for key in synthesized_tables:
-            synthesized_tables[key] = (
-                synthesized_tables[key]
+            results_tables[key] = (
+                synthesized_tables[key].concat_and_return()
                 .rename(
                     columns=keyed_columns_convert_map[key]
                 ).reindex(
@@ -496,7 +510,7 @@ class MultiTableRfecvCTGAN:
                 )
             )
 
-        return synthesized_tables
+        return results_tables
 
     def evaluate(self, x_args, synthetic_data, prompt=""):
         real_ctgan_data = self.multi_x_join.origin_tables

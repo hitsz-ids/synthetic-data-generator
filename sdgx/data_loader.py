@@ -9,6 +9,7 @@ from sdgx.cachers.base import Cacher, NoCache
 from sdgx.cachers.disk_cache import DiskCache
 from sdgx.cachers.manager import CacherManager
 from sdgx.data_connectors.base import DataConnector
+from sdgx.data_connectors.dataframe_connector import DataFrameConnector
 from sdgx.data_connectors.generator_connector import GeneratorConnector
 from sdgx.exceptions import DataLoaderInitError
 from sdgx.utils import cache
@@ -99,6 +100,9 @@ class DataLoader:
         cacher_kwargs: None | dict[str, Any] = None,
         identity: str | None = None,
     ) -> None:
+        if isinstance(data_connector, DataFrameConnector) and cacher is None:
+            cacher = NoCache
+
         self.data_connector = data_connector
         self.chunksize = chunksize
         self.cache_manager = CacherManager()

@@ -4,6 +4,7 @@ from collections import defaultdict
 from datetime import datetime
 from typing import Any, Dict
 
+import numpy as np
 import pandas as pd
 
 from sdgx.data_models.metadata import Metadata
@@ -133,14 +134,14 @@ class DatetimeFormatter(Formatter):
                 datetime_obj = datetime.strptime(str(each_value), datetime_format)
                 each_stamp = datetime.timestamp(datetime_obj)
             except Exception as e:
-                logger.warning(f"An error occured when convert str to timestamp {e}.")
+                logger.warning(f"An error occured when convert str to timestamp {e}, we set as mean.")
                 logger.warning(f"Input parameters: ({str(each_value)}, {datetime_format})")
                 logger.warning(f"Input type: ({type(each_value)}, {type(datetime_format)})")
-                each_stamp = 0
+                each_stamp = np.nan
             return each_stamp
 
         # Make a copy of processed_data to avoid modifying the original data
-        result_data = processed_data.copy()
+        result_data: pd.DataFrame = processed_data.copy()
 
         # Convert each datetime column in datetime_column_list to timestamp
         for column in datetime_column_list:
@@ -148,6 +149,7 @@ class DatetimeFormatter(Formatter):
             result_data[column] = result_data[column].apply(
                 datetime_formatter, datetime_format=datetime_formats[column]
             )
+            result_data[column].fillna(result_data[column].mean(), inplace=True)
         return result_data
 
     def reverse_convert(self, processed_data: pd.DataFrame) -> pd.DataFrame:
