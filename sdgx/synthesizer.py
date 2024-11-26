@@ -412,7 +412,7 @@ class Synthesizer:
 
         while missing_count > 0 and max_trails > 0:
             sample_data = self.model.sample(max(int(missing_count * 1.2), batch_size), **model_sample_args)
-            # TODO parallel process?
+            # TODO table separated parallel process
             for d in self.data_processors:
                 sample_data = d.reverse_convert(sample_data)
             sample_data = sample_data.dropna(how="all")
