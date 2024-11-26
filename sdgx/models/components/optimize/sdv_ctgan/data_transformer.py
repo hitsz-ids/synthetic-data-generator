@@ -66,7 +66,7 @@ class DataTransformer(object):
             column_name=column_name,
             column_type="continuous",
             transform=gm,
-            output_info=[SpanInfo(1, "tanh"), SpanInfo(num_components, "softmax")],  # 贝叶斯gmm，多个正态分布，选择一个
+            output_info=[SpanInfo(1, "tanh"), SpanInfo(num_components, "softmax")], 
             output_dimensions=1 + num_components,
         )
 
