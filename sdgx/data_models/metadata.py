@@ -5,7 +5,7 @@ from collections import defaultdict
 from collections.abc import Iterable
 from itertools import chain
 from pathlib import Path
-from typing import Any, Dict, List, Set, Literal
+from typing import Any, Dict, List, Set, Literal, Union
 
 import pandas as pd
 from pydantic import BaseModel, Field, field_validator
@@ -16,6 +16,8 @@ from sdgx.exceptions import MetadataInitError, MetadataInvalidError
 from sdgx.utils import logger
 
 CategoricalEncoderType = Literal["onehot", "label"]
+
+
 class Metadata(BaseModel):
     """
     Metadata is mainly used to describe the data types of all columns in a single data table.
@@ -75,9 +77,9 @@ class Metadata(BaseModel):
     numeric_format: Dict = defaultdict(list)
 
     # def columns encoder, even not matched categorical_threshold.
-    categorical_encoder: Dict[str, CategoricalEncoderType] = defaultdict(str)
+    categorical_encoder: Union[Dict[str, CategoricalEncoderType], None] = defaultdict(str)
     # if greater than categorical_threshold, encoder = label
-    categorical_threshold: int = None
+    categorical_threshold: Union[int, None] = None
 
     # version info
     version: str = "1.0"

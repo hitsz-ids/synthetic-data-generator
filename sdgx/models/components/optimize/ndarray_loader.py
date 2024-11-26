@@ -8,7 +8,11 @@ from typing import Generator
 from uuid import uuid4
 
 import numpy as np
+import pandas as pd
 from numpy import ndarray
+
+from sdgx.data_connectors.dataframe_connector import DataFrameConnector
+from sdgx.data_loader import DataLoader
 
 DEFAULT_CACHE_ROOT = os.getenv("SDG_NDARRAY_CACHE_ROOT", "./.ndarry_cache")
 
@@ -28,6 +32,15 @@ class NDArrayLoader:
             self.cache_root.mkdir(exist_ok=True, parents=True)
         else:
             self.ndarray_list = []
+
+    @staticmethod
+    def get_auto_save(raw_data) -> NDArrayLoader:
+        save_to_file = True
+        if isinstance(raw_data, pd.DataFrame) or (
+                isinstance(raw_data, DataLoader) and isinstance(raw_data.data_connector, DataFrameConnector)
+        ):
+            save_to_file = False
+        return NDArrayLoader(save_to_file=save_to_file)
 
     @cached_property
     def subdir(self) -> str:

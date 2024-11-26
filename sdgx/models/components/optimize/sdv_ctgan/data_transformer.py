@@ -9,6 +9,7 @@ import pandas as pd
 from joblib import Parallel, delayed
 from tqdm import autonotebook as tqdm
 
+from sdgx.data_connectors.dataframe_connector import DataFrameConnector
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.metadata import Metadata, CategoricalEncoderType
 from sdgx.models.components.optimize.ndarray_loader import NDArrayLoader
@@ -66,7 +67,7 @@ class DataTransformer(object):
             column_name=column_name,
             column_type="continuous",
             transform=gm,
-            output_info=[SpanInfo(1, "tanh"), SpanInfo(num_components, "softmax")], 
+            output_info=[SpanInfo(1, "tanh"), SpanInfo(num_components, "softmax")],
             output_dimensions=1 + num_components,
         )
 
@@ -125,10 +126,12 @@ class DataTransformer(object):
             if column_name in discrete_columns:
                 #  or column_name in self.metadata.label_columns
                 logger.debug(f"Fitting discrete column {column_name}...")
-
-                column_transform_info = self._fit_discrete(data_loader[[column_name]],
-                                                           self.metadata.categorical_encoder[
-                                                               column_name] if column_name in self.metadata.categorical_encoder else 'onehot')
+                encoder_type = None
+                if self.metadata.categorical_encoder and column_name in self.metadata.categorical_encoder:
+                    encoder_type = self.metadata.categorical_encoder[column_name]
+                column_transform_info = self._fit_discrete(
+                    data_loader[[column_name]], encoder_type
+                )
             else:
                 logger.debug(f"Fitting continuous column {column_name}...")
                 column_transform_info = self._fit_continuous(data_loader[[column_name]])
@@ -136,9 +139,6 @@ class DataTransformer(object):
             self.output_info_list.append(column_transform_info.output_info)
             self.output_dimensions += column_transform_info.output_dimensions
             self._column_transform_info_list.append(column_transform_info)
-
-    def get_column_transform_info_list(self):
-        return self._column_transform_info_list
 
     def _transform_continuous(self, column_transform_info, data):
         logger.debug(f"Transforming continuous column {column_transform_info.column_name}...")
@@ -162,12 +162,13 @@ class DataTransformer(object):
         ohe = column_transform_info.transform
         return ohe.transform(data).to_numpy()
 
+
     def _synchronous_transform(self, raw_data, column_transform_info_list) -> NDArrayLoader:
         """Take a Pandas DataFrame and transform columns synchronous.
 
         Outputs a list with Numpy arrays.
         """
-        loader = NDArrayLoader(save_to_file=False)
+        loader = NDArrayLoader.get_auto_save(raw_data)
         for column_transform_info in column_transform_info_list:
             column_name = column_transform_info.column_name
             data = raw_data[[column_name]]
@@ -196,7 +197,7 @@ class DataTransformer(object):
 
         p = Parallel(n_jobs=-1, return_as="generator")
 
-        loader = NDArrayLoader(save_to_file=False)
+        loader = NDArrayLoader.get_auto_save(raw_data)
         for ndarray in tqdm.tqdm(
                 p(processes), desc="Transforming data", total=len(processes), delay=3
         ):
@@ -238,7 +239,7 @@ class DataTransformer(object):
         Either np array or pd dataframe.
         """
 
-        # 这里可以考虑并行化或者 apply TODO
+        # TODO using pd.df.apply to increase performance.
         st = 0
         recovered_column_data_list = []
         column_names = []
@@ -266,7 +267,6 @@ class DataTransformer(object):
         )
         if not self.dataframe:
             recovered_data = recovered_data.to_numpy()
-        print("Recovered {} samples".format(len(recovered_data)))
         return recovered_data
 
     def convert_column_name_value_to_id(self, column_name, value):
