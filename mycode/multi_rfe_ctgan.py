@@ -24,21 +24,44 @@ from sdgx.utils import logger
 CATEGORY_THRESHOLD = 15
 
 
-class SampledDataList:
-    def __init__(self):
-        self.__list: List[pd.DataFrame] = []
-        self.__column_names: Set[str] = set()
+class KeyedSampledDataList:
+    # class KeyedSampledData:
+    #     def __init__(self, table_name, data):
+    def __init__(self, tables_name):
+        self.__dict: Dict[str, List[pd.DataFrame]] = {}
+        self.__column_names: Dict[str, List[str]] = {}
+        for tbn in tables_name:
+            self.__dict[tbn] = []
+            self.__column_names[tbn] = []
 
-    def add_data(self, df: pd.DataFrame):
-        self.__list.append(df)
-        self.__column_names.union(df.columns.tolist())
+    def __check_tables_key(self, k1, k2):
+        inter = set(k1).intersection(k2)
+        if inter:
+            raise ValueError(f'key duplicated: {inter} = {set(k1)} & {k2}')
 
-    @property
-    def columns(self):
-        return frozenset(self.__column_names)
+    def __check_table_name(self, table_name):
+        if table_name not in self.__dict:
+            raise KeyError(f'Table {table_name} does not exist')
 
-    def concat_and_return(self):
-        return pd.concat(self.__list, axis=1)
+    def add_data(self, table_name: str, df: pd.DataFrame):
+        # self.__check_table_name(table_name)
+        self.__check_tables_key(df.columns.tolist(), self.get_columns(table_name))
+        self.__dict[table_name].append(df)
+        self.__column_names[table_name].extend(df.columns.tolist())
+
+    def get_columns(self, table_name: str):
+        self.__check_table_name(table_name)
+        return frozenset(self.__column_names[table_name])
+
+    def concat_and_return(self, rename_map: Dict[str, Dict[str, str]], reindex_map: Dict[str, List[str]]):
+        return {
+            key: pd.concat(self.__dict[key], axis=1).rename(
+                columns=rename_map[key]
+            ).reindex(
+                columns=reindex_map[key]
+            )
+            for key in self.__dict.keys()
+        }
 
 
 def _is_categorical(column: pd.Series | pd.DataFrame) -> bool:
@@ -104,6 +127,7 @@ class MultiTableRfecvCTGAN:
         if set(preprocessed_data.columns) != set(self.multi_x_join.join_tables):
             warnings.warn("Detected columns deleting by data processors, we will attach original data to train RFECV.")
             missing_columns = set(self.multi_x_join.join_tables) - set(preprocessed_data.columns)
+            warnings.warn(f'{missing_columns}')
             attached_columns_data = pd.DataFrame(self.multi_x_join.join_tables[list(missing_columns)])
 
         self.to_training = MultiTableRfecvCTGAN._argument_tables(
@@ -127,7 +151,7 @@ class MultiTableRfecvCTGAN:
             f"Fitted {len(self.data_processors)} data processors in  {time.time() - start_time}s."
         )
         data = dataloader.load_all()
-        for d in self.data_processors:
+        for d in tqdm.tqdm(self.data_processors, desc="Transforming data"):
             data = d.convert(data)
         assert not data.isna().any().any()
         assert not data.isnull().any().any()
@@ -412,23 +436,19 @@ class MultiTableRfecvCTGAN:
             # TODO attached列会重复出现（email），每次reverse都会生成一次。
             # TODO 这里面有Nan
             sample_data_list.append(sample_data)
-            missing_count = missing_count - len(sample_data)
-            psb.update(len(sample_data))
+            missing_count = missing_count - sample_data.shape[0]
+            psb.update(sample_data.shape[0])
             max_trails -= 1
         res = pd.concat(sample_data_list)[:count]
-        assert len(res) == count
-        # TODO 这里有bug
+        if res.shape[0] < count: warnings.warn(f"Generated {res} < {count} records.")
         return res.reset_index(drop=True)
 
     def sample(self, n) -> Dict[str, pd.DataFrame]:
-
         # TODO 外键约束被破坏？join之后恢复？
         keyed_columns_convert_map = self.multi_x_join.join_columns_map
         tables_name = self.multi_x_join.origin_tables.keys()
         columns_table_name_map = self.multi_x_join.join_columns_table_name_map
-        synthesized_tables: Dict[str: SampledDataList] = {
-            tbn: SampledDataList() for tbn in tables_name
-        }
+        synthesized_tables = KeyedSampledDataList(tables_name)
         for i, v in enumerate(self.to_training):
             if not v.need_fitted:
                 continue
@@ -440,13 +460,12 @@ class MultiTableRfecvCTGAN:
             # 包含了是本表的attach_columns，因此无需再下面的计算
             # delta_columns = set(v.attached_columns) - set(real_current_columns)
             # if delta_columns:
-            exists_columns = synthesized_tables[v.table_name].columns
+            exists_columns = synthesized_tables.get_columns(v.table_name)
             # 要除去已经存在的列，他们是优先级更高的，按理说之前应该已经被data[columns]过滤了，这里再做个检验。(不对)
             # assert not list(set(exists_columns) & set(real_current_columns))
             # REF在后面代码会被附到每个生成表中，这里有可能重复生成了，只取前面生成的。
-            # assert np.all(pd.Series(exists_columns).apply(self.multi_x_join.is_ref_column))
             fil_columns = list(set(real_current_columns) - set(exists_columns))
-            synthesized_tables[v.table_name].add_data(data[fil_columns])
+            synthesized_tables.add_data(v.table_name, data[fil_columns])
 
             # 提取其他表列，当前表列有可能是REF（其他表的），因此不能直接用relative
             reference_columns = {col for col in columns if self.multi_x_join.is_ref_column(col)}
@@ -455,35 +474,19 @@ class MultiTableRfecvCTGAN:
 
             for col in to_add_columns:  # 寻找匹配的表名
                 to_add_table_set = set(columns_table_name_map[col]) - {v.table_name}
-
-                # assert col not in synthesized_tables[v.table_name].columns
-
                 for to_add_table_name in to_add_table_set:
-                    if to_add_table_name == v.table_name:
-                        continue
-                    # assert col not in synthesized_tables[to_add_table_name]
-                    if col in synthesized_tables[to_add_table_name].columns:
+                    if col in synthesized_tables.get_columns(to_add_table_name):
                         # TODO REF有重复，只取前面的REF。影响评估结果，但保证Join
                         continue
-                    # pd.concat只使用一次，一次性使用pd.concat()比迭代concat更快。
-                    synthesized_tables[to_add_table_name].add_data(data[[col]])
+                    synthesized_tables.add_data(to_add_table_name, data[[col]])
 
         # if save:
         #     self.save_xlsx(synthesized_tables, f"{self.TABLE_TEMP_NAME}_sample_split.xlsx")
         #     self.save_xlsx(self.origin_tables, f"{self.TABLE_TEMP_NAME}_origin_split.xlsx")
 
-        results_tables: Dict[str, pd.DataFrame] = {}
-        # 恢复列名，重新排序
-        for key in synthesized_tables:
-            results_tables[key] = (
-                synthesized_tables[key].concat_and_return()
-                .rename(
-                    columns=keyed_columns_convert_map[key]
-                ).reindex(
-                    columns=self.multi_x_join.tablekeyed_columns_order[key]
-                )
-            )
-
+        results_tables: Dict[str, pd.DataFrame] = synthesized_tables.concat_and_return(
+            keyed_columns_convert_map, self.multi_x_join.tablekeyed_columns_order
+        )
         return results_tables
 
     def evaluate(self, x_args, synthetic_data, prompt=""):

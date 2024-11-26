@@ -166,7 +166,7 @@ class DataTransformer(object):
 
         Outputs a list with Numpy arrays.
         """
-        loader = NDArrayLoader()
+        loader = NDArrayLoader(save_to_file=False)
         for column_transform_info in column_transform_info_list:
             column_name = column_transform_info.column_name
             data = raw_data[[column_name]]
@@ -195,7 +195,7 @@ class DataTransformer(object):
 
         p = Parallel(n_jobs=-1, return_as="generator")
 
-        loader = NDArrayLoader()
+        loader = NDArrayLoader(save_to_file=False)
         for ndarray in tqdm.tqdm(
             p(processes), desc="Transforming data", total=len(processes), delay=3
         ):

@@ -1,3 +1,4 @@
+import warnings
 from typing import List, Tuple
 
 from pydantic.dataclasses import dataclass
@@ -108,13 +109,26 @@ class XMetaBuilder(MetaBuilder):
         metadata.datetime_format.update({
             i: "%Y-%m-%d %H:%M:%S" for i in copyed_columns['datetime']
         })
+
+        if copyed_columns['time']:
+            warnings.warn("SDG不支持‘%H:%M:%S’！！建议删掉此列！{}".format(copyed_columns['time']))
+            # metadata.discrete_columns.union(copyed_columns['time'])
+
         # metadata.datetime_format.update({
         #     i: '' for i in copyed_columns['time']  # #"%H:%M:%S"
         #     # 此处有问题，SDG不支持该格式
         # })
+
         metadata.discrete_columns = set([
             key for key in metadata.discrete_columns if key not in metadata.datetime_columns
         ])
+        metadata.discrete_columns = metadata.discrete_columns.union(
+            set(metadata.datetime_columns) - set(metadata.datetime_format.keys())
+        )
+
+
+
+
         print(
             f"{metadata.int_columns=}\n{metadata.float_columns=}\n{metadata.const_columns=}\n{metadata.bool_columns=}\n{metadata.discrete_columns=}")
 
