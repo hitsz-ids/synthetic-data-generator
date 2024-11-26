@@ -37,7 +37,8 @@ class NDArrayLoader:
     def get_auto_save(raw_data) -> NDArrayLoader:
         save_to_file = True
         if isinstance(raw_data, pd.DataFrame) or (
-                isinstance(raw_data, DataLoader) and isinstance(raw_data.data_connector, DataFrameConnector)
+            isinstance(raw_data, DataLoader)
+            and isinstance(raw_data.data_connector, DataFrameConnector)
         ):
             save_to_file = False
         return NDArrayLoader(save_to_file=save_to_file)

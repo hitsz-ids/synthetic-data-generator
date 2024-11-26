@@ -442,7 +442,7 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
         return SDVBaseSynthesizer.save(self, save_dir / self.MODEL_SAVE_NAME)
 
     @classmethod
-    def load(cls, save_dir: str | Path, device: str=None) -> "CTGANSynthesizerModel":
+    def load(cls, save_dir: str | Path, device: str = None) -> "CTGANSynthesizerModel":
         return SDVBaseSynthesizer.load(save_dir / cls.MODEL_SAVE_NAME, device)
 
     @staticmethod

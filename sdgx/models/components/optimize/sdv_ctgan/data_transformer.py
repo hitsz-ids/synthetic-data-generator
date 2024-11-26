@@ -16,7 +16,9 @@ from sdgx.models.components.sdv_rdt.transformers import (
     ClusterBasedNormalizer,
     OneHotEncoder,
 )
-from sdgx.models.components.sdv_rdt.transformers.categorical import NormalizedLabelEncoder
+from sdgx.models.components.sdv_rdt.transformers.categorical import (
+    NormalizedLabelEncoder,
+)
 from sdgx.utils import logger
 
 SpanInfo = namedtuple("SpanInfo", ["dim", "activation_fn"])
@@ -126,11 +128,12 @@ class DataTransformer(object):
                 #  or column_name in self.metadata.label_columns
                 logger.debug(f"Fitting discrete column {column_name}...")
                 encoder_type = None
-                if self.metadata.categorical_encoder and column_name in self.metadata.categorical_encoder:
+                if (
+                    self.metadata.categorical_encoder
+                    and column_name in self.metadata.categorical_encoder
+                ):
                     encoder_type = self.metadata.categorical_encoder[column_name]
-                column_transform_info = self._fit_discrete(
-                    data_loader[[column_name]], encoder_type
-                )
+                column_transform_info = self._fit_discrete(data_loader[[column_name]], encoder_type)
             else:
                 logger.debug(f"Fitting continuous column {column_name}...")
                 column_transform_info = self._fit_continuous(data_loader[[column_name]])
