@@ -255,14 +255,3 @@ cython_debug/
 
 .sdgx_cache
 .ndarry_cache
-**/model/ctgan.pkl
-log_*.txt
-*.pkl
-*.xlsx
-*.db
-/syndiffix
-mycode/sdf/__init__.py
-bug_report2.ipynb
-bug_report.ipynb
-test.ipynb
-1.json
