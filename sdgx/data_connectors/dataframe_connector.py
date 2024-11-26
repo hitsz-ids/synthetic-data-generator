@@ -40,5 +40,5 @@ class DataFrameConnector(DataConnector):
 
         return generator()
 
-    def reset_df(self, df: pd.DataFrame):
+    def reset_dataframe(self, df: pd.DataFrame):
         self.df = df
