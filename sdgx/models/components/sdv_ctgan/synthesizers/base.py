@@ -142,3 +142,12 @@ class BaseSynthesizer:
                 f"`random_state` {random_state} expected to be an int or a tuple of "
                 "(`np.random.RandomState`, `torch.Generator`)"
             )
+
+
+class BatchedSynthesizer(BaseSynthesizer):
+    def __init__(self, batch_size, **kwargs):
+        self._batch_size = batch_size
+        super().__init__(**kwargs)
+
+    def get_batch_size(self):
+        return self._batch_size

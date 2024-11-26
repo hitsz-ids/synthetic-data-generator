@@ -10,7 +10,7 @@ from torch.utils.data import DataLoader, TensorDataset
 from sdgx.models.components.sdv_ctgan.data_transformer import DataTransformer
 from sdgx.models.components.sdv_ctgan.synthesizers.base import (
     BaseSynthesizer,
-    random_state,
+    random_state, BatchedSynthesizer,
 )
 
 
@@ -103,7 +103,7 @@ def _loss_function(recon_x, x, sigmas, mu, logvar, output_info, factor):
     return sum(loss) * factor / x.size()[0], KLD / x.size()[0]
 
 
-class TVAE(BaseSynthesizer):
+class TVAE(BatchedSynthesizer):
     """TVAE."""
 
     def __init__(
@@ -117,12 +117,12 @@ class TVAE(BaseSynthesizer):
         loss_factor=2,
         cuda=True,
     ):
+        super().__init__(batch_size)
         self.embedding_dim = embedding_dim
         self.compress_dims = compress_dims
         self.decompress_dims = decompress_dims
 
         self.l2scale = l2scale
-        self.batch_size = batch_size
         self.loss_factor = loss_factor
         self.epochs = epochs
 
@@ -152,7 +152,7 @@ class TVAE(BaseSynthesizer):
         self.transformer.fit(train_data, discrete_columns)
         train_data = self.transformer.transform(train_data)
         dataset = TensorDataset(torch.from_numpy(train_data.astype("float32")).to(self._device))
-        loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True, drop_last=False)
+        loader = DataLoader(dataset, batch_size=self._batch_size, shuffle=True, drop_last=False)
 
         data_dim = self.transformer.output_dimensions
         encoder = Encoder(data_dim, self.compress_dims, self.embedding_dim).to(self._device)
@@ -196,10 +196,10 @@ class TVAE(BaseSynthesizer):
         """
         self.decoder.eval()
 
-        steps = samples // self.batch_size + 1
+        steps = samples // self._batch_size + 1
         data = []
         for _ in range(steps):
-            mean = torch.zeros(self.batch_size, self.embedding_dim)
+            mean = torch.zeros(self._batch_size, self.embedding_dim)
             std = mean + 1
             noise = torch.normal(mean=mean, std=std).to(self._device)
             fake, sigmas = self.decoder(noise)

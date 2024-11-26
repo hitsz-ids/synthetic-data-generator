@@ -15,6 +15,7 @@ from sdgx.data_processors.base import DataProcessor
 from sdgx.data_processors.manager import DataProcessorManager
 from sdgx.exceptions import SynthesizerInitError, SynthesizerSampleError
 from sdgx.models.base import SynthesizerModel
+from sdgx.models.components.sdv_ctgan.synthesizers.base import BatchedSynthesizer
 from sdgx.models.manager import ModelManager
 from sdgx.models.statistics.single_table.base import StatisticSynthesizerModel
 from sdgx.utils import logger
@@ -403,8 +404,15 @@ class Synthesizer:
         max_trails = 5
         sample_data_list = []
         psb = tqdm.tqdm(total=count, desc="Sampling")
+
+        # To improve batched model performance, such as tvae or ctgan.
+        batch_size = 0
+        if isinstance(self.model, BatchedSynthesizer):
+            batch_size = self.model.get_batch_size()
+
         while missing_count > 0 and max_trails > 0:
-            sample_data = self.model.sample(int(missing_count * 1.2), **model_sample_args)
+            sample_data = self.model.sample(max(int(missing_count * 1.2), batch_size), **model_sample_args)
+            # TODO parallel process?
             for d in self.data_processors:
                 sample_data = d.reverse_convert(sample_data)
             sample_data = sample_data.dropna(how="all")

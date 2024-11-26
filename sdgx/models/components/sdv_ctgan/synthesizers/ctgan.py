@@ -22,7 +22,7 @@ from sdgx.models.components.sdv_ctgan.data_sampler import DataSampler
 from sdgx.models.components.sdv_ctgan.data_transformer import DataTransformer
 from sdgx.models.components.sdv_ctgan.synthesizers.base import (
     BaseSynthesizer,
-    random_state,
+    random_state, BatchedSynthesizer,
 )
 
 
@@ -108,7 +108,7 @@ class Generator(Module):
         return data
 
 
-class CTGAN(BaseSynthesizer):
+class CTGAN(BatchedSynthesizer):
     """Conditional Table GAN Synthesizer.
 
     This is the core class of the CTGAN project, where the different components
@@ -173,6 +173,7 @@ class CTGAN(BaseSynthesizer):
         cuda=True,
     ):
         assert batch_size % 2 == 0
+        super().__init__(batch_size)
 
         self._embedding_dim = embedding_dim
         self._generator_dim = generator_dim
@@ -183,7 +184,6 @@ class CTGAN(BaseSynthesizer):
         self._discriminator_lr = discriminator_lr
         self._discriminator_decay = discriminator_decay
 
-        self._batch_size = batch_size
         self._discriminator_steps = discriminator_steps
         self._log_frequency = log_frequency
         self._verbose = verbose
