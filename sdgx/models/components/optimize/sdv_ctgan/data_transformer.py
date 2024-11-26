@@ -10,6 +10,7 @@ from joblib import Parallel, delayed
 from tqdm import autonotebook as tqdm
 
 from sdgx.data_loader import DataLoader
+from sdgx.data_models.metadata import Metadata
 from sdgx.models.components.optimize.ndarray_loader import NDArrayLoader
 from sdgx.models.components.sdv_rdt.transformers import (
     ClusterBasedNormalizer,
@@ -41,7 +42,7 @@ class DataTransformer(object):
             weight_threshold (float):
                 Weight threshold for a Gaussian distribution to be kept.
         """
-        self.metadata = metadata
+        self.metadata: Metadata = metadata
         self._max_clusters = max_clusters
         self._weight_threshold = weight_threshold
 
@@ -90,7 +91,7 @@ class DataTransformer(object):
         if encoder == 'onehot':
             # 阈值
             pass
-        elif encoder == 'label' and num_categories > 100:
+        elif encoder == 'label' and num_categories > self.metadata.categorical_threshold:
             ohe = LabelEncoder(order_by="alphabetical")
             ohe.fit(data, column_name)
             num_categories = 1  # len(ohe.categories_to_values)  # len(ohe.dummies)
@@ -126,8 +127,8 @@ class DataTransformer(object):
                 #  or column_name in self.metadata.label_columns
                 logger.debug(f"Fitting discrete column {column_name}...")
 
-                column_transform_info = self._fit_discrete(data_loader[[column_name]], self.metadata.column_encoder[
-                    column_name] if column_name in self.metadata.column_encoder else 'onehot')
+                column_transform_info = self._fit_discrete(data_loader[[column_name]], self.metadata.categorical_encoder[
+                    column_name] if column_name in self.metadata.categorical_encoder else 'onehot')
             else:
                 logger.debug(f"Fitting continuous column {column_name}...")
                 column_transform_info = self._fit_continuous(data_loader[[column_name]])

@@ -6,6 +6,7 @@ import numpy as np
 from tqdm import autonotebook as tqdm
 
 from sdgx.models.components.optimize.ndarray_loader import NDArrayLoader
+from sdgx.models.components.optimize.sdv_ctgan.data_transformer import SpanInfo
 
 
 class DataSampler(object):
@@ -14,11 +15,11 @@ class DataSampler(object):
     def __init__(self, data: NDArrayLoader | np.ndarray, output_info, log_frequency):
         self._data: NDArrayLoader | np.ndarray = data
 
-        def is_discrete_column(column_info):
-            return len(column_info) == 1 and column_info[0].activation_fn == "softmax"  # todo 修改了tanh
+        def is_onehot_encoding_column(column_info: SpanInfo):
+            return len(column_info) == 1 and column_info[0].activation_fn == "softmax"
 
         n_discrete_columns = sum(
-            [1 for column_info in output_info if is_discrete_column(column_info)]
+            [1 for column_info in output_info if is_onehot_encoding_column(column_info)]
         )
 
         self._discrete_column_matrix_st = np.zeros(n_discrete_columns, dtype="int32")
@@ -31,7 +32,7 @@ class DataSampler(object):
         # Compute _rid_by_cat_cols
         st = 0
         for column_info in output_info:
-            if is_discrete_column(column_info):
+            if is_onehot_encoding_column(column_info):
                 span_info = column_info[0]
                 ed = st + span_info.dim
 
@@ -46,7 +47,7 @@ class DataSampler(object):
 
         # Prepare an interval matrix for efficiently sample conditional vector
         max_category = max(
-            [column_info[0].dim for column_info in output_info if is_discrete_column(column_info)],
+            [column_info[0].dim for column_info in output_info if is_onehot_encoding_column(column_info)],
             default=0,
         )
 
@@ -55,14 +56,14 @@ class DataSampler(object):
         self._discrete_column_category_prob = np.zeros((n_discrete_columns, max_category))
         self._n_discrete_columns = n_discrete_columns
         self._n_categories = sum(
-            [column_info[0].dim for column_info in output_info if is_discrete_column(column_info)]
+            [column_info[0].dim for column_info in output_info if is_onehot_encoding_column(column_info)]
         )
 
         st = 0
         current_id = 0
         current_cond_st = 0
         for column_info in output_info:
-            if is_discrete_column(column_info):
+            if is_onehot_encoding_column(column_info):
                 span_info = column_info[0]
                 ed = st + span_info.dim
                 category_freq = np.sum(data[:, st:ed], axis=0)

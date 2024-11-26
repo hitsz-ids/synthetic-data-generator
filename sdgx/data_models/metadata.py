@@ -1,5 +1,5 @@
 from __future__ import annotations
-import cloudpickle
+
 import json
 from collections import defaultdict
 from collections.abc import Iterable
@@ -9,7 +9,6 @@ from typing import Any, Dict, List, Set
 
 import pandas as pd
 from pydantic import BaseModel, Field, field_validator
-
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.inspectors.base import RelationshipInspector
 from sdgx.data_models.inspectors.manager import InspectorManager
@@ -75,8 +74,8 @@ class Metadata(BaseModel):
     datetime_format: Dict = defaultdict(str)
     numeric_format: Dict = defaultdict(list)
 
-    # label_columns: Set[str] = set()
-    column_encoder: Dict = defaultdict(str)
+    categorical_encoder: Dict = defaultdict(str)
+    categorical_threshold: int = 100
 
     # version info
     version: str = "1.0"
@@ -395,16 +394,12 @@ class Metadata(BaseModel):
         Save metadata to json file.
         """
 
-        # with path.open("wb") as f:
-        #     cloudpickle.dump(self, f)
-        #     f.write(self._dump_json())
-
         with path.open("w") as f:
             f.write(self._dump_json())
 
 
     @classmethod
-    def load_json(cls, attributes):
+    def loads(cls, attributes):
         return Metadata(**attributes)
 
     @classmethod
