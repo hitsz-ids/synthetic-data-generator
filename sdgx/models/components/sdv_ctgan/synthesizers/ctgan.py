@@ -22,7 +22,8 @@ from sdgx.models.components.sdv_ctgan.data_sampler import DataSampler
 from sdgx.models.components.sdv_ctgan.data_transformer import DataTransformer
 from sdgx.models.components.sdv_ctgan.synthesizers.base import (
     BaseSynthesizer,
-    random_state, BatchedSynthesizer,
+    BatchedSynthesizer,
+    random_state,
 )
 
 
@@ -262,7 +263,7 @@ class CTGAN(BatchedSynthesizer):
         st_c = 0
         for column_info in self._transformer.output_info_list:
             for span_info in column_info:
-                if len(column_info) != 1 or span_info.activation_fn != "softmax": # todo 待修改
+                if len(column_info) != 1 or span_info.activation_fn != "softmax":  # todo 待修改
                     # not discrete column
                     st += span_info.dim
                 else:

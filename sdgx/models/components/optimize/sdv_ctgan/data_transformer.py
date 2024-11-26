@@ -10,13 +10,16 @@ from joblib import Parallel, delayed
 from tqdm import autonotebook as tqdm
 
 from sdgx.data_loader import DataLoader
-from sdgx.data_models.metadata import Metadata, CategoricalEncoderType
+from sdgx.data_models.metadata import CategoricalEncoderType, Metadata
 from sdgx.models.components.optimize.ndarray_loader import NDArrayLoader
 from sdgx.models.components.sdv_rdt.transformers import (
     ClusterBasedNormalizer,
     OneHotEncoder,
 )
-from sdgx.models.components.sdv_rdt.transformers.categorical import LabelEncoder, NormalizedLabelEncoder
+from sdgx.models.components.sdv_rdt.transformers.categorical import (
+    LabelEncoder,
+    NormalizedLabelEncoder,
+)
 from sdgx.utils import logger
 
 SpanInfo = namedtuple("SpanInfo", ["dim", "activation_fn"])
@@ -66,7 +69,7 @@ class DataTransformer(object):
             column_name=column_name,
             column_type="continuous",
             transform=gm,
-            output_info=[SpanInfo(1, "tanh"), SpanInfo(num_components, "softmax")], 
+            output_info=[SpanInfo(1, "tanh"), SpanInfo(num_components, "softmax")],
             output_dimensions=1 + num_components,
         )
 
@@ -89,9 +92,9 @@ class DataTransformer(object):
         activate_fn = "softmax"
 
         checked = self.metadata.check_categorical_threshold(num_categories)
-        if encoder_type == 'onehot' or not checked:
+        if encoder_type == "onehot" or not checked:
             pass
-        elif encoder_type == 'label':
+        elif encoder_type == "label":
             encoder = NormalizedLabelEncoder(order_by="alphabetical")
             encoder.fit(data, column_name)
             num_categories = 1
@@ -126,9 +129,14 @@ class DataTransformer(object):
                 #  or column_name in self.metadata.label_columns
                 logger.debug(f"Fitting discrete column {column_name}...")
 
-                column_transform_info = self._fit_discrete(data_loader[[column_name]],
-                                                           self.metadata.categorical_encoder[
-                                                               column_name] if column_name in self.metadata.categorical_encoder else 'onehot')
+                column_transform_info = self._fit_discrete(
+                    data_loader[[column_name]],
+                    (
+                        self.metadata.categorical_encoder[column_name]
+                        if column_name in self.metadata.categorical_encoder
+                        else "onehot"
+                    ),
+                )
             else:
                 logger.debug(f"Fitting continuous column {column_name}...")
                 column_transform_info = self._fit_continuous(data_loader[[column_name]])
@@ -198,7 +206,7 @@ class DataTransformer(object):
 
         loader = NDArrayLoader(save_to_file=False)
         for ndarray in tqdm.tqdm(
-                p(processes), desc="Transforming data", total=len(processes), delay=3
+            p(processes), desc="Transforming data", total=len(processes), delay=3
         ):
             loader.store(ndarray.astype(float))
         return loader
@@ -244,10 +252,10 @@ class DataTransformer(object):
         column_names = []
 
         for column_transform_info in tqdm.tqdm(
-                self._column_transform_info_list, desc="Inverse transforming", delay=3
+            self._column_transform_info_list, desc="Inverse transforming", delay=3
         ):
             dim = column_transform_info.output_dimensions
-            column_data = data[:, st: st + dim]
+            column_data = data[:, st : st + dim]
             if column_transform_info.column_type == "continuous":
                 recovered_column_data = self._inverse_transform_continuous(
                     column_transform_info, column_data, sigmas, st

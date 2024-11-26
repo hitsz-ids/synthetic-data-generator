@@ -55,7 +55,7 @@ class NDArrayLoader:
                 np.save(self._get_cache_filename(self.store_index), ndarray)
                 self.store_index += 1
         else:
-             for ndarray in np.split(ndarray, indices_or_sections=ndarray.shape[1], axis=1):
+            for ndarray in np.split(ndarray, indices_or_sections=ndarray.shape[1], axis=1):
                 self.ndarray_list.append(ndarray)
                 self.store_index += 1
 

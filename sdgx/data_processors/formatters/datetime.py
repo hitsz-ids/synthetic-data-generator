@@ -134,7 +134,9 @@ class DatetimeFormatter(Formatter):
                 datetime_obj = datetime.strptime(str(each_value), datetime_format)
                 each_stamp = datetime.timestamp(datetime_obj)
             except Exception as e:
-                logger.warning(f"An error occured when convert str to timestamp {e}, we set as mean.")
+                logger.warning(
+                    f"An error occured when convert str to timestamp {e}, we set as mean."
+                )
                 logger.warning(f"Input parameters: ({str(each_value)}, {datetime_format})")
                 logger.warning(f"Input type: ({type(each_value)}, {type(datetime_format)})")
                 each_stamp = np.nan
