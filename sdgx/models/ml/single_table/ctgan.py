@@ -164,9 +164,6 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
 
     MODEL_SAVE_NAME = "ctgan.pkl"
 
-    def set_batch_size_test(self, b):
-        self._batch_size = b
-
     def __init__(
         self,
         embedding_dim=128,
@@ -209,23 +206,10 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
         self._ndarry_loader = None
         self.data_dim = None
 
-    def fit(self, metadata: Metadata, dataloader: DataLoader, epochs=None, prefited=False, *args, **kwargs):
+    def fit(self, metadata: Metadata, dataloader: DataLoader, epochs=None, *args, **kwargs):
         # In the future, sdgx use `sdgx.data_processor.transformers.discrete` to handle discrete_columns
         # the original sdv transformer will be removed in version 0.3.0
         # This will be done in another PR.
-        discrete_columns = list(metadata.get("discrete_columns"))
-        if epochs is not None:
-            self._epochs = epochs
-        if not prefited:
-            self._pre_fit(dataloader, discrete_columns, metadata)
-        if self.fit_data_empty:
-            logger.info("CTGAN fit finished because of empty df detected.")
-            return
-        logger.info("CTGAN prefit finished, start CTGAN training.")
-        self._fit(len(self._ndarry_loader))
-        logger.info("CTGAN training finished.")
-
-    def pre_fit_test(self, metadata: Metadata, dataloader: DataLoader, epochs=None, *args, **kwargs):
         discrete_columns = list(metadata.get("discrete_columns"))
         if epochs is not None:
             self._epochs = epochs
@@ -233,7 +217,9 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
         if self.fit_data_empty:
             logger.info("CTGAN fit finished because of empty df detected.")
             return
-        logger.info("CTGAN prefit finished.")
+        logger.info("CTGAN prefit finished, start CTGAN training.")
+        self._fit(len(self._ndarry_loader))
+        logger.info("CTGAN training finished.")
 
     def _pre_fit(self, dataloader: DataLoader, discrete_columns: list[str] = None, metadata: Metadata = None) -> NDArrayLoader:
         if not discrete_columns:
@@ -421,7 +407,7 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
 
         steps = n // self._batch_size + 1
         data = []
-        for i in tqdm.tqdm(range(steps), desc="Sampling batches", delay=3):
+        for _ in tqdm.tqdm(range(steps), desc="Sampling batches", delay=3):
             mean = torch.zeros(self._batch_size, self._embedding_dim)
             std = mean + 1
             fakez = torch.normal(mean=mean, std=std).to(self._device)
@@ -443,7 +429,7 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
             data.append(fakeact.detach().cpu().numpy())
 
         data = np.concatenate(data, axis=0)
-        print("CTGAN Generated {} raw samples".format(len(data)))
+        logger.info("CTGAN Generated {} raw samples.".format(data.shape[0]))
         if drop_more:
             data = data[:n]
         return self._transformer.inverse_transform(data)
@@ -453,7 +439,7 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
         return SDVBaseSynthesizer.save(self, save_dir / self.MODEL_SAVE_NAME)
 
     @classmethod
-    def load(cls, save_dir: str | Path, device) -> "CTGANSynthesizerModel":
+    def load(cls, save_dir: str | Path, device: str) -> "CTGANSynthesizerModel":
         return SDVBaseSynthesizer.load(save_dir / cls.MODEL_SAVE_NAME, device)
 
     @staticmethod
@@ -504,7 +490,7 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
                     data_t.append(transformed)
                     st = ed
                 elif span_info.activation_fn == "liner":
-                    # 修改为了线性
+                    # for label encoder
                     ed = st + span_info.dim
                     transformed = data[:, st:ed].clone()
                     data_t.append(transformed)

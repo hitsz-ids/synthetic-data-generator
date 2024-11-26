@@ -246,8 +246,6 @@ class Synthesizer:
 
     def fit(
         self,
-        prefit = False,
-        from_prefit = False,
         metadata: None | Metadata = None,
         inspector_max_chunk: int = 10,
         metadata_include_inspectors: None | list[str] = None,
@@ -293,7 +291,7 @@ class Synthesizer:
             )
         )
         self.metadata = metadata  # Ensure update metadata
-        # print(self.metadata.model_dump())
+
         logger.info("Fitting data processors...")
         if not self.dataloader:
             logger.info("Fitting without dataloader.")
@@ -323,14 +321,7 @@ class Synthesizer:
         logger.info(f"Initialized processed data loader in {time.time() - start_time}s")
         try:
             logger.info("Model fit Started...")
-            if not prefit and not from_prefit:
-                self.model.fit(metadata, processed_dataloader,**(model_fit_kwargs or {}))
-            elif prefit and not from_prefit:
-                self.model.pre_fit_test(metadata, processed_dataloader, **(model_fit_kwargs or {}))
-                return
-            elif not prefit and from_prefit:
-                self.model.fit(metadata, processed_dataloader,prefited=True,**(model_fit_kwargs or {}))
-                
+            self.model.fit(metadata, processed_dataloader,**(model_fit_kwargs or {}))
             logger.info("Model fit... Finished")
         finally:
             processed_dataloader.finalize(clear_cache=True)

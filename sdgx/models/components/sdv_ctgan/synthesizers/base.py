@@ -1,6 +1,9 @@
 """BaseSynthesizer module."""
 
 import contextlib
+import warnings
+from pathlib import Path
+from typing import Union
 
 import cloudpickle
 import numpy as np
@@ -73,9 +76,9 @@ class BaseSynthesizer:
 
         random_states = self.random_states
         if (
-            isinstance(random_states, tuple)
-            and isinstance(random_states[0], np.random.RandomState)
-            and isinstance(random_states[1], torch.Generator)
+                isinstance(random_states, tuple)
+                and isinstance(random_states[0], np.random.RandomState)
+                and isinstance(random_states[1], torch.Generator)
         ):
             state["_numpy_random_state"] = random_states[0].get_state()
             state["_torch_random_state"] = random_states[1].get_state()
@@ -109,8 +112,8 @@ class BaseSynthesizer:
         self.set_device(device_backup)
 
     @classmethod
-    def load(cls, path, device="cuda" if torch.cuda.is_available() else "cpu"):
-        """Load the model stored in the passed `path`."""
+    def load(cls, path: Union[str, Path], device: str = "cuda" if torch.cuda.is_available() else "cpu"):
+        """Load the model stored in the passed arg `path`."""
         with open(path, "rb") as f:
             model = cloudpickle.load(f)
         model.set_device(device)
@@ -132,9 +135,9 @@ class BaseSynthesizer:
                 torch.Generator().manual_seed(random_state),
             )
         elif (
-            isinstance(random_state, tuple)
-            and isinstance(random_state[0], np.random.RandomState)
-            and isinstance(random_state[1], torch.Generator)
+                isinstance(random_state, tuple)
+                and isinstance(random_state[0], np.random.RandomState)
+                and isinstance(random_state[1], torch.Generator)
         ):
             self.random_states = random_state
         else:
@@ -151,3 +154,7 @@ class BatchedSynthesizer(BaseSynthesizer):
 
     def get_batch_size(self):
         return self._batch_size
+
+    def set_batch_size(self, b: int):
+        warnings.warn("Reset batch_size may caused unintentional behavior.")
+        self._batch_size = b
