@@ -3,7 +3,7 @@ from __future__ import annotations
 import time
 from pathlib import Path
 from typing import Any, Generator
-from tqdm import notebook as tqdm
+from tqdm import autonotebook as tqdm
 import pandas as pd
 
 from sdgx.data_connectors.base import DataConnector

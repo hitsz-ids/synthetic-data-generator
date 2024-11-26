@@ -10,13 +10,13 @@ from joblib import Parallel, delayed
 from tqdm import autonotebook as tqdm
 
 from sdgx.data_loader import DataLoader
-from sdgx.data_models.metadata import Metadata
+from sdgx.data_models.metadata import Metadata, CategoricalEncoderType
 from sdgx.models.components.optimize.ndarray_loader import NDArrayLoader
 from sdgx.models.components.sdv_rdt.transformers import (
     ClusterBasedNormalizer,
     OneHotEncoder,
 )
-from sdgx.models.components.sdv_rdt.transformers.categorical import LabelEncoder
+from sdgx.models.components.sdv_rdt.transformers.categorical import LabelEncoder, NormalizedLabelEncoder
 from sdgx.utils import logger
 
 SpanInfo = namedtuple("SpanInfo", ["dim", "activation_fn"])
@@ -70,7 +70,7 @@ class DataTransformer(object):
             output_dimensions=1 + num_components,
         )
 
-    def _fit_discrete(self, data, encoder="onehot"):
+    def _fit_discrete(self, data, encoder_type: CategoricalEncoderType = None):
         """Fit one hot encoder for discrete column.
 
         Args:
@@ -83,27 +83,26 @@ class DataTransformer(object):
         """
         column_name = data.columns[0]
 
-        #
-        ohe = OneHotEncoder()  # LabelEncoder(order_by="alphabetical")  # OneHotEncoder()
-        ohe.fit(data, column_name)
-        num_categories = len(ohe.dummies)  # 1  # len(ohe.categories_to_values)  # len(ohe.dummies)
+        encoder = OneHotEncoder()
+        encoder.fit(data, column_name)
+        num_categories = len(encoder.dummies)
         activate_fn = "softmax"
-        if encoder == 'onehot':
-            # 阈值
+
+        checked = self.metadata.check_categorical_threshold(num_categories)
+        if encoder_type == 'onehot' or not checked:
             pass
-        elif encoder == 'label' and num_categories > self.metadata.categorical_threshold:
-            ohe = LabelEncoder(order_by="alphabetical")
-            ohe.fit(data, column_name)
-            num_categories = 1  # len(ohe.categories_to_values)  # len(ohe.dummies)
+        elif encoder_type == 'label':
+            encoder = NormalizedLabelEncoder(order_by="alphabetical")
+            encoder.fit(data, column_name)
+            num_categories = 1
             activate_fn = "liner"
         else:
-            pass
-            # raise ValueError("column encoder must be either 'onehot'(default) or 'label'")
+            raise ValueError("column encoder must be either 'onehot'(default) or 'label'")
 
         return ColumnTransformInfo(
             column_name=column_name,
-            column_type="discrete",  # if activate_fn == "softmax" else "continuous",
-            transform=ohe,
+            column_type="discrete",
+            transform=encoder,
             output_info=[SpanInfo(num_categories, activate_fn)],
             output_dimensions=num_categories,
         )
@@ -127,8 +126,9 @@ class DataTransformer(object):
                 #  or column_name in self.metadata.label_columns
                 logger.debug(f"Fitting discrete column {column_name}...")
 
-                column_transform_info = self._fit_discrete(data_loader[[column_name]], self.metadata.categorical_encoder[
-                    column_name] if column_name in self.metadata.categorical_encoder else 'onehot')
+                column_transform_info = self._fit_discrete(data_loader[[column_name]],
+                                                           self.metadata.categorical_encoder[
+                                                               column_name] if column_name in self.metadata.categorical_encoder else 'onehot')
             else:
                 logger.debug(f"Fitting continuous column {column_name}...")
                 column_transform_info = self._fit_continuous(data_loader[[column_name]])
@@ -198,7 +198,7 @@ class DataTransformer(object):
 
         loader = NDArrayLoader(save_to_file=False)
         for ndarray in tqdm.tqdm(
-            p(processes), desc="Transforming data", total=len(processes), delay=3
+                p(processes), desc="Transforming data", total=len(processes), delay=3
         ):
             loader.store(ndarray.astype(float))
         return loader
@@ -244,10 +244,10 @@ class DataTransformer(object):
         column_names = []
 
         for column_transform_info in tqdm.tqdm(
-            self._column_transform_info_list, desc="Inverse transforming", delay=3
+                self._column_transform_info_list, desc="Inverse transforming", delay=3
         ):
             dim = column_transform_info.output_dimensions
-            column_data = data[:, st : st + dim]
+            column_data = data[:, st: st + dim]
             if column_transform_info.column_type == "continuous":
                 recovered_column_data = self._inverse_transform_continuous(
                     column_transform_info, column_data, sigmas, st
