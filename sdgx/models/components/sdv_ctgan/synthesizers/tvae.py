@@ -9,8 +9,8 @@ from torch.utils.data import DataLoader, TensorDataset
 
 from sdgx.models.components.sdv_ctgan.data_transformer import DataTransformer
 from sdgx.models.components.sdv_ctgan.synthesizers.base import (
+    BatchedSynthesizer,
     random_state,
-    BatchedSynthesizer
 )
 
 
@@ -85,7 +85,7 @@ def _loss_function(recon_x, x, sigmas, mu, logvar, output_info, factor):
                 ed = st + span_info.dim
                 std = sigmas[st]
                 eq = x[:, st] - torch.tanh(recon_x[:, st])
-                loss.append((eq ** 2 / 2 / (std ** 2)).sum())
+                loss.append((eq**2 / 2 / (std**2)).sum())
                 loss.append(torch.log(std) * x.size()[0])
                 st = ed
 
@@ -99,7 +99,7 @@ def _loss_function(recon_x, x, sigmas, mu, logvar, output_info, factor):
                 st = ed
 
     assert st == recon_x.size()[1]
-    KLD = -0.5 * torch.sum(1 + logvar - mu ** 2 - logvar.exp())
+    KLD = -0.5 * torch.sum(1 + logvar - mu**2 - logvar.exp())
     return sum(loss) * factor / x.size()[0], KLD / x.size()[0]
 
 
@@ -107,15 +107,15 @@ class TVAE(BatchedSynthesizer):
     """TVAE."""
 
     def __init__(
-            self,
-            embedding_dim=128,
-            compress_dims=(128, 128),
-            decompress_dims=(128, 128),
-            l2scale=1e-5,
-            batch_size=500,
-            epochs=300,
-            loss_factor=2,
-            cuda=True,
+        self,
+        embedding_dim=128,
+        compress_dims=(128, 128),
+        decompress_dims=(128, 128),
+        l2scale=1e-5,
+        batch_size=500,
+        epochs=300,
+        loss_factor=2,
+        cuda=True,
     ):
         super().__init__(batch_size)
         self.embedding_dim = embedding_dim

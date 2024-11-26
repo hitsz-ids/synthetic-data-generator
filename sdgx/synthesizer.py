@@ -3,8 +3,9 @@ from __future__ import annotations
 import time
 from pathlib import Path
 from typing import Any, Generator
-from tqdm import autonotebook as tqdm
+
 import pandas as pd
+from tqdm import autonotebook as tqdm
 
 from sdgx.data_connectors.base import DataConnector
 from sdgx.data_connectors.generator_connector import GeneratorConnector
@@ -190,7 +191,7 @@ class Synthesizer:
         processed_data_loaders_kwargs: None | dict[str, Any] = None,
         data_processors: None | list[str | DataProcessor | type[DataProcessor]] = None,
         data_processors_kwargs: None | dict[str, dict[str, Any]] = None,
-        model_kwargs = None 
+        model_kwargs=None,
     ) -> "Synthesizer":
         """
         Load metadata and model, allow rebuilding Synthesizer for finetuning or other use cases.
@@ -321,7 +322,7 @@ class Synthesizer:
         logger.info(f"Initialized processed data loader in {time.time() - start_time}s")
         try:
             logger.info("Model fit Started...")
-            self.model.fit(metadata, processed_dataloader,**(model_fit_kwargs or {}))
+            self.model.fit(metadata, processed_dataloader, **(model_fit_kwargs or {}))
             logger.info("Model fit... Finished")
         finally:
             processed_dataloader.finalize(clear_cache=True)
@@ -402,7 +403,9 @@ class Synthesizer:
             batch_size = self.model.get_batch_size()
 
         while missing_count > 0 and max_trails > 0:
-            sample_data = self.model.sample(max(int(missing_count * 1.2), batch_size), **model_sample_args)
+            sample_data = self.model.sample(
+                max(int(missing_count * 1.2), batch_size), **model_sample_args
+            )
             # TODO table separated parallel process
             for d in self.data_processors:
                 sample_data = d.reverse_convert(sample_data)

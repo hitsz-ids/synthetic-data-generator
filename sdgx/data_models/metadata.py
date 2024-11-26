@@ -9,6 +9,7 @@ from typing import Any, Dict, List, Set, Literal, Union
 
 import pandas as pd
 from pydantic import BaseModel, Field, field_validator
+
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.inspectors.base import RelationshipInspector
 from sdgx.data_models.inspectors.manager import InspectorManager
@@ -89,7 +90,11 @@ class Metadata(BaseModel):
     """
 
     def check_categorical_threshold(self, num_categories):
-        return num_categories > self.categorical_threshold if self.categorical_threshold is not None else False
+        return (
+            num_categories > self.categorical_threshold
+            if self.categorical_threshold is not None
+            else False
+        )
 
     @property
     def tag_fields(self) -> Iterable[str]:
@@ -117,16 +122,16 @@ class Metadata(BaseModel):
         if not isinstance(other, Metadata):
             return super().__eq__(other)
         return (
-                set(self.tag_fields) == set(other.tag_fields)
-                and all(
-            self.get(key) == other.get(key)
-            for key in set(chain(self.tag_fields, other.tag_fields))
-        )
-                and all(
-            self.get(key) == other.get(key)
-            for key in set(chain(self.format_fields, other.format_fields))
-        )
-                and self.version == other.version
+            set(self.tag_fields) == set(other.tag_fields)
+            and all(
+                self.get(key) == other.get(key)
+                for key in set(chain(self.tag_fields, other.tag_fields))
+            )
+            and all(
+                self.get(key) == other.get(key)
+                for key in set(chain(self.format_fields, other.format_fields))
+            )
+            and self.version == other.version
         )
 
     def query(self, field: str) -> Iterable[str]:
@@ -186,9 +191,9 @@ class Metadata(BaseModel):
 
         old_value = self.get(key)
         if (
-                key in self.model_fields
-                and key not in self.tag_fields
-                and key not in self.format_fields
+            key in self.model_fields
+            and key not in self.tag_fields
+            and key not in self.format_fields
         ):
             raise MetadataInitError(
                 f"Set {key} not in tag_fields, try set it directly as m.{key} = value"
@@ -278,14 +283,14 @@ class Metadata(BaseModel):
 
     @classmethod
     def from_dataloader(
-            cls,
-            dataloader: DataLoader,
-            max_chunk: int = 10,
-            primary_keys: Set[str] = None,
-            include_inspectors: Iterable[str] | None = None,
-            exclude_inspectors: Iterable[str] | None = None,
-            inspector_init_kwargs: dict[str, Any] | None = None,
-            check: bool = False,
+        cls,
+        dataloader: DataLoader,
+        max_chunk: int = 10,
+        primary_keys: Set[str] = None,
+        include_inspectors: Iterable[str] | None = None,
+        exclude_inspectors: Iterable[str] | None = None,
+        inspector_init_kwargs: dict[str, Any] | None = None,
+        check: bool = False,
     ) -> "Metadata":
         """Initialize a metadata from DataLoader and Inspectors
 
@@ -345,12 +350,12 @@ class Metadata(BaseModel):
 
     @classmethod
     def from_dataframe(
-            cls,
-            df: pd.DataFrame,
-            include_inspectors: list[str] | None = None,
-            exclude_inspectors: list[str] | None = None,
-            inspector_init_kwargs: dict[str, Any] | None = None,
-            check: bool = False,
+        cls,
+        df: pd.DataFrame,
+        include_inspectors: list[str] | None = None,
+        exclude_inspectors: list[str] | None = None,
+        inspector_init_kwargs: dict[str, Any] | None = None,
+        check: bool = False,
     ) -> "Metadata":
         """Initialize a metadata from DataFrame and Inspectors
 
@@ -534,10 +539,10 @@ class Metadata(BaseModel):
         # find the dtype who has most high inspector level
         for each_key in list(self.model_fields.keys()) + list(self._extend.keys()):
             if (
-                    each_key != "pii_columns"
-                    and each_key.endswith("_columns")
-                    and column_name in self.get(each_key)
-                    and current_level < self.column_inspect_level[each_key]
+                each_key != "pii_columns"
+                and each_key.endswith("_columns")
+                and column_name in self.get(each_key)
+                and current_level < self.column_inspect_level[each_key]
             ):
                 current_level = self.column_inspect_level[each_key]
                 current_type = each_key

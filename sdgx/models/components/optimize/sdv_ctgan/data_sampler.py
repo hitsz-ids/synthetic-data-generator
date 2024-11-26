@@ -47,7 +47,11 @@ class DataSampler(object):
 
         # Prepare an interval matrix for efficiently sample conditional vector
         max_category = max(
-            [column_info[0].dim for column_info in output_info if is_onehot_encoding_column(column_info)],
+            [
+                column_info[0].dim
+                for column_info in output_info
+                if is_onehot_encoding_column(column_info)
+            ],
             default=0,
         )
 
@@ -56,7 +60,11 @@ class DataSampler(object):
         self._discrete_column_category_prob = np.zeros((n_discrete_columns, max_category))
         self._n_discrete_columns = n_discrete_columns
         self._n_categories = sum(
-            [column_info[0].dim for column_info in output_info if is_onehot_encoding_column(column_info)]
+            [
+                column_info[0].dim
+                for column_info in output_info
+                if is_onehot_encoding_column(column_info)
+            ]
         )
 
         st = 0

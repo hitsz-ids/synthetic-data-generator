@@ -1,5 +1,5 @@
 from __future__ import annotations
-from tqdm import autonotebook as tqdm
+
 import time
 from pathlib import Path
 from typing import List
@@ -19,6 +19,7 @@ from torch.nn import (
     Sequential,
     functional,
 )
+from tqdm import autonotebook as tqdm
 
 from sdgx.data_loader import DataLoader
 from sdgx.data_models.metadata import Metadata
@@ -221,7 +222,9 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
         self._fit(len(self._ndarry_loader))
         logger.info("CTGAN training finished.")
 
-    def _pre_fit(self, dataloader: DataLoader, discrete_columns: list[str] = None, metadata: Metadata = None) -> NDArrayLoader:
+    def _pre_fit(
+        self, dataloader: DataLoader, discrete_columns: list[str] = None, metadata: Metadata = None
+    ) -> NDArrayLoader:
         if not discrete_columns:
             discrete_columns = []
 

@@ -1,4 +1,5 @@
 """Transformers for categorical data."""
+
 import math
 import warnings
 

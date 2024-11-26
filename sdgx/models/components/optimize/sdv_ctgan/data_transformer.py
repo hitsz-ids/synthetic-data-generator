@@ -9,15 +9,14 @@ import pandas as pd
 from joblib import Parallel, delayed
 from tqdm import autonotebook as tqdm
 
-from sdgx.data_connectors.dataframe_connector import DataFrameConnector
 from sdgx.data_loader import DataLoader
-from sdgx.data_models.metadata import Metadata, CategoricalEncoderType
+from sdgx.data_models.metadata import CategoricalEncoderType, Metadata
 from sdgx.models.components.optimize.ndarray_loader import NDArrayLoader
 from sdgx.models.components.sdv_rdt.transformers import (
     ClusterBasedNormalizer,
     OneHotEncoder,
 )
-from sdgx.models.components.sdv_rdt.transformers.categorical import LabelEncoder, NormalizedLabelEncoder
+from sdgx.models.components.sdv_rdt.transformers.categorical import NormalizedLabelEncoder
 from sdgx.utils import logger
 
 SpanInfo = namedtuple("SpanInfo", ["dim", "activation_fn"])
@@ -90,9 +89,9 @@ class DataTransformer(object):
         activate_fn = "softmax"
 
         checked = self.metadata.check_categorical_threshold(num_categories)
-        if encoder_type == 'onehot' or not checked:
+        if encoder_type == "onehot" or not checked:
             pass
-        elif encoder_type == 'label':
+        elif encoder_type == "label":
             encoder = NormalizedLabelEncoder(order_by="alphabetical")
             encoder.fit(data, column_name)
             num_categories = 1
@@ -162,7 +161,6 @@ class DataTransformer(object):
         ohe = column_transform_info.transform
         return ohe.transform(data).to_numpy()
 
-
     def _synchronous_transform(self, raw_data, column_transform_info_list) -> NDArrayLoader:
         """Take a Pandas DataFrame and transform columns synchronous.
 
@@ -199,7 +197,7 @@ class DataTransformer(object):
 
         loader = NDArrayLoader.get_auto_save(raw_data)
         for ndarray in tqdm.tqdm(
-                p(processes), desc="Transforming data", total=len(processes), delay=3
+            p(processes), desc="Transforming data", total=len(processes), delay=3
         ):
             loader.store(ndarray.astype(float))
         return loader
@@ -245,10 +243,10 @@ class DataTransformer(object):
         column_names = []
 
         for column_transform_info in tqdm.tqdm(
-                self._column_transform_info_list, desc="Inverse transforming", delay=3
+            self._column_transform_info_list, desc="Inverse transforming", delay=3
         ):
             dim = column_transform_info.output_dimensions
-            column_data = data[:, st: st + dim]
+            column_data = data[:, st : st + dim]
             if column_transform_info.column_type == "continuous":
                 recovered_column_data = self._inverse_transform_continuous(
                     column_transform_info, column_data, sigmas, st
