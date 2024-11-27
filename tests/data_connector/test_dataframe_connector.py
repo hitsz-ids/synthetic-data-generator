@@ -4,6 +4,7 @@ from pandas.testing import assert_frame_equal
 
 from sdgx.data_connectors.dataframe_connector import DataFrameConnector
 
+
 @pytest.fixture
 def data_for_test():
     return pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
