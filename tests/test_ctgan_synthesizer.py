@@ -41,7 +41,7 @@ def demo_single_table_data_pos_neg():
 
 @pytest.fixture
 def demo_single_table_data_pos_neg_metadata(demo_single_table_data_pos_neg):
-    yield Metadata.from_dataframe(demo_single_table_data_pos_neg)
+    yield Metadata.from_dataframe(demo_single_table_data_pos_neg.copy(), check=True)
 
 
 @pytest.fixture
@@ -82,7 +82,6 @@ def test_ctgan_synthesizer_with_pos_neg(
     demo_single_table_data_pos_neg,
 ):
     original_data = demo_single_table_data_pos_neg
-    metadata = demo_single_table_data_pos_neg_metadata
 
     # Train the CTGAN model
     ctgan_synthesizer.fit(demo_single_table_data_pos_neg_metadata)

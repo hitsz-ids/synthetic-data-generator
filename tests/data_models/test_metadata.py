@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from pathlib import Path
-
 import pytest
 
 from sdgx.data_connectors.csv_connector import CsvConnector

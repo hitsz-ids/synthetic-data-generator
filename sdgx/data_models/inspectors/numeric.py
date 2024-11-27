@@ -171,7 +171,9 @@ class NumericInspector(Inspector):
 
         # Iterate all columns and determain the final data type
         for col in raw_data.columns:
-            if raw_data[col].dtype in ["int64", "float64"]:
+            if (pd.api.types.is_integer_dtype(raw_data[col].dtype)
+                    or pd.api.types.is_float_dtype(raw_data[col].dtype)):
+                # series type may be 32/64bit.
                 # float or int
                 if self._is_int_column(raw_data[col]):
                     self.int_columns.add(col)

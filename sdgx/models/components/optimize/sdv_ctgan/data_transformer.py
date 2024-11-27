@@ -90,7 +90,7 @@ class DataTransformer(object):
         num_categories = len(encoder.dummies)
         activate_fn = "softmax"
 
-        checked = self.metadata.check_categorical_threshold(num_categories)
+        checked = self.metadata.check_categorical_threshold(num_categories) if self.metadata else False
         if encoder_type == "onehot" or not checked:
             pass
         elif encoder_type == "label":
@@ -127,12 +127,7 @@ class DataTransformer(object):
             if column_name in discrete_columns:
                 #  or column_name in self.metadata.label_columns
                 logger.debug(f"Fitting discrete column {column_name}...")
-                encoder_type = None
-                if (
-                    self.metadata.categorical_encoder
-                    and column_name in self.metadata.categorical_encoder
-                ):
-                    encoder_type = self.metadata.categorical_encoder[column_name]
+                encoder_type = self.metadata.get_column_encoder(column_name) if self.metadata else None
                 column_transform_info = self._fit_discrete(data_loader[[column_name]], encoder_type)
             else:
                 logger.debug(f"Fitting continuous column {column_name}...")

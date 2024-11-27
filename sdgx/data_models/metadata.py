@@ -96,6 +96,15 @@ class Metadata(BaseModel):
             else False
         )
 
+    def get_column_encoder(self, column_name):
+        encoder_type = None
+        if (
+                self.categorical_encoder
+                and column_name in self.categorical_encoder
+        ):
+            encoder_type = self.categorical_encoder[column_name]
+        return encoder_type
+
     @property
     def tag_fields(self) -> Iterable[str]:
         """
