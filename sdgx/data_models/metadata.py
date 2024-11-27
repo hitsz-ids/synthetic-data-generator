@@ -98,10 +98,7 @@ class Metadata(BaseModel):
 
     def get_column_encoder(self, column_name):
         encoder_type = None
-        if (
-                self.categorical_encoder
-                and column_name in self.categorical_encoder
-        ):
+        if self.categorical_encoder and column_name in self.categorical_encoder:
             encoder_type = self.categorical_encoder[column_name]
         return encoder_type
 
