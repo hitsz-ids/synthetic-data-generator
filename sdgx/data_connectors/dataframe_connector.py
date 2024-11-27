@@ -35,7 +35,7 @@ class DataFrameConnector(DataConnector):
             if offset < length:
                 current = offset
                 while current < length:
-                    yield self.df.iloc[current : min(current + chunksize, length - 1)]
+                    yield self.df.iloc[current : min(current + chunksize, length)]
                     current += chunksize
 
         return generator()
