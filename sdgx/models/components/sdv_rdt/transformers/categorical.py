@@ -69,7 +69,7 @@ class FrequencyEncoder(BaseTransformer):
         return not self.add_noise
 
     @staticmethod
-    def _get_intervals(data):
+    def _get_intervals(data, normalized=False):
         """Compute intervals for each categorical value.
 
         Args:
@@ -83,15 +83,15 @@ class FrequencyEncoder(BaseTransformer):
         data = data.fillna(np.nan)
         frequencies = data.value_counts(dropna=False)
 
-        start = 0
-        end = 0
+        start = -1.0 if normalized else 0.0
+        end = 0.0
         elements = len(data)
+        probes = frequencies / (elements / 2.0) if normalized else frequencies / elements
 
         intervals = {}
         means = []
         starts = []
-        for value, frequency in frequencies.items():
-            prob = frequency / elements
+        for value, prob in probes.items():
             end = start + prob
             mean = start + prob / 2
             std = prob / 6
@@ -543,6 +543,8 @@ class LabelEncoder(BaseTransformer):
 
 
 class NormalizedLabelEncoder(LabelEncoder):
+    """Same to the LabelEncoder except the transform result will be [-1, 1] instead of positive integer.
+    """
     def __init__(self, order_by=None):
         super().__init__(False, order_by)
         self._round_digit = None
@@ -657,3 +659,19 @@ class CustomLabelEncoder(LabelEncoder):
         self.categories_to_values = {
             category: value for value, category in self.values_to_categories.items()
         }
+
+
+class NormalizedFrequencyEncoder(FrequencyEncoder):
+    """Same to FrequencyEncoder except the transform result is in [-1, 1] instead of [0, 1]
+    """
+    def _fit(self, data):
+        """Fit the transformer to the data.
+
+        Compute the intervals for each categorical value.
+
+        Args:
+            data (pandas.Series):
+                Data to fit the transformer to.
+        """
+        self.dtype = data.dtype
+        self.intervals, self.means, self.starts = self._get_intervals(data, normalized=True)

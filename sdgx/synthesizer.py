@@ -393,18 +393,20 @@ class Synthesizer:
 
         """
         missing_count = count
-        max_trails = 5
+        max_trails = 50
         sample_data_list = []
         psb = tqdm.tqdm(total=count, desc="Sampling")
 
         # To improve batched model performance, such as tvae or ctgan.
-        batch_size = 0
+        batch_size: int = 0
+        multiply_factor: float = 4.0
         if isinstance(self.model, BatchedSynthesizer):
             batch_size = self.model.get_batch_size()
+            multiply_factor = 1.2
 
         while missing_count > 0 and max_trails > 0:
             sample_data = self.model.sample(
-                max(int(missing_count * 1.2), batch_size), **model_sample_args
+                max(int(missing_count * multiply_factor), batch_size), **model_sample_args
             )
             # TODO table separated parallel process
             for d in self.data_processors:

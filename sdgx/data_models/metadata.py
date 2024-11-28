@@ -16,7 +16,7 @@ from sdgx.data_models.inspectors.manager import InspectorManager
 from sdgx.exceptions import MetadataInitError, MetadataInvalidError
 from sdgx.utils import logger
 
-CategoricalEncoderType = Literal["onehot", "label"]
+CategoricalEncoderType = Literal["onehot", "label", "frequency"]
 
 
 class Metadata(BaseModel):
@@ -79,8 +79,8 @@ class Metadata(BaseModel):
 
     # def columns encoder, even not matched categorical_threshold.
     categorical_encoder: Union[Dict[str, CategoricalEncoderType], None] = defaultdict(str)
-    # if greater than categorical_threshold, encoder = label
-    categorical_threshold: Union[int, None] = None
+    # if greater than categorical_threshold, encoder is the mapped.
+    categorical_threshold: Union[Dict[int, CategoricalEncoderType], None] = None
 
     # version info
     version: str = "1.0"
@@ -89,14 +89,19 @@ class Metadata(BaseModel):
     For extend information, use ``get`` and ``set``
     """
 
-    def check_categorical_threshold(self, num_categories):
-        return (
-            num_categories > self.categorical_threshold
-            if self.categorical_threshold is not None
-            else False
-        )
+    def get_column_encoder_by_categorical_threshold(self, num_categories: int) -> Union[CategoricalEncoderType, None]:
+        encoder_type = None
+        if self.categorical_threshold is None:
+            return encoder_type
 
-    def get_column_encoder(self, column_name):
+        for threshold in sorted(self.categorical_threshold.keys()):
+            if num_categories > threshold:
+                encoder_type = self.categorical_threshold[threshold]
+            else:
+                break
+        return encoder_type
+
+    def get_column_encoder_by_name(self, column_name) -> Union[CategoricalEncoderType, None]:
         encoder_type = None
         if self.categorical_encoder and column_name in self.categorical_encoder:
             encoder_type = self.categorical_encoder[column_name]

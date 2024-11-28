@@ -17,7 +17,7 @@ from sdgx.models.components.sdv_rdt.transformers import (
     OneHotEncoder,
 )
 from sdgx.models.components.sdv_rdt.transformers.categorical import (
-    NormalizedLabelEncoder,
+    NormalizedLabelEncoder, NormalizedFrequencyEncoder,
 )
 from sdgx.utils import logger
 
@@ -84,25 +84,42 @@ class DataTransformer(object):
                 A ``ColumnTransformInfo`` object.
         """
         column_name = data.columns[0]
+        encoder = None
+        activate_fn = None
 
-        encoder = OneHotEncoder()
-        encoder.fit(data, column_name)
-        num_categories = len(encoder.dummies)
-        activate_fn = "softmax"
+        # Load encoder from metadata
+        if encoder_type is None and self.metadata:
+            encoder_type = self.metadata.get_column_encoder_by_name(column_name)
+        # if the encoder is not be specified, using onehot.
+        if encoder_type is None:
+            encoder_type = "onehot"
+        # if the encoder is onehot, or not be specified.
+        num_categories = -1  # if zero may cause crash to onehot.
+        if encoder_type == "onehot":
+            encoder = OneHotEncoder()
+            encoder.fit(data, column_name)
+            num_categories = len(encoder.dummies)
+            activate_fn = "softmax"
+        # if using onehot num_categories > threshold, change the encoder.
+        if self.metadata and num_categories != -1:
+            encoder_type = self.metadata.get_column_encoder_by_categorical_threshold(num_categories) or encoder_type
 
-        checked = (
-            self.metadata.check_categorical_threshold(num_categories) if self.metadata else False
-        )
-        if encoder_type == "onehot" or not checked:
+        if encoder_type == "onehot":
             pass
         elif encoder_type == "label":
             encoder = NormalizedLabelEncoder(order_by="alphabetical")
             encoder.fit(data, column_name)
             num_categories = 1
             activate_fn = "liner"
+        elif encoder_type == "frequency":
+            encoder = NormalizedFrequencyEncoder()
+            encoder.fit(data, column_name)
+            num_categories = 1
+            activate_fn = "liner"
         else:
-            raise ValueError("column encoder must be either 'onehot'(default) or 'label'")
+            raise ValueError("column encoder must be either 'onehot'(default), 'label' or 'frequency', not {0}".format(encoder_type))
 
+        assert encoder and activate_fn
         return ColumnTransformInfo(
             column_name=column_name,
             column_type="discrete",
@@ -129,10 +146,7 @@ class DataTransformer(object):
             if column_name in discrete_columns:
                 #  or column_name in self.metadata.label_columns
                 logger.debug(f"Fitting discrete column {column_name}...")
-                encoder_type = (
-                    self.metadata.get_column_encoder(column_name) if self.metadata else None
-                )
-                column_transform_info = self._fit_discrete(data_loader[[column_name]], encoder_type)
+                column_transform_info = self._fit_discrete(data_loader[[column_name]])
             else:
                 logger.debug(f"Fitting continuous column {column_name}...")
                 column_transform_info = self._fit_continuous(data_loader[[column_name]])
@@ -199,7 +213,7 @@ class DataTransformer(object):
 
         loader = NDArrayLoader.get_auto_save(raw_data)
         for ndarray in tqdm.tqdm(
-            p(processes), desc="Transforming data", total=len(processes), delay=3
+                p(processes), desc="Transforming data", total=len(processes), delay=3
         ):
             loader.store(ndarray.astype(float))
         return loader
@@ -245,10 +259,10 @@ class DataTransformer(object):
         column_names = []
 
         for column_transform_info in tqdm.tqdm(
-            self._column_transform_info_list, desc="Inverse transforming", delay=3
+                self._column_transform_info_list, desc="Inverse transforming", delay=3
         ):
             dim = column_transform_info.output_dimensions
-            column_data = data[:, st : st + dim]
+            column_data = data[:, st: st + dim]
             if column_transform_info.column_type == "continuous":
                 recovered_column_data = self._inverse_transform_continuous(
                     column_transform_info, column_data, sigmas, st
