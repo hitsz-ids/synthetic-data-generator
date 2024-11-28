@@ -543,8 +543,8 @@ class LabelEncoder(BaseTransformer):
 
 
 class NormalizedLabelEncoder(LabelEncoder):
-    """Same to the LabelEncoder except the transform result will be [-1, 1] instead of positive integer.
-    """
+    """Same to the LabelEncoder except the transform result will be [-1, 1] instead of positive integer."""
+
     def __init__(self, order_by=None):
         super().__init__(False, order_by)
         self._round_digit = None
@@ -662,8 +662,8 @@ class CustomLabelEncoder(LabelEncoder):
 
 
 class NormalizedFrequencyEncoder(FrequencyEncoder):
-    """Same to FrequencyEncoder except the transform result is in [-1, 1] instead of [0, 1]
-    """
+    """Same to FrequencyEncoder except the transform result is in [-1, 1] instead of [0, 1]"""
+
     def _fit(self, data):
         """Fit the transformer to the data.
 

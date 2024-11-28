@@ -116,10 +116,14 @@ class DiskCache(Cacher):
             if next_data is None or len(next_data) == 0:
                 break
             data_list.append(next_data)
-        data = pd.concat(
-            data_list,
-            ignore_index=True,
-        ) if len(data_list) > 1 else data
+        data = (
+            pd.concat(
+                data_list,
+                ignore_index=True,
+            )
+            if len(data_list) > 1
+            else data
+        )
 
         self._refresh(offset, data)
         if len(data) < chunksize:

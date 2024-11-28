@@ -89,7 +89,9 @@ class Metadata(BaseModel):
     For extend information, use ``get`` and ``set``
     """
 
-    def get_column_encoder_by_categorical_threshold(self, num_categories: int) -> Union[CategoricalEncoderType, None]:
+    def get_column_encoder_by_categorical_threshold(
+        self, num_categories: int
+    ) -> Union[CategoricalEncoderType, None]:
         encoder_type = None
         if self.categorical_threshold is None:
             return encoder_type

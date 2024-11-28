@@ -17,7 +17,8 @@ from sdgx.models.components.sdv_rdt.transformers import (
     OneHotEncoder,
 )
 from sdgx.models.components.sdv_rdt.transformers.categorical import (
-    NormalizedLabelEncoder, NormalizedFrequencyEncoder,
+    NormalizedFrequencyEncoder,
+    NormalizedLabelEncoder,
 )
 from sdgx.utils import logger
 
@@ -102,7 +103,10 @@ class DataTransformer(object):
             activate_fn = "softmax"
         # if using onehot num_categories > threshold, change the encoder.
         if self.metadata and num_categories != -1:
-            encoder_type = self.metadata.get_column_encoder_by_categorical_threshold(num_categories) or encoder_type
+            encoder_type = (
+                self.metadata.get_column_encoder_by_categorical_threshold(num_categories)
+                or encoder_type
+            )
 
         if encoder_type == "onehot":
             pass
@@ -117,7 +121,11 @@ class DataTransformer(object):
             num_categories = 1
             activate_fn = "liner"
         else:
-            raise ValueError("column encoder must be either 'onehot'(default), 'label' or 'frequency', not {0}".format(encoder_type))
+            raise ValueError(
+                "column encoder must be either 'onehot'(default), 'label' or 'frequency', not {0}".format(
+                    encoder_type
+                )
+            )
 
         assert encoder and activate_fn
         return ColumnTransformInfo(
@@ -213,7 +221,7 @@ class DataTransformer(object):
 
         loader = NDArrayLoader.get_auto_save(raw_data)
         for ndarray in tqdm.tqdm(
-                p(processes), desc="Transforming data", total=len(processes), delay=3
+            p(processes), desc="Transforming data", total=len(processes), delay=3
         ):
             loader.store(ndarray.astype(float))
         return loader
@@ -259,10 +267,10 @@ class DataTransformer(object):
         column_names = []
 
         for column_transform_info in tqdm.tqdm(
-                self._column_transform_info_list, desc="Inverse transforming", delay=3
+            self._column_transform_info_list, desc="Inverse transforming", delay=3
         ):
             dim = column_transform_info.output_dimensions
-            column_data = data[:, st: st + dim]
+            column_data = data[:, st : st + dim]
             if column_transform_info.column_type == "continuous":
                 recovered_column_data = self._inverse_transform_continuous(
                     column_transform_info, column_data, sigmas, st
