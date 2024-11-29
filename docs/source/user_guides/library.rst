@@ -69,6 +69,7 @@ So you can modify the metadata of your dataset before fit model.
     from sdgx.data_models.metadata import Metadata
     metadata = Metadata.from_dataframe(df)
 
+Click `here <https://github.com/hitsz-ids/synthetic-data-generator/blob/main/example/sdgx_example_metadata.ipynb>`_ to find more examples for metadata.
 
 Use :ref:`Synthesizer <Synthesizer>` to generate synthetic data
 ---------------------------------------------------------------------------------

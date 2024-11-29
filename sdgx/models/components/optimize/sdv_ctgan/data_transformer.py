@@ -87,10 +87,11 @@ class DataTransformer(object):
         column_name = data.columns[0]
         encoder = None
         activate_fn = None
+        selected_encoder_type = None
 
         # Load encoder from metadata
         if encoder_type is None and self.metadata:
-            encoder_type = self.metadata.get_column_encoder_by_name(column_name)
+            selected_encoder_type = encoder_type = self.metadata.get_column_encoder_by_name(column_name)
         # if the encoder is not be specified, using onehot.
         if encoder_type is None:
             encoder_type = "onehot"
@@ -101,8 +102,8 @@ class DataTransformer(object):
             encoder.fit(data, column_name)
             num_categories = len(encoder.dummies)
             activate_fn = "softmax"
-        # if using onehot num_categories > threshold, change the encoder.
-        if self.metadata and num_categories != -1:
+        # if selected_encoder_type is not specified or using onehot num_categories > threshold, change the encoder.
+        if not selected_encoder_type or self.metadata and num_categories != -1:
             encoder_type = (
                 self.metadata.get_column_encoder_by_categorical_threshold(num_categories)
                 or encoder_type
