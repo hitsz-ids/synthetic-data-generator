@@ -7,9 +7,15 @@ import pytest
 
 from sdgx.data_connectors.dataframe_connector import DataFrameConnector
 from sdgx.data_models.metadata import Metadata
-from sdgx.models.components.optimize.sdv_ctgan.data_transformer import DataTransformer, SpanInfo
-from sdgx.models.components.sdv_rdt.transformers.categorical import NormalizedFrequencyEncoder, NormalizedLabelEncoder, \
-    OneHotEncoder
+from sdgx.models.components.optimize.sdv_ctgan.data_transformer import (
+    DataTransformer,
+    SpanInfo,
+)
+from sdgx.models.components.sdv_rdt.transformers.categorical import (
+    NormalizedFrequencyEncoder,
+    NormalizedLabelEncoder,
+    OneHotEncoder,
+)
 from sdgx.models.components.sdv_rdt.transformers.numerical import ClusterBasedNormalizer
 from sdgx.models.ml.single_table.ctgan import CTGANSynthesizerModel
 from sdgx.synthesizer import Synthesizer
@@ -34,7 +40,7 @@ def demo_single_table_data_pos_neg():
         "cat_date": [fake.date() for _ in range(row_cnt)],
         "cat_freq": [str(i) for i in range(row_cnt)],
         "cat_thres_freq": [str(i) for i in range(100)] * (row_cnt // 100),
-        "cat_thres_label": [str(i) for i in range(200)] * (row_cnt // 200)
+        "cat_thres_label": [str(i) for i in range(200)] * (row_cnt // 200),
     }
     header = X.keys()
     yield pd.DataFrame(X, columns=list(header))
@@ -46,29 +52,21 @@ def demo_single_table_data_pos_neg_metadata(demo_single_table_data_pos_neg):
     metadata.categorical_encoder = {
         "cat_onehot": "onehot",
         "cat_label": "label",
-        "cat_freq": "frequency"
+        "cat_freq": "frequency",
     }
-    metadata.datetime_format = {
-        "cat_date": "%Y-%m-%d"
-    }
-    metadata.categorical_threshold = {
-        99: "frequency",
-        199: "label"
-    }
+    metadata.datetime_format = {"cat_date": "%Y-%m-%d"}
+    metadata.categorical_threshold = {99: "frequency", 199: "label"}
     yield metadata
 
 
 @pytest.fixture
 def demo_single_table_data_pos_neg_connector(demo_single_table_data_pos_neg):
-    yield DataFrameConnector(
-        df=demo_single_table_data_pos_neg
-    )
+    yield DataFrameConnector(df=demo_single_table_data_pos_neg)
 
 
 @pytest.fixture
 def ctgan_synthesizer(
-        demo_single_table_data_pos_neg_connector,
-        demo_single_table_data_pos_neg_metadata
+    demo_single_table_data_pos_neg_connector, demo_single_table_data_pos_neg_metadata
 ):
     yield Synthesizer(
         metadata=demo_single_table_data_pos_neg_metadata,
@@ -78,8 +76,7 @@ def ctgan_synthesizer(
 
 
 def test_ctgan_synthesizer_with_pos_neg(
-        ctgan_synthesizer: Synthesizer,
-        demo_single_table_data_pos_neg
+    ctgan_synthesizer: Synthesizer, demo_single_table_data_pos_neg
 ):
     original_data = demo_single_table_data_pos_neg
 
@@ -94,7 +91,7 @@ def test_ctgan_synthesizer_with_pos_neg(
     for item in transform_list:
         span_info: List[SpanInfo] = item.output_info
         col_dim = item.output_dimensions
-        current_data = transformed_data[:, current_dim:current_dim + col_dim]
+        current_data = transformed_data[:, current_dim : current_dim + col_dim]
         current_dim += col_dim
         col = item.column_name
         if col in ["cat_freq", "cat_thres_freq"]:
@@ -109,7 +106,9 @@ def test_ctgan_synthesizer_with_pos_neg(
             assert col_dim == 1
             assert len(span_info) == 1
             assert span_info[0].activation_fn == "liner"
-            assert len(item.transform.categories_to_values.keys()) == original_data[col].nunique(dropna=False)
+            assert len(item.transform.categories_to_values.keys()) == original_data[col].nunique(
+                dropna=False
+            )
             assert (current_data >= -1).all() and (current_data <= 1).all()
         elif col in ["cat_onehot"]:
             assert isinstance(item.transform, OneHotEncoder)
@@ -136,12 +135,12 @@ def test_ctgan_synthesizer_with_pos_neg(
         if is_all_positive:
             # Assert that the sampled_data column is also all positive
             assert (
-                    sampled_data[column] >= 0
+                sampled_data[column] >= 0
             ).all(), f"Column '{column}' in sampled data should be all positive."
         elif is_all_negative:
             # Assert that the sampled_data column is also all negative
             assert (
-                    sampled_data[column] <= 0
+                sampled_data[column] <= 0
             ).all(), f"Column '{column}' in sampled data should be all negative."
 
 

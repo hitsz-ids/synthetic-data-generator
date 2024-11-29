@@ -199,6 +199,7 @@ class DatetimeFormatter(Formatter):
         TODO:
             if the value <0, the result will be `No Datetime`, try to fix it.
         """
+
         def column_timestamp_formatter(each_stamp: int, timestamp_format: str) -> str:
             try:
                 each_str = datetime.fromtimestamp(each_stamp).strftime(timestamp_format)
@@ -216,8 +217,7 @@ class DatetimeFormatter(Formatter):
             if column in result_data.columns:
                 # Convert the timestamp to datetime format using the format provided in datetime_column_dict
                 result_data[column] = result_data[column].apply(
-                    column_timestamp_formatter,
-                    timestamp_format=format_dict[column]
+                    column_timestamp_formatter, timestamp_format=format_dict[column]
                 )
             else:
                 logger.error(f"Column {column} not in processed data's column list!")

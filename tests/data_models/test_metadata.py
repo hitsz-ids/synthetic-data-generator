@@ -34,6 +34,7 @@ def test_metadata(metadata: Metadata):
 
     assert metadata._dump_json()
 
+
 def test_change_metadata(metadata: Metadata):
     metadata = metadata.model_copy()
     col = "age"
@@ -46,12 +47,14 @@ def test_change_metadata(metadata: Metadata):
     assert col in metadata.int_columns
     assert col not in metadata.datetime_columns
 
+
 def test_remove_metadata(metadata: Metadata):
     metadata = metadata.model_copy()
     col = "age"
     assert col in metadata.int_columns
     metadata.remove_column([col])
     assert col not in metadata.int_columns
+
 
 def test_metadata_save_load(metadata: Metadata, tmp_path: Path):
     test_path = tmp_path / "metadata_path_test.json"

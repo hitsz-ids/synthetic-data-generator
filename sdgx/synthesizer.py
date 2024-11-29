@@ -406,9 +406,7 @@ class Synthesizer:
             batch_size = self.model.get_batch_size()
             multiply_factor = 1.2
             if isinstance(self.model, CTGANSynthesizerModel):
-                model_sample_args = {
-                    "drop_more": False
-                }
+                model_sample_args = {"drop_more": False}
 
         while missing_count > 0 and max_trails > 0:
             sample_data = self.model.sample(

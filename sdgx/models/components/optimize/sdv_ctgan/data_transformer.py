@@ -92,7 +92,9 @@ class DataTransformer(object):
 
         # Load encoder from metadata
         if encoder_type is None and self.metadata:
-            selected_encoder_type = encoder_type = self.metadata.get_column_encoder_by_name(column_name)
+            selected_encoder_type = encoder_type = self.metadata.get_column_encoder_by_name(
+                column_name
+            )
         # if the encoder is not be specified, using onehot.
         if encoder_type is None:
             encoder_type = "onehot"
