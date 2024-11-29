@@ -263,8 +263,7 @@ class CTGAN(BatchedSynthesizer):
         for column_info in self._transformer.output_info_list:
             for span_info in column_info:
                 if len(column_info) != 1 or span_info.activation_fn != "softmax":
-                    # TODO may need to revise for label encoder?
-                    # not discrete column
+                    # not onehot column
                     st += span_info.dim
                 else:
                     ed = st + span_info.dim

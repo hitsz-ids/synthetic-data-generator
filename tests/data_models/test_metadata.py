@@ -30,10 +30,28 @@ def test_metadata(metadata: Metadata):
     assert metadata.float_columns == metadata.get("float_columns")
 
     metadata.set("a", "something")
-    assert metadata.get("a") == set(["something"])
+    assert metadata.get("a") == {"something"}
 
     assert metadata._dump_json()
 
+def test_change_metadata(metadata: Metadata):
+    metadata = metadata.model_copy()
+    col = "age"
+    assert col in metadata.int_columns
+    assert col not in metadata.datetime_columns
+    metadata.change_column_type(col, "int", "datetime")
+    assert col in metadata.datetime_columns
+    assert col not in metadata.int_columns
+    metadata.change_column_type(col, "datetime", "int")
+    assert col in metadata.int_columns
+    assert col not in metadata.datetime_columns
+
+def test_remove_metadata(metadata: Metadata):
+    metadata = metadata.model_copy()
+    col = "age"
+    assert col in metadata.int_columns
+    metadata.remove_column([col])
+    assert col not in metadata.int_columns
 
 def test_metadata_save_load(metadata: Metadata, tmp_path: Path):
     test_path = tmp_path / "metadata_path_test.json"
@@ -48,7 +66,7 @@ def test_metadata_primary_key(metadata: Metadata):
     metadata.add("id_columns", "fnlwgt")
     # set fnlwgt as primary key
     metadata.update_primary_key(["fnlwgt"])
-    assert metadata.primary_keys == set(["fnlwgt"])
+    assert metadata.primary_keys == {"fnlwgt"}
 
 
 def test_metadata_primary_query_filed_tags():

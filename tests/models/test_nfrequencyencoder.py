@@ -1,10 +1,8 @@
-import shutil
-
 import pandas as pd
 import pytest
 
 from sdgx.models.components.sdv_rdt.transformers.categorical import (
-    NormalizedLabelEncoder,
+    NormalizedFrequencyEncoder,
 )
 
 
@@ -23,7 +21,7 @@ def data_test():
 def test_encoder(data_test: pd.DataFrame):
 
     for col in ["x", "y", "z"]:
-        nlabel_encoder = NormalizedLabelEncoder()
+        nlabel_encoder = NormalizedFrequencyEncoder()
         nlabel_encoder.fit(data_test, col)
         td = nlabel_encoder.transform(data_test.copy())
         rd = nlabel_encoder.reverse_transform(td.copy())

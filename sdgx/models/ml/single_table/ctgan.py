@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 import time
 from pathlib import Path
 from typing import List
@@ -27,7 +28,7 @@ from sdgx.models.components.optimize.ndarray_loader import NDArrayLoader
 from sdgx.models.components.optimize.sdv_ctgan.data_sampler import DataSampler
 from sdgx.models.components.optimize.sdv_ctgan.data_transformer import DataTransformer
 from sdgx.models.components.sdv_ctgan.synthesizers.base import (
-    BaseSynthesizer as SDVBaseSynthesizer,
+    BaseSynthesizer as SDVBaseSynthesizer, BatchedSynthesizer,
 )
 from sdgx.models.components.sdv_ctgan.synthesizers.base import random_state
 from sdgx.models.extension import hookimpl
@@ -117,7 +118,7 @@ class Generator(Module):
         return data
 
 
-class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
+class CTGANSynthesizerModel(MLSynthesizerModel, BatchedSynthesizer):
     """
     Modified from ``sdgx.models.components.sdv_ctgan.synthesizers.ctgan.CTGANSynthesizer``.
     A CTGANSynthesizer but provided :ref:`SynthesizerModel` interface with chunked fit.
@@ -182,7 +183,7 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
         device="cuda" if torch.cuda.is_available() else "cpu",
     ):
         assert batch_size % 2 == 0
-
+        BatchedSynthesizer.__init__(self, batch_size=batch_size)
         self._embedding_dim = embedding_dim
         self._generator_dim = generator_dim
         self._discriminator_dim = discriminator_dim
@@ -192,7 +193,6 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
         self._discriminator_lr = discriminator_lr
         self._discriminator_decay = discriminator_decay
 
-        self._batch_size = batch_size
         self._discriminator_steps = discriminator_steps
         self._log_frequency = log_frequency
         self._epochs = epochs
@@ -201,11 +201,11 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
         self._device = torch.device(device)
 
         # Following components are initialized in `_pre_fit`
-        self._transformer = None
-        self._data_sampler = None
+        self._transformer: DataTransformer = None
+        self._data_sampler: DataSampler = None
         self._generator = None
-        self._ndarry_loader = None
-        self.data_dim = None
+        self._ndarry_loader: NDArrayLoader = None
+        self.data_dim: int = None
 
     def fit(self, metadata: Metadata, dataloader: DataLoader, epochs=None, *args, **kwargs):
         # In the future, sdgx use `sdgx.data_processor.transformers.discrete` to handle discrete_columns
@@ -224,7 +224,7 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
 
     def _pre_fit(
         self, dataloader: DataLoader, discrete_columns: list[str] = None, metadata: Metadata = None
-    ) -> NDArrayLoader:
+    ):
         if not discrete_columns:
             discrete_columns = []
 
@@ -408,7 +408,7 @@ class CTGANSynthesizerModel(MLSynthesizerModel, SDVBaseSynthesizer):
         else:
             global_condition_vec = None
 
-        steps = n // self._batch_size + 1
+        steps = math.ceil(n / self._batch_size)
         data = []
         for _ in tqdm.tqdm(range(steps), desc="Sampling batches", delay=3):
             mean = torch.zeros(self._batch_size, self._embedding_dim)

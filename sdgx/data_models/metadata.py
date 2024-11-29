@@ -90,7 +90,7 @@ class Metadata(BaseModel):
     """
 
     def get_column_encoder_by_categorical_threshold(
-        self, num_categories: int
+            self, num_categories: int
     ) -> Union[CategoricalEncoderType, None]:
         encoder_type = None
         if self.categorical_threshold is None:
@@ -135,16 +135,16 @@ class Metadata(BaseModel):
         if not isinstance(other, Metadata):
             return super().__eq__(other)
         return (
-            set(self.tag_fields) == set(other.tag_fields)
-            and all(
-                self.get(key) == other.get(key)
-                for key in set(chain(self.tag_fields, other.tag_fields))
-            )
-            and all(
-                self.get(key) == other.get(key)
-                for key in set(chain(self.format_fields, other.format_fields))
-            )
-            and self.version == other.version
+                set(self.tag_fields) == set(other.tag_fields)
+                and all(
+            self.get(key) == other.get(key)
+            for key in set(chain(self.tag_fields, other.tag_fields))
+        )
+                and all(
+            self.get(key) == other.get(key)
+            for key in set(chain(self.format_fields, other.format_fields))
+        )
+                and self.version == other.version
         )
 
     def query(self, field: str) -> Iterable[str]:
@@ -204,9 +204,9 @@ class Metadata(BaseModel):
 
         old_value = self.get(key)
         if (
-            key in self.model_fields
-            and key not in self.tag_fields
-            and key not in self.format_fields
+                key in self.model_fields
+                and key not in self.tag_fields
+                and key not in self.format_fields
         ):
             raise MetadataInitError(
                 f"Set {key} not in tag_fields, try set it directly as m.{key} = value"
@@ -215,7 +215,13 @@ class Metadata(BaseModel):
         if isinstance(old_value, Iterable) and not isinstance(old_value, str):
             # list, set, tuple...
             value = value if isinstance(value, Iterable) and not isinstance(value, str) else [value]
-            value = type(old_value)(value)
+            try:
+                value = type(old_value)(value)
+            except TypeError as e:
+                if type(old_value) == defaultdict:
+                    value = dict(value)
+                else:
+                    raise e
 
         if key in self.model_fields:
             setattr(self, key, value)
@@ -296,14 +302,14 @@ class Metadata(BaseModel):
 
     @classmethod
     def from_dataloader(
-        cls,
-        dataloader: DataLoader,
-        max_chunk: int = 10,
-        primary_keys: Set[str] = None,
-        include_inspectors: Iterable[str] | None = None,
-        exclude_inspectors: Iterable[str] | None = None,
-        inspector_init_kwargs: dict[str, Any] | None = None,
-        check: bool = False,
+            cls,
+            dataloader: DataLoader,
+            max_chunk: int = 10,
+            primary_keys: Set[str] = None,
+            include_inspectors: Iterable[str] | None = None,
+            exclude_inspectors: Iterable[str] | None = None,
+            inspector_init_kwargs: dict[str, Any] | None = None,
+            check: bool = False,
     ) -> "Metadata":
         """Initialize a metadata from DataLoader and Inspectors
 
@@ -363,12 +369,12 @@ class Metadata(BaseModel):
 
     @classmethod
     def from_dataframe(
-        cls,
-        df: pd.DataFrame,
-        include_inspectors: list[str] | None = None,
-        exclude_inspectors: list[str] | None = None,
-        inspector_init_kwargs: dict[str, Any] | None = None,
-        check: bool = False,
+            cls,
+            df: pd.DataFrame,
+            include_inspectors: list[str] | None = None,
+            exclude_inspectors: list[str] | None = None,
+            inspector_init_kwargs: dict[str, Any] | None = None,
+            check: bool = False,
     ) -> "Metadata":
         """Initialize a metadata from DataFrame and Inspectors
 
@@ -552,10 +558,10 @@ class Metadata(BaseModel):
         # find the dtype who has most high inspector level
         for each_key in list(self.model_fields.keys()) + list(self._extend.keys()):
             if (
-                each_key != "pii_columns"
-                and each_key.endswith("_columns")
-                and column_name in self.get(each_key)
-                and current_level < self.column_inspect_level[each_key]
+                    each_key != "pii_columns"
+                    and each_key.endswith("_columns")
+                    and column_name in self.get(each_key)
+                    and current_level < self.column_inspect_level[each_key]
             ):
                 current_level = self.column_inspect_level[each_key]
                 current_type = each_key
@@ -575,3 +581,77 @@ class Metadata(BaseModel):
         if column_name in self.pii_columns:
             return True
         return False
+
+    def change_column_type(self, column_names: str | List[str], column_original_type: str, column_new_type: str):
+        """Change the type of column."""
+        if not column_names:
+            return
+        if isinstance(column_names, str):
+            column_names = [column_names]
+        all_fields = list(self.tag_fields)
+        original_type = f"{column_original_type}_columns"
+        new_type = f"{column_new_type}_columns"
+        if original_type not in all_fields:
+            raise MetadataInvalidError(f"Column type {column_original_type} not exist in metadata.")
+        if new_type not in all_fields:
+            raise MetadataInvalidError(f"Column type {column_new_type} not exist in metadata.")
+        type_columns = self.get(original_type)
+        diff = set(column_names).difference(type_columns)
+        if diff:
+            raise MetadataInvalidError(f"Columns {column_names} not exist in {original_type}.")
+        self.add(new_type, column_names)
+        type_columns = type_columns.difference(column_names)
+        self.set(original_type, type_columns)
+
+    def remove_column(self, column_names: List[str] | str):
+        """
+        Remove a column from all columns type.
+        Args:
+            column_names: List[str]: To removed columns name list.
+        """
+        if not column_names:
+            return
+        if isinstance(column_names, str):
+            column_names = [column_names]
+        column_names = frozenset(column_names)
+        inter = column_names.intersection(self.column_list)
+        if not inter:
+            raise MetadataInvalidError(f"Columns {inter} not exist in metadata.")
+
+        def do_remove_columns(key, get=True, to_removes=column_names):
+            obj = self
+            if get:
+                target = obj.get(key)
+            else:
+                target = getattr(obj, key)
+            res = None
+            if isinstance(target, list):
+                res = [item for item in target if item not in to_removes]
+            elif isinstance(target, dict):
+                if key == "numeric_format":
+                    obj.set(key, {
+                        k: {
+                            v2 for v2 in v if v2 not in to_removes
+                        } for k, v in target.items()
+                    })
+                else:
+                    res = {
+                        k: v for k, v in target.items()
+                        if k not in to_removes
+                    }
+            elif isinstance(target, set):
+                res = target.difference(to_removes)
+
+            if res is not None:
+                if get:
+                    obj.set(key, res)
+                else:
+                    setattr(obj, key, res)
+
+        to_remove_attribute = list(self.tag_fields)
+        to_remove_attribute.extend(list(self.format_fields))
+        for attr in to_remove_attribute:
+            do_remove_columns(attr)
+        for attr in ["column_list", "primary_keys"]:
+            do_remove_columns(attr, False)
+        self.check()

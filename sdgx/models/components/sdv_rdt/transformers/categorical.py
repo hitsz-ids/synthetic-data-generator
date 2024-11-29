@@ -231,7 +231,7 @@ class FrequencyEncoder(BaseTransformer):
         """Reverse transform the data by iterating over each row."""
         return data.apply(self._get_category_from_start).astype(self.dtype)
 
-    def _reverse_transform(self, data):
+    def _reverse_transform(self, data, normalize=False):
         """Convert float values back to the original categorical values.
 
         Args:
@@ -241,7 +241,7 @@ class FrequencyEncoder(BaseTransformer):
         Returns:
             pandas.Series
         """
-        data = data.clip(0, 1)
+        data = data.clip(-1 if normalize else 0, 1)
         num_rows = len(data)
         num_categories = len(self.means)
 
@@ -675,3 +675,6 @@ class NormalizedFrequencyEncoder(FrequencyEncoder):
         """
         self.dtype = data.dtype
         self.intervals, self.means, self.starts = self._get_intervals(data, normalized=True)
+
+    def _reverse_transform(self, data):
+        return super()._reverse_transform(data, True)

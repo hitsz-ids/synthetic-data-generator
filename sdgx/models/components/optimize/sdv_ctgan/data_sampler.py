@@ -86,6 +86,7 @@ class DataSampler(object):
                 st = ed
             else:
                 st += sum([span_info.dim for span_info in column_info])
+        assert st == data.shape[1]
 
     def _random_choice_prob_index(self, discrete_column_id):
         probs = self._discrete_column_category_prob[discrete_column_id]

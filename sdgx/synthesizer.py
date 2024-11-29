@@ -18,6 +18,7 @@ from sdgx.exceptions import SynthesizerInitError, SynthesizerSampleError
 from sdgx.models.base import SynthesizerModel
 from sdgx.models.components.sdv_ctgan.synthesizers.base import BatchedSynthesizer
 from sdgx.models.manager import ModelManager
+from sdgx.models.ml.single_table.ctgan import CTGANSynthesizerModel
 from sdgx.models.statistics.single_table.base import StatisticSynthesizerModel
 from sdgx.utils import logger
 
@@ -291,7 +292,8 @@ class Synthesizer:
                 inspector_init_kwargs=inspector_init_kwargs,
             )
         )
-        self.metadata = metadata  # Ensure update metadata
+        # Some processors may cause metadata update before model fitting, we need to make a copy.
+        self.metadata = metadata.model_copy()  # Ensure update metadata
 
         logger.info("Fitting data processors...")
         if not self.dataloader:
@@ -403,6 +405,10 @@ class Synthesizer:
         if isinstance(self.model, BatchedSynthesizer):
             batch_size = self.model.get_batch_size()
             multiply_factor = 1.2
+            if isinstance(self.model, CTGANSynthesizerModel):
+                model_sample_args = {
+                    "drop_more": False
+                }
 
         while missing_count > 0 and max_trails > 0:
             sample_data = self.model.sample(

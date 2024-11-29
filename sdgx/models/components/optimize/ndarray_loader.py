@@ -98,8 +98,12 @@ class NDArrayLoader:
         return np.concatenate([array for array in self.iter()], axis=1)
 
     @cached_property
+    def __shape_0(self):
+        return self.load(0).shape[0]
+
+    @property
     def shape(self) -> tuple[int, int]:
-        return self.load(0).shape[0], self.store_index
+        return self.__shape_0, self.store_index
 
     def __len__(self):
         return self.shape[0]

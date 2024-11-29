@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections import namedtuple
+from typing import List
 
 import numpy as np
 import pandas as pd
@@ -102,8 +103,8 @@ class DataTransformer(object):
             encoder.fit(data, column_name)
             num_categories = len(encoder.dummies)
             activate_fn = "softmax"
-        # if selected_encoder_type is not specified or using onehot num_categories > threshold, change the encoder.
-        if not selected_encoder_type or self.metadata and num_categories != -1:
+        # if selected_encoder_type is not specified and using onehot num_categories > threshold, change the encoder.
+        if not selected_encoder_type and self.metadata and num_categories != -1:
             encoder_type = (
                 self.metadata.get_column_encoder_by_categorical_threshold(num_categories)
                 or encoder_type
@@ -145,12 +146,12 @@ class DataTransformer(object):
 
         This step also counts the #columns in matrix data and span information.
         """
-        self.output_info_list = []
-        self.output_dimensions = 0
-        self.dataframe = True
+        self.output_info_list: List[SpanInfo] = []
+        self.output_dimensions: int = 0
+        self.dataframe: bool = True
 
         self._column_raw_dtypes = data_loader[: data_loader.chunksize].infer_objects().dtypes
-        self._column_transform_info_list = []
+        self._column_transform_info_list: List[ColumnTransformInfo] = []
         for column_name in tqdm.tqdm(data_loader.columns(), desc="Preparing data", delay=3):
             if column_name in discrete_columns:
                 #  or column_name in self.metadata.label_columns
@@ -183,8 +184,8 @@ class DataTransformer(object):
 
     def _transform_discrete(self, column_transform_info, data):
         logger.debug(f"Transforming discrete column {column_transform_info.column_name}...")
-        ohe = column_transform_info.transform
-        return ohe.transform(data).to_numpy()
+        encoder = column_transform_info.transform
+        return encoder.transform(data).to_numpy()
 
     def _synchronous_transform(self, raw_data, column_transform_info_list) -> NDArrayLoader:
         """Take a Pandas DataFrame and transform columns synchronous.
