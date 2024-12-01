@@ -41,12 +41,12 @@ class SpanInfo:
 
 class ColumnTransformInfo:
     def __init__(
-            self,
-            column_name: str,
-            column_type: ColumnTransformType | str,
-            transform: TransformerEncoderInstanceType,
-            output_info: List[SpanInfo],
-            output_dimensions: int,
+        self,
+        column_name: str,
+        column_type: ColumnTransformType | str,
+        transform: TransformerEncoderInstanceType,
+        output_info: List[SpanInfo],
+        output_dimensions: int,
     ):
         self.column_name: str = column_name
         self.column_type: ColumnTransformType = ColumnTransformType(column_type)

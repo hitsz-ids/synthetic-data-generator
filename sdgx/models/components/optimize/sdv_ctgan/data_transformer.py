@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import List, Tuple, NamedTuple, Dict, Any, Callable, Type
+from typing import Any, Callable, Dict, List, NamedTuple, Tuple, Type
 
 import numpy as np
 import pandas as pd
@@ -26,27 +26,26 @@ from sdgx.models.components.sdv_rdt.transformers import (
 )
 from sdgx.utils import logger
 
-CategoricalEncoderParams = NamedTuple("CategoricalEncoderParams", (
-    ("encoder", Callable[[], CategoricalEncoderInstanceType]),
-    ("categories_caculator", Callable[[CategoricalEncoderInstanceType], int]),
-    ("activate_fn", ActivationFuncType)
-))
+CategoricalEncoderParams = NamedTuple(
+    "CategoricalEncoderParams",
+    (
+        ("encoder", Callable[[], CategoricalEncoderInstanceType]),
+        ("categories_caculator", Callable[[CategoricalEncoderInstanceType], int]),
+        ("activate_fn", ActivationFuncType),
+    ),
+)
 CategoricalEncoderMapper: Dict[CategoricalEncoderType, CategoricalEncoderParams] = {
     CategoricalEncoderType.ONEHOT: CategoricalEncoderParams(
-        lambda: OneHotEncoder(),
-        lambda encoder: len(encoder.dummies),
-        ActivationFuncType.SOFTMAX
+        lambda: OneHotEncoder(), lambda encoder: len(encoder.dummies), ActivationFuncType.SOFTMAX
     ),
     CategoricalEncoderType.LABEL: CategoricalEncoderParams(
         lambda: NormalizedLabelEncoder(order_by="alphabetical"),
         lambda encoder: 1,
-        ActivationFuncType.LINEAR
+        ActivationFuncType.LINEAR,
     ),
     CategoricalEncoderType.FREQUENCY: CategoricalEncoderParams(
-        lambda: NormalizedFrequencyEncoder(),
-        lambda encoder: 1,
-        ActivationFuncType.LINEAR
-    )
+        lambda: NormalizedFrequencyEncoder(), lambda encoder: 1, ActivationFuncType.LINEAR
+    ),
 }
 
 
@@ -71,7 +70,7 @@ class DataTransformer(object):
         self._weight_threshold = weight_threshold
 
     def _fit_categorical_encoder(
-            self, column_name: str, data: pd.DataFrame, encoder_type: CategoricalEncoderType
+        self, column_name: str, data: pd.DataFrame, encoder_type: CategoricalEncoderType
     ) -> Tuple[CategoricalEncoderInstanceType, int, ActivationFuncType]:
         if encoder_type not in CategoricalEncoderMapper.keys():
             raise ValueError("Unsupported encoder type {0}.".format(encoder_type))
@@ -132,19 +131,23 @@ class DataTransformer(object):
         # if the encoder is onehot, or not be specified.
         num_categories = -1  # if zero may cause crash to onehot.
         if encoder_type == "onehot":
-            encoder, num_categories, activate_fn = self._fit_categorical_encoder(column_name, data, encoder_type)
+            encoder, num_categories, activate_fn = self._fit_categorical_encoder(
+                column_name, data, encoder_type
+            )
 
         # if selected_encoder_type is not specified and using onehot num_categories > threshold, change the encoder.
         if not selected_encoder_type and self.metadata and num_categories != -1:
             encoder_type = (
-                    self.metadata.get_column_encoder_by_categorical_threshold(num_categories)
-                    or encoder_type
+                self.metadata.get_column_encoder_by_categorical_threshold(num_categories)
+                or encoder_type
             )
 
         if encoder_type == "onehot":
             pass
         else:
-            encoder, num_categories, activate_fn = self._fit_categorical_encoder(column_name, data, encoder_type)
+            encoder, num_categories, activate_fn = self._fit_categorical_encoder(
+                column_name, data, encoder_type
+            )
 
         assert encoder and activate_fn
 
@@ -242,7 +245,7 @@ class DataTransformer(object):
 
         loader = NDArrayLoader.get_auto_save(raw_data)
         for ndarray in tqdm.tqdm(
-                p(processes), desc="Transforming data", total=len(processes), delay=3
+            p(processes), desc="Transforming data", total=len(processes), delay=3
         ):
             loader.store(ndarray.astype(float))
         return loader
@@ -288,10 +291,10 @@ class DataTransformer(object):
         column_names = []
 
         for column_transform_info in tqdm.tqdm(
-                self._column_transform_info_list, desc="Inverse transforming", delay=3
+            self._column_transform_info_list, desc="Inverse transforming", delay=3
         ):
             dim = column_transform_info.output_dimensions
-            column_data = data[:, st: st + dim]
+            column_data = data[:, st : st + dim]
             if column_transform_info.column_type == "continuous":
                 recovered_column_data = self._inverse_transform_continuous(
                     column_transform_info, column_data, sigmas, st

@@ -1,6 +1,6 @@
 from enum import Enum, EnumMeta
 from functools import cached_property
-from typing import List, Iterable
+from typing import Iterable, List
 
 import numpy as np
 
@@ -22,6 +22,7 @@ class StrValuedEnumMeta(EnumMeta):
 class StrValuedBaseEnum(Enum, metaclass=StrValuedEnumMeta):
     def __hash__(self):
         return hash(self.value)
+
     @property
     def value(self):
         return str(super().value)
