@@ -8,7 +8,7 @@ from sdgx.models.components.sdv_ctgan.data_transformer import (
 )
 from sdgx.models.components.sdv_rdt.transformers import (
     ClusterBasedNormalizer,
-    FrequencyEncoder
+    FrequencyEncoder,
 )
 
 # TODO(Enhance) - Use different type of Encoder for discrete, like ordered columns, high cardinality columns...

@@ -13,16 +13,16 @@ from sdgx.data_loader import DataLoader
 from sdgx.data_models.metadata import CategoricalEncoderType, Metadata
 from sdgx.models.components.optimize.ndarray_loader import NDArrayLoader
 from sdgx.models.components.optimize.sdv_ctgan.types import (
-    CategoricalEncoderInstanceType,
     ActivationFuncType,
+    CategoricalEncoderInstanceType,
+    ColumnTransformInfo,
     SpanInfo,
-    ColumnTransformInfo
 )
 from sdgx.models.components.sdv_rdt.transformers import (
     ClusterBasedNormalizer,
-    OneHotEncoder,
     NormalizedFrequencyEncoder,
-    NormalizedLabelEncoder
+    NormalizedLabelEncoder,
+    OneHotEncoder,
 )
 from sdgx.utils import logger
 
@@ -48,10 +48,7 @@ class DataTransformer(object):
         self._weight_threshold = weight_threshold
 
     def _fit_categorical_encoder(
-            self,
-            column_name: str,
-            data: pd.DataFrame,
-            encoder_type: CategoricalEncoderType | None
+        self, column_name: str, data: pd.DataFrame, encoder_type: CategoricalEncoderType | None
     ) -> Tuple[CategoricalEncoderInstanceType, int, ActivationFuncType]:
         selected_encoder_type = None
         # Load encoder from metadata
@@ -74,8 +71,8 @@ class DataTransformer(object):
         # if selected_encoder_type is not specified and using onehot num_categories > threshold, change the encoder.
         if not selected_encoder_type and self.metadata and num_categories != -1:
             encoder_type = (
-                    self.metadata.get_column_encoder_by_categorical_threshold(num_categories)
-                    or encoder_type
+                self.metadata.get_column_encoder_by_categorical_threshold(num_categories)
+                or encoder_type
             )
 
         if encoder_type == "onehot":
@@ -135,7 +132,9 @@ class DataTransformer(object):
         """
         column_name = data.columns[0]
 
-        encoder, num_categories, activate_fn = self._fit_categorical_encoder(column_name, data, encoder_type)
+        encoder, num_categories, activate_fn = self._fit_categorical_encoder(
+            column_name, data, encoder_type
+        )
         assert encoder and activate_fn
 
         return ColumnTransformInfo(
@@ -232,7 +231,7 @@ class DataTransformer(object):
 
         loader = NDArrayLoader.get_auto_save(raw_data)
         for ndarray in tqdm.tqdm(
-                p(processes), desc="Transforming data", total=len(processes), delay=3
+            p(processes), desc="Transforming data", total=len(processes), delay=3
         ):
             loader.store(ndarray.astype(float))
         return loader
@@ -278,10 +277,10 @@ class DataTransformer(object):
         column_names = []
 
         for column_transform_info in tqdm.tqdm(
-                self._column_transform_info_list, desc="Inverse transforming", delay=3
+            self._column_transform_info_list, desc="Inverse transforming", delay=3
         ):
             dim = column_transform_info.output_dimensions
-            column_data = data[:, st: st + dim]
+            column_data = data[:, st : st + dim]
             if column_transform_info.column_type == "continuous":
                 recovered_column_data = self._inverse_transform_continuous(
                     column_transform_info, column_data, sigmas, st

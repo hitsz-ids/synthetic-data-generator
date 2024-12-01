@@ -12,9 +12,9 @@ from sdgx.models.components.sdv_rdt.transformers.categorical import (
     CustomLabelEncoder,
     FrequencyEncoder,
     LabelEncoder,
-    OneHotEncoder,
+    NormalizedFrequencyEncoder,
     NormalizedLabelEncoder,
-    NormalizedFrequencyEncoder
+    OneHotEncoder,
 )
 from sdgx.models.components.sdv_rdt.transformers.datetime import (
     OptimizedTimestampEncoder,

@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 from functools import cached_property
 from typing import Callable, Generator
+
 import pandas as pd
 
 from sdgx.data_connectors.base import DataConnector
@@ -28,10 +29,10 @@ class DataFrameConnector(DataConnector):
     """
 
     def __init__(
-            self,
-            df: pd.DataFrame,
-            *args,
-            **kwargs,
+        self,
+        df: pd.DataFrame,
+        *args,
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self.df: pd.DataFrame = df
@@ -41,7 +42,7 @@ class DataFrameConnector(DataConnector):
         if offset >= length:
             return None
         limit = limit or length
-        return self.df.iloc[offset: min(offset + limit, length)]
+        return self.df.iloc[offset : min(offset + limit, length)]
 
     def _columns(self) -> list[str]:
         return list(self.df.columns)
@@ -52,13 +53,14 @@ class DataFrameConnector(DataConnector):
             if offset < length:
                 current = offset
                 while current < length:
-                    yield self.df.iloc[current: min(current + chunksize, length)]
+                    yield self.df.iloc[current : min(current + chunksize, length)]
                     current += chunksize
 
         return generator()
 
 
 from sdgx.data_connectors.extension import hookimpl
+
 
 @hookimpl
 def register(manager):

@@ -14,7 +14,12 @@ from sdgx.models.components.optimize.sdv_ctgan.types import SpanInfo
 class DataSampler(object):
     """DataSampler samples the conditional vector and corresponding data for CTGAN."""
 
-    def __init__(self, data: NDArrayLoader | np.ndarray, output_info: List[List[SpanInfo]], log_frequency: bool):
+    def __init__(
+        self,
+        data: NDArrayLoader | np.ndarray,
+        output_info: List[List[SpanInfo]],
+        log_frequency: bool,
+    ):
         self._data: NDArrayLoader | np.ndarray = data
 
         def is_onehot_encoding_column(column_info: List[SpanInfo]):

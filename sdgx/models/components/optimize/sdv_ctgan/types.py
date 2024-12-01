@@ -1,17 +1,21 @@
 from __future__ import annotations
 
-from typing import Union, Literal, List
+from typing import List, Literal, Union
 
 from sdgx.models.components.sdv_rdt.transformers import (
-    OneHotEncoder,
     ClusterBasedNormalizer,
     NormalizedFrequencyEncoder,
-    NormalizedLabelEncoder
+    NormalizedLabelEncoder,
+    OneHotEncoder,
 )
 
-CategoricalEncoderInstanceType = Union[OneHotEncoder, NormalizedFrequencyEncoder, NormalizedLabelEncoder]
+CategoricalEncoderInstanceType = Union[
+    OneHotEncoder, NormalizedFrequencyEncoder, NormalizedLabelEncoder
+]
 ContinuousEncoderInstanceType = Union[ClusterBasedNormalizer]
-TransformerEncoderInstanceType = Union[CategoricalEncoderInstanceType, ContinuousEncoderInstanceType]
+TransformerEncoderInstanceType = Union[
+    CategoricalEncoderInstanceType, ContinuousEncoderInstanceType
+]
 ActivationFuncType = Literal["softmax", "tanh", "linear"]
 ColumnTransformType = Literal["discrete", "continuous"]
 
@@ -23,12 +27,14 @@ class SpanInfo:
 
 
 class ColumnTransformInfo:
-    def __init__(self,
-                 column_name: str,
-                 column_type: ColumnTransformType,
-                 transform: TransformerEncoderInstanceType,
-                 output_info: List[SpanInfo],
-                 output_dimensions: int):
+    def __init__(
+        self,
+        column_name: str,
+        column_type: ColumnTransformType,
+        transform: TransformerEncoderInstanceType,
+        output_info: List[SpanInfo],
+        output_dimensions: int,
+    ):
         self.column_name: str = column_name
         self.column_type: str = column_type
         self.transform: TransformerEncoderInstanceType = transform

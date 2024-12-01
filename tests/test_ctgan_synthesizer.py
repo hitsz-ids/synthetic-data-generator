@@ -7,15 +7,13 @@ import pytest
 
 from sdgx.data_connectors.dataframe_connector import DataFrameConnector
 from sdgx.data_models.metadata import Metadata
-from sdgx.models.components.optimize.sdv_ctgan.data_transformer import (
-    DataTransformer,
-)
+from sdgx.models.components.optimize.sdv_ctgan.data_transformer import DataTransformer
 from sdgx.models.components.optimize.sdv_ctgan.types import SpanInfo
 from sdgx.models.components.sdv_rdt.transformers import (
+    ClusterBasedNormalizer,
     NormalizedFrequencyEncoder,
     NormalizedLabelEncoder,
     OneHotEncoder,
-    ClusterBasedNormalizer
 )
 from sdgx.models.ml.single_table.ctgan import CTGANSynthesizerModel
 from sdgx.synthesizer import Synthesizer
