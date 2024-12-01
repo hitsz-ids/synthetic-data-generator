@@ -17,8 +17,7 @@ class DataFrameConnector(DataConnector):
 
     Example:
 
-        . code-block:: python
-
+        .. code-block:: python
             from sdgx.data_connectors.dataframe_connector import DataFrameConnector
             connector = DataFrameConnector(
                 df=pd.DataFrame({'a': [1, 2, 3], 'b': [4, 5, 6]}),
