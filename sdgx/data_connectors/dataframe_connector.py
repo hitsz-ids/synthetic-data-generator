@@ -17,7 +17,7 @@ class DataFrameConnector(DataConnector):
         df (pd.DataFrame): DataFrame to be wrapped.
 
     Example:
-       
+
         .. code-block:: python
             from sdgx.data_connectors.dataframe_connector import DataFrameConnector
             connector = DataFrameConnector(
