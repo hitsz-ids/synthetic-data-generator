@@ -6,6 +6,11 @@ import numpy as np
 
 
 class StrValuedEnumMeta(EnumMeta):
+
+    def __str__(self):
+        return str(self.values)
+    __repr__ = __str__
+
     def __contains__(cls, item):
         if isinstance(item, str):
             return item in cls.values
@@ -44,6 +49,7 @@ class StrValuedBaseEnum(Enum, metaclass=StrValuedEnumMeta):
 
     def __str__(self):
         return self.value
+
 
 
 def flatten_array(nested, prefix=""):
