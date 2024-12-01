@@ -90,7 +90,7 @@ class DataLoader:
 
     """
 
-    DEFAULT_CACHER = DiskCache
+    DEFAULT_CACHER_INITIAL = DiskCache
 
     def __init__(
         self,
@@ -100,8 +100,10 @@ class DataLoader:
         cacher_kwargs: None | dict[str, Any] = None,
         identity: str | None = None,
     ) -> None:
-        if isinstance(data_connector, DataFrameConnector) and cacher is None:
-            cacher = NoCache
+        if isinstance(data_connector, DataFrameConnector):
+            self.DEFAULT_CACHER = NoCache
+        else:
+            self.DEFAULT_CACHER = DataLoader.DEFAULT_CACHER_INITIAL
 
         self.data_connector = data_connector
         self.chunksize = chunksize

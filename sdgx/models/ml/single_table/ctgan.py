@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 import time
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 import numpy as np
 import pandas as pd
@@ -204,11 +204,11 @@ class CTGANSynthesizerModel(MLSynthesizerModel, BatchedSynthesizer):
         self._device = torch.device(device)
 
         # Following components are initialized in `_pre_fit`
-        self._transformer: DataTransformer = None
-        self._data_sampler: DataSampler = None
+        self._transformer: Optional[DataTransformer] = None
+        self._data_sampler: Optional[DataSampler] = None
         self._generator = None
-        self._ndarry_loader: NDArrayLoader = None
-        self.data_dim: int = None
+        self._ndarry_loader: Optional[NDArrayLoader] = None
+        self.data_dim: Optional[int] = None
 
     def fit(self, metadata: Metadata, dataloader: DataLoader, epochs=None, *args, **kwargs):
         # In the future, sdgx use `sdgx.data_processor.transformers.discrete` to handle discrete_columns
@@ -259,12 +259,7 @@ class CTGANSynthesizerModel(MLSynthesizerModel, BatchedSynthesizer):
 
     @random_state
     def _fit(self, data_size: int):
-        """Fit the CTGAN Synthesizer models to the training data.
-
-        Args:
-            dataloader: :ref:`DataLoader` for the training data processed by :ref:`DataProcessor`.
-
-        """
+        """Fit the CTGAN Synthesizer models to the training data."""
         logger.info(f"Fit using data_size:{data_size}, data_dim: {self.data_dim}.")
         epochs = self._epochs
         # data_dim = self._transformer.output_dimensions
@@ -495,7 +490,7 @@ class CTGANSynthesizerModel(MLSynthesizerModel, BatchedSynthesizer):
                     transformed = self._gumbel_softmax(data[:, st:ed], tau=0.2)
                     data_t.append(transformed)
                     st = ed
-                elif span_info.activation_fn == "liner":
+                elif span_info.activation_fn == "linear":
                     # for label encoder
                     ed = st + span_info.dim
                     transformed = data[:, st:ed].clone()

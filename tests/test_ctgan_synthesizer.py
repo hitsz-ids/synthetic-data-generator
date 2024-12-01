@@ -9,14 +9,14 @@ from sdgx.data_connectors.dataframe_connector import DataFrameConnector
 from sdgx.data_models.metadata import Metadata
 from sdgx.models.components.optimize.sdv_ctgan.data_transformer import (
     DataTransformer,
-    SpanInfo,
 )
-from sdgx.models.components.sdv_rdt.transformers.categorical import (
+from sdgx.models.components.optimize.sdv_ctgan.types import SpanInfo
+from sdgx.models.components.sdv_rdt.transformers import (
     NormalizedFrequencyEncoder,
     NormalizedLabelEncoder,
     OneHotEncoder,
+    ClusterBasedNormalizer
 )
-from sdgx.models.components.sdv_rdt.transformers.numerical import ClusterBasedNormalizer
 from sdgx.models.ml.single_table.ctgan import CTGANSynthesizerModel
 from sdgx.synthesizer import Synthesizer
 
@@ -98,14 +98,14 @@ def test_ctgan_synthesizer_with_pos_neg(
             assert isinstance(item.transform, NormalizedFrequencyEncoder)
             assert col_dim == 1
             assert len(span_info) == 1
-            assert span_info[0].activation_fn == "liner"
+            assert span_info[0].activation_fn == "linear"
             assert len(item.transform.intervals) == original_data[col].nunique(dropna=False)
             assert (current_data >= -1).all() and (current_data <= 1).all()
         elif col in ["cat_thres_label", "cat_label"]:
             assert isinstance(item.transform, NormalizedLabelEncoder)
             assert col_dim == 1
             assert len(span_info) == 1
-            assert span_info[0].activation_fn == "liner"
+            assert span_info[0].activation_fn == "linear"
             assert len(item.transform.categories_to_values.keys()) == original_data[col].nunique(
                 dropna=False
             )

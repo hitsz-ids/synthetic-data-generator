@@ -13,6 +13,8 @@ from sdgx.models.components.sdv_rdt.transformers.categorical import (
     FrequencyEncoder,
     LabelEncoder,
     OneHotEncoder,
+    NormalizedLabelEncoder,
+    NormalizedFrequencyEncoder
 )
 from sdgx.models.components.sdv_rdt.transformers.datetime import (
     OptimizedTimestampEncoder,
@@ -41,6 +43,8 @@ __all__ = [
     "LabelEncoder",
     "NullTransformer",
     "OneHotEncoder",
+    "NormalizedLabelEncoder",
+    "NormalizedFrequencyEncoder",
     "OptimizedTimestampEncoder",
     "UnixTimestampEncoder",
     "RegexGenerator",
@@ -80,7 +84,6 @@ TRANSFORMERS = {
     get_transformer_name(transformer): transformer
     for transformer in BaseTransformer.get_subclasses()
 }
-
 
 DEFAULT_TRANSFORMERS = {
     "numerical": FloatFormatter(missing_value_replacement="mean"),
