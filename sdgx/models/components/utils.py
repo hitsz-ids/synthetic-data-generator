@@ -1,4 +1,48 @@
+from enum import Enum, EnumMeta
+from functools import cached_property
+from typing import List, Iterable
+
 import numpy as np
+
+
+class StrValuedEnumMeta(EnumMeta):
+    def __contains__(cls, item):
+        if isinstance(item, str):
+            return item in cls.values
+        elif isinstance(item, Iterable):
+            a = np.array(list(item)).astype(str)
+            if len(a.shape) == 0 or a.shape[0] == 0:
+                return True
+            values = set(a)
+            return values.issubset(set(cls.values))
+        else:
+            super().__contains__(item)
+
+
+class StrValuedBaseEnum(Enum, metaclass=StrValuedEnumMeta):
+    def __hash__(self):
+        return hash(self.value)
+    @property
+    def value(self):
+        return str(super().value)
+
+    @classmethod
+    @property
+    def values(cls) -> set:
+        if not hasattr(cls, "__VALUES"):
+            cls.__VALUES = {i.value for i in cls}
+        return cls.__VALUES
+
+    def __eq__(self, other) -> bool:
+        if isinstance(other, type(self)):
+            return self.value == other.value
+        elif isinstance(other, str):
+            return self.value == other
+        else:
+            return False
+
+    def __str__(self):
+        return self.value
 
 
 def flatten_array(nested, prefix=""):

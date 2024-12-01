@@ -6,7 +6,8 @@ import pytest
 
 from sdgx.data_connectors.csv_connector import CsvConnector
 from sdgx.data_loader import DataLoader
-from sdgx.data_models.metadata import Metadata
+from sdgx.data_models.metadata import Metadata, CategoricalEncoderType
+from sdgx.exceptions import MetadataInvalidError
 
 
 @pytest.fixture
@@ -137,6 +138,31 @@ def test_demo_multi_table_data_metadata_child(demo_multi_data_child_matadata):
     # check dump
     assert "column_data_type" in demo_multi_data_child_matadata.dump().keys()
 
+def test_meta_encoder(metadata: Metadata):
+    metadata = metadata.model_copy()
+    metadata.categorical_threshold = {
+        1: "aaa"
+    }
+    with pytest.raises(MetadataInvalidError):
+        metadata.check()
+    metadata.categorical_threshold[1] = CategoricalEncoderType.ONEHOT
+    metadata.check()
+    metadata.categorical_threshold["1"] = CategoricalEncoderType.ONEHOT
+    with pytest.raises(MetadataInvalidError):
+        metadata.check()
+    del metadata.categorical_threshold["1"]
+    assert "education" in metadata.discrete_columns
+    metadata.categorical_encoder = {
+        "education": CategoricalEncoderType.ONEHOT,
+    }
+    metadata.check()
+    metadata.categorical_encoder["1"] = CategoricalEncoderType.ONEHOT
+    with pytest.raises(MetadataInvalidError):
+        metadata.check()
+    del metadata.categorical_encoder["1"]
+    metadata.categorical_encoder["1"] = "a"
+    with pytest.raises(MetadataInvalidError):
+        metadata.check()
 
 if __name__ == "__main__":
     pytest.main(["-vv", "-s", __file__])

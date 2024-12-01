@@ -14,9 +14,14 @@ from sdgx.data_loader import DataLoader
 from sdgx.data_models.inspectors.base import RelationshipInspector
 from sdgx.data_models.inspectors.manager import InspectorManager
 from sdgx.exceptions import MetadataInitError, MetadataInvalidError
+from sdgx.models.components.utils import StrValuedBaseEnum
 from sdgx.utils import logger
 
-CategoricalEncoderType = Literal["onehot", "label", "frequency"]
+
+class CategoricalEncoderType(StrValuedBaseEnum):
+    ONEHOT = "onehot"
+    LABEL = "label"
+    FREQUENCY = "frequency"
 
 
 class Metadata(BaseModel):
@@ -90,7 +95,7 @@ class Metadata(BaseModel):
     """
 
     def get_column_encoder_by_categorical_threshold(
-        self, num_categories: int
+            self, num_categories: int
     ) -> Union[CategoricalEncoderType, None]:
         encoder_type = None
         if self.categorical_threshold is None:
@@ -135,16 +140,16 @@ class Metadata(BaseModel):
         if not isinstance(other, Metadata):
             return super().__eq__(other)
         return (
-            set(self.tag_fields) == set(other.tag_fields)
-            and all(
-                self.get(key) == other.get(key)
-                for key in set(chain(self.tag_fields, other.tag_fields))
-            )
-            and all(
-                self.get(key) == other.get(key)
-                for key in set(chain(self.format_fields, other.format_fields))
-            )
-            and self.version == other.version
+                set(self.tag_fields) == set(other.tag_fields)
+                and all(
+            self.get(key) == other.get(key)
+            for key in set(chain(self.tag_fields, other.tag_fields))
+        )
+                and all(
+            self.get(key) == other.get(key)
+            for key in set(chain(self.format_fields, other.format_fields))
+        )
+                and self.version == other.version
         )
 
     def query(self, field: str) -> Iterable[str]:
@@ -204,9 +209,9 @@ class Metadata(BaseModel):
 
         old_value = self.get(key)
         if (
-            key in self.model_fields
-            and key not in self.tag_fields
-            and key not in self.format_fields
+                key in self.model_fields
+                and key not in self.tag_fields
+                and key not in self.format_fields
         ):
             raise MetadataInitError(
                 f"Set {key} not in tag_fields, try set it directly as m.{key} = value"
@@ -302,14 +307,14 @@ class Metadata(BaseModel):
 
     @classmethod
     def from_dataloader(
-        cls,
-        dataloader: DataLoader,
-        max_chunk: int = 10,
-        primary_keys: Set[str] = None,
-        include_inspectors: Iterable[str] | None = None,
-        exclude_inspectors: Iterable[str] | None = None,
-        inspector_init_kwargs: dict[str, Any] | None = None,
-        check: bool = False,
+            cls,
+            dataloader: DataLoader,
+            max_chunk: int = 10,
+            primary_keys: Set[str] = None,
+            include_inspectors: Iterable[str] | None = None,
+            exclude_inspectors: Iterable[str] | None = None,
+            inspector_init_kwargs: dict[str, Any] | None = None,
+            check: bool = False,
     ) -> "Metadata":
         """Initialize a metadata from DataLoader and Inspectors
 
@@ -369,12 +374,12 @@ class Metadata(BaseModel):
 
     @classmethod
     def from_dataframe(
-        cls,
-        df: pd.DataFrame,
-        include_inspectors: list[str] | None = None,
-        exclude_inspectors: list[str] | None = None,
-        inspector_init_kwargs: dict[str, Any] | None = None,
-        check: bool = False,
+            cls,
+            df: pd.DataFrame,
+            include_inspectors: list[str] | None = None,
+            exclude_inspectors: list[str] | None = None,
+            inspector_init_kwargs: dict[str, Any] | None = None,
+            check: bool = False,
     ) -> "Metadata":
         """Initialize a metadata from DataFrame and Inspectors
 
@@ -510,6 +515,23 @@ class Metadata(BaseModel):
                 f"Found undefined column: {set(all_dtype_columns) - set(self.column_list)}."
             )
 
+        if self.categorical_encoder is not None:
+            for i in self.categorical_encoder.keys():
+                if not isinstance(i, str) or i not in self.discrete_columns:
+                    raise MetadataInvalidError(f"categorical_encoder key {i} is invalid, it should be an str and is a discrete column name.")
+            if self.categorical_encoder.values() not in CategoricalEncoderType:
+                raise MetadataInvalidError(f"In categorical_encoder values, categorical encoder type invalid, now supports {list(CategoricalEncoderType)}.")
+
+        if self.categorical_threshold is not None:
+            for i in self.categorical_threshold.keys():
+                if not isinstance(i, int) or i < 0:
+                    raise MetadataInvalidError(f"categorical threshold {i} is invalid, it should be an positive int.")
+            if self.categorical_threshold.values() not in CategoricalEncoderType:
+                raise MetadataInvalidError(
+                    f"In categorical_threshold values, categorical encoder type invalid, now supports {list(CategoricalEncoderType)}.")
+
+
+
         logger.debug("Metadata check succeed.")
 
     def update_primary_key(self, primary_keys: Iterable[str] | str):
@@ -558,10 +580,10 @@ class Metadata(BaseModel):
         # find the dtype who has most high inspector level
         for each_key in list(self.model_fields.keys()) + list(self._extend.keys()):
             if (
-                each_key != "pii_columns"
-                and each_key.endswith("_columns")
-                and column_name in self.get(each_key)
-                and current_level < self.column_inspect_level[each_key]
+                    each_key != "pii_columns"
+                    and each_key.endswith("_columns")
+                    and column_name in self.get(each_key)
+                    and current_level < self.column_inspect_level[each_key]
             ):
                 current_level = self.column_inspect_level[each_key]
                 current_type = each_key
@@ -583,7 +605,7 @@ class Metadata(BaseModel):
         return False
 
     def change_column_type(
-        self, column_names: str | List[str], column_original_type: str, column_new_type: str
+            self, column_names: str | List[str], column_original_type: str, column_new_type: str
     ):
         """Change the type of column."""
         if not column_names:
