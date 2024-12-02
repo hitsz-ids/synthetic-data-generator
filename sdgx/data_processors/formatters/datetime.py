@@ -4,6 +4,7 @@ from collections import defaultdict
 from datetime import datetime
 from typing import Any, Dict
 
+import numpy as np
 import pandas as pd
 
 from sdgx.data_models.metadata import Metadata
@@ -77,6 +78,12 @@ class DatetimeFormatter(Formatter):
                     f"Column {each_col} has no datetime_format, DatetimeFormatter will REMOVE this column！"
                 )
 
+        # Remove successful formatted datetime columns from metadata.discrete_columns
+        if not (set(datetime_columns) - set(metadata.discrete_columns)):
+            metadata.change_column_type(datetime_columns, "discrete", "datetime")
+        # Remove dead_columns from metadata
+        metadata.remove_column(dead_columns)
+
         self.datetime_columns = datetime_columns
         self.dead_columns = dead_columns
 
@@ -133,14 +140,16 @@ class DatetimeFormatter(Formatter):
                 datetime_obj = datetime.strptime(str(each_value), datetime_format)
                 each_stamp = datetime.timestamp(datetime_obj)
             except Exception as e:
-                logger.warning(f"An error occured when convert str to timestamp {e}.")
+                logger.warning(
+                    f"An error occured when convert str to timestamp {e}, we set as mean."
+                )
                 logger.warning(f"Input parameters: ({str(each_value)}, {datetime_format})")
                 logger.warning(f"Input type: ({type(each_value)}, {type(datetime_format)})")
-                each_stamp = 0
+                each_stamp = np.nan
             return each_stamp
 
         # Make a copy of processed_data to avoid modifying the original data
-        result_data = processed_data.copy()
+        result_data: pd.DataFrame = processed_data.copy()
 
         # Convert each datetime column in datetime_column_list to timestamp
         for column in datetime_column_list:
@@ -148,6 +157,7 @@ class DatetimeFormatter(Formatter):
             result_data[column] = result_data[column].apply(
                 datetime_formatter, datetime_format=datetime_formats[column]
             )
+            result_data[column].fillna(result_data[column].mean(), inplace=True)
         return result_data
 
     def reverse_convert(self, processed_data: pd.DataFrame) -> pd.DataFrame:
@@ -185,25 +195,18 @@ class DatetimeFormatter(Formatter):
 
         Returns:
             - result_data (pd.DataFrame): DataFrame with timestamp columns converted to datetime format.
+
+        TODO:
+            if the value <0, the result will be `No Datetime`, try to fix it.
         """
 
-        def convert_single_column_timestamp_to_str(column_data: pd.Series, datetime_format: str):
-            """
-            convert each single column timestamp(int) to datetime string.
-            """
-            res = []
-
-            for each_stamp in column_data:
-                try:
-                    each_str = datetime.fromtimestamp(each_stamp).strftime(datetime_format)
-                except Exception as e:
-                    logger.debug(f"An error occured when convert timestamp to str {e}.")
-                    each_str = "No Datetime"
-
-                res.append(each_str)
-            res = pd.Series(res)
-            res = res.astype(str)
-            return res
+        def column_timestamp_formatter(each_stamp: int, timestamp_format: str) -> str:
+            try:
+                each_str = datetime.fromtimestamp(each_stamp).strftime(timestamp_format)
+            except Exception as e:
+                logger.debug(f"An error occured when convert timestamp to str {e}.")
+                each_str = "No Datetime"
+            return each_str
 
         # Copy the processed data to result_data
         result_data = processed_data.copy()
@@ -213,8 +216,8 @@ class DatetimeFormatter(Formatter):
             # Check if the column is in the DataFrame
             if column in result_data.columns:
                 # Convert the timestamp to datetime format using the format provided in datetime_column_dict
-                result_data[column] = convert_single_column_timestamp_to_str(
-                    result_data[column], format_dict[column]
+                result_data[column] = result_data[column].apply(
+                    column_timestamp_formatter, timestamp_format=format_dict[column]
                 )
             else:
                 logger.error(f"Column {column} not in processed data's column list!")

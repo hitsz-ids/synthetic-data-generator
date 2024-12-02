@@ -5,7 +5,7 @@ from collections import defaultdict
 from collections.abc import Iterable
 from itertools import chain
 from pathlib import Path
-from typing import Any, Dict, List, Set
+from typing import Any, Dict, List, Literal, Set, Union
 
 import pandas as pd
 from pydantic import BaseModel, Field, field_validator
@@ -14,7 +14,14 @@ from sdgx.data_loader import DataLoader
 from sdgx.data_models.inspectors.base import RelationshipInspector
 from sdgx.data_models.inspectors.manager import InspectorManager
 from sdgx.exceptions import MetadataInitError, MetadataInvalidError
+from sdgx.models.components.utils import StrValuedBaseEnum
 from sdgx.utils import logger
+
+
+class CategoricalEncoderType(StrValuedBaseEnum):
+    ONEHOT = "onehot"
+    LABEL = "label"
+    FREQUENCY = "frequency"
 
 
 class Metadata(BaseModel):
@@ -58,7 +65,7 @@ class Metadata(BaseModel):
     column_inspect_level is used to store every inspector's level, to specify the true type of each column.
     """
 
-    pii_columns: Set[set] = set()
+    pii_columns: Set[str] = set()
     """
     pii_columns is used to store all PII columns' name
     """
@@ -75,12 +82,37 @@ class Metadata(BaseModel):
     datetime_format: Dict = defaultdict(str)
     numeric_format: Dict = defaultdict(list)
 
+    # def columns encoder, even not matched categorical_threshold.
+    categorical_encoder: Union[Dict[str, CategoricalEncoderType], None] = defaultdict(str)
+    # if greater than categorical_threshold, encoder is the mapped.
+    categorical_threshold: Union[Dict[int, CategoricalEncoderType], None] = None
+
     # version info
     version: str = "1.0"
     _extend: Dict[str, Set[str]] = defaultdict(set)
     """
     For extend information, use ``get`` and ``set``
     """
+
+    def get_column_encoder_by_categorical_threshold(
+        self, num_categories: int
+    ) -> Union[CategoricalEncoderType, None]:
+        encoder_type = None
+        if self.categorical_threshold is None:
+            return encoder_type
+
+        for threshold in sorted(self.categorical_threshold.keys()):
+            if num_categories > threshold:
+                encoder_type = self.categorical_threshold[threshold]
+            else:
+                break
+        return encoder_type
+
+    def get_column_encoder_by_name(self, column_name) -> Union[CategoricalEncoderType, None]:
+        encoder_type = None
+        if self.categorical_encoder and column_name in self.categorical_encoder:
+            encoder_type = self.categorical_encoder[column_name]
+        return encoder_type
 
     @property
     def tag_fields(self) -> Iterable[str]:
@@ -188,7 +220,13 @@ class Metadata(BaseModel):
         if isinstance(old_value, Iterable) and not isinstance(old_value, str):
             # list, set, tuple...
             value = value if isinstance(value, Iterable) and not isinstance(value, str) else [value]
-            value = type(old_value)(value)
+            try:
+                value = type(old_value)(value)
+            except TypeError as e:
+                if type(old_value) == defaultdict:
+                    value = dict(value)
+                else:
+                    raise e
 
         if key in self.model_fields:
             setattr(self, key, value)
@@ -272,7 +310,7 @@ class Metadata(BaseModel):
         cls,
         dataloader: DataLoader,
         max_chunk: int = 10,
-        primary_keys: set[str] = None,
+        primary_keys: Set[str] = None,
         include_inspectors: Iterable[str] | None = None,
         exclude_inspectors: Iterable[str] | None = None,
         inspector_init_kwargs: dict[str, Any] | None = None,
@@ -396,6 +434,10 @@ class Metadata(BaseModel):
             f.write(self._dump_json())
 
     @classmethod
+    def loads(cls, attributes):
+        return Metadata(**attributes)
+
+    @classmethod
     def load(cls, path: str | Path) -> "Metadata":
         """
         Load metadata from json file.
@@ -473,6 +515,28 @@ class Metadata(BaseModel):
                 f"Found undefined column: {set(all_dtype_columns) - set(self.column_list)}."
             )
 
+        if self.categorical_encoder is not None:
+            for i in self.categorical_encoder.keys():
+                if not isinstance(i, str) or i not in self.discrete_columns:
+                    raise MetadataInvalidError(
+                        f"categorical_encoder key {i} is invalid, it should be an str and is a discrete column name."
+                    )
+            if self.categorical_encoder.values() not in CategoricalEncoderType:
+                raise MetadataInvalidError(
+                    f"In categorical_encoder values, categorical encoder type invalid, now supports {list(CategoricalEncoderType)}."
+                )
+
+        if self.categorical_threshold is not None:
+            for i in self.categorical_threshold.keys():
+                if not isinstance(i, int) or i < 0:
+                    raise MetadataInvalidError(
+                        f"categorical threshold {i} is invalid, it should be an positive int."
+                    )
+            if self.categorical_threshold.values() not in CategoricalEncoderType:
+                raise MetadataInvalidError(
+                    f"In categorical_threshold values, categorical encoder type invalid, now supports {list(CategoricalEncoderType)}."
+                )
+
         logger.debug("Metadata check succeed.")
 
     def update_primary_key(self, primary_keys: Iterable[str] | str):
@@ -544,3 +608,75 @@ class Metadata(BaseModel):
         if column_name in self.pii_columns:
             return True
         return False
+
+    def change_column_type(
+        self, column_names: str | List[str], column_original_type: str, column_new_type: str
+    ):
+        """Change the type of column."""
+        if not column_names:
+            return
+        if isinstance(column_names, str):
+            column_names = [column_names]
+        all_fields = list(self.tag_fields)
+        original_type = f"{column_original_type}_columns"
+        new_type = f"{column_new_type}_columns"
+        if original_type not in all_fields:
+            raise MetadataInvalidError(f"Column type {column_original_type} not exist in metadata.")
+        if new_type not in all_fields:
+            raise MetadataInvalidError(f"Column type {column_new_type} not exist in metadata.")
+        type_columns = self.get(original_type)
+        diff = set(column_names).difference(type_columns)
+        if diff:
+            raise MetadataInvalidError(f"Columns {column_names} not exist in {original_type}.")
+        self.add(new_type, column_names)
+        type_columns = type_columns.difference(column_names)
+        self.set(original_type, type_columns)
+
+    def remove_column(self, column_names: List[str] | str):
+        """
+        Remove a column from all columns type.
+        Args:
+            column_names: List[str]: To removed columns name list.
+        """
+        if not column_names:
+            return
+        if isinstance(column_names, str):
+            column_names = [column_names]
+        column_names = frozenset(column_names)
+        inter = column_names.intersection(self.column_list)
+        if not inter:
+            raise MetadataInvalidError(f"Columns {inter} not exist in metadata.")
+
+        def do_remove_columns(key, get=True, to_removes=column_names):
+            obj = self
+            if get:
+                target = obj.get(key)
+            else:
+                target = getattr(obj, key)
+            res = None
+            if isinstance(target, list):
+                res = [item for item in target if item not in to_removes]
+            elif isinstance(target, dict):
+                if key == "numeric_format":
+                    obj.set(
+                        key,
+                        {k: {v2 for v2 in v if v2 not in to_removes} for k, v in target.items()},
+                    )
+                else:
+                    res = {k: v for k, v in target.items() if k not in to_removes}
+            elif isinstance(target, set):
+                res = target.difference(to_removes)
+
+            if res is not None:
+                if get:
+                    obj.set(key, res)
+                else:
+                    setattr(obj, key, res)
+
+        to_remove_attribute = list(self.tag_fields)
+        to_remove_attribute.extend(list(self.format_fields))
+        for attr in to_remove_attribute:
+            do_remove_columns(attr)
+        for attr in ["column_list", "primary_keys"]:
+            do_remove_columns(attr, False)
+        self.check()

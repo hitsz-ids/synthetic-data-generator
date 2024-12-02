@@ -1,6 +1,9 @@
 """BaseSynthesizer module."""
 
 import contextlib
+import warnings
+from pathlib import Path
+from typing import Union
 
 import cloudpickle
 import numpy as np
@@ -109,8 +112,10 @@ class BaseSynthesizer:
         self.set_device(device_backup)
 
     @classmethod
-    def load(cls, path, device="cuda" if torch.cuda.is_available() else "cpu"):
-        """Load the model stored in the passed `path`."""
+    def load(
+        cls, path: Union[str, Path], device: str = "cuda" if torch.cuda.is_available() else "cpu"
+    ):
+        """Load the model stored in the passed arg `path`."""
         with open(path, "rb") as f:
             model = cloudpickle.load(f)
         model.set_device(device)
@@ -142,3 +147,16 @@ class BaseSynthesizer:
                 f"`random_state` {random_state} expected to be an int or a tuple of "
                 "(`np.random.RandomState`, `torch.Generator`)"
             )
+
+
+class BatchedSynthesizer(BaseSynthesizer):
+    def __init__(self, batch_size, **kwargs):
+        self._batch_size = batch_size
+        super().__init__(**kwargs)
+
+    def get_batch_size(self):
+        return self._batch_size
+
+    def set_batch_size(self, b: int):
+        warnings.warn("Reset batch_size may caused unintentional behavior.")
+        self._batch_size = b

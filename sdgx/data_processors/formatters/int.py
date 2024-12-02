@@ -62,8 +62,10 @@ class IntValueFormatter(Formatter):
         """
 
         for col in self.int_columns:
-            processed_data[col] = processed_data[col].astype(int)
-
+            if col in processed_data.columns:
+                processed_data[col] = processed_data[col].astype(int)
+            else:
+                logger.error("Column {} not found in processed_data.".format(col))
         logger.info("Data reverse-converted by IntValueFormatter.")
 
         return processed_data

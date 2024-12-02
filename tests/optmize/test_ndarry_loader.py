@@ -5,13 +5,17 @@ from sdgx.models.components.optimize.ndarray_loader import NDArrayLoader
 
 
 @pytest.fixture
-def ndarray_loader(tmp_path, ndarray_list):
-    cache_dir = tmp_path / "ndarrycache"
-    loader = NDArrayLoader(cache_root=cache_dir)
-    for ndarray in ndarray_list:
-        loader.store(ndarray)
-    yield loader
-    loader.cleanup()
+def ndarray_loaders(tmp_path, ndarray_list):
+    def generator():
+        cache_dir = tmp_path / "ndarrycache"
+        for save in [True, False]:
+            loader = NDArrayLoader(cache_root=cache_dir, save_to_file=save)
+            for ndarray in ndarray_list:
+                loader.store(ndarray)
+            yield loader
+            loader.cleanup()
+
+    yield generator()
 
 
 @pytest.fixture
@@ -28,7 +32,7 @@ def ndarray_list():
     ]
 
 
-def test_ndarray_loader_function(ndarray_loader: NDArrayLoader, ndarray_list):
+def subtest_ndarray_loader_function(ndarray_loader: NDArrayLoader, ndarray_list):
     ndarray_all = np.concatenate(ndarray_list, axis=1)
 
     for i, ndarray in enumerate(ndarray_loader.iter()):
@@ -38,7 +42,7 @@ def test_ndarray_loader_function(ndarray_loader: NDArrayLoader, ndarray_list):
     assert ndarray_loader.shape == ndarray_all.shape
 
 
-def test_ndarray_loader_slice(ndarray_loader: NDArrayLoader, ndarray_list):
+def subtest_ndarray_loader_slice(ndarray_loader: NDArrayLoader, ndarray_list):
     ndarray_all = np.concatenate(ndarray_list, axis=1)
 
     np.testing.assert_equal(ndarray_loader[:], ndarray_all[:])
@@ -66,6 +70,12 @@ def test_ndarray_loader_slice(ndarray_loader: NDArrayLoader, ndarray_list):
     5, 6
     8, 9
     """
+
+
+def test_ndarray_loader(ndarray_list, ndarray_loaders):
+    for ndarray_loader in ndarray_loaders:
+        subtest_ndarray_loader_function(ndarray_loader, ndarray_list)
+        subtest_ndarray_loader_slice(ndarray_loader, ndarray_list)
 
 
 if __name__ == "__main__":

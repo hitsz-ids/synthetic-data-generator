@@ -1,5 +1,6 @@
 """Transformers for categorical data."""
 
+import math
 import warnings
 
 import numpy as np
@@ -68,7 +69,7 @@ class FrequencyEncoder(BaseTransformer):
         return not self.add_noise
 
     @staticmethod
-    def _get_intervals(data):
+    def _get_intervals(data, normalized=False):
         """Compute intervals for each categorical value.
 
         Args:
@@ -82,15 +83,15 @@ class FrequencyEncoder(BaseTransformer):
         data = data.fillna(np.nan)
         frequencies = data.value_counts(dropna=False)
 
-        start = 0
-        end = 0
+        start = -1.0 if normalized else 0.0
+        end = 0.0
         elements = len(data)
+        probes = frequencies / (elements / 2.0) if normalized else frequencies / elements
 
         intervals = {}
         means = []
         starts = []
-        for value, frequency in frequencies.items():
-            prob = frequency / elements
+        for value, prob in probes.items():
             end = start + prob
             mean = start + prob / 2
             std = prob / 6
@@ -230,7 +231,7 @@ class FrequencyEncoder(BaseTransformer):
         """Reverse transform the data by iterating over each row."""
         return data.apply(self._get_category_from_start).astype(self.dtype)
 
-    def _reverse_transform(self, data):
+    def _reverse_transform(self, data, normalize=False):
         """Convert float values back to the original categorical values.
 
         Args:
@@ -240,7 +241,7 @@ class FrequencyEncoder(BaseTransformer):
         Returns:
             pandas.Series
         """
-        data = data.clip(0, 1)
+        data = data.clip(-1 if normalize else 0, 1)
         num_rows = len(data)
         num_categories = len(self.means)
 
@@ -485,6 +486,7 @@ class LabelEncoder(BaseTransformer):
         unique_data = pd.unique(data.fillna(np.nan))
         unique_data = self._order_categories(unique_data)
         self.values_to_categories = dict(enumerate(unique_data))
+
         self.categories_to_values = {
             category: value for value, category in self.values_to_categories.items()
         }
@@ -540,6 +542,79 @@ class LabelEncoder(BaseTransformer):
         return data.round().map(self.values_to_categories)
 
 
+class NormalizedLabelEncoder(LabelEncoder):
+    """Same to the LabelEncoder except the transform result will be [-1, 1] instead of positive integer."""
+
+    def __init__(self, order_by=None):
+        super().__init__(False, order_by)
+        self._round_digit = None
+
+    def _order_categories(self, unique_data):
+        # TODO for more check
+        if self.order_by == "alphabetical":
+            if unique_data.dtype.type not in [np.str_, np.object_]:
+                pass
+
+        elif self.order_by == "numerical_value":
+            if not np.issubdtype(unique_data.dtype.type, np.number):
+                pass
+
+        if self.order_by is not None:
+            nans = pd.isna(unique_data)
+            unique_data = np.sort(unique_data[~nans])
+            if nans.any():
+                unique_data = np.append(unique_data, [np.nan])
+
+        return unique_data
+
+    def _fit(self, data):
+        """Fit the transformer to the data.
+
+        Generate a unique integer representation for each category and
+        store them in the ``categories_to_values`` dict and its reverse
+        ``values_to_categories``.
+
+        Args:
+            data (pandas.Series):
+                Data to fit the transformer to.
+        """
+        unique_data = pd.unique(data.fillna(np.nan))
+        unique_data = self._order_categories(unique_data)
+
+        def normalize_array_to_dict(arr):
+            n = len(arr)
+            digit = math.ceil(math.log10(n)) + 1
+            self._round_digit = digit
+            normalized_dict = {round((2 * i / (n - 1)) - 1, digit): arr[i] for i in range(n)}
+            return normalized_dict
+
+        self.values_to_categories = normalize_array_to_dict(unique_data)
+
+        self.categories_to_values = {
+            category: value for value, category in self.values_to_categories.items()
+        }
+
+    def _reverse_transform(self, data):
+        """Convert float values back to the original categorical values.
+
+        Args:
+            data (pd.Series or numpy.ndarray):
+                Data to revert.
+
+        Returns:
+            pandas.Series
+        """
+        value_dict_keys = self.values_to_categories.keys()
+        value_dict = self.values_to_categories
+
+        def find_nearest_key(x):
+            nearest_key = min(value_dict_keys, key=lambda k: abs(k - x))
+            return value_dict[nearest_key]
+
+        data: pd.Series = data.clip(min(self.values_to_categories), max(self.values_to_categories))
+        return data.apply(find_nearest_key)
+
+
 class CustomLabelEncoder(LabelEncoder):
     """Custom label encoder for categorical data.
 
@@ -584,3 +659,22 @@ class CustomLabelEncoder(LabelEncoder):
         self.categories_to_values = {
             category: value for value, category in self.values_to_categories.items()
         }
+
+
+class NormalizedFrequencyEncoder(FrequencyEncoder):
+    """Same to FrequencyEncoder except the transform result is in [-1, 1] instead of [0, 1]"""
+
+    def _fit(self, data):
+        """Fit the transformer to the data.
+
+        Compute the intervals for each categorical value.
+
+        Args:
+            data (pandas.Series):
+                Data to fit the transformer to.
+        """
+        self.dtype = data.dtype
+        self.intervals, self.means, self.starts = self._get_intervals(data, normalized=True)
+
+    def _reverse_transform(self, data):
+        return super()._reverse_transform(data, True)

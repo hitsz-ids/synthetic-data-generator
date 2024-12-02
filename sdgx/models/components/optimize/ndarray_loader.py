@@ -8,7 +8,11 @@ from typing import Generator
 from uuid import uuid4
 
 import numpy as np
+import pandas as pd
 from numpy import ndarray
+
+from sdgx.data_connectors.dataframe_connector import DataFrameConnector
+from sdgx.data_loader import DataLoader
 
 DEFAULT_CACHE_ROOT = os.getenv("SDG_NDARRAY_CACHE_ROOT", "./.ndarry_cache")
 
@@ -20,10 +24,24 @@ class NDArrayLoader:
     Support for storing two-dimensional data by columns.
     """
 
-    def __init__(self, cache_root: str | Path = DEFAULT_CACHE_ROOT) -> None:
+    def __init__(self, cache_root: str | Path = DEFAULT_CACHE_ROOT, save_to_file=True) -> None:
         self.store_index = 0
         self.cache_root = Path(cache_root).expanduser().resolve()
-        self.cache_root.mkdir(exist_ok=True, parents=True)
+        self.save_to_file = save_to_file
+        if save_to_file:
+            self.cache_root.mkdir(exist_ok=True, parents=True)
+        else:
+            self.ndarray_list = []
+
+    @staticmethod
+    def get_auto_save(raw_data) -> NDArrayLoader:
+        save_to_file = True
+        if isinstance(raw_data, pd.DataFrame) or (
+            isinstance(raw_data, DataLoader)
+            and isinstance(raw_data.data_connector, DataFrameConnector)
+        ):
+            save_to_file = False
+        return NDArrayLoader(save_to_file=save_to_file)
 
     @cached_property
     def subdir(self) -> str:
@@ -45,22 +63,31 @@ class NDArrayLoader:
         """
         Spliting and storing columns of ndarry to disk, one by one.
         """
-        self.cache_dir.mkdir(exist_ok=True, parents=True)
-        for ndarray in np.split(ndarray, indices_or_sections=ndarray.shape[1], axis=1):
-            np.save(self._get_cache_filename(self.store_index), ndarray)
-            self.store_index += 1
+        if self.save_to_file:
+            self.cache_dir.mkdir(exist_ok=True, parents=True)
+            for ndarray in np.split(ndarray, indices_or_sections=ndarray.shape[1], axis=1):
+                np.save(self._get_cache_filename(self.store_index), ndarray)
+                self.store_index += 1
+        else:
+            for ndarray in np.split(ndarray, indices_or_sections=ndarray.shape[1], axis=1):
+                self.ndarray_list.append(ndarray)
+                self.store_index += 1
 
     def load(self, index: int) -> ndarray:
         """
         Load ndarray from disk by index of column.
         """
-        return np.load(self._get_cache_filename(int(index)))
+        if self.save_to_file:
+            return np.load(self._get_cache_filename(int(index)))
+        else:
+            return self.ndarray_list[index]
 
     def cleanup(self):
-        try:
-            shutil.rmtree(self.cache_dir, ignore_errors=True)
-        except AttributeError:
-            pass
+        if self.save_to_file:
+            try:
+                shutil.rmtree(self.cache_dir, ignore_errors=True)
+            except AttributeError:
+                pass
         self.store_index = 0
 
     def iter(self) -> Generator[ndarray, None, None]:
@@ -71,8 +98,12 @@ class NDArrayLoader:
         return np.concatenate([array for array in self.iter()], axis=1)
 
     @cached_property
+    def __shape_0(self):
+        return self.load(0).shape[0]
+
+    @property
     def shape(self) -> tuple[int, int]:
-        return (self.load(0).shape[0], self.store_index)
+        return self.__shape_0, self.store_index
 
     def __len__(self):
         return self.shape[0]

@@ -62,7 +62,7 @@ class SynthesizerModel:
         raise NotImplementedError
 
     @classmethod
-    def load(cls, save_dir: str | Path) -> "SynthesizerModel":
+    def load(cls, save_dir: str | Path, **kwargs) -> "SynthesizerModel":
         """
         Load model from file.
 

@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any, Generator
 
 import pandas as pd
+from tqdm import autonotebook as tqdm
 
 from sdgx.data_connectors.base import DataConnector
 from sdgx.data_connectors.generator_connector import GeneratorConnector
@@ -15,7 +16,9 @@ from sdgx.data_processors.base import DataProcessor
 from sdgx.data_processors.manager import DataProcessorManager
 from sdgx.exceptions import SynthesizerInitError, SynthesizerSampleError
 from sdgx.models.base import SynthesizerModel
+from sdgx.models.components.sdv_ctgan.synthesizers.base import BatchedSynthesizer
 from sdgx.models.manager import ModelManager
+from sdgx.models.ml.single_table.ctgan import CTGANSynthesizerModel
 from sdgx.models.statistics.single_table.base import StatisticSynthesizerModel
 from sdgx.utils import logger
 
@@ -138,7 +141,7 @@ class Synthesizer:
             )
         if (isinstance(model, str) or isinstance(model, type)) and model_path:
             # Load model by cls or str
-            self.model = self.model_manager.load(model, model_path)
+            self.model = self.model_manager.load(model, model_path, **(model_kwargs or {}))
             if model_kwargs:
                 logger.warning("model_kwargs will be ignored when loading model from model_path")
         elif isinstance(model, str) or isinstance(model, type):
@@ -189,6 +192,7 @@ class Synthesizer:
         processed_data_loaders_kwargs: None | dict[str, Any] = None,
         data_processors: None | list[str | DataProcessor | type[DataProcessor]] = None,
         data_processors_kwargs: None | dict[str, dict[str, Any]] = None,
+        model_kwargs=None,
     ) -> "Synthesizer":
         """
         Load metadata and model, allow rebuilding Synthesizer for finetuning or other use cases.
@@ -233,6 +237,7 @@ class Synthesizer:
             model_path=model_path,
             metadata=metadata,
             metadata_path=metadata_path,
+            model_kwargs=model_kwargs,
             data_connector=data_connector,
             data_connector_kwargs=data_connector_kwargs,
             raw_data_loaders_kwargs=raw_data_loaders_kwargs,
@@ -287,7 +292,8 @@ class Synthesizer:
                 inspector_init_kwargs=inspector_init_kwargs,
             )
         )
-        self.metadata = metadata  # Ensure update metadata
+        # Some processors may cause metadata update before model fitting, we need to make a copy.
+        self.metadata = metadata.model_copy()  # Ensure update metadata
 
         logger.info("Fitting data processors...")
         if not self.dataloader:
@@ -391,13 +397,28 @@ class Synthesizer:
         missing_count = count
         max_trails = 50
         sample_data_list = []
+        psb = tqdm.tqdm(total=count, desc="Sampling")
+
+        # To improve batched model performance, such as tvae or ctgan.
+        batch_size: int = 0
+        multiply_factor: float = 4.0
+        if isinstance(self.model, BatchedSynthesizer):
+            batch_size = self.model.get_batch_size()
+            multiply_factor = 1.2
+            if isinstance(self.model, CTGANSynthesizerModel):
+                model_sample_args = {"drop_more": False}
+
         while missing_count > 0 and max_trails > 0:
-            sample_data = self.model.sample(int(missing_count * 4), **model_sample_args)
+            sample_data = self.model.sample(
+                max(int(missing_count * multiply_factor), batch_size), **model_sample_args
+            )
+            # TODO table separated parallel process
             for d in self.data_processors:
                 sample_data = d.reverse_convert(sample_data)
             sample_data = sample_data.dropna(how="all")
             sample_data_list.append(sample_data)
             missing_count = missing_count - len(sample_data)
+            psb.update(len(sample_data))
             max_trails -= 1
 
         return pd.concat(sample_data_list)[:count]

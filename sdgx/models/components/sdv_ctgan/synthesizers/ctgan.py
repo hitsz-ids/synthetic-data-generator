@@ -21,7 +21,7 @@ from torch.nn import (
 from sdgx.models.components.sdv_ctgan.data_sampler import DataSampler
 from sdgx.models.components.sdv_ctgan.data_transformer import DataTransformer
 from sdgx.models.components.sdv_ctgan.synthesizers.base import (
-    BaseSynthesizer,
+    BatchedSynthesizer,
     random_state,
 )
 
@@ -108,7 +108,7 @@ class Generator(Module):
         return data
 
 
-class CTGAN(BaseSynthesizer):
+class CTGAN(BatchedSynthesizer):
     """Conditional Table GAN Synthesizer.
 
     This is the core class of the CTGAN project, where the different components
@@ -173,6 +173,7 @@ class CTGAN(BaseSynthesizer):
         cuda=True,
     ):
         assert batch_size % 2 == 0
+        super().__init__(batch_size)
 
         self._embedding_dim = embedding_dim
         self._generator_dim = generator_dim
@@ -183,7 +184,6 @@ class CTGAN(BaseSynthesizer):
         self._discriminator_lr = discriminator_lr
         self._discriminator_decay = discriminator_decay
 
-        self._batch_size = batch_size
         self._discriminator_steps = discriminator_steps
         self._log_frequency = log_frequency
         self._verbose = verbose
@@ -263,7 +263,7 @@ class CTGAN(BaseSynthesizer):
         for column_info in self._transformer.output_info_list:
             for span_info in column_info:
                 if len(column_info) != 1 or span_info.activation_fn != "softmax":
-                    # not discrete column
+                    # not onehot column
                     st += span_info.dim
                 else:
                     ed = st + span_info.dim

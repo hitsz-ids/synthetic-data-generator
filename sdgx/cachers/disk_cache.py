@@ -1,9 +1,8 @@
 from __future__ import annotations
 
 import shutil
-from functools import lru_cache
 from pathlib import Path
-from typing import Generator
+from typing import Generator, List
 
 import pandas as pd
 
@@ -108,19 +107,23 @@ class DiskCache(Cacher):
         data = data_connector.read(offset=offset, limit=limit)
         if data is None:
             return data
+
+        data_list: List[pd.DataFrame] = [data]
         while len(data) < limit:
             # When generator size is less than blocksize
             # Continue to read until fit the limit
             next_data = data_connector.read(offset=offset + len(data), limit=limit - len(data))
             if next_data is None or len(next_data) == 0:
                 break
-            data = pd.concat(
-                [
-                    data,
-                    next_data,
-                ],
+            data_list.append(next_data)
+        data = (
+            pd.concat(
+                data_list,
                 ignore_index=True,
             )
+            if len(data_list) > 1
+            else data
+        )
 
         self._refresh(offset, data)
         if len(data) < chunksize:
