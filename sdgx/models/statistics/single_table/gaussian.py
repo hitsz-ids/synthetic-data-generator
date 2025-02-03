@@ -1,6 +1,6 @@
 """
-    GaussianMultivariate module.
-    需要对 copulas 的代码进行修改 + 性能优化
+GaussianMultivariate module.
+需要对 copulas 的代码进行修改 + 性能优化
 """
 
 import logging
