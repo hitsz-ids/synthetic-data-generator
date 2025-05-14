@@ -1,7 +1,9 @@
+import pandas as pd
+
 from sdgx.exceptions import SynthesizerInitError
 from sdgx.models.base import SynthesizerModel
 from sdgx.utils import logger
-import pandas as pd
+
 
 class LLMBaseModel(SynthesizerModel):
     """
@@ -87,7 +89,7 @@ class LLMBaseModel(SynthesizerModel):
             raise SynthesizerInitError("Duplicate data access type found.")
 
     def _form_columns_description(self):
-        
+
         df = self.raw_data  # 确保 self.raw_data 是一个 pandas.DataFrame
         desc_lines = []
 
@@ -96,17 +98,23 @@ class LLMBaseModel(SynthesizerModel):
             dtype = series.dtype
 
             if pd.api.types.is_numeric_dtype(dtype):
-                line = (f'Column "{col}": type {dtype}, '
-                        f'min {series.min()}, max {series.max()}, '
-                        f'mean {series.mean():.2f}, std {series.std():.2f}.')
+                line = (
+                    f'Column "{col}": type {dtype}, '
+                    f"min {series.min()}, max {series.max()}, "
+                    f"mean {series.mean():.2f}, std {series.std():.2f}."
+                )
             elif pd.api.types.is_datetime64_any_dtype(dtype):
-                line = (f'Column "{col}": type datetime, '
-                        f'from {series.min().strftime("%Y-%m-%d")}, '
-                        f'to {series.max().strftime("%Y-%m-%d")}.')
+                line = (
+                    f'Column "{col}": type datetime, '
+                    f'from {series.min().strftime("%Y-%m-%d")}, '
+                    f'to {series.max().strftime("%Y-%m-%d")}.'
+                )
             elif pd.api.types.is_categorical_dtype(series) or series.nunique() < 20:
                 values = series.unique()
-                line = (f'Column "{col}": type category, '
-                        f'{len(values)} categories: {list(values[:5])}{"..." if len(values) > 5 else ""}.')
+                line = (
+                    f'Column "{col}": type category, '
+                    f'{len(values)} categories: {list(values[:5])}{"..." if len(values) > 5 else ""}.'
+                )
             else:
                 line = f'Column "{col}": type {dtype}.'
 
