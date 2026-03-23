@@ -66,7 +66,7 @@ Our current key achievements and timelines are as follows:
 
 For a long time, LLM has been used to understand and generate various types of data. In fact, LLM also has certain capabilities in tabular data generation. Also, it has some abilities that cannot be achieved by traditional (based on GAN methods or statistical methods) .
 
-Our `sdgx.models.LLM.single_table.gpt.SingleTableGPTModel` implements two new features:
+Our `sdgx.models.LLM.single_table.gpt.SingleTableGPTModel` and `sdgx.models.LLM.single_table.minimax.SingleTableMiniMaxModel` implement two new features:
 
 ### Synthetic data generation without Data
 
@@ -79,6 +79,32 @@ No training data is required, synthetic data can be generated based on metadata 
 Infer new column data based on the existing data in the table and the knowledge mastered by LLM, view in our <a href="https://colab.research.google.com/drive/1_chuTVZECpj5fklj-RAp7ZVrew8weLW_?usp=sharing" target="value"> colab example</a>.
 
 ![Off-Table feature inference](assets/LLM_Case_2.gif)
+
+### MiniMax LLM Support
+
+In addition to OpenAI GPT, SDG also supports [MiniMax](https://platform.minimax.io) as an LLM provider for synthetic data generation. MiniMax provides an OpenAI-compatible API with competitive pricing and strong performance.
+
+**Supported Models:**
+
+| Model                    | Description                                           |
+| ------------------------ | ----------------------------------------------------- |
+| `MiniMax-M2.7`           | Peak Performance. Ultimate Value. Master the Complex. |
+| `MiniMax-M2.7-highspeed` | Same performance, faster and more agile.              |
+
+**Quick Start:**
+
+```python
+import os
+os.environ["MINIMAX_API_KEY"] = "your-minimax-api-key"
+
+from sdgx.models.LLM.single_table.minimax import SingleTableMiniMaxModel
+
+model = SingleTableMiniMaxModel()
+model.fit(raw_data)
+synthetic_data = model.sample(100)
+```
+
+For more information, see the [MiniMax API Documentation](https://platform.minimax.io/docs/api-reference/text-openai-api).
 
 ## 💫 Why SDG ?
 
