@@ -85,10 +85,11 @@ Infer new column data based on the existing data in the table and the knowledge 
 In addition to OpenAI GPT, SDG also supports [MiniMax](https://platform.minimax.io) as an LLM provider for synthetic data generation. MiniMax provides an OpenAI-compatible API with competitive pricing and strong performance.
 
 **Supported Models:**
-| Model | Description |
-|-------|-------------|
-| `MiniMax-M2.7` | Peak Performance. Ultimate Value. Master the Complex. |
-| `MiniMax-M2.7-highspeed` | Same performance, faster and more agile. |
+
+| Model                    | Description                                           |
+| ------------------------ | ----------------------------------------------------- |
+| `MiniMax-M2.7`           | Peak Performance. Ultimate Value. Master the Complex. |
+| `MiniMax-M2.7-highspeed` | Same performance, faster and more agile.              |
 
 **Quick Start:**
 

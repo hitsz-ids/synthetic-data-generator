@@ -150,9 +150,7 @@ relationship is Husband, fnlwgt is 145441, educational-num is 9, education is HS
 income is <=50K, gender is Male, education is Assoc-acdm, native-country is ?, educational-num is 12, hours-per-week is 7, occupation is Prof-specialty, capital-gain is 0, capital-loss is 0, fnlwgt is 154164, race is White, workclass is Private, age is 66, relationship is Not-in-family, marital-status is Never-married
 """
 
-    def test_extract_samples(
-        self, minimax_model: SingleTableMiniMaxModel, raw_data: pd.DataFrame
-    ):
+    def test_extract_samples(self, minimax_model: SingleTableMiniMaxModel, raw_data: pd.DataFrame):
         minimax_model.fit(raw_data)
         features = minimax_model.extract_samples_from_response(self.minimax_response)
         assert isinstance(features, list)
