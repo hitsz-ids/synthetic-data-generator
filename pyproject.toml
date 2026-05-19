@@ -40,6 +40,7 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
+litellm = ["litellm>=1.80.0,<1.87"]
 test = ["pytest", "pytest-cov", "coverage<7", "email_validator"]
 docs = [
     "Sphinx",
