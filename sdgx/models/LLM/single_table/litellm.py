@@ -97,9 +97,7 @@ class SingleTableLiteLLMModel(LLMBaseModel):
         if self.api_base:
             kwargs["api_base"] = self.api_base
 
-        logger.info(
-            f"Ask LiteLLM ({kwargs['model']}) with temperature = {self.temperature}."
-        )
+        logger.info(f"Ask LiteLLM ({kwargs['model']}) with temperature = {self.temperature}.")
         response = litellm.completion(**kwargs)
         logger.info("Ask LiteLLM Finished.")
 
