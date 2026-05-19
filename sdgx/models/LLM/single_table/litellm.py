@@ -190,7 +190,9 @@ class SingleTableLiteLLMModel(LLMBaseModel):
             + str(each_cnt)
         )
 
-    def sample(self, count, *args, **kwargs):
+    def sample(self, count=50, dataset_desp="", *args, **kwargs):
+        if dataset_desp:
+            self.dataset_description = dataset_desp
         logger.info(f"Generating {count} samples using LiteLLM...")
 
         total_asked = 0
