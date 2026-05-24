@@ -14,7 +14,7 @@ Use SDG as a library allow researchers or developers to build their own project
 based on SDG. It's highly recommended to use SDG as a library if people have some
 basic programming experience.
 
-All avaliable built-in conponents are listed in :ref:`API Reference <api_reference>`.
+All available built-in conponents are listed in :ref:`API Reference <api_reference>`.
 You can also extend SDG with your own components, see :ref:`Developer guides for extension <Extented Synthetic Data Generator>` for more details.
 
 
@@ -22,7 +22,7 @@ Use :ref:`Data Connector <DataConnector>` to connect data resources.
 ---------------------------------------------------------------------------------
 
 ``Data Connector`` provide a unified interface to read data from different formats or
-data sources. Avaliable data connectors are listed in :ref:`Built-in Data Connectors <Built-in DataConnector>`.
+data sources. Available data connectors are listed in :ref:`Built-in Data Connectors <Built-in DataConnector>`.
 
 .. code-block:: python
 
