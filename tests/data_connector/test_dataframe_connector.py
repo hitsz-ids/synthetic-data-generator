@@ -19,6 +19,9 @@ def test_dataframe_connector(data_for_test):
     assert_frame_equal(c._read(offset=2), df[2:])
     assert c._read(offset=3) is None
 
+    assert_frame_equal(c.read(limit=0), df.iloc[:0])
+    assert_frame_equal(c.read(offset=1, limit=0), df.iloc[1:1])
+
     assert_frame_equal(c._read(offset=0), df)
     assert c._read(offset=5555) is None
 

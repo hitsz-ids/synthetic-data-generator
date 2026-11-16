@@ -41,7 +41,7 @@ class DataFrameConnector(DataConnector):
         length = self.df.shape[0]
         if offset >= length:
             return None
-        limit = limit or length
+        limit = length if limit is None else limit
         return self.df.iloc[offset : min(offset + limit, length)]
 
     def _columns(self) -> list[str]:
