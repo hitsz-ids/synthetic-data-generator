@@ -38,10 +38,13 @@ class DataFrameConnector(DataConnector):
         self.df: pd.DataFrame = df
 
     def _read(self, offset: int = 0, limit: int | None = None) -> pd.DataFrame | None:
+        if limit == 0:
+            return self.df.iloc[:0]
         length = self.df.shape[0]
         if offset >= length:
             return None
-        limit = limit or length
+        if limit is None:
+            limit = length
         return self.df.iloc[offset : min(offset + limit, length)]
 
     def _columns(self) -> list[str]:
